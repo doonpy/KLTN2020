@@ -1,0 +1,53 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+
+</title><meta name="robots" content="noindex,nofollow" /><script src="/bundles/jquery?v=UL4dLmuOu-n1TIK5u0QIw6uwTZ7rTpIhnF7c9JzCKtQ1"></script>
+</head>
+<body>
+    <form method="post" action="./ClickBanner.aspx?id=271" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="wGE/0HpSKJb8k/PmHRrPX5qcCIxTGaShIwGAx+p1iGLbFqg0ilAPQHuh9aseuN/774mDUyuVzcTxgQI1H7/7V4SaBfg=" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="8BDEA3BC" />
+    <label>Đang chuyển đến địa chỉ: </label><label id="lblink">https://nhadat24h.net/ban-can-ho-chung-cu-tai-the-terra-an-hung-quan-ha-dong-s1400833/</label>
+    <br />
+    <script type="text/javascript">
+
+        function isValidURL(url) {
+            var encodedURL = encodeURIComponent(url);
+            var isValid = false;
+
+            $.ajax({
+                url: "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22" + encodedURL + "%22&format=json",
+                type: "get",
+                async: false,
+                dataType: "json",
+                success: function (data) {
+                    isValid = data.query.results != null;
+                },
+                error: function () {
+                    isValid = false;
+                }
+            });
+
+            return true;
+        }
+        //alert(isValid);
+        document.write("Trang web sẽ được tự động chuyển đi trong vòng 02 giây");
+        function Redirect() {
+            var isValid = isValidURL(document.getElementById("lblink").innerText);
+            if (isValid) {
+                window.location = document.getElementById("lblink").innerText;
+            }
+            else {
+                document.write("Địa chỉ này không tồn tại hoặc đã bị xóa");
+            }
+        }
+        setTimeout('Redirect()', 2000);
+        </script>
+    </form>
+</body>
+</html>

@@ -1,0 +1,1531 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link rel="icon" href="http://www.diaoconline.vn/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="http://www.diaoconline.vn/favicon.ico" type="image/x-icon">
+    <title>Mách bạn - Nhà đất, Bất động sản, Địa ốc - DiaOcOnline</title>
+    <meta name="description" content="M&#225;ch bạn - Nh&#224; đất, Bất động sản, Địa ốc" />
+    <meta name="keywords" content="" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link href="/Content/css/reset.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/css/general.css?2242" rel="stylesheet" type="text/css" />
+    <!--[if IE 7]>
+    <link href="css/ie7.css" rel="stylesheet" type="text/css" />
+    <![endif]-->
+    <link href="/Content/css/Discovery.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/js/slides/slides.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/js/tooltip/tools.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/css/uniform.default.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/css/doolv3.css" rel="stylesheet" type="text/css" />
+    <script src="/Content/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-64913293-1', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+	<script>
+	function _gaLt(event){
+    var el = event.srcElement || event.target;
+
+    /* Loop up the DOM tree through parent elements if clicked element is not a link (eg: an image inside a link) */
+    while(el && (typeof el.tagName == 'undefined' || el.tagName.toLowerCase() != 'a' || !el.href)){
+        el = el.parentNode;
+    }
+
+    if(el && el.href){
+        /* link */
+        var link = el.href;
+        if(link.indexOf(location.host) == -1 && !link.match(/^javascript\:/i)){ /* external link */
+            /* HitCallback function to either open link in either same or new window */
+            var hitBack = function(link, target){
+                target ? window.open(link, target) : window.location.href = link;
+            };
+            /* Is target set and not _(self|parent|top)? */
+            var target = (el.target && !el.target.match(/^_(self|parent|top)$/i)) ? el.target : false;
+            /* send event with callback */
+            ga(
+                "send", "event", "Outgoing Links", link,
+                document.location.pathname + document.location.search,
+                {"hitCallback": hitBack(link, target)}
+            );
+
+            /* Prevent standard click */
+            event.preventDefault ? event.preventDefault() : event.returnValue = !1;
+        }
+
+    }
+}
+
+/* Attach the event to all clicks in the document after page has loaded */
+var w = window;
+w.addEventListener ? w.addEventListener("load",function(){document.body.addEventListener("click",_gaLt,!1)},!1)
+ : w.attachEvent && w.attachEvent("onload",function(){document.body.attachEvent("onclick",_gaLt)});
+	
+	</script>
+	
+  <a href="https://plus.google.com/110717481866490919957" rel="publisher"></a>
+  <meta property="article:author" content="https://www.facebook.com/diaoconlinefc" />
+  <!-- Facebook Pixel Code -->
+	<!--<script>
+	!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+	n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+	n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+	t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+	document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+	fbq('init', '1011870945534074');
+	fbq('track', "PageView");</script>
+	<noscript><img height="1" width="1" style="display:none"
+	src="https://www.facebook.com/tr?id=1011870945534074&ev=PageView&noscript=1"
+	/></noscript>-->
+	<!-- End Facebook Pixel Code -->
+<script src="/Content/js/js.cookie.js" type="text/javascript"></script>
+<script>
+
+    $(document).ready(function () {
+        function detectmob() {
+            var isMobile = false; //initiate as false
+            // device detection
+            if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
+        || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4))) isMobile = true;
+            return isMobile;
+        }
+        function detectResolution() {
+            if ((screen.width < 1024) && (screen.height < 768)) {
+                return true;
+            }
+            return false;
+        }
+
+        var cokName = 'IsReMob';
+        var isMobileCookie = Cookies.get(cokName);
+        var isRedirectMobile = true;
+
+        if (detectmob() || detectResolution()) {
+            if ($(location).attr('search') == '?type=desktop') {
+                Cookies.set(cokName, '0', { expires: 1 });
+            } else {
+                if (!isMobileCookie || isMobileCookie == 1) {
+                    Cookies.set(cokName, '1', { expires: 1 });
+                    //alert('mobile');
+                    //alert(window.location.href);
+                    window.location = window.location.href.replace('www.diaoconline.vn', 'diaoconline.vn').replace('diaoconline.vn', 'm.diaoconline.vn');
+                }
+            }
+        }
+
+    });
+    
+</script>
+
+</head>
+<body>
+<a href="#0" class="cd-top">Top</a>
+<div id="container">
+<style type="text/css">
+
+	#b_left {
+    	position: absolute;
+        top: 78px;
+        z-index:50 !important;
+		width:100px;
+	}
+	#b_right {
+    	position: absolute;
+        top: 78px;
+        z-index:50 !important;
+		width:100px;
+	}
+</style>
+    <div id="b_left" style="left:90px">
+
+
+
+<div id="position_64" class =''><div><a href="http://diaoconline.vn/quangcao/1032/64" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2018/03/30/437-100x300_Q7.gif" width="100px" height="300px"/></a></div><div><a href="http://diaoconline.vn/quangcao/1100/64" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2019/05/21/EDF-Nhapho-Q12.gif" width="100px" height="300px"/></a></div><div><a href="http://diaoconline.vn/quangcao/1098/64" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2019/05/21/FDC-Datnen-BinhDuong.gif" width="100px" height="300px"/></a></div></div><script type='text/javascript'>var Banner64=1;function Random_Banner64(){    var _Arr=document.getElementById("position_64").getElementsByTagName("div");    for (i=0; i<=_Arr.length-1; i++)    {        _Arr[i].className='bannerHide';    }    _Arr[Banner64 - 1].className='bannerShow';    var tempBanner = $(_Arr[Banner64 - 1]).html(); $(_Arr[Banner64 - 1]).html(''); $(_Arr[Banner64 - 1]).html(tempBanner);    window.setTimeout("Random_Banner64()" ,25000);    Banner64 = Banner64 + 1;    if(Banner64 > _Arr.length)        Banner64 = 1;}Random_Banner64();</script>
+
+
+
+
+
+
+    </div>
+    <div id="b_right" style="right:90px">
+
+
+
+<div id="position_66" class =''><div><a href="http://diaoconline.vn/quangcao/1099/66" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2019/05/21/753-Datnen-BinhChanh.gif" width="100px" height="300px"/></a></div><div><a href="http://diaoconline.vn/quangcao/1097/66" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2019/05/21/926-Nhapho-ThuDuc.gif" width="100px" height="300px"/></a></div></div><script type='text/javascript'>var Banner66=1;function Random_Banner66(){    var _Arr=document.getElementById("position_66").getElementsByTagName("div");    for (i=0; i<=_Arr.length-1; i++)    {        _Arr[i].className='bannerHide';    }    _Arr[Banner66 - 1].className='bannerShow';    var tempBanner = $(_Arr[Banner66 - 1]).html(); $(_Arr[Banner66 - 1]).html(''); $(_Arr[Banner66 - 1]).html(tempBanner);    window.setTimeout("Random_Banner66()" ,25000);    Banner66 = Banner66 + 1;    if(Banner66 > _Arr.length)        Banner66 = 1;}Random_Banner66();</script>
+
+
+
+
+
+
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            WindowResize();
+            $(window).resize(function () {
+                WindowResize();
+            });
+        });
+        function WindowResize() {
+            var bannerLeft = $("#b_left");
+            var bannerRight = $("#b_right");
+            var widthWindow = $(window).width();
+            if (widthWindow < 1200) {
+                bannerLeft.css("display", "none");
+                bannerRight.css("display", "none");
+            } else {
+                bannerLeft.css("display", "");
+                bannerLeft.css("right", (widthWindow / 2 + 485) + "px");
+                bannerRight.css("display", "");
+                bannerRight.css("right", (widthWindow - (widthWindow / 2 + 585)) + "px");
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            $('#b_left').scrollToFixed();
+            $('#b_right').scrollToFixed();
+        });
+        
+</script>
+    <div id="header" class="margin_bottom">
+        <div id="head_content" class="wrap">
+            <span id="logo"><a href="/" title="Về trang chủ DiaOcOnline.vn">Địa Ốc Online</a></span>
+            <div id="head_nav">
+                <ul>
+                    <li id="news_item" ><a href="/tin-tuc">
+                        THÔNG TIN ĐỊA ỐC</a>
+                        <div class="sub_menu">
+                            <div class="wrap">
+                                <div class="col_178">
+                                    <div class="left_menu">
+                                        <ul>
+                                                <li><a href="/tin-tuc/thi-truong-dia-oc-c18">Thị trường địa ốc</a>
+                                                </li>
+                                                <li><a href="/tin-tuc/hoat-dong-doanh-nghiep-c23">Hoạt động Doanh nghiệp</a>
+                                                </li>
+                                                <li><a href="/tin-tuc/chinh-sach-quy-hoach-c16">Chính sách - Quy hoạch</a>
+                                                </li>
+                                                <li><a href="/tin-tuc/tai-chinh-chung-khoan-c57">Tài chính - Chứng khoán</a>
+                                                </li>
+                                                <li><a href="/tin-tuc/xay-dung-c25">Xây dựng</a>
+                                                </li>
+                                                <li><a href="/tin-tuc/bat-dong-san-the-gioi-c24">Bất động sản thế giới</a>
+                                                </li>
+                                                <li><a href="/tin-tuc/ngoai-kieu-viet-kieu-c17">Ngoại kiều - Việt kiều</a>
+                                                </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col_463">
+                                    <div class="info">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    THÔNG TIN MỚI NHẤT</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner rounded_style_7 rounded_box">
+                                                <div class="content">
+                                                    <div class="img">
+                                                        <a href="/tin-tuc/chinh-sach-quy-hoach-c16/ha-noi-phai-xu-ly-dut-diem-cac-chu-dau-tu-du-an-chung-cu-co-sai-pham-i79343">
+                                                            <img src="http://image.diaoconline.vn/tin-tuc/2019/09/26/thumb-176-ha-noi-phai-xu-ly-dut-diem-cac-chu-dau-tu-du-an-chung-cu-co-sai-pham.jpg" width="200" height="154" alt="H&#224; Nội: Phải xử l&#253; dứt điểm c&#225;c chủ đầu tư dự &#225;n chung cư c&#243; sai phạm" title="H&#224; Nội: Phải xử l&#253; dứt điểm c&#225;c chủ đầu tư dự &#225;n chung cư c&#243; sai phạm"/>
+                                                        </a>
+                                                    </div>
+                                                    <div class="right">
+                                                        <h2>
+                                                            <a href="/tin-tuc/chinh-sach-quy-hoach-c16/ha-noi-phai-xu-ly-dut-diem-cac-chu-dau-tu-du-an-chung-cu-co-sai-pham-i79343">Hà Nội: Phải xử lý dứt điểm các chủ đầu tư dự án chung cư có sai phạm</a></h2>
+                                                        <span class="updated_date">7 giờ 12 ph&#250;t trước</span>
+                                                        <br />
+                                                        <p>Giám đốc Sở Xây dựng Hà Nội Lê Văn Dục nhấn mạnh, thành phố kiên quyết xử lý nghiêm, dứt điểm các vi phạm trong quản lý, vận hành, sử dụng nhà chung cư, kể cả xử lý hình sự nếu hành vi sai phạm ảnh hưởng nghiêm trọng đến tính mạng, quyền lợi của dân...</p>
+                                                    </div>
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col_290 margin_left">
+                                    <div class="latest">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    THÔNG TIN MỚI CẬP NHẬT</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner">
+                                            <ul>
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/chinh-sach-quy-hoach-c16/du-an-san-bay-long-thanh-duoc-bo-tri-11490-ti-dong-chi-moi-tieu-duoc-300-ti-dong-i79342" title="Dự &#225;n S&#226;n bay Long Th&#224;nh được bố tr&#237; 11.490 tỉ đồng, chỉ mới ti&#234;u được 300 tỉ đồng">
+                                                        Dự án Sân bay Long Thành được bố trí  ...
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/thi-truong-dia-oc-c18/tphcm-nguon-thu-tu-bat-dong-san-giam-do-vuong-rung-luat-i79338" title="TPHCM: Nguồn thu từ bất động sản giảm do vướng &quot;rừng luật&quot;">
+                                                        TPHCM: Nguồn thu từ bất động sản giảm  ...
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/thi-truong-dia-oc-c18/dong-nai-chuan-bi-quy-dat-phat-trien-hon-20000-can-nha-xa-hoi-i79341" title="Đồng Nai chuẩn bị quỹ đất ph&#225;t triển hơn 20.000 căn nh&#224; x&#227; hội">
+                                                        Đồng Nai chuẩn bị quỹ đất phát triển  ...
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/chinh-sach-quy-hoach-c16/tuong-lai-cua-sieu-du-an-khu-nam-i79340" title="Tương lai của si&#234;u dự &#225;n khu Nam">
+                                                        Tương lai của siêu dự án khu Nam
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/thi-truong-dia-oc-c18/nha-1-ty-dong-mat-tich-sa-lay-vi-doi-von-i79339" title="Nh&#224; 1 tỷ đồng ‘mất t&#237;ch’, sa lầy v&#236; đ&#243;i vốn">
+                                                        Nhà 1 tỷ đồng ‘mất tích’, sa lầy vì đói  ...
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/chinh-sach-quy-hoach-c16/tp-hue-se-duoc-mo-rong-gap-5-lan-i79337" title="TP Huế sẽ được mở rộng gấp 5 lần">
+                                                        TP Huế sẽ được mở rộng gấp 5 lần
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/chinh-sach-quy-hoach-c16/gs-dang-hung-vo-so-luong-luat-o-viet-nam-con-nhieu-hon-cua-trung-quoc-i79330" title="GS Đặng H&#249;ng V&#245;: &quot;Số lượng luật ở Việt Nam c&#242;n nhiều hơn của Trung Quốc&quot;">
+                                                        GS Đặng Hùng Võ: "Số lượng luật ở Việt  ...
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/chinh-sach-quy-hoach-c16/du-an-sai-gon-safari-bi-cat-chuc-nang-nha-o-nghi-duong-i79336" title="Dự &#225;n S&#224;i G&#242;n Safari bị &#39;cắt&#39; chức năng nh&#224; ở, nghỉ dưỡng">
+                                                        Dự án Sài Gòn Safari bị 'cắt' chức năng  ...
+                                                    </a></li> 
+                                                    <li><span class="bullet"></span><a href="/tin-tuc/chinh-sach-quy-hoach-c16/vuong-vai-met-dat-hon-hop-tram-du-an-dung-im-chiu-tran-i79335" title="Vướng v&#224;i m&#233;t đất hỗn hợp, trăm dự &#225;n đứng im chịu trận">
+                                                        Vướng vài mét đất hỗn hợp, trăm dự án  ...
+                                                    </a></li> 
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li id="real_market_item" ><a href="/sieu-thi">
+                        SIÊU THỊ ĐỊA ỐC</a>
+                        <div class="sub_menu">
+                            <div class="wrap">
+                                <div class="col_178">
+                                    <div class="left_menu">
+                                        <ul>
+                                                <li><a href="/sieu-thi/nha-pho-c20">Nhà phố</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/villa-biet-thu-c1">Villa - Biệt thự</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/can-ho-chung-cu-c8">Căn hộ chung cư</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/dat-o-dat-tho-cu-c11">Đất ở - Đất thổ cư</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/dat-du-an-quy-hoach-c12">Đất dự án - Quy hoạch</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/van-phong-c9">Văn phòng</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/mat-bang-cua-hang-c15">Mặt bằng - Cửa hàng</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/nha-hang-khach-san-c17">Nhà hàng - Khách sạn</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/nha-kho-xuong-c19">Nhà Kho - Xưởng</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/khach-san-nha-pho-c25">Khách Sạn - Nhà Phố</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/can-ho-dich-vu-c26">Căn hộ dich vụ</a>
+                                                </li>
+                                                <li><a href="/sieu-thi/dat-vuon-c27">Đất vườn</a>
+                                                </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col_463">
+                                    <div class="info">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    TÀI SẢN NỔI BẬT</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner rounded_style_7 rounded_box">
+                                            <div class="content">
+                                                    <div class="real_block">
+                                                        <a href="/ban-nha-pho-c20/can-ban-moi-xay-tuyet-dep-phong-cach-cha-au-dt-4x20-duc-4-tam-5-pn-gia-375-ty-i998536">
+                                                            <img src="http://image.diaoconline.vn/sieu-thi/2015/03/27/thumb-6EF-5ABA2E.jpg" width="140" height="140"  alt="Cần b&#225;n  mới x&#226;y tuyệt đẹp phong c&#225;ch ch&#226; &#226;u DT  4x20 đ&#250;c 4 tấm 5 PN  gi&#225; 3,75 tỷ" title="Cần b&#225;n  mới x&#226;y tuyệt đẹp phong c&#225;ch ch&#226; &#226;u DT  4x20 đ&#250;c 4 tấm 5 PN  gi&#225; 3,75 tỷ"/></a>
+                                                        <h3>
+                                                            <a href="/ban-nha-pho-c20/can-ban-moi-xay-tuyet-dep-phong-cach-cha-au-dt-4x20-duc-4-tam-5-pn-gia-375-ty-i998536">
+                                                                Cần bán  mới xây tuyệt đẹp phong cách  ...
+                                                            </a>
+                                                        </h3>
+                                                    </div>
+                                                    <div class="real_block">
+                                                        <a href="/ban-nha-pho-c20/ban-nha-phan-huy-ich-phuong-12-moi-xay-2014-dt-4mx21m-duc-35-tam-4-pn-5wc-gia-28-ty-i1059045">
+                                                            <img src="http://image.diaoconline.vn/sieu-thi/nha-pho.jpg" width="140" height="140"  alt="B&#225;n nh&#224; Phan Huy &#205;ch, Phường 12 mới x&#226;y 2014 DT: 4mx21m đ&#250;c 3,5 tấm 4 PN, 5WC g&#237;a 2,8 tỷ" title="B&#225;n nh&#224; Phan Huy &#205;ch, Phường 12 mới x&#226;y 2014 DT: 4mx21m đ&#250;c 3,5 tấm 4 PN, 5WC g&#237;a 2,8 tỷ"/></a>
+                                                        <h3>
+                                                            <a href="/ban-nha-pho-c20/ban-nha-phan-huy-ich-phuong-12-moi-xay-2014-dt-4mx21m-duc-35-tam-4-pn-5wc-gia-28-ty-i1059045">
+                                                                Bán nhà Phan Huy Ích, Phường 12 mới xây  ...
+                                                            </a>
+                                                        </h3>
+                                                    </div>
+                                                    <div class="real_block last">
+                                                        <a href="/ban-nha-pho-c20/ban-nha-xay-moi-nguyen-van-luong-phuong-10-dt-55mx15m-duc-35-tam-4-pn-4-wc-gia-28-ty-i1005474">
+                                                            <img src="http://image.diaoconline.vn/sieu-thi/2015/04/12/thumb-A36-1CCBEF.jpg" width="140" height="140"  alt="b&#225;n nh&#224; x&#226;y mới Nguyễn Văn Lượng, Phường 10, DT: 5,5mx15m đ&#250;c 3,5 tấm 4 PN, 4 WC gi&#225; 2,8 tỷ" title="b&#225;n nh&#224; x&#226;y mới Nguyễn Văn Lượng, Phường 10, DT: 5,5mx15m đ&#250;c 3,5 tấm 4 PN, 4 WC gi&#225; 2,8 tỷ"/></a>
+                                                        <h3>
+                                                            <a href="/ban-nha-pho-c20/ban-nha-xay-moi-nguyen-van-luong-phuong-10-dt-55mx15m-duc-35-tam-4-pn-4-wc-gia-28-ty-i1005474">
+                                                                bán nhà xây mới Nguyễn Văn Lượng,  ...
+                                                            </a>
+                                                        </h3>
+                                                    </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col_290 margin_left">
+                                    <div class="latest">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    CÁC TÀI SẢN MỚI ĐĂNG</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner">
+                                            <ul>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/can-ban-gap-can-nha-duong-ha-huy-giap-gan-cau-an-loc-giap-quan-go-vap-dt-4mx16m-duc-2-lau-i1004999" title="Cần b&#225;n gấp căn nh&#224; đường H&#224; Huy Gi&#225;p gần cầu An Lộc gi&#225;p qu&#226;n G&#242; Vấp, DT: 4mx16m đ&#250;c 2 lầu">
+                                                        <span>TP.HCM: </span>
+                                                        Cần bán gấp căn nhà đường Hà  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-mat-bang-cua-hang-c15/cho-thue-mt-duong-le-thi-hong-p17-dt4mx19m-2-lau-4pn-tien-moi-van-phong-ct-i1287948" title="Cho thu&#234; MT đường l&#234; thị hồng P17 DT4mx19m 2 lầu 4PN tiện mởi văn ph&#242;ng CT">
+                                                        <span>TP.HCM: </span>
+                                                        Cho thuê MT đường lê thị hồng  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/mt-pham-van-chieu-p9-dt-8mx25m-cap-4-sh-chinh-chu-gia-82-ty-i1143229" title="MT phạm văn chi&#234;u p9 DT 8mx25m cấp 4 SH ch&#237;nh chủ gi&#225; 8,2 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        MT phạm văn chiêu p9 DT  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/can-ban-nha-moi-sang-trong-hxh-duong-thong-nhat-p11-dt-4mx17m-duc-35-tam-5pn-gia-285-ty-i1240894" title="Cần b&#225;n nh&#224; mới sang trọng HXH đường Thống Nhất, P.11, DT: 4mx17m, đ&#250;c 3,5 tấm, 5PN gi&#225; 2,85 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        Cần bán nhà mới sang trọng  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/can-ban-gap-mat-tien-duong-thong-nhat-phuong-11dt-5mx30m-cap-4-con-dep-gia-52-ty-i1059508" title="Cần b&#225;n gấp mặt tiền đường Thống Nhất, Phường 11,DT: 5mx30m cấp 4 c&#242;n đẹp, gi&#225; 5,2 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        Cần bán gấp mặt tiền đường  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/chuyen-cong-tac-can-ban-gap-can-nha-moi-duong-le-van-khuong-dt-4mx14m-duc-1-lau-gia-115-ty-i1057657" title="Chuyển c&#244;ng t&#225;c cần b&#225;n gấp căn nh&#224; mới đường L&#234; Văn Khương DT: 4mx14m đ&#250;c 1 lầu gi&#225; 1,15 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        Chuyển công tác cần bán gấp  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/ban-muon-so-huu-mot-can-nha-dep-gia-re-hay-goi-cho-chung-toi-dt-4mx19m-duc-3-tam-4pn-gia-175-ty-i1059603" title="Bạn muốn sở hữu một căn nh&#224; đẹp gi&#225; rẻ h&#227;y gọi cho ch&#250;ng t&#244;i DT: 4mx19m, đ&#250;c 3 tấm, 4PN gi&#225; 1,75 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        Bạn muốn sở hữu một căn nhà  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/ban-nha-moi-xay-duong-quang-trung-p8-go-vap-duc-3-tam-ruoi-gia-22-ty-i1059666" title="B&#225;n nh&#224; mới x&#226;y đường Quang Trung, P.8, G&#242; Vấp, Đ&#250;c 3 tấm rưỡi, gi&#225;: 2,2 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        Bán nhà mới xây đường Quang  ...</a> </li>
+                                                    <li><span class="bullet"></span><a href="/ban-nha-pho-c20/ban-nha-duong-thong-nhat-p11-vao-70m-dt-4mx15m-duc-kien-co-4-tam-4pn-5wc-gia-26-ty-i1059049" title="B&#225;n nh&#224; đường thống nhất P.11 v&#224;o 70m DT: 4mx15m đ&#250;c ki&#234;n cố 4 tấm 4PN 5WC gi&#225; 2,6 tỷ">
+                                                        <span>TP.HCM: </span>
+                                                        Bán nhà đường thống nhất P.11  ...</a> </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li id="project_item" ><a href="/du-an">
+                        DỰ ÁN</a>
+                        <div class="sub_menu">
+                            <div class="wrap">
+                                <div class="col_178">
+                                    <div class="left_menu">
+                                        <ul>
+                                                <li><a href="/du-an/khu-cong-nghiep-c11">Khu công nghiệp</a></li>
+                                                <li><a href="/du-an/khu-dan-cu-do-thi-moi-c24">Khu dân cư – Đô thị mới </a></li>
+                                                <li><a href="/du-an/khu-phuc-hop-thuong-mai-c25">Khu phức hợp - Thương mại</a></li>
+                                                <li><a href="/du-an/cao-oc-van-phong-c26">Cao ốc văn phòng</a></li>
+                                                <li><a href="/du-an/khu-du-lich-nghi-duong-c28">Khu du lịch - Nghỉ dưỡng</a></li>
+                                                <li><a href="/du-an/cong-trinh-cong-cong-c29">Công trình công cộng</a></li>
+                                                <li><a href="/du-an/khu-can-ho-c27">Khu căn hộ</a></li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col_463">
+                                    <div class="info">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    DỰ ÁN MỚI</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner rounded_style_7 rounded_box">
+                                                <div class="content">
+                                                    <div class="img">
+                                                        <a href="/du-an/khu-dan-cu-do-thi-moi-c24/du-an-dat-nen-sky-center-city-5-chon-thanh-binh-phuoc-i2339">
+                                                            <img src="http://image.diaoconline.vn/du-an/2019/05/29/thumb-84E-du-an-dat-nen-sky-center-city-5-chon-thanh-binh-phuoc.jpg" width="200" height="154" alt="Dự &#193;n Đất Nền Sky Center City 5 – Chơn Th&#224;nh, B&#236;nh Phước" title="Dự &#193;n Đất Nền Sky Center City 5 – Chơn Th&#224;nh, B&#236;nh Phước"/>
+                                                        </a>
+                                                    </div>
+                                                    <div class="right">
+                                                        <h2>
+                                                            <a href="/du-an/khu-dan-cu-do-thi-moi-c24/du-an-dat-nen-sky-center-city-5-chon-thanh-binh-phuoc-i2339">Dự Án Đất Nền Sky Center City 5 – Chơn Thành, Bình Phước</a></h2>
+                                                        <span class="updated_date">29/05/2019 03:09</span>
+                                                        <br />
+                                                        <p>Sky Center City 5 sở hữu vị trí đắc địa, tại mặt tiền đường Trần Quốc Toản, KP5, TT. Chơn Thành, huyện Chơn Thành, dự án nằm cách trục đường QL13 hướng từ Chơn Thành về TP.HCM khoảng 1km, cơ sở hạ tầng hoàn thiện, kết nối giao thông thông suốt bằng đường nhựa 7m</p>
+                                                    </div>
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col_290 margin_left">
+                                    <div class="latest">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    CÁC DỰ ÁN KHÁC</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner">
+                                            <ul>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-dan-cu-do-thi-moi-c24/khu-dan-cu-senturia-nam-sai-gon-huyen-binh-chanh-i2338" title="Khu d&#226;n cư Senturia Nam S&#224;i G&#242;n huyện B&#236;nh Ch&#225;nh">
+                                                        <span>TP.HCM: </span>
+                                                        Khu dân cư Senturia Nam Sài Gòn huyện  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-dan-cu-do-thi-moi-c24/dat-nen-rich-central-ba-ria-vung-tau-i2337" title="Đ&#226;́t n&#234;̀n Rich Central Bà Rịa – Vũng Tàu">
+                                                        <span>Bà Rịa - Vũng Tàu: </span>
+                                                        Đất nền Rich Central Bà Rịa – Vũng  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-dan-cu-do-thi-moi-c24/khu-do-thi-sinh-thai-dvilla-centa-long-an-i2336" title="Khu đ&#244; thị sinh th&#225;i D’Villa Centa Long An">
+                                                        <span>Long An: </span>
+                                                        Khu đô thị sinh thái D’Villa Centa Long  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-can-ho-c27/du-an-6th-element-ha-noi-i2335" title="Dự án 6th Element Hà N&#244;̣i">
+                                                        <span>Hà Nội: </span>
+                                                        Dự án 6th Element Hà Nội
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-can-ho-c27/toa-thap-can-ho-diamond-brilliant-quan-tan-phu-i2334" title="Tòa tháp căn h&#244;̣ Diamond Brilliant qu&#226;̣n T&#226;n Phú">
+                                                        <span>TP.HCM: </span>
+                                                        Tòa tháp căn hộ Diamond Brilliant  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-du-lich-nghi-duong-c28/khu-nghi-duong-malibu-mgm-hoi-an-resorts-villas-i2333" title="Khu nghỉ dưỡng Malibu MGM Hội An Resorts &amp; Villas">
+                                                        <span>Quảng Nam: </span>
+                                                        Khu nghỉ dưỡng Malibu MGM Hội An  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-dan-cu-do-thi-moi-c24/khu-do-thi-new-times-city-binh-duong-i2332" title="Khu đ&#244; thị New Times City B&#236;nh Dương">
+                                                        <span>Bình Dương: </span>
+                                                        Khu đô thị New Times City Bình Dương
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-can-ho-c27/dat-nam-luxury-i2331" title="Đất Nam Luxury">
+                                                        <span>TP.HCM: </span>
+                                                        Đất Nam Luxury
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/du-an/khu-du-lich-nghi-duong-c28/khu-nghi-duong-flc-quang-binh-beach-golf-resor-i2330" title="Khu nghỉ dưỡng FLC Quang Binh Beach &amp; Golf Resor">
+                                                        <span>Quảng Bình: </span>
+                                                        Khu nghỉ dưỡng FLC Quang Binh Beach &  ...
+                                                    </a></li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li ><a href="/doanh-nghiep">
+                        DOANH NGHIỆP</a></li>
+                    <li  class=actived ><a href="/kham-pha" >
+                        KHÁM PHÁ</a>
+                        <div class="sub_menu">
+                            <div class="wrap">
+                                <div class="col_178">
+                                    <div class="left_menu">
+                                        <ul>
+                                                <li><a href="/kham-pha/the-gioi-kien-truc-c4">Thế giới kiến trúc</a></li>
+                                                <li><a href="/kham-pha/mach-ban-c6">Mách bạn</a></li>
+                                                <li><a href="/kham-pha/phong-thuy-c9">Phong thủy</a></li>
+                                                <li><a href="/kham-pha/khong-gian-song-c7">Không gian sống</a></li>
+                                                <li><a href="/kham-pha/shopping-cung-dool-c10">Shopping cùng DOOL</a></li>
+                                                <li><a href="/kham-pha/thuong-hieu-c11">Thương hiệu</a></li>
+                                                <li><a href="/kham-pha/nha-cua-sao-c76">Nhà của sao</a></li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col_463">
+                                    <div class="info">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    KHÁM PHÁ NỔI BẬT</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner rounded_style_7 rounded_box">
+                                                <div class="content">
+                                                    <div class="img">
+                                                        <a href="/kham-pha/mach-ban-c6/mua-nha-chung-cu-thich-den-may-cung-phai-xem-ki-8-dieu-nay-i78838">
+                                                            <img src="http://image.diaoconline.vn/kham-pha/2019/08/13/thumb-C01-mua-nha-chung-cu-thich-den-may-cung-phai-xem-ki-8-dieu-nay.jpg" width="200" height="125" alt="Mua nh&#224; chung cư, th&#237;ch đến mấy cũng phải xem kĩ 8 điều n&#224;y" title="Mua nh&#224; chung cư, th&#237;ch đến mấy cũng phải xem kĩ 8 điều n&#224;y"/></a>
+                                                    </div>
+                                                    <div class="right">
+                                                        <h2>
+                                                            <a href="/kham-pha/mach-ban-c6/mua-nha-chung-cu-thich-den-may-cung-phai-xem-ki-8-dieu-nay-i78838">Mua nhà chung cư, thích đến mấy cũng phải xem kĩ 8 điều này</a></h2>
+                                                        <span class="updated_date">13/08/2019 15:30</span>
+                                                        <br />
+                                                        <p>Nhiều chủ đầu tư chưa thực sự chú trọng tới vấn đề phong thủy trong xây dựng chung cư, vì thế trước khi chọn mua gia chủ nên quan tâm nhiều hơn tới vấn đề này.</p>
+                                                    </div>
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col_290 margin_left">
+                                    <div class="latest">
+                                        <div class="headline rounded_style_6 rounded_box">
+                                            <div class="content">
+                                                <h2>
+                                                    CÁC TIN KHÁC</h2>
+                                            </div>
+                                        </div>
+                                        <div class="content_inner">
+                                            <ul>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/meo-trung-manh-khi-mua-nha-dat-thang-co-hon-khong-phai-ai-cung-biet-i78742" title="Mẹo tr&#250;ng m&#225;nh khi mua nh&#224;, đất th&#225;ng “c&#244; hồn” kh&#244;ng phải ai cũng biết" >
+                                                        Mẹo trúng mánh khi mua nhà, đất tháng  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/4-kieu-giao-dich-bat-dong-san-de-mat-sach-tien-i78427" title="4 kiểu giao dịch bất động sản dễ mất sạch tiền" >
+                                                        4 kiểu giao dịch bất động sản dễ mất  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/8-quyen-loi-nguoi-mua-bat-dong-san-hinh-thanh-trong-tuong-lai-can-biet-i78419" title="8 quyền lợi người mua bất động sản h&#236;nh th&#224;nh trong tương lai cần biết" >
+                                                        8 quyền lợi người mua bất động sản hình  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/day-la-4-tinh-huong-nha-dau-tu-can-hieu-ro-de-tranh-rui-ro-trong-con-sot-dat-i78409" title="Đ&#226;y l&#224; 4 t&#236;nh huống nh&#224; đầu tư cần hiểu r&#245; để tr&#225;nh rủi ro trong cơn sốt đất" >
+                                                        Đây là 4 tình huống nhà đầu tư cần hiểu  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/lam-the-nao-de-dau-tu-vao-bat-dong-san-va-kiem-loi-lau-dai-i78336" title="L&#224;m thế n&#224;o để đầu tư v&#224;o bất động sản v&#224; kiếm lời l&#226;u d&#224;i?" >
+                                                        Làm thế nào để đầu tư vào bất động sản  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/10-loi-khuyen-quy-hon-vang-tu-soi-gia-bat-dong-san-i78080" title="10 lời khuy&#234;n qu&#253; hơn v&#224;ng từ ‘s&#243;i gi&#224;’ bất động sản" >
+                                                        10 lời khuyên quý hơn vàng từ ‘sói già’  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/sai-lam-chi-mang-mat-dut-tram-trieu-khi-ban-nha-i77827" title="Sai lầm ‘ch&#237; mạng’ mất đứt trăm triệu khi b&#225;n nh&#224;" >
+                                                        Sai lầm ‘chí mạng’ mất đứt trăm triệu  ...
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/kinh-nghiem-khi-mua-nha-co-noi-that-i77744" title="Kinh nghiệm khi mua nh&#224; c&#243; nội thất" >
+                                                        Kinh nghiệm khi mua nhà có nội thất
+                                                    </a></li>
+                                                    <li><span class="bullet"></span><a href="/kham-pha/mach-ban-c6/6-sai-lam-khien-nha-ban-mua-khong-the-tang-gia-i77403" title="6 sai lầm khiến nh&#224; bạn mua kh&#244;ng thể tăng gi&#225;" >
+                                                        6 sai lầm khiến nhà bạn mua không thể  ...
+                                                    </a></li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li ><a href="/nha-dep" >
+                        NHÀ ĐẸP</a></li>
+                </ul>
+            </div>
+            <div id="acc_section">
+                <div class="left_cn">
+                </div>
+                <div class="right_cn">
+                </div>
+                    <div class="content default">
+                        <ul>
+                            <li class="login"><span class="login_ico ico_24 ico_login_24"></span><a href="/dang-nhap">
+                                Đăng nhập</a></li>
+                            <li class="register"><span class="register_ico ico_24 ico_register_24"></span><a href="/dang-ky" class="register">
+                                Đăng ký</a></li>
+                        </ul>
+                    </div>
+
+            </div>
+            <div class="post_propertise">
+                <a href="/thanh-vien/tai-san-dang-moi/6">ĐĂNG TÀI SẢN CỦA BẠN</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+ var tvcConfig = {
+        //'fixbottom': 60,
+		'fixbottom': 0,
+        'bottom':0
+}
+</script>
+<script type="text/javascript" src="http://media1.admicro.vn/ads_codes/ads_box_13813.ads"></script>
+
+    <div id="content_container">
+        
+
+    <div class="wrap">
+
+
+
+<div id="position_41" class ='banner_960x75 margin_bottom'><div><a href="http://diaoconline.vn/quangcao/806/41" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2016/06/24/BB9-phongthuy_960x90.jpg" width="960px" height="90px"/></a></div><div><a href="http://diaoconline.vn/quangcao/806/41" target="_blank"><img src="http://image.diaoconline.vn/banner-dool/2016/06/24/BB9-phongthuy_960x90.jpg" width="960px" height="90px"/></a></div></div><script type='text/javascript'>var Banner41=1;function Random_Banner41(){    var _Arr=document.getElementById("position_41").getElementsByTagName("div");    for (i=0; i<=_Arr.length-1; i++)    {        _Arr[i].className='bannerHide';    }    _Arr[Banner41 - 1].className='bannerShow';    var tempBanner = $(_Arr[Banner41 - 1]).html(); $(_Arr[Banner41 - 1]).html(''); $(_Arr[Banner41 - 1]).html(tempBanner);    window.setTimeout("Random_Banner41()" ,25000);    Banner41 = Banner41 + 1;    if(Banner41 > _Arr.length)        Banner41 = 1;}Random_Banner41();</script>
+
+        <div class="wrap">
+            <div class="col_180">
+                <div class="menu_col_left margin_bottom">
+<div style="clear:both;display:table;">
+    <div class="headline_title_1 rounded_style_5 rounded_box">
+        <div class="TL"></div>
+        <div class="TR"></div>
+        <div class="BL"></div>
+        <div class="BR"></div>
+        <h2 class="headline"><a href="/kham-pha/kham-pha-trai-nghiem-c3"><span>Khám Phá Trải Nghiệm</span></a></h2>
+    </div>
+    <div class="headline_title_2 rounded_box">
+    <ul>
+            <li ><a href="/kham-pha/the-gioi-kien-truc-c4">Thế giới kiến trúc</a></li>
+            <li  class=actived><a href="/kham-pha/mach-ban-c6">Mách bạn</a></li>
+            <li ><a href="/kham-pha/phong-thuy-c9">Phong thủy</a></li>
+            <li ><a href="/kham-pha/khong-gian-song-c7">Không gian sống</a></li>
+            <li ><a href="/kham-pha/shopping-cung-dool-c10">Shopping cùng DOOL</a></li>
+            <li ><a href="/kham-pha/thuong-hieu-c11">Thương hiệu</a></li>
+            <li ><a href="/kham-pha/nha-cua-sao-c76">Nhà của sao</a></li>
+    </ul>
+    </div>
+</div>
+
+                </div>
+                <div id="left_search" class="rounded_style_1 rounded_box margin_bottom">
+                        <script type="text/javascript">
+        $(function () {
+            $("#FormSearch").submit(function () {
+                if ($('#KeySearch').val().trim().length <= 2) {
+                    $('#KeySearch').focus();
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        });
+    </script>
+    <div class="body">
+        <form action="/kham-pha/tim-kiem" id="FormSearch" method="post" class="form_style_1">
+        <fieldset>
+            <div class="business_search_type margin_bottom_form">
+                <input type="text" class="input_text" value="" id="KeySearch" name="KeySearch" placeholder="Nhập từ khóa cần tìm"/>
+                <button type="submit" name="Submit" id="Submit" class="btn_2">
+                    <span>TÌM KIẾM</span></button>
+            </div>
+        </fieldset>
+        </form>
+    </div>
+
+
+                </div>
+                <div id="latest_news" class="margin_bottom">
+    <div class="asset-spec-left margin_bottom">
+        <div class="headline_title_1 rounded_style_5 rounded_box">
+            <h2 class="headline">
+                <span>TÀI SẢN MỚI NHẤT</span></h2>
+        </div>
+        <div class="rounded_style_2 rounded_box">
+            <div class="content">
+                <ul class="listing_1">
+                        <li><a href="/thue-can-ho-cao-cap-c10/chinh-chu-cho-thue-can-2pn-florita-q7-noi-that-day-du-thiet-ke-sang-trong-lh-0938334088-i1915271" >
+                             <h2><img src="http://image.diaoconline.vn/sieu-thi/2019/09/18/thumb-B6F-8AED39.jpg" style="float:left; margin-right:5px;" width="45" height="45" alt="Ch&#237;nh chủ cho thu&#234; căn 2PN Florita Q7 - Nội thất đầy đủ - Thiết kế sang trọng - LH 0938334088" title="Ch&#237;nh chủ cho thu&#234; căn 2PN Florita Q7 - Nội thất đầy đủ - Thiết kế sang trọng - LH 0938334088" />
+                                   Chính chủ cho thuê căn 2PN Florita Q7 - Nội thất đầy đủ - Thiết kế sang trọng - LH 0938334088</h2></a>
+                        </li>
+                        <li><a href="/thue-can-ho-cao-cap-c10/chinh-chu-cho-thue-can-2pn-florita-q7-noi-that-day-du-thiet-ke-sang-trong-lh-0938334088-i1915272" >
+                             <h2><img src="http://image.diaoconline.vn/sieu-thi/2019/09/23/thumb-D51-EC75B0.jpg" style="float:left; margin-right:5px;" width="45" height="45" alt="Ch&#237;nh chủ cho thu&#234; căn 2PN Florita Q7 - Nội thất đầy đủ - Thiết kế sang trọng - LH 0938334088" title="Ch&#237;nh chủ cho thu&#234; căn 2PN Florita Q7 - Nội thất đầy đủ - Thiết kế sang trọng - LH 0938334088" />
+                                   Chính chủ cho thuê căn 2PN Florita Q7 - Nội thất đầy đủ - Thiết kế sang trọng - LH 0938334088</h2></a>
+                        </li>
+                        <li><a href="/ban-dat-o-dat-tho-cu-c11/chinh-chu-ban-dat-hxh-duong-vo-van-hat-quan-9-dt-22x35m-gia-26-trieum2-tl-lh-0938334088-i1886896" >
+                             <h2><img src="http://image.diaoconline.vn/sieu-thi/2019/07/25/thumb-166-0E9E23.jpg" style="float:left; margin-right:5px;" width="45" height="45" alt="Ch&#237;nh chủ b&#225;n đất HXH đường V&#245; Văn H&#225;t Quận 9, DT 22x35m, gi&#225; 26 triệu/m2 (TL), LH 0938334088" title="Ch&#237;nh chủ b&#225;n đất HXH đường V&#245; Văn H&#225;t Quận 9, DT 22x35m, gi&#225; 26 triệu/m2 (TL), LH 0938334088" />
+                                   Chính chủ bán đất HXH đường Võ Văn Hát Quận 9, DT 22x35m, giá 26 triệu/m2 (TL), LH 0938334088</h2></a>
+                        </li>
+                        <li><a href="/thue-can-ho-cao-cap-c10/cho-thue-can-1pn-florita-q7-full-noi-that-view-bitexco-gia-chi-105-trthang-lh-0938334088-i1913193" >
+                             <h2><img src="http://image.diaoconline.vn/sieu-thi/2019/09/13/thumb-369-917E66.jpg" style="float:left; margin-right:5px;" width="45" height="45" alt="Cho thu&#234; căn 1PN Florita Q7 - Full nội thất - View Bitexco - Gi&#225; chỉ 10,5 tr/th&#225;ng - LH 0938334088" title="Cho thu&#234; căn 1PN Florita Q7 - Full nội thất - View Bitexco - Gi&#225; chỉ 10,5 tr/th&#225;ng - LH 0938334088" />
+                                   Cho thuê căn 1PN Florita Q7 - Full nội thất - View Bitexco - Giá chỉ 10,5 tr/tháng - LH 0938334088</h2></a>
+                        </li>
+                        <li><a href="/thue-can-ho-cao-cap-c10/chinh-chu-cho-thue-can-103m2-florita-q7-full-noi-that-lh-0938334088-gia-22-trthang-i1904032" >
+                             <h2><img src="http://image.diaoconline.vn/sieu-thi/2019/09/23/thumb-BE1-DBD029.jpg" style="float:left; margin-right:5px;" width="45" height="45" alt="Ch&#237;nh chủ cho thu&#234; căn 103m2 Florita Q7, full nội thất, LH 0938334088, gi&#225; 22 tr/th&#225;ng." title="Ch&#237;nh chủ cho thu&#234; căn 103m2 Florita Q7, full nội thất, LH 0938334088, gi&#225; 22 tr/th&#225;ng." />
+                                   Chính chủ cho thuê căn 103m2 Florita Q7, full nội thất, LH 0938334088, giá 22 tr/tháng.</h2></a>
+                        </li>
+                        <li><a href="/thue-phong-tro-c16/cho-thue-phong-ngay-su-van-hanh-q10-dt-20m2-co-cho-de-xe-camera-kv-an-ninh-sam-uat-i1886838" >
+                             <h2><img src="http://image.diaoconline.vn/sieu-thi/2019/07/25/thumb-BBE-BEEE0C.jpg" style="float:left; margin-right:5px;" width="45" height="45" alt="Cho thu&#234; ph&#242;ng ngay Sư Vạn Hạnh Q10, DT 20m2, c&#243; chỗ để xe, camera, KV an ninh sầm uất." title="Cho thu&#234; ph&#242;ng ngay Sư Vạn Hạnh Q10, DT 20m2, c&#243; chỗ để xe, camera, KV an ninh sầm uất." />
+                                   Cho thuê phòng ngay Sư Vạn Hạnh Q10, DT 20m2, có chỗ để xe, camera, KV an ninh sầm uất.</h2></a>
+                        </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+                </div>
+    <div id="hot_prj">
+    <div class="headline_title_1 rounded_style_5 rounded_box">
+		<h2 class="headline"><span>DỰ ÁN NỔI BẬT</span></h2>
+	</div>
+    <div class="properties_block">
+        <ul>
+            <li >
+            <a href="/du-an/khu-can-ho-c27/can-ho-the-botanica-i2228">
+            <img src="http://image.diaoconline.vn/du-an/2017/12/15/thumb-4FE-can-ho-the-botanica.jpg" width="180" height="118" alt="Căn hộ The Botanica"/></a>
+            <h2><a href="/du-an/khu-can-ho-c27/can-ho-the-botanica-i2228">Căn hộ The Botanica</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-can-ho-c27/thu-thiem-garden-i2115">
+            <img src="http://image.diaoconline.vn/du-an/2017/02/09/thumb-883-thu-thiem-garden.jpg" width="180" height="118" alt="Thủ Thi&#234;m Garden"/></a>
+            <h2><a href="/du-an/khu-can-ho-c27/thu-thiem-garden-i2115">Thủ Thiêm Garden</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-dan-cu-do-thi-moi-c24/lakeview-city-i2061">
+            <img src="http://image.diaoconline.vn/du-an/2016/05/06/thumb-B8F-lakeview-city.jpg" width="180" height="118" alt="Lakeview City"/></a>
+            <h2><a href="/du-an/khu-dan-cu-do-thi-moi-c24/lakeview-city-i2061">Lakeview City</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-can-ho-c27/saigon-mia-i2030">
+            <img src="http://image.diaoconline.vn/du-an/2016/03/04/thumb-FDD-saigon-mia.jpg" width="180" height="118" alt="Saigon Mia"/></a>
+            <h2><a href="/du-an/khu-can-ho-c27/saigon-mia-i2030">Saigon Mia</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-can-ho-c27/9-view-apartment-i2025">
+            <img src="http://image.diaoconline.vn/du-an/2015/12/23/thumb-F54-9-view-apartment.jpg" width="180" height="118" alt="9 View Apartment"/></a>
+            <h2><a href="/du-an/khu-can-ho-c27/9-view-apartment-i2025">9 View Apartment</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-dan-cu-do-thi-moi-c24/cat-tuong-phu-nguyen-residence-i2010">
+            <img src="http://image.diaoconline.vn/du-an/2015/11/13/thumb-502-cat-tuong-phu-nguyen-residence.jpg" width="180" height="118" alt="C&#225;t Tường Ph&#250; Nguy&#234;n Residence"/></a>
+            <h2><a href="/du-an/khu-dan-cu-do-thi-moi-c24/cat-tuong-phu-nguyen-residence-i2010">Cát Tường Phú Nguyên Residence</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-can-ho-c27/diamond-lotus-i1953">
+            <img src="http://image.diaoconline.vn/du-an/2015/09/03/thumb-80A-diamond-lotus-phuc-khang.jpg" width="180" height="118" alt="Diamond Lotus"/></a>
+            <h2><a href="/du-an/khu-can-ho-c27/diamond-lotus-i1953">Diamond Lotus</a></h2>
+        </li>
+            <li >
+            <a href="/du-an/khu-phuc-hop-thuong-mai-c25/river-gate-residence-i1538">
+            <img src="http://image.diaoconline.vn/du-an/2017/10/26/thumb-E2D-river-gate-residence.jpg" width="180" height="118" alt="River Gate Residence"/></a>
+            <h2><a href="/du-an/khu-phuc-hop-thuong-mai-c25/river-gate-residence-i1538">River Gate Residence</a></h2>
+        </li>
+            <li  class=last >
+            <a href="/du-an/khu-can-ho-c27/bay-hien-tower-i1395">
+            <img src="http://image.diaoconline.vn/du-an/2013/07/16/thumb-681-bay-hien-tower.jpg" width="180" height="118" alt="Bảy Hiền Tower"/></a>
+            <h2><a href="/du-an/khu-can-ho-c27/bay-hien-tower-i1395">Bảy Hiền Tower</a></h2>
+        </li>
+
+        </ul>
+    </div>    
+</div>
+
+
+                <div class="banner_180">
+                    <h2>
+                        Quảng cáo</h2>
+
+
+
+
+
+                </div>
+            </div>
+            <div class="col_460 margin_left margin_bottom">
+                <div class="rounded_style_2 rounded_box margin_bottom">
+    <div class="breadcrumb">
+            <div itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                <a href="http://diaoconline.vn/kham-pha" itemprop="url" title="Kh&#225;m ph&#225;"><span itemprop="title">Khám phá</span></a>
+&raquo;            </div>
+            <div itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                <a href="http://diaoconline.vn/kham-pha/mach-ban-c6" itemprop="url" title="Kh&#225;m ph&#225; M&#225;ch bạn"><span itemprop="title">Mách bạn</span></a>
+            </div>
+
+    </div>
+
+
+                    <div class="body">
+                            <div id="hotline_discover" class="margin_bottom">
+                                <div>
+                                    <a href="/kham-pha/mach-ban-c6/mua-nha-chung-cu-thich-den-may-cung-phai-xem-ki-8-dieu-nay-i78838">
+                                        <img src="http://image.diaoconline.vn/kham-pha/2019/08/13/large-C01-mua-nha-chung-cu-thich-den-may-cung-phai-xem-ki-8-dieu-nay.jpg" width="438" height="270" alt="Mua nh&#224; chung cư, th&#237;ch đến mấy cũng phải xem kĩ 8 điều n&#224;y"/></a></div>
+                                <div class="headline">
+                                    <h2>
+                                        <a href="/kham-pha/mach-ban-c6/mua-nha-chung-cu-thich-den-may-cung-phai-xem-ki-8-dieu-nay-i78838">Mua nhà chung cư, thích đến mấy cũng phải xem kĩ 8 điều này</a></h2>
+                                    <span>Cập nhật: 13/08/2019 15:30</span>
+                                </div>
+                            </div>
+                            <div id="discover_list">
+                                <div class="headline_title_1 rounded_style_5 rounded_box margin_bottom">
+                                    <h2 class="headline">
+                                        <span>CÁC TIN KHÁC</span></h2>
+                                    <div class="paging_2">
+                                        <ul class="pager">
+</ul>
+<script type="text/javascript">
+    $(function () {
+        $('.pager').html(LoadPagging(1, 225, '/kham-pha/mach-ban-c6'));
+    });
+</script>
+
+                                    </div>
+                                </div>
+                                <ul>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/meo-trung-manh-khi-mua-nha-dat-thang-co-hon-khong-phai-ai-cung-biet-i78742">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/08/05/thumb-A9E-meo-trung-manh-khi-mua-nha-dat-thang-co-hon-khong-phai-ai-cung-biet.jpg" width="170" height="128" alt="Mẹo tr&#250;ng m&#225;nh khi mua nh&#224;, đất th&#225;ng “c&#244; hồn” kh&#244;ng phải ai cũng biết"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/meo-trung-manh-khi-mua-nha-dat-thang-co-hon-khong-phai-ai-cung-biet-i78742">Mẹo trúng mánh khi mua nhà, đất tháng “cô hồn” không phải ai cũng biết</a></h2>
+                                                    <span class="updated_date">Cập nhật: 06/08/2019 11:00</span><br />
+                                                    <p>Mua nhà đất trong tháng Vu Lan báo hiếu là điều tốt chứ sao phải kiêng kị.</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/4-kieu-giao-dich-bat-dong-san-de-mat-sach-tien-i78427">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/07/03/thumb-720-4-kieu-giao-dich-bat-dong-san-de-mat-sach-tien.jpg" width="170" height="128" alt="4 kiểu giao dịch bất động sản dễ mất sạch tiền"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/4-kieu-giao-dich-bat-dong-san-de-mat-sach-tien-i78427">4 kiểu giao dịch bất động sản dễ mất sạch tiền</a></h2>
+                                                    <span class="updated_date">Cập nhật: 08/07/2019 10:30</span><br />
+                                                    <p>Tham gia huy động vốn theo mô hình đa cấp hay mua “lúa non” (nhà đất chưa xong pháp lý) là những giao dịch nhiều rủi ro.</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/8-quyen-loi-nguoi-mua-bat-dong-san-hinh-thanh-trong-tuong-lai-can-biet-i78419">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/07/02/thumb-2CE-8-quyen-loi-nguoi-mua-bat-dong-san-hinh-thanh-trong-tuong-lai-can-biet.jpg" width="170" height="128" alt="8 quyền lợi người mua bất động sản h&#236;nh th&#224;nh trong tương lai cần biết"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/8-quyen-loi-nguoi-mua-bat-dong-san-hinh-thanh-trong-tuong-lai-can-biet-i78419">8 quyền lợi người mua bất động sản hình thành trong tương lai cần biết</a></h2>
+                                                    <span class="updated_date">Cập nhật: 04/07/2019 13:45</span><br />
+                                                    <p>Các chuyên gia nhận định, trong giao dịch bất động sản hiện nay, nếu các chủ đầu tư(CĐT), bên phân phối luôn có sự chuẩn bị kỹ về luật thì người mua nhà phần nhiều thiếu kinh nghiệm và hiểu biết về  ...</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/day-la-4-tinh-huong-nha-dau-tu-can-hieu-ro-de-tranh-rui-ro-trong-con-sot-dat-i78409">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/07/02/thumb-2C3-day-la-4-tinh-huong-nha-dau-tu-can-hieu-ro-de-tranh-rui-ro-trong-con-sot-dat.jpg" width="170" height="128" alt="Đ&#226;y l&#224; 4 t&#236;nh huống nh&#224; đầu tư cần hiểu r&#245; để tr&#225;nh rủi ro trong cơn sốt đất"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/day-la-4-tinh-huong-nha-dau-tu-can-hieu-ro-de-tranh-rui-ro-trong-con-sot-dat-i78409">Đây là 4 tình huống nhà đầu tư cần hiểu rõ để tránh rủi ro trong cơn sốt đất</a></h2>
+                                                    <span class="updated_date">Cập nhật: 02/07/2019 15:45</span><br />
+                                                    <p>Theo Luật sư Nguyễn Văn Lộc, Chủ tịch LP Group, trong giao dịch mua bán bất động sản (BĐS), rất nhiều vụ êm thấm nhưng cũng không ít người mua bị lừa bởi chưa hiểu rõ về tính pháp lý của từng sản  ...</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/lam-the-nao-de-dau-tu-vao-bat-dong-san-va-kiem-loi-lau-dai-i78336">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/06/25/thumb-254-lam-the-nao-de-dau-tu-vao-bat-dong-san-va-kiem-loi-lau-dai.jpg" width="170" height="128" alt="L&#224;m thế n&#224;o để đầu tư v&#224;o bất động sản v&#224; kiếm lời l&#226;u d&#224;i?"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/lam-the-nao-de-dau-tu-vao-bat-dong-san-va-kiem-loi-lau-dai-i78336">Làm thế nào để đầu tư vào bất động sản và kiếm lời lâu dài?</a></h2>
+                                                    <span class="updated_date">Cập nhật: 25/06/2019 09:30</span><br />
+                                                    <p>Bất động sản có thể là một khoản đầu tư sinh lợi lớn, nhưng nó đòi hỏi về mặt thời gian, sự kiên nhẫn và quan trọng nhất là tiền mặt.</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/10-loi-khuyen-quy-hon-vang-tu-soi-gia-bat-dong-san-i78080">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/05/26/thumb-420-10-loi-khuyen-quy-hon-vang-tu-soi-gia-bat-dong-san.jpg" width="170" height="128" alt="10 lời khuy&#234;n qu&#253; hơn v&#224;ng từ ‘s&#243;i gi&#224;’ bất động sản"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/10-loi-khuyen-quy-hon-vang-tu-soi-gia-bat-dong-san-i78080">10 lời khuyên quý hơn vàng từ ‘sói già’ bất động sản</a></h2>
+                                                    <span class="updated_date">Cập nhật: 27/05/2019 08:15</span><br />
+                                                    <p>Bất động sản được biết đến là kênh đầu tư với cơ hội sinh lời rất lớn. Do vậy, khi bạn có ý tưởng đầu tư vào bất động sản, bạn cần chuẩn bị kỹ càng và tham khảo lời khuyên của các chuyên  ...</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/sai-lam-chi-mang-mat-dut-tram-trieu-khi-ban-nha-i77827">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/04/30/thumb-332-sai-lam-chi-mang-mat-dut-tram-trieu-khi-ban-nha.jpg" width="170" height="128" alt="Sai lầm ‘ch&#237; mạng’ mất đứt trăm triệu khi b&#225;n nh&#224;"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/sai-lam-chi-mang-mat-dut-tram-trieu-khi-ban-nha-i77827">Sai lầm ‘chí mạng’ mất đứt trăm triệu khi bán nhà</a></h2>
+                                                    <span class="updated_date">Cập nhật: 01/05/2019 15:00</span><br />
+                                                    <p>Một sai lầm nhỏ khi bán nhà có thể dẫn đến thiệt hại cho chính chủ nhà.</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/kinh-nghiem-khi-mua-nha-co-noi-that-i77744">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/04/23/thumb-366-kinh-nghiem-khi-mua-nha-co-noi-that.jpg" width="170" height="128" alt="Kinh nghiệm khi mua nh&#224; c&#243; nội thất"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/kinh-nghiem-khi-mua-nha-co-noi-that-i77744">Kinh nghiệm khi mua nhà có nội thất</a></h2>
+                                                    <span class="updated_date">Cập nhật: 24/04/2019 08:30</span><br />
+                                                    <p>Sở hữu một căn nhà có đầy đủ nội thất sẽ giúp người mua không mất thêm thời gian cho việc thiết kế, mua sắm cho ngôi nhà.</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="block_2">
+                                                <div class="img">
+                                                    <a href="/kham-pha/mach-ban-c6/6-sai-lam-khien-nha-ban-mua-khong-the-tang-gia-i77403">
+                                                        <img src="http://image.diaoconline.vn/kham-pha/2019/03/29/thumb-BF2-6-sai-lam-khien-nha-ban-mua-khong-the-tang-gia.jpg" width="170" height="128" alt="6 sai lầm khiến nh&#224; bạn mua kh&#244;ng thể tăng gi&#225;"/></a></div>
+                                                <div class="content">
+                                                    <h2>
+                                                        <a href="/kham-pha/mach-ban-c6/6-sai-lam-khien-nha-ban-mua-khong-the-tang-gia-i77403">6 sai lầm khiến nhà bạn mua không thể tăng giá</a></h2>
+                                                    <span class="updated_date">Cập nhật: 31/03/2019 16:30</span><br />
+                                                    <p>Mua nhà chờ tăng giá là cách nhanh chóng làm tăng tài sản của bạn, nhưng chỉ khi bạn tránh được các sai lầm sau:</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                </ul>
+                            </div>
+
+                    </div>
+                </div>
+                <div class="paging_2 margin_bottom">
+                    <ul class="pager">
+</ul>
+<script type="text/javascript">
+    $(function () {
+        $('.pager').html(LoadPagging(1, 225, '/kham-pha/mach-ban-c6'));
+    });
+</script>
+
+                </div>
+            </div>
+            <div class="col_300 margin_left">
+
+
+
+
+
+    <link href="/Content/js/slidejs/house_star.css" rel="stylesheet" type="text/css" />
+    <script src="/Content/js/slidejs/jquery.flexslider.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        $(window).load(function () {
+
+            $('#hstarslider').flexslider({
+                animation: "slide",
+                controlNav: false,
+                animationLoop: true,
+                slideshow: true,
+                start: function (slider) {
+                    $('body').removeClass('loading');
+                }
+            });
+        });
+    </script>
+    <div id="star_house" class="margin_bottom">
+        <div class="headline_title_1 rounded_style_5 rounded_box">
+            <div class="TL">
+            </div>
+            <div class="TR">
+            </div>
+            <div class="BL">
+            </div>
+            <div class="BR">
+            </div>
+            <h2 class="headline">
+                <span>NHÀ CỦA SAO</span></h2>
+            <a href="/kham-pha/nha-cua-sao-c76" class="grey_link">
+                Xem thêm</a>
+        </div>
+        <div class="rounded_style_2 rounded_box">
+            <div class="TL">
+            </div>
+            <div class="TR">
+            </div>
+            <div class="BL">
+            </div>
+            <div class="BR">
+            </div>
+            <div class="content">
+                <div class="img_galery">
+                    <div id="hstarslider" class="flexslider">
+                        <ul class="slides">
+                                <li><a href="/kham-pha/nha-cua-sao-c76/choang-voi-khoi-bat-dong-san-tren-toan-nuoc-my-cua-ong-chu-amazon-trong-vu-ly-hon-140-ty-usd-i76500">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2019/01/10/large-100-choang-voi-khoi-bat-dong-san-tren-toan-nuoc-my-cua-ong-chu-amazon-trong-vu-ly-hon-140-ty-usd.jpg" alt="Cho&#225;ng với khối bất động sản tr&#234;n to&#224;n nước Mỹ của &#244;ng chủ Amazon trong vụ ly h&#244;n 140 tỷ USD" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/choang-voi-khoi-bat-dong-san-tren-toan-nuoc-my-cua-ong-chu-amazon-trong-vu-ly-hon-140-ty-usd-i76500">
+                                        Choáng với khối bất động sản trên toàn nước Mỹ của ông chủ Amazon trong vụ ly hôn 140 tỷ USD
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/biet-thu-xinh-xan-vua-to-chuc-le-cuoi-cua-miley-cyrus-i76220">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/12/27/large-91B-biet-thu-xinh-xan-vua-to-chuc-le-cuoi-cua-miley-cyrus.jpg" alt="Biệt thự xinh xắn vừa &#39;tổ chức lễ cưới&#39; của Miley Cyrus" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/biet-thu-xinh-xan-vua-to-chuc-le-cuoi-cua-miley-cyrus-i76220">
+                                        Biệt thự xinh xắn vừa 'tổ chức lễ cưới' của Miley Cyrus
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/biet-thu-60-ty-cua-dam-vinh-hung-lung-linh-trong-ngay-giang-sinh-i76177">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/12/25/large-E3C-biet-thu-60-ty-cua-dam-vinh-hung-lung-linh-trong-ngay-giang-sinh.jpg" alt="Biệt thự 60 tỷ của Đ&#224;m Vĩnh Hưng lung linh trong ng&#224;y Gi&#225;ng sinh" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/biet-thu-60-ty-cua-dam-vinh-hung-lung-linh-trong-ngay-giang-sinh-i76177">
+                                        Biệt thự 60 tỷ của Đàm Vĩnh Hưng lung linh trong ngày Giáng sinh
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/dot-nhap-nhung-to-am-ngap-tran-khong-khi-giang-sinh-cua-sao-viet-i76133">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/12/23/large-6CF-dot-nhap-nhung-to-am-ngap-tran-khong-khi-giang-sinh-cua-sao-viet.jpg" alt="&quot;Đột nhập&quot; những tổ ấm ngập tr&#224;n kh&#244;ng kh&#237; Gi&#225;ng sinh của Sao Việt" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/dot-nhap-nhung-to-am-ngap-tran-khong-khi-giang-sinh-cua-sao-viet-i76133">
+                                        "Đột nhập" những tổ ấm ngập tràn không khí Giáng sinh của Sao Việt
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/vo-chong-bang-lang-tu-trang-tri-biet-thu-don-giang-sinh-i76035">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/12/18/large-9AB-vo-chong-bang-lang-tu-trang-tri-biet-thu-don-giang-sinh.jpg" alt="Vợ chồng Bằng Lăng tự trang tr&#237; biệt thự đ&#243;n Gi&#225;ng sinh" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/vo-chong-bang-lang-tu-trang-tri-biet-thu-don-giang-sinh-i76035">
+                                        Vợ chồng Bằng Lăng tự trang trí biệt thự đón Giáng sinh
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/ngam-khu-vuon-mini-xanh-mat-noi-goc-ban-cong-nho-cua-ca-si-my-le-i75840">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/12/10/large-193-ngam-khu-vuon-mini-xanh-mat-noi-goc-ban-cong-nho-cua-ca-si-my-le.jpg" alt="Ngắm khu vườn mini xanh m&#225;t nơi g&#243;c ban c&#244;ng nhỏ của ca sĩ Mỹ Lệ" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/ngam-khu-vuon-mini-xanh-mat-noi-goc-ban-cong-nho-cua-ca-si-my-le-i75840">
+                                        Ngắm khu vườn mini xanh mát nơi góc ban công nhỏ của ca sĩ Mỹ Lệ
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/ngam-biet-thu-trieu-do-cua-nu-ca-si-nguyen-hong-nhung-i75659">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/12/03/large-654-ngam-biet-thu-trieu-do-cua-nu-ca-si-nguyen-hong-nhung.jpg" alt="Ngắm biệt thự triệu đ&#244; của nữ ca sĩ Nguyễn Hồng Nhung" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/ngam-biet-thu-trieu-do-cua-nu-ca-si-nguyen-hong-nhung-i75659">
+                                        Ngắm biệt thự triệu đô của nữ ca sĩ Nguyễn Hồng Nhung
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/nha-trang-trang-hoang-cay-thong-do-don-giang-sinh-i75552">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/11/28/large-E03-nha-trang-trang-hoang-cay-thong-do-don-giang-sinh.jpg" alt="Nh&#224; Trắng trang ho&#224;ng &#39;c&#226;y th&#244;ng đỏ&#39; đ&#243;n Gi&#225;ng sinh" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/nha-trang-trang-hoang-cay-thong-do-don-giang-sinh-i75552">
+                                        Nhà Trắng trang hoàng 'cây thông đỏ' đón Giáng sinh
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/ben-trong-biet-thu-10-trieu-usd-bi-hoa-hoan-cua-sao-one-direction-i75168">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/11/12/large-AA3-ben-trong-biet-thu-10-trieu-usd-bi-hoa-hoan-cua-sao-one-direction.jpg" alt="B&#234;n trong biệt thự 10 triệu USD bị hỏa hoạn của sao One Direction" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/ben-trong-biet-thu-10-trieu-usd-bi-hoa-hoan-cua-sao-one-direction-i75168">
+                                        Bên trong biệt thự 10 triệu USD bị hỏa hoạn của sao One Direction
+                                        </a>
+                                    </div>
+                                </li>
+                                <li><a href="/kham-pha/nha-cua-sao-c76/kylie-jenner-va-ban-trai-chung-tien-tau-biet-thu-13-trieu-usd-i75010">
+                                    <img src="http://image.diaoconline.vn/kham-pha/2018/11/06/large-F43-kylie-jenner-va-ban-trai-chung-tien-tau-biet-thu-13-trieu-usd.jpg" alt="Kylie Jenner v&#224; bạn trai chung tiền tậu biệt thự 13 triệu USD" style="width:290px;height:200px;" /></a>
+                                    <div class="housetitle">
+                                        <a href="/kham-pha/nha-cua-sao-c76/kylie-jenner-va-ban-trai-chung-tien-tau-biet-thu-13-trieu-usd-i75010">
+                                        Kylie Jenner và bạn trai chung tiền tậu biệt thự 13 triệu USD
+                                        </a>
+                                    </div>
+                                </li>
+                        </ul>
+                        <div class="housebor">
+                            <ul>
+                                <li></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+    <link href="/Content/js/slidejs/house_outstanding.css" rel="stylesheet" type="text/css" />
+    <script src="/Content/js/slidejs/jquery.flexslider.js" type="text/javascript"></script>
+     <script type="text/javascript">
+
+         $(window).load(function () {
+           
+             $('#houseslider').flexslider({
+                 animation: "slide",
+                 controlNav: false,
+                 animationLoop: true,
+                 slideshow: true,
+                 start: function (slider) {
+                     $('body').removeClass('loading');
+                 }
+             });
+         });
+  </script>
+<div id="house_collection">
+    <div class="rounded_style_2 rounded_box">
+        <div class="content">
+            <h3>Bộ sưu tập nhà đẹp</h3>
+            <div id="houseslider" class="flexslider">
+                <ul class="slides">
+                    <li>
+                        <div class="houseimg">
+  	    	            <a href="/nha-dep/khac-c12/nha-4-tang-mo-phong-ruong-bac-thang-dat-giai-kien-truc-xanh-i1167"><img src="http://image.diaoconline.vn/nha-dep/2019/01/07/special-834-nha-4-tang-mo-phong-ruong-bac-thang-dat-giai-kien-truc-xanh.jpg" alt="0" /></a>
+                        </div>
+                        <div class="housetitle"><a href="/nha-dep/khac-c12/nha-4-tang-mo-phong-ruong-bac-thang-dat-giai-kien-truc-xanh-i1167">Nh&#224; 4 tầng m&#244; phỏng ruộng bậc thang đạt giải Kiến tr&#250;c xanh</a></div>
+  	    		    </li>
+                    <li>
+                        <div class="houseimg">
+  	    	            <a href="/nha-dep/khac-c12/15-mau-lich-treo-tuong-vua-sang-tao-lai-dep-mat-danh-cho-nhung-nguoi-thich-do-handmade-i1166"><img src="http://image.diaoconline.vn/nha-dep/2018/12/30/special-754-15-mau-lich-treo-tuong-vua-sang-tao-lai-dep-mat-danh-cho-nhung-nguoi-thich-do-handmade.jpg" alt="1" /></a>
+                        </div>
+                        <div class="housetitle"><a href="/nha-dep/khac-c12/15-mau-lich-treo-tuong-vua-sang-tao-lai-dep-mat-danh-cho-nhung-nguoi-thich-do-handmade-i1166">15 mẫu lịch treo tường vừa s&#225;ng tạo lại đẹp mắt d&#224;nh cho những người th&#237;ch đồ handmade</a></div>
+  	    		    </li>
+                    <li>
+                        <div class="houseimg">
+  	    	            <a href="/nha-dep/mau-nha-c1/nhung-mau-nha-cap-4-van-nguoi-me-chi-phi-xay-dung-chi-tu-300-trieu-i1165"><img src="http://image.diaoconline.vn/nha-dep/2018/12/29/special-E19-nhung-mau-nha-cap-4-van-nguoi-me-chi-phi-xay-dung-chi-tu-300-trieu.jpg" alt="2" /></a>
+                        </div>
+                        <div class="housetitle"><a href="/nha-dep/mau-nha-c1/nhung-mau-nha-cap-4-van-nguoi-me-chi-phi-xay-dung-chi-tu-300-trieu-i1165">Những mẫu nh&#224; cấp 4 “vạn người m&#234;” chi ph&#237; x&#226;y dựng chỉ từ 300 triệu</a></div>
+  	    		    </li>
+                    <li>
+                        <div class="houseimg">
+  	    	            <a href="/nha-dep/nha-bep-c2/dep-ngat-ngay-mau-phong-bep-chung-cu-cuc-tien-nghi-cho-gia-dinh-tre-i1164"><img src="http://image.diaoconline.vn/nha-dep/2018/12/26/special-27E-dep-ngat-ngay-mau-phong-bep-chung-cu-cuc-tien-nghi-cho-gia-dinh-tre.jpg" alt="3" /></a>
+                        </div>
+                        <div class="housetitle"><a href="/nha-dep/nha-bep-c2/dep-ngat-ngay-mau-phong-bep-chung-cu-cuc-tien-nghi-cho-gia-dinh-tre-i1164">Đẹp ngất ng&#226;y mẫu ph&#242;ng bếp chung cư cực tiện nghi cho gia đ&#236;nh trẻ</a></div>
+  	    		    </li>
+                    <li>
+                        <div class="houseimg">
+  	    	            <a href="/nha-dep/phong-ngu-c3/6-thiet-ke-giuong-dac-biet-danh-rieng-cho-nhung-phong-ngu-co-dien-tich-nho-i1163"><img src="http://image.diaoconline.vn/nha-dep/2018/12/25/special-C95-6-thiet-ke-giuong-dac-biet-danh-rieng-cho-nhung-phong-ngu-co-dien-tich-nho.jpg" alt="4" /></a>
+                        </div>
+                        <div class="housetitle"><a href="/nha-dep/phong-ngu-c3/6-thiet-ke-giuong-dac-biet-danh-rieng-cho-nhung-phong-ngu-co-dien-tich-nho-i1163">6 thiết kế giường đặc biệt d&#224;nh ri&#234;ng cho những ph&#242;ng ngủ c&#243; diện t&#237;ch nhỏ</a></div>
+  	    		    </li>
+                </ul>
+                 <div class="housebor"><ul><li></li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="business_brand" class="margin_bottom">
+    <div class="headline_title_1 rounded_style_5 rounded_box">
+        <h2 class="headline">
+        <a href="/kham-pha/thuong-hieu-c11"><span>Thương Hiệu</span></a></h2>
+        <a href="/kham-pha/thuong-hieu-c11" class="grey_link">Xem thêm</a>
+    </div>
+    <div class="rounded_style_2 rounded_box">
+        <div class="content">
+			<ul class="listing_5">
+                    <li >
+                        <div class="img">
+                            <a href="/kham-pha/thuong-hieu-c11/chuyen-3-nguoi-ban-cung-nhau-startup-chi-4-thang-da-duoc-dinh-gia-trieu-usd-nhung-tan-dan-xe-nghe-vi-ai-cung-nghi-cong-toi-lon-hon-i75486">
+                                <img src="http://image.diaoconline.vn/kham-pha/2018/11/26/thumb-CAB-chuyen-3-nguoi-ban-cung-nhau-startup-chi-4-thang-da-duoc-dinh-gia-trieu-usd-nhung-tan-dan-xe-nghe-vi-ai-cung-nghi-cong-toi-lon-hon.jpg" width="80" height="62" alt="Chuyện 3 người bạn c&#249;ng nhau startup: Chỉ 4 th&#225;ng đ&#227; được định gi&#225; triệu USD, nhưng “tan đ&#224;n xẻ ngh&#233;” v&#236; ai cũng nghĩ “c&#244;ng t&#244;i lớn hơn”" /></a></div>
+                        <div class="right">
+                            <h2><a href="/kham-pha/thuong-hieu-c11/chuyen-3-nguoi-ban-cung-nhau-startup-chi-4-thang-da-duoc-dinh-gia-trieu-usd-nhung-tan-dan-xe-nghe-vi-ai-cung-nghi-cong-toi-lon-hon-i75486">Chuyện 3 người bạn cùng nhau startup: Chỉ 4 tháng đã được định giá triệu USD, nhưng “tan đàn xẻ nghé” vì ai cũng nghĩ “công tôi lớn hơn”</a></h2>
+                            <span class="updated_date">Cập nhật: 26/11/2018 08:54</span>
+                        </div>
+                    </li>
+                    <li >
+                        <div class="img">
+                            <a href="/kham-pha/thuong-hieu-c11/4-bai-hoc-growth-hacking-cua-tik-tok-startup-co-gia-tri-nhat-the-gioi-cham-moc-500-trieu-nguoi-dung-duoc-dinh-gia-cao-hon-uber-chi-trong-2-nam-phat-trien-i75244">
+                                <img src="http://image.diaoconline.vn/kham-pha/2018/11/15/thumb-F81-4-bai-hoc-growth-hacking-cua-tik-tok-startup-co-gia-tri-nhat-the-gioi-cham-moc-500-trieu-nguoi-dung-duoc-dinh-gia-cao-hon-uber-chi-trong-2-nam-phat-trien.jpg" width="80" height="62" alt="4 b&#224;i học “growth hacking” của Tik Tok - Startup c&#243; gi&#225; trị nhất thế giới, chạm mốc 500 triệu người d&#249;ng, được định gi&#225; cao hơn Uber chỉ trong 2 năm ph&#225;t triển" /></a></div>
+                        <div class="right">
+                            <h2><a href="/kham-pha/thuong-hieu-c11/4-bai-hoc-growth-hacking-cua-tik-tok-startup-co-gia-tri-nhat-the-gioi-cham-moc-500-trieu-nguoi-dung-duoc-dinh-gia-cao-hon-uber-chi-trong-2-nam-phat-trien-i75244">4 bài học “growth hacking” của Tik Tok - Startup có giá trị nhất thế giới, chạm mốc 500 triệu người dùng, được định giá cao hơn Uber chỉ trong 2 năm phát triển</a></h2>
+                            <span class="updated_date">Cập nhật: 15/11/2018 10:24</span>
+                        </div>
+                    </li>
+                    <li >
+                        <div class="img">
+                            <a href="/kham-pha/thuong-hieu-c11/vao-miniso-cu-ngo-mua-do-chuan-nhat-vao-tous-les-jours-cu-ngo-an-banh-ngot-chuan-phap-mo-hinh-kinh-doanh-sao-chep-van-hoa-dang-xam-chiem-the-gioi-nhu-the-nao-i75133">
+                                <img src="http://image.diaoconline.vn/kham-pha/2018/11/11/thumb-6D4-vao-miniso-cu-ngo-mua-do-chuan-nhat-vao-tous-les-jours-cu-ngo-an-banh-ngot-chuan-phap-mo-hinh-kinh-doanh-sao-chep-van-hoa-dang-xam-chiem-the-gioi-nhu-the-nao.jpg" width="80" height="62" alt="V&#224;o Miniso cứ ngỡ mua đồ chuẩn Nhật, v&#224;o Tous Les Jours cứ ngỡ ăn b&#225;nh ngọt chuẩn Ph&#225;p - M&#244; h&#236;nh kinh doanh ‘sao ch&#233;p văn h&#243;a’ đang x&#226;m chiếm thế giới như thế n&#224;o?" /></a></div>
+                        <div class="right">
+                            <h2><a href="/kham-pha/thuong-hieu-c11/vao-miniso-cu-ngo-mua-do-chuan-nhat-vao-tous-les-jours-cu-ngo-an-banh-ngot-chuan-phap-mo-hinh-kinh-doanh-sao-chep-van-hoa-dang-xam-chiem-the-gioi-nhu-the-nao-i75133">Vào Miniso cứ ngỡ mua đồ chuẩn Nhật, vào Tous Les Jours cứ ngỡ ăn bánh ngọt chuẩn Pháp - Mô hình kinh doanh ‘sao chép văn hóa’ đang xâm chiếm thế giới như thế nào?</a></h2>
+                            <span class="updated_date">Cập nhật: 11/11/2018 08:22</span>
+                        </div>
+                    </li>
+                    <li >
+                        <div class="img">
+                            <a href="/kham-pha/thuong-hieu-c11/miniso-gia-nhat-mumuso-nhai-han-nhung-thuong-hieu-tu-trung-quoc-tung-hoanh-khap-the-gioi-nho-ly-luan-sao-chep-van-hoa-khong-he-pham-phap-i75089">
+                                <img src="http://image.diaoconline.vn/kham-pha/2018/11/09/thumb-480-miniso-gia-nhat-mumuso-nhai-han-nhung-thuong-hieu-tu-trung-quoc-tung-hoanh-khap-the-gioi-nho-ly-luan-sao-chep-van-hoa-khong-he-pham-phap.jpg" width="80" height="62" alt="Miniso &quot;giả Nhật”, Mumuso &quot;nh&#225;i H&#224;n”- Những thương hiệu từ Trung Quốc “tung ho&#224;nh” khắp thế giới nhờ l&#253; luận &quot;sao ch&#233;p văn h&#243;a kh&#244;ng hề phạm ph&#225;p&quot;" /></a></div>
+                        <div class="right">
+                            <h2><a href="/kham-pha/thuong-hieu-c11/miniso-gia-nhat-mumuso-nhai-han-nhung-thuong-hieu-tu-trung-quoc-tung-hoanh-khap-the-gioi-nho-ly-luan-sao-chep-van-hoa-khong-he-pham-phap-i75089">Miniso "giả Nhật”, Mumuso "nhái Hàn”- Những thương hiệu từ Trung Quốc “tung hoành” khắp thế giới nhờ lý luận "sao chép văn hóa không hề phạm pháp"</a></h2>
+                            <span class="updated_date">Cập nhật: 09/11/2018 09:11</span>
+                        </div>
+                    </li>
+                    <li >
+                        <div class="img">
+                            <a href="/kham-pha/thuong-hieu-c11/tropicana-va-tham-hoa-thiet-ke-thay-cai-vo-hop-tuong-sang-tao-hon-ai-ngo-mat-sach-khach-hang-va-bay-luon-65-trieu-usd-i74287">
+                                <img src="http://image.diaoconline.vn/kham-pha/2018/10/10/thumb-018-tropicana-va-tham-hoa-thiet-ke-thay-cai-vo-hop-tuong-sang-tao-hon-ai-ngo-mat-sach-khach-hang-va-bay-luon-65-trieu-usd.jpg" width="80" height="62" alt="Tropicana v&#224; thảm họa thiết kế: Thay c&#225;i vỏ hộp, tưởng s&#225;ng tạo hơn ai ngờ “mất sạch” kh&#225;ch h&#224;ng v&#224; bay lu&#244;n 65 triệu USD" /></a></div>
+                        <div class="right">
+                            <h2><a href="/kham-pha/thuong-hieu-c11/tropicana-va-tham-hoa-thiet-ke-thay-cai-vo-hop-tuong-sang-tao-hon-ai-ngo-mat-sach-khach-hang-va-bay-luon-65-trieu-usd-i74287">Tropicana và thảm họa thiết kế: Thay cái vỏ hộp, tưởng sáng tạo hơn ai ngờ “mất sạch” khách hàng và bay luôn 65 triệu USD</a></h2>
+                            <span class="updated_date">Cập nhật: 10/10/2018 08:54</span>
+                        </div>
+                    </li>
+                    <li  class=last >
+                        <div class="img">
+                            <a href="/kham-pha/thuong-hieu-c11/neu-la-chu-doanh-nghiep-ban-khong-nen-bo-qua-bai-nay-xay-dung-thuong-hieu-voi-nhan-vien-hay-voi-khach-hang-i74059">
+                                <img src="http://image.diaoconline.vn/kham-pha/2018/10/01/thumb-A55-neu-la-chu-doanh-nghiep-ban-khong-nen-bo-qua-bai-nay-xay-dung-thuong-hieu-voi-nhan-vien-hay-voi-khach-hang.jpg" width="80" height="62" alt="Nếu l&#224; chủ doanh nghiệp, bạn kh&#244;ng n&#234;n bỏ qua b&#224;i n&#224;y: X&#226;y dựng thương hiệu với nh&#226;n vi&#234;n hay với kh&#225;ch h&#224;ng?" /></a></div>
+                        <div class="right">
+                            <h2><a href="/kham-pha/thuong-hieu-c11/neu-la-chu-doanh-nghiep-ban-khong-nen-bo-qua-bai-nay-xay-dung-thuong-hieu-voi-nhan-vien-hay-voi-khach-hang-i74059">Nếu là chủ doanh nghiệp, bạn không nên bỏ qua bài này: Xây dựng thương hiệu với nhân viên hay với khách hàng?</a></h2>
+                            <span class="updated_date">Cập nhật: 01/10/2018 08:44</span>
+                        </div>
+                    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+            </div>
+<div id="shopping" class="wrap margin_bottom">
+    <div class="rounded_style_4 rounded_box">
+        <div class="content">
+            <div class="top">
+                <h2 class="headline"><a href="/kham-pha/shopping-cung-dool-c10"><span>Shopping Cùng DOOL</span></a></h2>
+                
+            </div>
+            <div class="show">
+                <ul>
+                    <li class="shop_block ">
+                        <div class="BL"></div>
+                        <div class="BR"></div>
+                        <div class="content">
+                            <a href="/kham-pha/shopping-cung-dool-c10/phu-kien-trang-hoang-nha-cua-don-giang-sinh-i75915"><img src="http://image.diaoconline.vn/kham-pha/2018/12/13/thumb-7E3-phu-kien-trang-hoang-nha-cua-don-giang-sinh.jpg" width="160" height="124" alt="Phụ kiện trang ho&#224;ng nh&#224; cửa đ&#243;n Gi&#225;ng sinh"/></a>
+                            <a href="/kham-pha/shopping-cung-dool-c10/phu-kien-trang-hoang-nha-cua-don-giang-sinh-i75915">Phụ kiện trang hoàng nhà cửa đón Giáng sinh</a> 
+	                    </div>
+                    </li>
+                    <li class="shop_block ">
+                        <div class="BL"></div>
+                        <div class="BR"></div>
+                        <div class="content">
+                            <a href="/kham-pha/shopping-cung-dool-c10/do-gia-dung-doc-dao-i55793"><img src="http://image.diaoconline.vn/kham-pha/2015/07/27/thumb-61E-do-gia-dung-doc-dao.jpg" width="160" height="124" alt="Đồ gia dụng độc đ&#225;o"/></a>
+                            <a href="/kham-pha/shopping-cung-dool-c10/do-gia-dung-doc-dao-i55793">Đồ gia dụng độc đáo</a> 
+	                    </div>
+                    </li>
+                    <li class="shop_block ">
+                        <div class="BL"></div>
+                        <div class="BR"></div>
+                        <div class="content">
+                            <a href="/kham-pha/shopping-cung-dool-c10/mua-sam-do-dung-tien-ich-cho-ba-noi-tro-i55681"><img src="http://image.diaoconline.vn/kham-pha/2015/07/20/thumb-F6C-mua-sam-do-dung-tien-ich-cho-ba-noi-tro.jpg" width="160" height="124" alt="Mua sắm đồ d&#249;ng tiện &#237;ch cho b&#224; nội trợ"/></a>
+                            <a href="/kham-pha/shopping-cung-dool-c10/mua-sam-do-dung-tien-ich-cho-ba-noi-tro-i55681">Mua sắm đồ dùng tiện ích cho bà nội trợ</a> 
+	                    </div>
+                    </li>
+                    <li class="shop_block ">
+                        <div class="BL"></div>
+                        <div class="BR"></div>
+                        <div class="content">
+                            <a href="/kham-pha/shopping-cung-dool-c10/mua-sam-gom-su-moc-gia-cuc-mem-i55007"><img src="http://image.diaoconline.vn/kham-pha/2015/06/09/thumb-0C4-mua-sam-gom-su-moc-gia-cuc-mem.jpg" width="160" height="124" alt="Mua sắm gốm sứ &#39;mộc&#39; gi&#225; cực mềm"/></a>
+                            <a href="/kham-pha/shopping-cung-dool-c10/mua-sam-gom-su-moc-gia-cuc-mem-i55007">Mua sắm gốm sứ 'mộc' giá cực mềm</a> 
+	                    </div>
+                    </li>
+                    <li class="shop_block last">
+                        <div class="BL"></div>
+                        <div class="BR"></div>
+                        <div class="content">
+                            <a href="/kham-pha/shopping-cung-dool-c10/dua-thien-nhien-vao-nha-i54623"><img src="http://image.diaoconline.vn/kham-pha/2015/05/13/thumb-46B-dua-thien-nhien-vao-nha.jpg" width="160" height="124" alt="Đưa thi&#234;n nhi&#234;n v&#224;o nh&#224;"/></a>
+                            <a href="/kham-pha/shopping-cung-dool-c10/dua-thien-nhien-vao-nha-i54623">Đưa thiên nhiên vào nhà</a> 
+	                    </div>
+                    </li>
+                </ul>
+            </div>
+        </div>    
+    </div>
+    <p class="note"></p>
+</div>
+
+        </div>
+    </div>
+
+
+	</div>
+    
+<!--FOOTER-->
+<div id="footer">
+    
+    <div id="footer_top">
+        
+<div id="bottom_menu" class="wrap">
+                <div id="news_menu">
+                    <h4>»THÔNG TIN ĐỊA ỐC</h4>
+                    <ul>
+                        <li><a href="/tin-tuc/thi-truong-dia-oc-c18">Thị trường địa ốc</a></li>
+                        <li><a href="/tin-tuc/hoat-dong-doanh-nghiep-c23">Hoạt động Doanh nghiệp</a></li>
+                        <li><a href="/tin-tuc/chinh-sach-quy-hoach-c16">Chính sách - Quy hoạch</a></li>
+                        <li><a href="/tin-tuc/tai-chinh-chung-khoan-c57">Tài chính - Chứng khoán</a></li>
+                        <li><a href="/tin-tuc/xay-dung-c25">Xây dựng</a></li>
+                        <li><a href="/tin-tuc/bat-dong-san-the-gioi-c24">Bất động sản thế giới</a></li>
+                    </ul>
+                </div>
+                <div id="market_menu">
+                    <h4>»SIÊU THỊ ĐỊA ỐC</h4>
+                    <ul>
+                        <li>
+                            <a href="/sieu-thi/nha-pho-c20">Nhà phố</a>
+                        </li>
+                        <li>
+                            <a href="/sieu-thi/villa-biet-thu-c1">Villa - Biệt thự</a>
+                        </li>
+                        <li>
+                            <a href="/sieu-thi/can-ho-chung-cu-c8">Căn hộ chung cư</a>
+                        </li>
+                        <li>
+                            <a href="/sieu-thi/dat-o-dat-tho-cu-c11">Đất ở - Đất thổ cư</a>
+                        </li>
+                        <li>
+                            <a href="/sieu-thi/dat-du-an-quy-hoach-c12">Đất dự án - Quy hoạch</a>
+                        </li>
+                        <li>
+                            <a href="/sieu-thi/van-phong-c9">Văn phòng</a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="project_menu">
+                    <h4>»DỰ ÁN</h4>
+                    <ul>
+                            <li><a href="/du-an/khu-du-lich-nghi-duong-c28">Khu du lịch - Nghỉ dưỡng</a></li>
+                            <li><a href="/du-an/cong-trinh-cong-cong-c29">Công trình công cộng</a></li>
+                            <li><a href="/du-an/khu-cong-nghiep-c11">Khu công nghiệp</a></li>
+                            <li><a href="/du-an/khu-dan-cu-do-thi-moi-c24">Khu dân cư – Đô thị mới </a></li>
+                            <li><a href="/du-an/khu-phuc-hop-thuong-mai-c25">Khu phức hợp - Thương mại</a></li>
+                            <li><a href="/du-an/cao-oc-van-phong-c26">Cao ốc văn phòng</a></li>
+                    </ul>
+                </div>
+                <div id="company_menu">
+                    <h4>»DOANH NGHIỆP ĐỊA ỐC</h4>
+                    <ul>
+                            <li>
+                                <a href="/doanh-nghiep/moi-gioi-dia-oc-c1">Môi giới địa ốc</a>
+                            </li>
+                            <li>
+                                <a href="/doanh-nghiep/vlxd-thi-cong-c3">VLXD & Thi công</a>
+                            </li>
+                            <li>
+                                <a href="/doanh-nghiep/tai-chinh-phap-ly-c6">Tài chính pháp lý</a>
+                            </li>
+                            <li>
+                                <a href="/doanh-nghiep/dau-tu-du-an-c12">Đầu tư - Dự án</a>
+                            </li>
+                            <li>
+                                <a href="/doanh-nghiep/thiet-ke-trang-tri-c14">Thiết kế - Trang trí</a>
+                            </li>
+                            <li>
+                                <a href="/doanh-nghiep/truyen-thong-quang-cao-c16">Truyền thông - Quảng cáo</a>
+                            </li>
+                    </ul>
+                </div>
+                <div id="discover_menu" class="last">
+                    <h4>
+                        »KHÁM PHÁ - TRẢI NGHIỆM</h4>
+                    <ul>
+                            <li><a href="/kham-pha/the-gioi-kien-truc-c4">Thế giới kiến trúc</a></li>
+                            <li><a href="/kham-pha/mach-ban-c6">Mách bạn</a></li>
+                            <li><a href="/kham-pha/phong-thuy-c9">Phong thủy</a></li>
+                            <li><a href="/kham-pha/khong-gian-song-c7">Không gian sống</a></li>
+                            <li><a href="/kham-pha/shopping-cung-dool-c10">Shopping cùng DOOL</a></li>
+                            <li><a href="/kham-pha/thuong-hieu-c11">Thương hiệu</a></li>
+                    </ul>
+                </div>
+
+</div>
+
+        
+        <div class="wrap">
+            <div id="social_network" class="white_border_box rounded_box" style="width: 960px; text-align: center;">
+                <div class="content">
+                    <div class="like" style="width: 250px;">
+                        <h2>Hỗ trợ kỹ thuật</h2>
+                        <span class="phone"><!--0909 480 599--> 0975 148 873</span><span>(Mr. Giang)</span>
+                    </div>
+                    <div class="like" style="width: 200px; border-left: 1px solid #e1e1e1;"> 
+		                    <h2>Hỗ trợ dịch vụ</h2>
+		                    <a style="color: #007bc4; font-size: 12px; line-height: 18px;" href="http://adv.diaoconline.vn/AboutUs/hotrotructuyen.html">Liên hệ phòng kinh doanh</a>
+		                </div>
+                    <div class="join_network" style="width: 488px;">
+                        <h4 style="width: 236px; float: left;">KẾT NỐI VỚI CHÚNG TÔI TẠI: </h4>
+                        <ul style="width: 236px; padding: 10px 0 10px 10px;">
+	                        <li class="facebook"><a href="http://facebook.com/diaoconlinefc" target="_blank">facebook</a></li>
+	                        <li class="twitter"><a href="https://twitter.com/DiaOcOnlinevn" target="_blank">twitter</a></li>
+	                        <li class="youtube"><a href="http://www.youtube.com/diaoconline" target="_blank">youtube</a></li>
+	                        <!--<li class="google"><a href="https://plus.google.com/u/1/b/101503616522434888485/" target="_blank">google</a></li>-->
+	                        <li class="linkedin"><a href="http://www.linkedin.com/in/diaoconline" target="_blank">linkedin</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="misc" class="rounded_style_3 rounded_box">
+                <div class="content">
+                   	<ul>
+                    <li class="btn_help_center first"><a href="http://adv.diaoconline.vn/AboutUs/trogiup.html" target="_blank"><span></span>TRUNG TÂM TRỢ GIÚP</a></li>
+                    <li class="btn_ad_price_list"><a href="http://adv.diaoconline.vn/AboutUs/banggia.html" target="_blank"><span></span>BẢNG GIÁ QUẢNG CÁO</a></li>
+                    <li class="btn_point_load"><a href="http://adv.diaoconline.vn/AboutUs/trogiup_tphi_napthe.html" target="_blank"><span></span>NẠP ĐIỂM DOOL</a></li>
+                    <li class="btn_our_services"><a href="http://adv.diaoconline.vn/AboutUs/dichvu.html" target="_blank"><span></span>DỊCH VỤ CỦA CHÚNG TÔI</a></li>
+                    <li class="btn_post_guide"><a href="http://adv.diaoconline.vn/AboutUs/trogiup_tdang.html" target="_blank"><span></span>HƯỚNG DẪN ĐĂNG TIN</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+	<div id="footer_bottom" style="height: 200px; background: #0071b5;;">
+        <div id="foot_content" class="wrap">
+			<div style="position: relative; float: right; width: 120px; padding-top: 10px;" id="bocongthuong"></div>
+			<div id="foot_nav">
+				<ul>
+				<li class="first"><a href="http://adv.diaoconline.vn/AboutUs" target="_blank">Về chúng tôi</a></li>
+				<li><a href="http://adv.diaoconline.vn/AboutUs/trogiup.html" target="_blank">Hướng dẫn sử dụng</a></li>
+				<li><a href="/quy-che-hoat-dong">Quy chế hoạt động</a></li>
+				
+				<li><a href="/chinh-sach-bao-mat">Chính sách bảo mật</a></li>
+				<li><a href="/chinh-sach-giai-quyet-khieu-nai">Chính sách giải quyết khiếu nại</a></li>
+				<li><a href="/lien-he">Liên hệ</a></li>
+				<li><a href="/rss"><img width="36" height="14" alt="rss diaoconline" src="/Content/images/icon_rss.gif"/></a></li>
+			</div>
+			<div class="copyright" style="padding-top: 10px;">
+			  <!--<p style="width: 40%;float: left; text-align: left; color: #8dccf2;">
+				  Copyright &copy; 2007 - 2016 DiaOcOnline Corp. &reg; <br>
+				  Ghi rõ nguồn "DiaOcOnline.vn" khi phát hành lại thông tin từ website này.<br>
+				  Công ty Cổ phần Địa ốc Trực Tuyến. Lầu 1, Phòng 102 tòa nhà OfficeSpot, 79C Điện Biên Phủ, Phường Đakao, Quận 1, TP.HCM, Viet Nam. <br>
+				  Tel: (028) 39115304 - Fax: (028) 39115360      
+			  </p>-->
+			  <p style="width: 40%;float: left; text-align: left; color: #8dccf2;">
+				Copyright &copy; 2007 - 2019 DiaOcOnline Corp. &reg; <br>
+				Ghi rõ nguồn "DiaOcOnline.vn" khi phát hành lại thông tin từ website này.<br>
+				Công ty Cổ phần Địa ốc Trực Tuyến - Số 79C Điện Biên Phủ, Phường Đakao, Quận 1, TP.HCM, Viet Nam. Tel: (028) 6299 1486
+			  </p>
+			  <p style="width: 20%;float: left;">
+				<a href="http://online.gov.vn/WebsiteDisplay.aspx?DocId=23064" target="_blank"><img src="http://diaoconline.vn/Content/images/diaoconline.vn_bocongthuong.png" title="" alt=""></a>
+			  </p>
+			  <p style="width: 40%; float: left; text-align: left; color: #8dccf2;">
+			  
+				  Giấy phép MXH số 285/GP-BTTTT cấp ngày 14/06/2017 <br />
+				  Đơn vị chủ quản: CÔNG TY CỔ PHẦN ĐỊA ỐC TRỰC TUYẾN
+			  <!--
+			  Giấy xác nhận cung cấp dịch vụ mạng xã hội trực tuyến số 131/GXN-TTĐT do Cục QL Phát thanh, Truyền hình và Thông tin điện tử cấp.<br>
+			  Giấy phép ICP số 07/GP-ICP-STTTT do Sở Thông tin và Truyền thông TP. HCM cấp.-->
+			  
+			  </p>
+			</div>
+		</div>
+	</div>
+	
+	
+    
+</div>
+
+<!-- STICKY FOOTER -->
+<!--<div style="position: fixed; bottom: 0; z-index: 999; width: 100%;">
+	<div style="width: 960px; margin-left: auto; margin-right: auto;">
+			<div id="swiffycontainer" style="width: 960px; height: 50px; background: #fff;">
+				<a href="http://www.diaockimoanh.com.vn/dat-nen/du-an-dau-giay-center-city-2/240/2774" target="_blank"><img src="http://image.diaoconline.vn/kimoanh_sf_960x50.gif" /></a>
+	    </div>
+	</div>
+</div>-->
+
+<!-- Google Code for Remarketing Tag -->
+<!--------------------------------------------------
+Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. See more information and instructions on how to setup the tag on: http://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 899111951;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/899111951/?value=0&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+
+
+
+    <script src="/Content/js/uniform/uniform.js" type="text/javascript"></script>
+    <script src="/Content/js/script.js" type="text/javascript"></script>
+    <script src="/Content/js/tooltip/tooltipsy.min.js" type="text/javascript"></script>
+    <script src="/Content/js/slides/slides.min.jquery.js" type="text/javascript"></script>
+    <script src="/Content/js/doolv3.js?2242" type="text/javascript"></script>
+    <script src="/Content/js/jquery-scrolltofixed-min.js" type="text/javascript"></script>
+    <script src="/Content/js/jquery.stickyelement.js" type="text/javascript"></script>
+</div>
+</body>
+</html>

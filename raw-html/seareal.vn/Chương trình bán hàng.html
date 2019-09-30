@@ -1,0 +1,1015 @@
+﻿ <!DOCTYPE html>
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <html lang="vi">
+  <head>
+	<meta name="google-site-verification" content="oazGn1EnX8B3JKGCUskp0CQy3EVxhvhhGgbGe2U1kM8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link href="/app/webroot/img/general/seareal_logo.jpg" rel="shortcut icon" type="image/x-icon" />
+	<!-- Google font-->
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed&subset=latin,vietnamese' rel='stylesheet' type='text/css'>
+	<meta property="og:description" content="" />
+	<meta property="og:image" content="http://seareal.vn/app/webroot/img/upload/new/" />
+    <meta property="og:title" content="" />
+	<meta name="language" content="vn" />
+    <meta name="placename" content="Ha Noi, Viet Nam" />
+	<meta name="region" content="VN-HN" />
+    <meta http-equiv="refresh" content="1800" />
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <title>Chương trình bán hàng</title>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-68402730-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.css" /><link rel="stylesheet" type="text/css" href="/css/bootstrap-wysihtml5.css" /><link rel="stylesheet" type="text/css" href="/css/font-awesome.css" /><link rel="stylesheet" type="text/css" href="/css/jquery.mCustomScrollbar.css" /><link rel="stylesheet" type="text/css" href="/css/mCustomScrollbar_style.css" /><link rel="stylesheet" type="text/css" href="/css/jquery-ui.css" /><link rel="stylesheet" type="text/css" href="/css/bootstrap-fileinput.css" /><link rel="stylesheet" type="text/css" href="/css/kstyle.css" /><link rel="stylesheet" type="text/css" href="/css/kmedia.css" /><link rel="stylesheet" type="text/css" href="/css/kjs_style.css" /><link rel="stylesheet" type="text/css" href="/css/qstyle.css" />		 
+</head>	 
+		 
+<body>
+	<div class="container">
+		<div class="row">
+			<div id="header" class="col-sm-12 pad-lr0">
+				<div class="col-sm-2 logo">
+					<a href="/"><img src="/app/webroot/img/general/seareal_logo.png" alt="SEAREAL - Bất Động Sản Đông Nam Á"></a>
+				</div><!-- /logo -->
+
+				<div class="col-sm-10 header-rightcol">
+					<div class="col-md-4 hidden-xs col-sm-12 header-background"></div><!-- /header-background -->
+
+					<div class="col-md-3 col-md-offset-1 col-sm-offset-4 col-sm-4 col-xs-6 hotline">
+						Hotline: 093 929 24 34					</div><!-- /hotline -->
+
+					<div class="col-sm-4 search col-xs-6">
+						<form method="post" action="/chuong-trinh-ban-hang" style="">
+							<div class="input-group">							
+								<input type="text" class="form-control" name="word" placeholder="Tìm kiếm">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="submit"><i class="fa fa-search fa-flip-horizontal"></i></button>
+								</span>
+						    </div><!-- /input-group -->
+					    </form>
+
+						<div class="login" style="display:none">
+							<div class="div-dkdn">
+								
+									<a href="#" data-toggle="modal" data-target="#loginModal" >Đăng nhập</a>
+									<a href="#" data-toggle="modal" data-target="#createModal">Đăng ký</a>
+															
+							</div>
+
+							<!-- loginModal -->
+							<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+								<div class="modal-dialog" role="document">
+								    <div class="modal-content">
+										<div class="modal-header">
+										    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										    <h4 class="modal-title" id="myModalLabel">Đăng nhập</h4>
+										</div>
+										<div class="modal-body">
+											<form id="dang_nhap" action="/Accounts/login" method="post">
+												<div>
+													<input type="text" required="true" name="email" placeholder="Tên đăng nhập">
+												</div>
+												<div>
+													<input type="password" required="true" name="pass"  placeholder="Mật khẩu">
+												</div>
+												<div>
+													<a href="#" class="facebook kloginfb"><i class="fa fa-facebook"></i> Đăng nhập bằng facebook</a>
+												</div>
+												<div>
+													<button class="kbtn-login" type="submit">Đăng nhập</button>
+												</div>
+												<div>
+													<ul>
+														<li><a id="link2forgetpassModal" href="#" data-toggle="modal" data-target="#forgetpassModal">Quên mật khẩu</a></li>
+														<li><a id="link2createModal" href="#" data-toggle="modal" data-target="#createModal">Đăng ký tài khoản mới</a></li>
+													</ul>
+												</div>
+												<div class="login-error">(*) Vui lòng nhập tên đăng nhập và mật khẩu</div>
+											</form>
+										</div>
+								    </div>
+								</div>
+							</div>
+
+							<!-- createModal -->
+							<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+								<div class="modal-dialog" role="document">
+								    <div class="modal-content">
+										<div class="modal-header">
+										    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										    <h4 class="modal-title" id="myModalLabel">Đăng Ký</h4>
+										</div>
+										<div class="modal-body">
+											<form action="/Accounts/register" id="add-form" method="post">
+												<!--<div>
+													<input type="text" name="fullname" placeholder="Tên đăng nhập">
+												</div>
+												-->
+												<div>
+													<input type="text" required="true" name="fullname" placeholder="Họ tên">
+												</div>
+												<ul>
+													<li><input  required="true" name="password" id="password" type="password" placeholder="Mật khẩu"></li>
+													<li><input  required="true" name="confirm_password" type="password" placeholder="Nhập lại mật khẩu"></li>
+												</ul>
+												
+												<div>
+													<input type="text"  required="true" name="email" placeholder="Email">
+												</div>
+												<div>
+													<input type="text"  required="true" name="phone" placeholder="Điện thoại">
+												</div>
+												<!--<ul>
+													<li>
+														<select name="province" id="">
+															<option value="">Tỉnh/ Thành phố</option>
+														</select>
+													</li>
+													<li>
+														<select name="district" id="">
+															<option value="">Quận/ Huyện</option>
+														</select>
+													</li>
+												</ul>	
+												-->						
+												<div>
+													<input type="text"  required="true" name="address" placeholder="Địa Chỉ">
+												</div>
+												<ul>
+													<li>
+														<div class="input-group">
+															<input type="text" class="form-control" name="captcha_check" id="captcha_check" value="34329" >
+															<!--<span class="input-group-btn">
+																<button class="btn" type="button"><i class="fa fa-repeat"></i></button>
+															</span>
+															-->
+													    </div><!-- /input-group -->
+													</li>
+													<li>
+														<input type="text" name="captcha"  required="true" placeholder="Nhập mã an toàn">
+													</li>
+												</ul>	
+												<!--						
+												<div class="login-error">
+													Các lỗi hiện ra ở chỗ này <br>
+													(*) lỗi 1 <br>
+													(*) lỗi 2
+												</div>
+												-->
+												<div>
+													<button class="kbtn-dk" type="submit">Đăng ký</button>
+												</div>
+											</form>
+										</div>
+								    </div>
+								</div>
+							</div>
+
+							<!-- forgetpasswordModal -->
+							<div class="modal fade" id="forgetpassModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+								<div class="modal-dialog" role="document">
+								    <div class="modal-content">
+										<div class="modal-header">
+										    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+										    <h4 class="modal-title" id="myModalLabel">Quên mật khẩu</h4>
+										</div>
+										<div class="modal-body">
+											<form action="/Accounts/forgetpassword" id="forget" method="post">
+												<div>
+													<input type="text" name="email" required="true" placeholder="Nhập Email">
+												</div>
+												<div class="note">
+													(*) Vui lòng nhập địa chỉ Email để SEAREAL gửi mật khẩu mới vào hòm thư của bạn. Sau khi bấm "Gửi" xin vui lòng kiểm tra Email.
+												</div>
+												<div>
+													<button class="kbtn-login" type="submit">Gửi</button>
+												</div>
+											</form>
+										</div>
+								    </div>
+								</div>
+							</div>
+						</div>
+					</div><!-- search -->
+				</div><!-- /header-rightcol -->
+
+				<div class="col-md-10 col-md-offset-2 col-sm-12 menu">
+					<nav class="navbar navbar-default">
+						<div class="container-fluid">
+							<!-- Brand and toggle get grouped for better mobile display -->
+							<div class="navbar-header hidden-lg hidden-md hidden-sm">
+								<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+									<span class="sr-only">Toggle navigation</span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+									<span class="icon-bar"></span>
+								</button>
+								<a class="navbar-brand" id="home" href="."><i class="fa fa-home"></i></a>
+							</div>
+
+							<!-- Collect the nav links, forms, and other content for toggling -->
+							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul class="nav navbar-nav">
+									<li class="hidden-xs"><a class="" href="/"><i class="fa fa-home"></i></a></li>
+									<li><a class="" href="/ve-chung-toi">Giới thiệu</a></li>
+									<li><a class="" href="/du-an/dang-thuc-hien">Dự án</a></li>
+									<li><a class="" href="/nha-dat/san-giao-dich">Sàn giao dịch</a></li>
+									<li><a class="" href="/tin-tuc">Tin tức</a></li>
+									<li><a class="" href="/doi-tac">Đối tác</a></li>
+									<li><a class="" href="/tuyen-dung">Tuyển dụng</a></li>
+									<li><a class="" href="/lien-he">Liên hệ</a></li>
+								</ul>
+								<div class="clear"></div>
+							</div><!-- /.navbar-collapse -->
+						</div><!-- /.container-fluid -->
+					</nav>
+				</div><!-- /menu -->
+			</div><!-- /header -->
+
+			<div class="col-sm-12 news-content">
+	<div class="col-sm-12">
+		<div class="pl-line"></div>
+	</div>
+	
+	<div class="col-sm-12 news-hmenu">
+	<!-- Split button -->
+	<div class="btn-group">
+		<button type="button" class="kbtn btn-title">Tin tức</button>
+		<button type="button" class="kbtn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		    <span class="fa fa-chevron-down"></span>
+		    <span class="sr-only">Tin tức</span>
+		</button>
+		<ul class="dropdown-menu">
+							<li class="news-hmenu-item"><a class="" href="/van-hoa-seareal">Văn hóa seareal</a></li>
+							<li class="news-hmenu-item"><a class="" href="/tin-thoi-su">Tin thời sự</a></li>
+							<li class="news-hmenu-item"><a class="" href="/ban-tin-seareal">Bản tin seareal</a></li>
+			
+			<li class="news-hmenu-item"><a href="/chuong-trinh-ban-hang">Chương Trình Bán Hàng</a></li>
+		</ul>
+	</div>
+</div>
+	<div class="col-sm-12 news-leftcol">
+		<form method="Post" id="form1" action="/chuong-trinh-ban-hang">
+			<div class="col-sm-12 news-header pad-lr0">
+				<div class="col-lg-10 col-md-9 col-sm-12">
+					<ul class="news-menu">
+						<li><a href="#">Chương Trình Bán Hàng</a></li>
+					</ul>
+				</div>
+
+				<div class="col-lg-2 col-md-3 col-sm-3 div-btn-ctbh">
+					<button class="btn btn-ctbh btn-newest" type="submit" name="button_new">Mới Nhất >></button>
+				</div>
+			</div>
+			
+		
+
+			<div class="col-sm-12 frm-ctbh">
+				<ul class="menu-ctbh">
+					<li class="ctbh-24 ctbh-text">
+						Chính sách bán hàng dự án
+					</li>
+
+					<li class="ctbh-15 ctbh-input">
+						<input type="text" class="form-control fc-ctbh" id="" name="word" value="">
+					</li>
+
+					<li class="ctbh-20 ctbh-md-26">
+						<select name="loai" >
+							<option value="">Loại bất động sản</option>
+															<option value="1">Căn Hộ Cao Cấp</option>
+																<option value="4">Nhà Phố</option>
+														</select>
+					</li>
+
+					<li class="ctbh-15">
+						<select name="Province" id="menu1">
+							<option value="">Thành phố</option>
+															<option value="01">Hà Nội</option>
+																<option value="02">Hà Giang</option>
+																<option value="04">Cao Bằng</option>
+																<option value="06">Bắc Kạn</option>
+																<option value="08">Tuyên Quang</option>
+																<option value="10">Lào Cai</option>
+																<option value="11">Điện Biên</option>
+																<option value="12">Lai Châu</option>
+																<option value="14">Sơn La</option>
+																<option value="15">Yên Bái</option>
+																<option value="17">Hòa Bình</option>
+																<option value="19">Thái Nguyên</option>
+																<option value="20">Lạng Sơn</option>
+																<option value="22">Quảng Ninh</option>
+																<option value="24">Bắc Giang</option>
+																<option value="25">Phú Thọ</option>
+																<option value="26">Vĩnh Phúc</option>
+																<option value="27">Bắc Ninh</option>
+																<option value="30">Hải Dương</option>
+																<option value="31">Hải Phòng</option>
+																<option value="33">Hưng Yên</option>
+																<option value="34">Thái Bình</option>
+																<option value="35">Hà Nam</option>
+																<option value="36">Nam Định</option>
+																<option value="37">Ninh Bình</option>
+																<option value="38">Thanh Hóa</option>
+																<option value="40">Nghệ An</option>
+																<option value="42">Hà Tĩnh</option>
+																<option value="44">Quảng Bình</option>
+																<option value="45">Quảng Trị</option>
+																<option value="46">Thừa Thiên Huế</option>
+																<option value="48">Đà Nẵng</option>
+																<option value="49">Quảng Nam</option>
+																<option value="51">Quảng Ngãi</option>
+																<option value="52">Bình Định</option>
+																<option value="54">Phú Yên</option>
+																<option value="56">Khánh Hòa</option>
+																<option value="58">Ninh Thuận</option>
+																<option value="60">Bình Thuận</option>
+																<option value="62">Kon Tum</option>
+																<option value="64">Gia Lai</option>
+																<option value="66">Đắk Lắk</option>
+																<option value="67">Đắk Nông</option>
+																<option value="68">Lâm Đồng</option>
+																<option value="70">Bình Phước</option>
+																<option value="72">Tây Ninh</option>
+																<option value="74">Bình Dương</option>
+																<option value="75">Đồng Nai</option>
+																<option value="77">Bà Rịa - Vũng Tàu</option>
+																<option value="79">Hồ Chí Minh</option>
+																<option value="80">Long An</option>
+																<option value="82">Tiền Giang</option>
+																<option value="83">Bến Tre</option>
+																<option value="84">Trà Vinh</option>
+																<option value="86">Vĩnh Long</option>
+																<option value="87">Đồng Tháp</option>
+																<option value="89">An Giang</option>
+																<option value="91">Kiên Giang</option>
+																<option value="92">Cần Thơ</option>
+																<option value="93">Hậu Giang</option>
+																<option value="94">Sóc Trăng</option>
+																<option value="95">Bạc Liêu</option>
+																<option value="96">Cà Mau</option>
+														</select>
+					</li>
+
+					<li class="ctbh-15" id="menu_2">
+						<select name="district" >
+							<option value="">Quận huyện</option>
+						</select>
+					</li>
+
+					<li class="ctbh-11">
+						<button type="submit" class="btn btn-ctbh btn-search">Tìm Kiếm</button>
+					</li>
+				</ul>
+			</div>
+			
+			<input type="hidden" name="sale" />
+		</form>
+	</div>
+
+	<div id="news-leftcol" class="col-sm-12 col-md-9 news-leftcol">
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/74"><img src="http://seareal.vn/img/upload/project/du-an-waterpoint.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/74">Khu Đô Thị Waterpoint</a></h3>
+				<div>
+					<p class="date">
+						24/07/2019					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/74">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/73"><img src="http://seareal.vn/img/upload/project/du-an-la-premier.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/73">La Premier</a></h3>
+				<div>
+					<p class="date">
+						06/04/2019					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/73">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/72"><img src="http://seareal.vn/img/upload/project/khu-dan-cu-phu-my-toc-tien.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/72">Khu dân cư Phú Mỹ-Tóc Tiên</a></h3>
+				<div>
+					<p class="date">
+						06/04/2019					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/72">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/71"><img src="http://seareal.vn/img/upload/project/lago-centro.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/71">Lago Centro</a></h3>
+				<div>
+					<p class="date">
+						06/04/2019					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/71">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/68"><img src="http://seareal.vn/img/upload/project/la-cosmo-residences.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/68">La Cosmo Residences</a></h3>
+				<div>
+					<p class="date">
+						17/05/2018					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/68">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/67"><img src="http://seareal.vn/img/upload/project/can-ho-fresca-riverside.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/67">Căn hộ Fresca Riverside</a></h3>
+				<div>
+					<p class="date">
+						06/03/2018					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/67">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/65"><img src="http://seareal.vn/img/upload/project/du-an-homyland-riverside.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/65">Homyland Riverside</a></h3>
+				<div>
+					<p class="date">
+						14/12/2017					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/65">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="col-sm-12 news-item pad-lr0">
+			<div class="col-md-4 col-sm-5">
+				 <a href="/toa-nha/64"><img src="http://seareal.vn/img/upload/project/can-ho-one-verandah.jpg"alt="Seareal - Tin tức", name="imgtempt"/>
+				 </a>
+			</div>
+			<div class="col-md-8 col-sm-7">
+				<h3 class="title"><a href="/toa-nha/64">ONE VERANDAH</a></h3>
+				<div>
+					<p class="date">
+						17/11/2017					</p>
+					<p class="views">0  views</p>
+				</div>
+				<p></p>
+				<div class="seemore"><a href="/toa-nha/64">xem thêm >></a></div>
+			</div>
+		</div>
+			<div class="pages col-sm-12">
+			<ul>	
+				<li class="disabled"><a>&lt; Trang trước</a></li>			
+				<li class="active"><a>1</a></li><li><a href="/News/sale/page:2/sort:Project.id/direction:desc?url=chuong-trinh-ban-hang">2</a></li><li><a href="/News/sale/page:3/sort:Project.id/direction:desc?url=chuong-trinh-ban-hang">3</a></li><li><a href="/News/sale/page:4/sort:Project.id/direction:desc?url=chuong-trinh-ban-hang">4</a></li><li><a href="/News/sale/page:5/sort:Project.id/direction:desc?url=chuong-trinh-ban-hang">5</a></li>			
+				<li class="next"><a href="/News/sale/page:2/sort:Project.id/direction:desc?url=chuong-trinh-ban-hang" rel="next" currentClass="disabled">Trang sau &gt;</a></li>			</ul>
+		</div>
+	</div>
+
+	<div class="col-sm-12 col-md-3 news-rightcol">
+	<div id="news-menu">
+		<ul class="news-menu">
+		<li class="title">Tin Tức</li>
+					<a class="" href="/van-hoa-seareal">
+				<li>Văn hóa seareal</li>
+				
+			</a>
+					<a class="" href="/tin-thoi-su">
+				<li>Tin thời sự</li>
+				
+			</a>
+					<a class="" href="/ban-tin-seareal">
+				<li>Bản tin seareal</li>
+				
+			</a>
+			
+		<a href="/chuong-trinh-ban-hang"><li>Chương Trình Bán Hàng</li></a>
+		</ul>
+		
+		<ul class="news-menu">
+		<li class="title">Tin Nổi Bật</li>
+		
+					<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/du-an-la-premier.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>La Premier</h4>
+					<div>Căn Hộ Cao Cấp</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/73">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/khu-dan-cu-phu-my-toc-tien.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>Khu dân cư Phú Mỹ-Tóc Tiên</h4>
+					<div>Nhà Phố</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/72">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/lago-centro.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>Lago Centro</h4>
+					<div>Nhà Phố</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/71">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/can-ho-fresca-riverside.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>Căn hộ Fresca Riverside</h4>
+					<div>Căn Hộ Cao Cấp</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/67">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/du-an-homyland-riverside.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>Homyland Riverside</h4>
+					<div>Căn Hộ Cao Cấp</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/65">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/can-ho-one-verandah.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>ONE VERANDAH</h4>
+					<div>Căn Hộ Cao Cấp</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/64">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/mizuki-park.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>Khu đô thị Mizuki Park</h4>
+					<div>Căn Hộ Cao Cấp</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/62">xem thêm >></a></div>
+				</div>
+			</li>
+						<li class="newsrc-item">
+				<div class="img">
+					<img src="/img/upload/project/dedge-thao-dien.jpg" alt="" />				</div>
+				<div class="content">
+					<h4>d'Edge Thảo Điền</h4>
+					<div>Căn Hộ Cao Cấp</div>
+						<div>0 views</div>
+					<div class="seemore"><a href="/toa-nha/61">xem thêm >></a></div>
+				</div>
+			</li>
+					
+		</ul>
+	</div>	</div>
+	
+</div>
+
+
+	<script type="text/javascript" src="/js/jquery-1.11.3.js"></script>
+<script>
+	$(document).ready(function() {
+		$('#menu1').on('change',function() {
+        $.ajax({
+			type:'POST',
+			url:'/Project/ajax_district',
+			 data: $("#form1").serialize(),
+			success:function(data){
+				
+				$('#menu_2').html(data);
+				
+				
+			}
+		});
+
+		
+		
+	
+    });
+	});
+</script>	
+
+
+			
+			<div id="footer" class="col-sm-12 pad-lr0">
+				<div class="col-sm-4 col-md-3 logo">
+					<img src="/app/webroot/img/general/seareal_footer_logo.png" alt="Seareal - Bất Động Sản Đông Nam Á">
+				</div>
+
+				<div class="col-md-5 col-sm-8 thongtinlienhe pad-lr0">
+									<h3 class="title">Công ty TNHH Bất Động Sản Đông Nam Á</h3>					<p>Trụ sở chính: 27 Quốc lộ 13, phường 26, Q. Bình Thạnh, Tp. HCM  </p>
+					<p>Điện thoại:  (028) 3840 00 09         Phone: 093 929 24 34</p>
+					<p>Website: www.seareal.vn  -  Email: info@seareal.vn </p>
+								</div>
+
+				<div class="col-md-4 col-sm-12 menu-footer">
+					<ul>
+						<li><h2><a href="/ve-chung-toi">Giới thiệu</a></h2></li>
+						<li><h2><a href="/tin-tuc">Tin tức</a></h2></li>
+						<li><h2><a href="/du-an/dang-thuc-hien">Dự án</a></h2></li>
+						<li><h2><a href="/doi-tac">Đối tác</a></h2></li>
+						<li><h2><a href="/nha-dat/san-giao-dich">Sàn giao dịch</a></h2></li>
+						<li><h2><a href="/tuyen-dung">Tuyển dụng</a></h2></li>
+						<li><h2><a href="/lien-he">Liên hệ</a></h2></li>
+					</ul>
+				</div>
+
+				<div class="clear"></div>
+				<script lang="javascript">(function() {var pname = ( (document.title !='')? document.title : document.querySelector('meta[property="og:title"]').getAttribute('content') );var ga = document.createElement('script'); ga.type = 'text/javascript';ga.src = '//live.vnpgroup.net/js/web_client_box.php?hash=28e242c1e313acfa1ad25f3f65e211dd&data=eyJzc29faWQiOjM5Mjc1MjYsImhhc2giOiI1ZWJjNWIwZTFiMTM3MzQ1MTM0ODVmMjNhZTI1YWJmNiJ9&pname='+pname;var s = document.getElementsByTagName('script');s[0].parentNode.insertBefore(ga, s[0]);})();</script><noscript><a href="http://www.vatgia.com" title="vatgia.com" target="_blank">Tài trợ bởi vatgia.com</a></noscript><noscript><a href="http://vchat.vn" title="vchat.vn" target="_blank">Phát triển bởi vchat.vn</a></noscript>	
+				<div class="col-sm-12 footer-bottom">
+					<div class="col-sm-6 leftcol">
+						Giữ liên lạc với chúng tôi <a style="color: white;"  href="https://www.facebook.com/seareal.vn/"> <i class="fa fa-facebook"></i>  </a> &nbsp;<i class="fa fa-twitter"></i>
+					</div>
+<a href="http://seareal.vn/Du-an/du-an-can-ho-samland-airport-go-vap.html" target="_self" rel="">Samland Airport</a>
+
+					<div class="col-sm-6 rightcol"> Bản quyền thuộc về Seareal
+											</div>
+				</div>
+			</div>
+		</div><!-- /row -->
+	</div><!-- /container -->
+    
+	
+	
+	<script type="text/javascript" src="/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/js/jquery.validate.js"></script>
+	<script type="text/javascript" src="/js/jssor.slider.mini.js"></script>
+	<script type="text/javascript" src="/js/oauthpopup.js"></script>
+	<script type="text/javascript" src="/js/jquery-ui.js"></script>
+	<script type="text/javascript" src="/js/bootstrap-fileinput.js"></script>
+	<script type="text/javascript" src="/js/wysihtml5-0.3.0.js"></script>
+	<script type="text/javascript" src="/js/bootstrap-wysihtml5.js"></script>
+	<script type="text/javascript" src="/js/jquery.mCustomScrollbar.js"></script>
+	<script type="text/javascript" src="/js/kjquery.mCustomScrollbar.js"></script>
+
+		<!-- mCustomScrollbar -->
+<!-- Project Detail -->
+	<script type="text/javascript">
+			</script>
+
+	<!-- Projects List -->
+	<script type="text/javascript">
+			</script>
+
+	<!-- News List -->
+	<script type="text/javascript">
+		var nl_right = document.querySelector('.news-rightcol #news-menu');
+		
+		var nl_leftHeight = $('#news-leftcol').height();
+		var nl_rightHeight = $('.news-rightcol #news-menu').height();
+		if(nl_leftHeight < nl_rightHeight) nl_leftHeight = nl_rightHeight;
+		$('.news-rightcol').height(nl_leftHeight - 60);
+		var sr_header = $('#header').height();
+
+		function onScroll(e) {
+			window.scrollY >= (sr_header + 130) ? nl_right.classList.add('sticky') : nl_right.classList.remove('sticky');
+			window.scrollY >= (nl_leftHeight - nl_rightHeight + sr_header) ? nl_right.classList.add('stop') : nl_right.classList.remove('stop');
+		}
+		document.addEventListener('scroll', onScroll);	</script>
+	
+	<script>
+		$(document).ready(function(){
+		
+		$("#forget").validate();
+		
+		$("#dang_nhap").validate({
+		rules: {
+		
+	
+			
+			email: {
+			
+				email: true
+			}
+			
+			
+		},
+		messages: {
+			
+			email: "Bạn Chưa Nhập Đúng Định Dạng của Email"
+			
+		}
+	});
+		$("#add-form").validate({
+		rules: {
+		
+			password: {
+				required: true,
+				minlength: 5
+			},
+			confirm_password: {
+				required: true,
+				minlength: 5,
+				equalTo: "#password"
+			},
+			email: {
+				required: true,
+				email: true
+			},
+			captcha:
+			{
+				equalTo: "#captcha_check"
+			}
+			
+		},
+		messages: {
+			
+			password: {
+				
+				minlength: "Mật Khẩu Tối thiểu là 5 ký tự"
+			},
+			confirm_password: {
+			
+				minlength: "Mật Khẩu Tối thiểu là 5 ký tự",
+				equalTo: "Mật Khẩu Xác Nhận Lại Chưa Đúng"
+			},
+				captcha: {
+			
+				
+				equalTo: "Mã  Xác Nhận Chưa Đúng"
+			},
+			email: "Bạn Chưa Nhập Đúng Định Dạng của Email"
+			
+		}
+	});
+	$('#dang_nhap').submit(function(e){
+		var tis = $(this);
+		e.preventDefault();
+		
+		$.post(tis.attr('action'),tis.serialize(),function(data){
+			if(data==0)
+			alert('Email Hoặc Mật Khẩu Chưa Chính Xác');
+			if(data==1)
+				window.location.reload();
+			
+		});
+	
+	
+	});
+	
+	  $('.facebook').click(function(e){
+        $.oauthpopup({
+            path: '/FacebookCps/login',
+			width:600,
+			height:300,
+            callback: function(){
+                window.location.reload();
+            }
+        });
+		e.preventDefault();
+    });
+	/*
+		$('#add-form').submit(function(e){
+		var tis = $(this);
+		e.preventDefault();
+		
+		$.post(tis.attr('action'),tis.serialize(),function(data){
+			
+			
+		});
+	
+	
+	});
+	*/
+			$(function () {
+				$('#project-detail .top ul li a').click(function (e) {
+				  var id = $(this).attr('href');
+				  if($(id).length > 0)
+				  {
+					console.log($(id).offset().top);
+					$('body,html').animate({scrollTop: $(id).offset().top - 115}, 800);
+				  }
+				  e.preventDefault();
+				});
+			});
+			$('#tienich-duan .seemore a').click(function () {$('body,html').animate({scrollTop: $('#tienich').offset().top - 115}, 800);return false;});
+		});
+	</script>
+	
+<script>
+	$(document).ready(function(){
+		$(function () {
+			//get pathname: http://local/websitename/index.html => websitename/index.html
+			var pgurl = window.location.pathname;
+
+			$(".qldm-leftcol a").each(function(){
+				if($(this).attr("href") == pgurl)
+					$(this).addClass("active");
+			});
+		});
+	
+		$("input[name='checkAll']").change(function () {
+		    $("input:checkbox").prop('checked', $(this).prop("checked"));
+		});
+
+		$('#link2createModal').click(function(){
+			$('#loginModal').modal('hide');
+		});
+
+		$('#link2forgetpassModal').click(function(){
+			$('#loginModal').modal('hide');
+		});
+
+		// scroll hotline
+		$(function(){
+			$(window).scroll(function(){
+				if($(this).scrollTop() > 100 && $('body').width() >= 544){
+					$('.header-rightcol .hotline').addClass('fixed');
+				} else{
+					$('.header-rightcol .hotline').removeClass('fixed');
+				}
+			});
+		});
+	});
+</script>
+	
+<!-- Google Code dành cho Thẻ tiếp thị lại -->
+<!--------------------------------------------------
+Không thể liên kết thẻ tiếp thị lại với thông tin nhận dạng cá nhân hay đặt thẻ tiếp thị lại trên các trang có liên quan đến danh mục nhạy cảm. Xem thêm thông tin và hướng dẫn về cách thiết lập thẻ trên: http://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 855576328;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/855576328/?guid=ON&amp;script=0"/>
+</div>
+</noscript>	
+	
+	
+		
+<!-- Google Code dành cho Thẻ tiếp thị lại -->
+<!--------------------------------------------------
+Không thể liên kết thẻ tiếp thị lại với thông tin nhận dạng cá nhân hay đặt thẻ tiếp thị lại trên các trang có liên quan đến danh mục nhạy cảm. Xem thêm thông tin và hướng dẫn về cách thiết lập thẻ trên: http://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 857900234;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/857900234/?guid=ON&amp;script=0"/>
+</div>
+</noscript>
+	
+	<!-- Google Code dành cho Thẻ tiếp thị lại -->
+<!--------------------------------------------------
+Không thể liên kết thẻ tiếp thị lại với thông tin nhận dạng cá nhân hay đặt thẻ tiếp thị lại trên các trang có liên quan đến danh mục nhạy cảm. Xem thêm thông tin và hướng dẫn về cách thiết lập thẻ trên: http://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 879960294;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/879960294/?guid=ON&amp;script=0"/>
+</div>
+</noscript>
+
+	<!-- Facebook Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '570563859815443'); // Insert your pixel ID here.
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=570563859815443&ev=PageView&noscript=1"
+/></noscript>
+<!-- DO NOT MODIFY -->
+<!-- End Facebook Pixel Code -->
+
+	
+	
+	<!-- Google Code dành cho Thẻ tiếp thị lại -->
+<!--------------------------------------------------
+Không thể liên kết thẻ tiếp thị lại với thông tin nhận dạng cá nhân hay đặt thẻ tiếp thị lại trên các trang có liên quan đến danh mục nhạy cảm. Xem thêm thông tin và hướng dẫn về cách thiết lập thẻ trên: http://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 941606910;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/941606910/?value=0&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+	
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 864540773;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/864540773/?guid=ON&amp;script=0"/>
+</div>
+</noscript>	
+
+
+<!-- Google Code dành cho Thẻ tiếp thị lại -->
+<!--------------------------------------------------
+Không thể liên kết thẻ tiếp thị lại với thông tin nhận dạng cá nhân hay đặt thẻ tiếp thị lại trên các trang có liên quan đến danh mục nhạy cảm. Xem thêm thông tin và hướng dẫn về cách thiết lập thẻ trên: http://google.com/ads/remarketingsetup
+--------------------------------------------------->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 845242704;
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/845242704/?guid=ON&amp;script=0"/>
+</div>
+</noscript>
+
+
+	</body>
+	</html>
