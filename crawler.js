@@ -77,7 +77,9 @@ const handleRequestSuccessed = (response, queueUrl) => {
     `-`,
     `${response.elapsedTime}ms`
   );
-  markHandledUrl.apply(queueUrl, response);
+
+  markHandledUrl(queueUrl, response);
+
   const $ = cheerio.load(response.body);
   let title = $("title")
     .text()
@@ -163,6 +165,6 @@ const main = (url, option) => {
     });
 };
 
-// main("https://vndiaoc.com/", {
-//   maxRequestPerCrawl: 100
-// });
+main("https://batdongsan.vn/", {
+  maxRequestPerCrawl: 100
+});
