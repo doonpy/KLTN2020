@@ -105,6 +105,11 @@ const handleRequestFailed = (queueUrl, error) => {
     `-`,
     `ERROR: ${error.code}`
   );
+  queueUrl.waiting.push(
+    `http://webcache.googleusercontent.com/search?q=cache:${
+      queueUrl.waiting[0]
+    }`
+  );
   markFailedUrl(queueUrl, error);
 };
 
@@ -130,7 +135,9 @@ const crawler = async queueUrl => {
     }
   }
   queueUrl.executeTime += new Date() - startTime;
+  console.log("=> Exporting log file...");
   storageMethod.exportLog(queueUrl);
+
   console.log("=> Done!");
   process.send({ type: true, err: null });
 };

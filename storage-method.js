@@ -49,7 +49,6 @@ module.exports.getRawHtmlFile = (folderName, fileName) => {
 };
 
 module.exports.exportLog = queueUrl => {
-  console.log("Exporting log file...");
   let nowDate = new Date();
   queueUrl.lastUpdate = nowDate;
   fs.writeFileSync(
