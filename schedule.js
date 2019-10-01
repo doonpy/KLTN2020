@@ -9,11 +9,11 @@ const childProcessCrawler = urlList => {
 
   const loopUrl = setInterval(() => {
     //prevent duplicate process
-
-    if (
-      crawlProcessList.length < numCPUs - 1 &&
-      crawlProcessList.find(p => p.url === cloneUrlList[0]) === undefined
-    ) {
+    if (crawlProcessList.length < numCPUs - 1) {
+      if (crawlProcessList.find(p => p.url === cloneUrlList[0]) !== undefined) {
+        cloneUrlList.shift();
+        return;
+      }
       let forked = childProcess.fork(MODUlE_PATH);
       console.log(
         `=> Fork child process ${forked.pid} for crawl "${cloneUrlList[0]}"`
@@ -41,9 +41,8 @@ const childProcessCrawler = urlList => {
           `=> Kill child process ${forked.pid} - status: ${forked.killed}`
         );
       });
-    } else {
-      cloneUrlList.shift();
     }
+
     if (cloneUrlList.length === 0) {
       clearInterval(loopUrl);
     }

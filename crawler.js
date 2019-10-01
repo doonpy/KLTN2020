@@ -100,12 +100,16 @@ const handleRequestSuccessed = (response, queueUrl) => {
 };
 
 const handleRequestFailed = (queueUrl, error) => {
-  console.log(`Request to ${queueUrl.waiting[0]}`, `-`, `ERROR: ${error.code}`);
+  console.log(
+    `-> Request to ${queueUrl.waiting[0]}`,
+    `-`,
+    `ERROR: ${error.code}`
+  );
   markFailedUrl(queueUrl, error);
 };
 
 const crawler = async queueUrl => {
-  console.log(`Start crawl ${queueUrl.mainUrl}`);
+  console.log(`=> Start crawl ${queueUrl.mainUrl}`);
   let startTime = new Date();
   let requestCount = 0;
   while (
@@ -125,10 +129,10 @@ const crawler = async queueUrl => {
       queueUrl.waiting.shift();
     }
   }
-  queueUrl.executeTime = new Date() - startTime;
+  queueUrl.executeTime += new Date() - startTime;
   storageMethod.exportLog(queueUrl);
-  console.log("Done!");
-  // process.send({ type: true, err: null });
+  console.log("=> Done!");
+  process.send({ type: true, err: null });
 };
 
 const validateUrl = url => {
@@ -160,7 +164,6 @@ const main = (url, option) => {
   }
 
   let queueUrl = storageMethod.createLog(url);
-  console.log(queueUrl);
 
   storageMethod
     .createStorageFolder(url)
