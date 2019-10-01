@@ -1,6 +1,6 @@
 const request = require("request");
 const cheerio = require("cheerio");
-const storageMethod = require("./storageMethod");
+const storageMethod = require("./storage-method");
 const DEFAULT_OPTION = {
   MAX_REQUEST_PER_CRAWL: 20,
   MAX_TIMEOUT: 1000 * 15,
@@ -17,6 +17,12 @@ const sendRequest = url => {
       resolve(response);
     });
   });
+};
+
+const isHandled = (queueUrl, url) => {
+  let urlHandled = queueUrl.handled.find(e => e.url === url);
+  if (urlHandled === undefined) return false;
+  return true;
 };
 
 const enqeueLinks = ($, response, queueUrl) => {
@@ -41,7 +47,7 @@ const enqeueLinks = ($, response, queueUrl) => {
       // console.log(pattern.test(url), url);
       if (
         pattern.test(url) &&
-        queueUrl.handled.find(e => e.url === url) === undefined &&
+        !isHandled(queueUrl, url) &&
         queueUrl.waiting.find(e => e === url) === undefined &&
         deepRange - deepStandard <= DEFAULT_OPTION.DEEPLIMIT
       ) {
@@ -101,21 +107,28 @@ const handleRequestFailed = (queueUrl, error) => {
 const crawler = async queueUrl => {
   console.log(`Start crawl ${queueUrl.mainUrl}`);
   let startTime = new Date();
+  let requestCount = 0;
   while (
     queueUrl.waiting.length > 0 &&
-    queueUrl.handled.length <= DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL
+    requestCount <= DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL
   ) {
-    await sendRequest(queueUrl.waiting[0])
-      .then(response => {
-        handleRequestSuccessed(response, queueUrl);
-      })
-      .catch(err => {
-        handleRequestFailed(queueUrl, err);
-      });
+    if (!isHandled(queueUrl, queueUrl.waiting[0])) {
+      await sendRequest(queueUrl.waiting[0])
+        .then(response => {
+          handleRequestSuccessed(response, queueUrl);
+        })
+        .catch(err => {
+          handleRequestFailed(queueUrl, err);
+        });
+      requestCount++;
+    } else {
+      queueUrl.waiting.shift();
+    }
   }
   queueUrl.executeTime = new Date() - startTime;
   storageMethod.exportLog(queueUrl);
   console.log("Done!");
+  // process.send({ type: true, err: null });
 };
 
 const validateUrl = url => {
@@ -133,7 +146,7 @@ const sanitizeUrl = url => {
 
 const main = (url, option) => {
   if (!validateUrl(url)) {
-    return console.log("Invalid URL!");
+    throw "Invalid URL!";
   }
   url = sanitizeUrl(url);
 
@@ -146,25 +159,25 @@ const main = (url, option) => {
       option.maxTimeout || DEFAULT_OPTION.MAX_TIMEOUT;
   }
 
-  let queueUrl = {
-    mainUrl: url,
-    handled: new Array(),
-    waiting: new Array(),
-    failed: new Array()
-  };
-  let domain = storageMethod.getMainDomainFromUrl(url);
+  let queueUrl = storageMethod.createLog(url);
+  console.log(queueUrl);
 
   storageMethod
-    .createStorageFolder(domain)
+    .createStorageFolder(url)
     .then(() => {
       queueUrl.waiting.push(url);
       crawler(queueUrl);
     })
     .catch(err => {
-      console.log(err);
+      throw err;
     });
 };
 
-main("https://batdongsan.vn/", {
-  maxRequestPerCrawl: 100
+process.on("message", data => {
+  try {
+    main(data.url);
+  } catch (err) {
+    process.send({ type: false, err: err });
+  }
 });
+module.exports.main = main;
