@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 const request = require('request');
-const load = require('cheerio');
+const cherrio = require('cheerio');
 const storageMethod = require('./storage-method');
 const DEFAULT_OPTION = {
   MAX_REQUEST_PER_CRAWL: 20,
@@ -9,13 +10,17 @@ const DEFAULT_OPTION = {
 
 const sendRequest = (url) => {
   return new Promise((resolve, reject) => {
-    request(url, {time: true, timeout: DEFAULT_OPTION.MAX_TIMEOUT}, function(
-        error,
-        response
-    ) {
-      if (error) reject(error);
-      resolve(response);
-    });
+    const headers = {
+      'User-Agent': 'Googlebot/2.1 (+http://www.googlebot.com/bot.html)',
+    };
+    request(
+        url,
+        {time: true, timeout: DEFAULT_OPTION.MAX_TIMEOUT, headers: headers},
+        function(error, response) {
+          if (error) reject(error);
+          else resolve(response);
+        }
+    );
   });
 };
 
@@ -86,7 +91,7 @@ const handleRequestSuccessed = (response, queueUrl) => {
 
   markHandledUrl(queueUrl, response);
 
-  const $ = load(response.body);
+  const $ = cherrio.load(response.body);
   const title = $('title')
       .text()
       .trim();
@@ -103,13 +108,9 @@ const handleRequestFailed = (queueUrl, error) => {
   console.log(
       `-> Request to ${queueUrl.waiting[0]}`,
       `-`,
-      `ERROR: ${error.code}`
+      `ERROR: ${error.code || error}`
   );
-  queueUrl.waiting.push(
-      `http://webcache.googleusercontent.com/search?q=cache:${
-        queueUrl.waiting[0]
-      }`
-  );
+
   markFailedUrl(queueUrl, error);
 };
 
