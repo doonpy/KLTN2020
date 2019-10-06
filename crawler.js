@@ -1,17 +1,17 @@
-const request = require("request");
-const cheerio = require("cheerio");
-const storageMethod = require("./storageMethod");
+const request = require('request');
+const load = require('cheerio');
+const storageMethod = require('./storage-method');
 const DEFAULT_OPTION = {
   MAX_REQUEST_PER_CRAWL: 20,
   MAX_TIMEOUT: 1000 * 15,
-  DEEPLIMIT: Number.MAX_SAFE_INTEGER //1 is unlimited
+  DEEPLIMIT: Number.MAX_SAFE_INTEGER, // 1 is unlimited
 };
 
-const sendRequest = url => {
+const sendRequest = (url) => {
   return new Promise((resolve, reject) => {
-    request(url, { time: true, timeout: DEFAULT_OPTION.MAX_TIMEOUT }, function(
-      error,
-      response
+    request(url, {time: true, timeout: DEFAULT_OPTION.MAX_TIMEOUT}, function(
+        error,
+        response
     ) {
       if (error) reject(error);
       resolve(response);
@@ -19,30 +19,36 @@ const sendRequest = url => {
   });
 };
 
+const isHandled = (queueUrl, url) => {
+  const urlHandled = queueUrl.handled.find((e) => e.url === url);
+  if (urlHandled === undefined) return false;
+  return true;
+};
+
 const enqeueLinks = ($, response, queueUrl) => {
   const pattern = new RegExp(`^${queueUrl.mainUrl}(\/){1}(.*)$`);
 
-  //enqeue pseudo Url
-  let elementList = $("a").toArray();
-  let uri = response.request.uri;
+  // enqeue pseudo Url
+  const elementList = $('a').toArray();
+  const uri = response.request.uri;
 
-  elementList.forEach(e => {
+  elementList.forEach((e) => {
     if (
-      $(e).attr("href") !== undefined &&
+      $(e).attr('href') !== undefined &&
       !$(e)
-        .attr("href")
-        .match(/^\/\//g)
+          .attr('href')
+          .match(/^\/\//g)
     ) {
-      let url = `${uri.protocol}//${uri.hostname}${$(e)
-        .attr("href")
-        .replace(`${uri.protocol}//${uri.hostname}`, "")}`;
-      let deepRange = url.split("/").length - 2; //not include // of 'https://'
-      let deepStandard = queueUrl.mainUrl.split("/").length - 3;
+      const url = `${uri.protocol}//${uri.hostname}${$(e)
+          .attr('href')
+          .replace(`${uri.protocol}//${uri.hostname}`, '')}`;
+      const deepRange = url.split('/').length - 2; // not include // of 'https://'
+      const deepStandard = queueUrl.mainUrl.split('/').length - 3;
       // console.log(pattern.test(url), url);
       if (
         pattern.test(url) &&
-        queueUrl.handled.find(e => e.url === url) === undefined &&
-        queueUrl.waiting.find(e => e === url) === undefined &&
+        !isHandled(queueUrl, url) &&
+        queueUrl.waiting.find((e) => e === url) === undefined &&
         deepRange - deepStandard <= DEFAULT_OPTION.DEEPLIMIT
       ) {
         queueUrl.waiting.push(url);
@@ -55,7 +61,7 @@ const markHandledUrl = (queueUrl, response) => {
   queueUrl.handled.push({
     url: response.request.uri.href,
     elapsedTime: response.elapsedTime,
-    statusCode: response.statusCode
+    statusCode: response.statusCode,
   });
   queueUrl.waiting.shift();
 };
@@ -64,80 +70,100 @@ const markFailedUrl = (queueUrl, error) => {
   queueUrl.failed.push({
     url: queueUrl.waiting[0],
     errNo: error.errno,
-    errCode: error.code
+    errCode: error.code,
   });
   queueUrl.waiting.shift();
 };
 
 const handleRequestSuccessed = (response, queueUrl) => {
   console.log(
-    `Request to ${response && response.request.uri.href}`,
-    `-`,
-    response && response.statusCode,
-    `-`,
-    `${response.elapsedTime}ms`
+      `Request to ${response && response.request.uri.href}`,
+      `-`,
+      response && response.statusCode,
+      `-`,
+      `${response.elapsedTime}ms`
   );
 
   markHandledUrl(queueUrl, response);
 
-  const $ = cheerio.load(response.body);
-  let title = $("title")
-    .text()
-    .trim();
+  const $ = load(response.body);
+  const title = $('title')
+      .text()
+      .trim();
   storageMethod.createRawHtmlFile(
-    storageMethod.getMainDomainFromUrl(queueUrl.mainUrl),
-    title,
-    response.body
+      storageMethod.getMainDomainFromUrl(queueUrl.mainUrl),
+      title,
+      response.body
   );
 
   enqeueLinks($, response, queueUrl);
 };
 
 const handleRequestFailed = (queueUrl, error) => {
-  console.log(`Request to ${queueUrl.waiting[0]}`, `-`, `ERROR: ${error.code}`);
+  console.log(
+      `-> Request to ${queueUrl.waiting[0]}`,
+      `-`,
+      `ERROR: ${error.code}`
+  );
+  queueUrl.waiting.push(
+      `http://webcache.googleusercontent.com/search?q=cache:${
+        queueUrl.waiting[0]
+      }`
+  );
   markFailedUrl(queueUrl, error);
 };
 
-const crawler = async queueUrl => {
-  console.log(`Start crawl ${queueUrl.mainUrl}`);
-  let startTime = new Date();
+const crawler = async (queueUrl) => {
+  console.log(`=> Start crawl ${queueUrl.mainUrl}`);
+  const startTime = new Date();
+  let requestCount = 0;
   while (
     queueUrl.waiting.length > 0 &&
-    queueUrl.handled.length <= DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL
+    requestCount <= DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL
   ) {
-    await sendRequest(queueUrl.waiting[0])
-      .then(response => {
-        handleRequestSuccessed(response, queueUrl);
-      })
-      .catch(err => {
-        handleRequestFailed(queueUrl, err);
-      });
+    if (!isHandled(queueUrl, queueUrl.waiting[0])) {
+      await sendRequest(queueUrl.waiting[0])
+          .then((response) => {
+            handleRequestSuccessed(response, queueUrl);
+          })
+          .catch((err) => {
+            handleRequestFailed(queueUrl, err);
+          });
+      requestCount++;
+    } else {
+      queueUrl.waiting.shift();
+    }
   }
-  queueUrl.executeTime = new Date() - startTime;
+  queueUrl.executeTime += new Date() - startTime;
+  console.log('=> Exporting log file...');
   storageMethod.exportLog(queueUrl);
-  console.log("Done!");
+
+  console.log('=> Done!');
+  process.send({type: true, err: null});
 };
 
-const validateUrl = url => {
-  let pattern = new RegExp(
-    /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
+const validateUrl = (url) => {
+  const pattern = new RegExp(
+      // eslint-disable-next-line max-len
+      /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
   );
 
   return pattern.test(url);
 };
 
-const sanitizeUrl = url => {
-  let pattern = new RegExp(/\/+$/g);
-  return url.replace(pattern, "");
+const sanitizeUrl = (url) => {
+  const pattern = new RegExp(/\/+$/g);
+  return url.replace(pattern, '');
 };
 
 const main = (url, option) => {
   if (!validateUrl(url)) {
-    return console.log("Invalid URL!");
+    // eslint-disable-next-line no-throw-literal
+    throw 'Invalid URL!';
   }
   url = sanitizeUrl(url);
 
-  //setting option
+  // setting option
   if (option !== undefined) {
     DEFAULT_OPTION.DEEPLIMIT = option.deepLimit || DEFAULT_OPTION.DEEPLIMIT;
     DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL =
@@ -146,25 +172,23 @@ const main = (url, option) => {
       option.maxTimeout || DEFAULT_OPTION.MAX_TIMEOUT;
   }
 
-  let queueUrl = {
-    mainUrl: url,
-    handled: new Array(),
-    waiting: new Array(),
-    failed: new Array()
-  };
-  let domain = storageMethod.getMainDomainFromUrl(url);
+  const queueUrl = storageMethod.createLog(url);
 
   storageMethod
-    .createStorageFolder(domain)
-    .then(() => {
-      queueUrl.waiting.push(url);
-      crawler(queueUrl);
-    })
-    .catch(err => {
-      console.log(err);
-    });
+      .createStorageFolder(url)
+      .then(() => {
+        queueUrl.waiting.push(url);
+        crawler(queueUrl);
+      })
+      .catch((err) => {
+        throw err;
+      });
 };
 
-main("https://batdongsan.vn/", {
-  maxRequestPerCrawl: 100
+process.on('message', (data) => {
+  try {
+    main(data.url);
+  } catch (err) {
+    process.send({type: false, err: err});
+  }
 });

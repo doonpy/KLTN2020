@@ -1,14 +1,19 @@
-const { fork } = require("child_process");
-function main() {
-  // fork another process
-  const process = fork("./send_mail.js");
-  const mails = "Poon";
-  // send list of e-mails to forked process
-  process.send({ mails });
-  // listen for messages from forked process
-  process.on("message", message => {
-    log.info(`Number of mails sent ${message.counter}`);
-  });
-}
+require('./schedule').main(
+    [
+      'https://alonhadat.com.vn',
+      'http://www.batdongsan.vn/',
+      'https://www.muabannhadat.vn/',
+      'https://nhadat.cafeland.vn/',
+      'http://seareal.vn/',
+      'https://homedy.com/',
+      'http://123nhadat.vn/',
+      'https://kenhbds.vn/',
+      'https://nhadat24h.net/',
+      'https://propzy.vn/',
+      'https://www.nhadat.net/',
+      'https://vndiaoc.com/',
+    ],
+    1
+);
 
-main();
+// require("./crawler").main("https://vnexpress.net", { deepLimit: 2 });
