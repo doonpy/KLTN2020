@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 const request = require("request");
-const cheerio = require("cheerio");
-const storageMethod = require("./storageMethod");
+const cherrio = require("cheerio");
+const storageMethod = require("./storage-method");
 const DEFAULT_OPTION = {
   MAX_REQUEST_PER_CRAWL: 20,
   MAX_TIMEOUT: 1000 * 15,
@@ -9,13 +10,17 @@ const DEFAULT_OPTION = {
 
 const sendRequest = url => {
   return new Promise((resolve, reject) => {
-    request(url, { time: true, timeout: DEFAULT_OPTION.MAX_TIMEOUT }, function(
-      error,
-      response
-    ) {
-      if (error) reject(error);
-      resolve(response);
-    });
+    const headers = {
+      "User-Agent": "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
+    };
+    request(
+      url,
+      { time: true, timeout: DEFAULT_OPTION.MAX_TIMEOUT, headers: headers },
+      function(error, response) {
+        if (error) reject(error);
+        else resolve(response);
+      }
+    );
   });
 };
 
@@ -80,8 +85,8 @@ const handleRequestSuccessed = (response, queueUrl) => {
 
   markHandledUrl(queueUrl, response);
 
-  const $ = cheerio.load(response.body);
-  let title = $("title")
+  const $ = cherrio.load(response.body);
+  const title = $("title")
     .text()
     .trim();
   storageMethod.createRawHtmlFile(
@@ -94,7 +99,12 @@ const handleRequestSuccessed = (response, queueUrl) => {
 };
 
 const handleRequestFailed = (queueUrl, error) => {
-  console.log(`Request to ${queueUrl.waiting[0]}`, `-`, `ERROR: ${error.code}`);
+  console.log(
+    `-> Request to ${queueUrl.waiting[0]}`,
+    `-`,
+    `ERROR: ${error.code || error}`
+  );
+
   markFailedUrl(queueUrl, error);
 };
 
