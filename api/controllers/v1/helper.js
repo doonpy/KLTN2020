@@ -1,7 +1,7 @@
 /* eslint-disable no-array-constructor */
 const fs = require('fs');
 const path = require('path');
-const PATH_FOLDER = './raw-html';
+const PATH_FOLDER = '../../../raw-html';
 
 // eslint-disable-next-line require-jsdoc
 function isFolderExist(pathFolder) {

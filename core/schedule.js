@@ -1,9 +1,10 @@
 /* eslint-disable no-array-constructor */
 /* eslint-disable max-len */
 /* eslint-disable camelcase */
+const path = require('path');
 const childProcess = require('child_process');
 const numCPUs = require('os').cpus().length;
-const MODUlE_PATH = `./crawler`;
+const MODUlE_PATH = path.join(__dirname, `./crawler`);
 const REPEAT_TIME_DAY = 1000 * 3600 * 24;
 const crawlProcessList = new Array();
 
