@@ -1,7 +1,8 @@
 /* eslint-disable no-array-constructor */
 /* eslint-disable no-invalid-this */
 /* eslint-disable require-jsdoc */
-const FOLDER_STORAGE = `./raw-html`;
+const API_VERSION = `v1`;
+const FOLDER_STORAGE = `../api/controllers/${API_VERSION}/raw-html`;
 const FOLDER_LOG = `./logs`;
 const fs = require('fs');
 
