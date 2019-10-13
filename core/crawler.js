@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const request = require('request');
 const cherrio = require('cheerio');
-const storageMethod = require('./storage-method');
+const storageMethod = require('./storage-methods');
 const DEFAULT_OPTION = {
   MAX_REQUEST_PER_CRAWL: 20,
   MAX_TIMEOUT: 1000 * 15,
@@ -82,7 +82,7 @@ const markFailedUrl = (queueUrl, error) => {
 
 const handleRequestSuccessed = (response, queueUrl) => {
   console.log(
-      `Request to ${response && response.request.uri.href}`,
+      `-> Request to ${response && response.request.uri.href}`,
       `-`,
       response && response.statusCode,
       `-`,
