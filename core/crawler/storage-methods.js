@@ -5,12 +5,6 @@ const FOLDER_STORAGE = `./raw-html`;
 const FOLDER_LOG = `./logs`;
 const fs = require('fs');
 
-(() => {
-  fs.access(FOLDER_STORAGE, (err) => {
-    if (err && err.code === 'ENOENT') fs.mkdirSync(FOLDER_STORAGE);
-  });
-})();
-
 module.exports.getMainDomainFromUrl = function getMainDomainFromUrl(url) {
   const pattern = new RegExp(
       /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/gim
