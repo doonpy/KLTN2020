@@ -2,7 +2,6 @@
   "name": "crawler",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "start": "node ./api/bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,15 +12,16 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.3",
-    "core-util-is": "^1.0.2",
-    "node-html-parser": "^1.1.16",
-    "request": "^2.88.0",
     "cookie-parser": "~1.4.4",
+    "core-util-is": "^1.0.2",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
+    "mongoose": "^5.7.5",
     "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
+    "node-html-parser": "^1.1.16",
+    "pug": "2.0.0-beta11",
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "eslint": "^6.5.1",
