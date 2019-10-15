@@ -34,3 +34,12 @@ exports.getHtmlFile = (domain, amount) => {
   result.status = `Success`;
   return result;
 };
+
+exports.validateUrl = (url) => {
+  const pattern = new RegExp(
+      // eslint-disable-next-line max-len
+      /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/
+  );
+
+  return pattern.test(url);
+};
