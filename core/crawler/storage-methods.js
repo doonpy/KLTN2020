@@ -1,11 +1,10 @@
 /* eslint-disable no-array-constructor */
 /* eslint-disable no-invalid-this */
 /* eslint-disable require-jsdoc */
-const FOLDER_STORAGE = `./raw-html`;
-const FOLDER_LOG = `./logs`;
+
 const fs = require('fs');
 
-module.exports.getMainDomainFromUrl = function getMainDomainFromUrl(url) {
+exports.getMainDomainFromUrl = function getMainDomainFromUrl(url) {
   const pattern = new RegExp(
       /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/gim
   );
@@ -15,31 +14,36 @@ module.exports.getMainDomainFromUrl = function getMainDomainFromUrl(url) {
       .replace(/(http|https):\/\//, '');
 };
 
-module.exports.createStorageFolder = function createStorageFolder(url) {
+exports.createStorageFolder = function createStorageFolder(url) {
   return new Promise((resolve, reject) => {
     const domain = this.getMainDomainFromUrl(url);
-    fs.mkdir(`${FOLDER_STORAGE}/${domain}`, (err) => {
+    fs.mkdir(`${process.env.RAW_HTML_STORAGE_PATH}/${domain}`, (err) => {
       err && err.code !== 'EEXIST' ? reject(err) : resolve();
     });
   });
 };
 
-module.exports.createRawHtmlFile = function createRawHtmlFile(
+exports.createRawHtmlFile = function createRawHtmlFile(
     folderName,
     fileName,
     content
 ) {
   fs.writeFileSync(
-      `${FOLDER_STORAGE}/${folderName}/${fileName.replace(/\//g)}.html`,
+      `${process.env.RAW_HTML_STORAGE_PATH}/${folderName}/${fileName.replace(
+          /\//g
+      )}.html`,
       content
   );
 };
 
-module.exports.getRawHtmlFile = function getRawHtmlFile(folderName, fileName) {
+exports.getRawHtmlFile = function getRawHtmlFile(folderName, fileName) {
   try {
-    return fs.readFileSync(`${FOLDER_STORAGE}/${folderName}/${fileName}.html`, {
-      encoding: 'utf-8',
-    });
+    return fs.readFileSync(
+        `${process.env.RAW_HTML_STORAGE_PATH}/${folderName}/${fileName}.html`,
+        {
+          encoding: 'utf-8',
+        }
+    );
   } catch (err) {
     if (err.code === 'ENOENT') {
       return 'ENOENT';
@@ -49,20 +53,22 @@ module.exports.getRawHtmlFile = function getRawHtmlFile(folderName, fileName) {
   }
 };
 
-module.exports.exportLog = function exportLog(queueUrl) {
+exports.exportLog = function exportLog(queueUrl) {
   const nowDate = new Date();
   queueUrl.lastUpdate = nowDate;
   fs.writeFileSync(
-      `${FOLDER_LOG}/log_${this.getMainDomainFromUrl(queueUrl.mainUrl)}.json`,
+      `${process.env.LOG_STORAGE_PATH}/log_${this.getMainDomainFromUrl(
+          queueUrl.mainUrl
+      )}.json`,
       JSON.stringify(queueUrl)
   );
 };
 
-module.exports.createLog = function createLog(url) {
+exports.createLog = function createLog(url) {
   const domain = this.getMainDomainFromUrl(url);
   try {
     return JSON.parse(
-        fs.readFileSync(`${FOLDER_LOG}/log_${domain}.json`, {
+        fs.readFileSync(`${process.env.LOG_STORAGE_PATH}/log_${domain}.json`, {
           encoding: 'utf-8',
         })
     );

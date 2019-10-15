@@ -14,4 +14,6 @@ require('./configs/routes').init(app);
 // middleware
 require('./configs/middleware').init(app);
 
+require('./nope');
+
 module.exports = app;
