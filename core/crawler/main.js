@@ -120,7 +120,7 @@ const crawler = async (queueUrl) => {
   let requestCount = 0;
   while (
     queueUrl.waiting.length > 0 &&
-    requestCount <= DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL
+    requestCount < DEFAULT_OPTION.MAX_REQUEST_PER_CRAWL
   ) {
     if (!isHandled(queueUrl, queueUrl.waiting[0])) {
       await sendRequest(queueUrl.waiting[0])
@@ -188,7 +188,7 @@ const main = (url, option) => {
 
 process.on('message', (data) => {
   try {
-    main(data.url);
+    main(data.url, data.options);
   } catch (err) {
     console.log(err);
     process.send({type: false, err: err});

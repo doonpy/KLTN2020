@@ -14,7 +14,8 @@ const app = express();
   // routes
   await require('./configs/routes').init(app);
 
-  await require('./nope');
+  // schedule crawler
+  await require('./configs/scheduleCofig');
 })();
 
 module.exports = app;
