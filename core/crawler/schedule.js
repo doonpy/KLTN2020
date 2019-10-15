@@ -9,8 +9,9 @@ const REPEAT_TIME_DAY = 1000 * 3600 * 24;
 const crawlProcessList = new Array();
 
 // fork child process
-const childProcessCrawler = (urlList) => {
+const childProcessCrawler = (urlList, options) => {
   const cloneUrlList = [...urlList];
+  console.log(cloneUrlList);
 
   const loopUrl = setInterval(() => {
     // prevent duplicate process
@@ -25,7 +26,7 @@ const childProcessCrawler = (urlList) => {
         `=> Fork child process ${forked.pid} for crawl "${cloneUrlList[0]}"`
     );
 
-    forked.send({url: cloneUrlList[0]});
+    forked.send({url: cloneUrlList[0], options: options});
     crawlProcessList.push({
       pid: forked.pid,
       url: cloneUrlList[0],
@@ -54,10 +55,10 @@ const childProcessCrawler = (urlList) => {
   }, 0); // 0 for callback exec immediately
 };
 
-module.exports.main = (urlList, repeatTime) => {
+exports.main = (urlList, repeatTime, options) => {
   console.log(`=> Num of CPUs: ${numCPUs}`);
-  childProcessCrawler(urlList);
+  childProcessCrawler(urlList, options);
   setInterval(() => {
-    childProcessCrawler(urlList);
+    childProcessCrawler(urlList, options);
   }, repeatTime * REPEAT_TIME_DAY);
 };

@@ -185,4 +185,5 @@ exports.deleteTarget = (req, res, next) => {
       });
 };
 
-exports = {getAllTarget: getAllTarget, updateTarget: updateTarget};
+exports.getAllTarget = getAllTarget;
+exports.updateTarget = updateTarget;

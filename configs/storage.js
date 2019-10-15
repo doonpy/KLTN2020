@@ -11,7 +11,7 @@ process.env.LOG_STORAGE_PATH = LOG_STORAGE_PATH;
 
 const isFolderExist = (folderName) => {
   return new Promise((resolve) => {
-    fs.open(folderName, (err) => {
+    fs.access(folderName, (err) => {
       if (err && err.code === 'ENOENT') resolve(false);
       else resolve(true);
     });
