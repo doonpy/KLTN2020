@@ -3,8 +3,8 @@ const moment = require('moment');
 const Schema = mongoose.Schema;
 
 const targetSchema = new Schema({
-  url: String,
-  lastCrawl: {type: Date, unique: true},
+  url: {type: String},
+  lastCrawl: {type: Date},
 });
 
 targetSchema.virtual('lastCrawl_formatted').get(function() {
