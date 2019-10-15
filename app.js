@@ -1,18 +1,20 @@
 const express = require('express');
 const app = express();
 
-// database
-require('./configs/database');
+(async () => {
+  // database
+  require('./configs/database');
 
-// storage folder
-require('./configs/storage').init();
+  // storage folder
+  await require('./configs/storage').init();
 
-// routes
-require('./configs/routes').init(app);
+  // middleware
+  await require('./configs/middleware').init(app);
 
-// middleware
-require('./configs/middleware').init(app);
+  // routes
+  await require('./configs/routes').init(app);
 
-require('./nope');
+  await require('./nope');
+})();
 
 module.exports = app;
