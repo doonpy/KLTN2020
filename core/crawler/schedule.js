@@ -4,10 +4,11 @@
 const path = require('path');
 const childProcess = require('child_process');
 const numCPUs = require('os').cpus().length;
-const MODUlE_PATH = path.join(__dirname, `./crawler`);
+const MODUlE_PATH = path.join(__dirname, `./main`);
 const REPEAT_TIME_DAY = 1000 * 3600 * 24;
 const crawlProcessList = new Array();
 
+// fork child process
 const childProcessCrawler = (urlList) => {
   const cloneUrlList = [...urlList];
 
@@ -33,7 +34,7 @@ const childProcessCrawler = (urlList) => {
 
     forked.on('message', (data) => {
       if (data.type === false) {
-        console.log(`=> [PID:${forked.pid}] ERR: ${data.err}`);
+        console.log(`=> [PID:${forked.pid}] ERR: ${JSON.stringify(data)}`);
       }
       forked.kill('SIGTERM');
       crawlProcessList.splice(

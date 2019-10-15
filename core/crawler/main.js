@@ -190,6 +190,7 @@ process.on('message', (data) => {
   try {
     main(data.url);
   } catch (err) {
+    console.log(err);
     process.send({type: false, err: err});
   }
 });

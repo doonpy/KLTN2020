@@ -1,13 +1,18 @@
 const express = require('express');
-const ConnectDB = require('./configs/database')
 const app = express();
 
 // database
-ConnectDB();
+require('./configs/database');
+
+// storage folder
+require('./configs/storage').init();
+
 // routes
 require('./configs/routes').init(app);
 
 // middleware
 require('./configs/middleware').init(app);
+
+require('./nope');
 
 module.exports = app;

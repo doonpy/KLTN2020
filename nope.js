@@ -1,6 +1,6 @@
 const dateRepeat = 1;
 
-require('./core/schedule').main(
+require('./core/crawler/schedule').main(
     [
       'https://batdongsan.com.vn/',
       'https://alonhadat.com.vn',
