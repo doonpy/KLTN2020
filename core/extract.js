@@ -16,8 +16,8 @@ function getContentByXPath(body, xpath) {
         let firstElement = xpathArray.shift();
 
         tagName = firstElement.match(/[a-z]+([1-6])?/g)[0];
-        index = firstElement.match(/[0-9]+/g)
-            ? parseInt(firstElement.match(/[0-9]+/g)[0]) - 1
+        index = firstElement.match(/\[[0-9]+\]/g)
+            ? firstElement.match(/\[[0-9]+\]/g)[0].replace(/\[+|\]+/g, "") - 1
             : 0;
 
         selector = $(selector)
