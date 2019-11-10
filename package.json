@@ -1,36 +1,39 @@
 {
-  "name": "crawler",
+  "name": "crawl-extract",
   "version": "1.0.0",
-  "description": "",
+  "private": true,
   "scripts": {
-    "start": "node ./api/bin/www",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx webpack && nodemon ./bin/www",
+    "build": "npx webpack -w",
+    "debug": "nodemon ./bin/www"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.7.1",
-    "body-parser": "^1.19.0",
-    "chalk": "^2.4.2",
     "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "~1.4.4",
-    "core-util-is": "^1.0.2",
     "debug": "~2.6.9",
-    "eslint-config-prettier": "^6.4.0",
     "express": "~4.16.1",
+    "htmlparser2": "^4.0.0",
     "http-errors": "~1.6.3",
-    "lodash": "^4.17.15",
+    "jquery": "^3.4.1",
     "moment": "^2.24.0",
-    "mongoose": "^5.7.5",
+    "mongoose": "^5.7.7",
     "morgan": "~1.9.1",
-    "node-html-parser": "^1.1.16",
+    "nodemon": "^1.19.4",
     "pug": "2.0.0-beta11",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
-    "eslint": "^6.5.1",
-    "eslint-config-google": "^0.14.0"
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "css-loader": "^3.2.0",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.9.0"
   },
-  "type": "module"
+  "description": "My webpack project"
 }

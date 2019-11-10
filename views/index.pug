@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    h1 Crawler :D
+    p Welcome to Poon Nguyen
+    form(method="POST" action="/crawl")
+        .form-group
+            label(for='urls') URLs (separated by line)
+            textarea#urls.form-control(rows='10' name="links")
+        button.btn.btn-primary Submit
+

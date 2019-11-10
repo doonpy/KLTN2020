@@ -62,3 +62,9 @@ typings/
 
 # temp
 temp/
+
+# data
+data/
+
+#.idea
+.idea/

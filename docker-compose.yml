@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  crawler-extract:
+    image: crawl-extract:lastest
+    container_name: crawl
+    command: sh -c " npm install && npx webpack && npm start"
+    build: .
+    environment:
+      NODE_ENV: development
+      STORAGE_PATH: ./temp
+    volumes:
+      - .:/home/node/app
+    working_dir: /home/node/app
+    ports:
+      - 3000:3000
+    links:
+      - mongo
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
