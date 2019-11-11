@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "npx webpack && nodemon ./bin/www",
-    "build": "npx webpack -w",
-    "debug": "nodemon ./bin/www"
+    "start": "node -r dotenv/config ./bin/www",
+    "build": "npx webpack"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
     "express": "~4.16.1",
     "htmlparser2": "^4.0.0",
     "http-errors": "~1.6.3",
