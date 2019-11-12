@@ -1,0 +1,18 @@
+include ../header
+
+body
+    include ../navbar
+    include ../breadcrumb
+
+    .container-fluid
+        h2 Definition list
+        if definitions.length === 0
+            p Definition is empty
+        else
+            ul.definition-list
+                for definition in definitions
+                    li.definition-item
+                        a.item-url(href=definition._id)=definition.host
+
+
+include ../footer

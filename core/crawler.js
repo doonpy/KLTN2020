@@ -109,7 +109,7 @@ const saveResponseBody = response => {
 
 const getHostHasDefined = () => {
     return new Promise((resolve, reject) => {
-        const DefData = require("../models/def-data-model");
+        const DefData = require("../models/definition-model");
         DefData.find({}, "host", (err, hosts) => {
             if (err) reject(err);
             if (!hosts) resolve([]);

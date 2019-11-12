@@ -1,0 +1,9 @@
+nav(aria-label='breadcrumb')
+    ol.breadcrumb
+        for crumb, index in breadcrumb
+            if index === breadcrumb.length - 1
+                li.breadcrumb-item.active(aria-current="page")
+                    a=crumb.pageName
+            else
+                li.breadcrumb-item
+                    a(href=crumb.href)=crumb.pageName

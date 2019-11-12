@@ -1,5 +1,5 @@
 const indexRouter = require("../routes/index");
-const usersRouter = require("../routes/users");
+const definitionRouter = require("../routes/definition-route");
 const apiRouter = require("../routes/api-route");
 const createError = require("http-errors");
 
@@ -9,7 +9,7 @@ const createError = require("http-errors");
  */
 exports.init = app => {
     app.use("/", indexRouter);
-    app.use("/users", usersRouter);
+    app.use("/definition", definitionRouter);
     app.use("/api", apiRouter);
 
     // catch 404 and forward to error handler

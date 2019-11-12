@@ -1,4 +1,4 @@
-const DefData = require("../models/def-data-model");
+const DefData = require("../models/definition-model");
 const RawData = require("../models/raw-data-model");
 const cheerio = require("cheerio");
 const NODE_TYPE_TEXT = 3;
