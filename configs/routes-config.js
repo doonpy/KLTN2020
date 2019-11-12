@@ -8,7 +8,7 @@ const createError = require("http-errors");
  * @param app
  */
 exports.init = app => {
-    app.use("/", indexRouter);
+    // app.use("/", indexRouter);
     app.use("/definition", definitionRouter);
     app.use("/api", apiRouter);
 

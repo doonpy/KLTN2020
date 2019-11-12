@@ -5,7 +5,7 @@ $(document).ready(() => {
     let hostname = $("#hostname").text();
     let filename = $("#filename").text();
 
-    $("#live-iframe").attr("src", `/api/v1/htmls/html/${hostname}/${filename}`);
+    $("#live-iframe").attr("src", `/api/get-html/${hostname}/${filename}`);
 
     //init handle iframe
     handleIframe.init();

@@ -445,7 +445,7 @@ eval("function _toConsumableArray(arr) {\n  return _arrayWithoutHoles(arr) || _i
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("var $ = __webpack_require__(/*! jquery */ \"./node_modules/jquery/dist/jquery.js\");\n\nvar handleIframe = __webpack_require__(/*! ./handle-iframe */ \"./source/def-data/handle-iframe.js\");\n\n$(document).ready(function () {\n  var hostname = $(\"#hostname\").text();\n  var filename = $(\"#filename\").text();\n  $(\"#live-iframe\").attr(\"src\", \"/api/v1/htmls/html/\".concat(hostname, \"/\").concat(filename)); //init handle iframe\n\n  handleIframe.init(); //toggle right-side\n\n  $(\"#swift-right\").click(function (e) {\n    if (e.which === 1) {\n      $(\"#right\").toggle(\"fast\");\n    }\n  });\n});\n\n//# sourceURL=webpack:///./source/def-data/main.js?");
+eval("var $ = __webpack_require__(/*! jquery */ \"./node_modules/jquery/dist/jquery.js\");\n\nvar handleIframe = __webpack_require__(/*! ./handle-iframe */ \"./source/def-data/handle-iframe.js\");\n\n$(document).ready(function () {\n  var hostname = $(\"#hostname\").text();\n  var filename = $(\"#filename\").text();\n  $(\"#live-iframe\").attr(\"src\", \"/api/get-html/\".concat(hostname, \"/\").concat(filename)); //init handle iframe\n\n  handleIframe.init(); //toggle right-side\n\n  $(\"#swift-right\").click(function (e) {\n    if (e.which === 1) {\n      $(\"#right\").toggle(\"fast\");\n    }\n  });\n});\n\n//# sourceURL=webpack:///./source/def-data/main.js?");
 
 /***/ }),
 

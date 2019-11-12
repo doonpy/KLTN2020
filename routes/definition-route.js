@@ -1,29 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const Definition = require("../models/definition-model");
+const definitionController = require("../controllers/definition-controller");
 
 /**
  * get all definition
  */
-router.get("/", function (req, res, next) {
-  Definition.find({}, (err, definitions) => {
-    if (err) next(err);
-    let assigns = {
-      title: "Definition",
-      breadcrumb: [
-        {
-          href: "/",
-          pageName: "Index"
-        },
-        {
-          href: "/definition",
-          pageName: "Definition"
-        }
-      ],
-      definitions: definitions
-    };
-    res.render("definition/view", assigns);
-  });
-});
+router.get("/", definitionController.getIndex);
+
+/**
+ * add definition
+ */
+router.get("/add", definitionController.getAdd);
 
 module.exports = router;

@@ -1,0 +1,13 @@
+extends ../header
+
+block content
+    script(src='/javascripts/def-main.js')
+    if error
+        p=JSON.stringify(error)
+    else
+        p#hostname=hostname
+        p#filename=fileName
+        .row
+            .col
+                iframe#live-iframe(src=`/api/get-html/${hostname}/${fileName}`)
+
