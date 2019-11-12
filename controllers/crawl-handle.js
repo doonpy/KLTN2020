@@ -1,5 +1,5 @@
 const cheerio = require("cheerio");
-const DefData = require("../models/def-data-model");
+const DefData = require("../models/definition-model");
 const moment = require("moment");
 
 function mergeArray(array, data) {
