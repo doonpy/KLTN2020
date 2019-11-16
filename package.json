@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node -r dotenv/config ./bin/www",
+    "start": "nodemon -r dotenv/config ./bin/www",
     "build": "npx webpack"
   },
   "dependencies": {
+    "bluebird": "^3.7.1",
     "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -21,6 +22,7 @@
     "nodemon": "^1.19.4",
     "pug": "2.0.0-beta11",
     "request": "^2.88.0",
+    "request-promise": "^4.2.5",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
