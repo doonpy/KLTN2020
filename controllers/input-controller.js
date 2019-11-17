@@ -2,7 +2,7 @@ const request = require("request-promise");
 const chalk = require("chalk");
 const cheerio = require("cheerio");
 const Promise = require("bluebird");
-
+const extract = require("../core/extractDetail");
 let urlPage;
 let listCatalog = [];
 let objCatalog = [];
@@ -39,6 +39,7 @@ let postURL = (req, res) => {
     }
   });
 };
+
 let getURL = (url, res) => {
   return res.render("iframecatalog", { html: url });
 };
@@ -61,14 +62,12 @@ let postCatalog = (req, res) => {
       if (objCatalog.includes(obj) !== true) objCatalog.push(obj);
     }
   });
-
   objCatalog.forEach(el => {
-    // console.log(chalk.bold.red(el.urlCatalogs[0]));
     listCatalog.push(el.urlCatalogs[0]);
   });
-
-  // global.urlCatalog = listCatalog[0];
-  res.send("Success!");
+  res.send(listCatalog);
+  console.log(listCatalog);
+  // console.log(objCatalog)
 };
 //
 let getListPage = (req, res) => {
@@ -97,17 +96,25 @@ let getListPage = (req, res) => {
     handleListPage(items, res);
   });
 };
+//
 let handleListPage = (urls, res) => {
   myMap.set("urls", urls);
   return res.render("pagelist", {
-    listpage: urls[0]
+    listpage: urls
   });
 };
-
+let getDetailPage = (req, res) => {
+  console.log(listCatalog);
+  let xpath = JSON.parse(req.body.xPathArray);
+  let paginationXpath = JSON.parse(req.body.paginationXpath);
+  let classMap = extract.extractDetail(listCatalog[0], xpath[0]);
+  res.send("Success!");
+};
 module.exports = {
   getInput: getInput,
   getURL: getURL,
   postURL: postURL,
   postCatalog: postCatalog,
-  getListPage: getListPage
+  getListPage: getListPage,
+  getDetailPage: getDetailPage
 };

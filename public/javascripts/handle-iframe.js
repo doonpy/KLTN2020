@@ -1,5 +1,6 @@
 var linkCatalog = [];
 let urlInfo = "";
+var text = [];
 function inputURL() {
   return new Promise((resolve, reject) => {
     return $("#form-input-url").bind("change", function() {
@@ -20,6 +21,7 @@ const mouseoverHandle = body => {
       $(e.target).removeClass(classesToAdd);
     });
 };
+
 function handleCatalog(url) {
   var myArray = [];
   $("#iframe-id").on("load", function() {
@@ -89,14 +91,16 @@ function handleCatalog(url) {
     $("#button-catalog").click(e => {
       e.preventDefault();
       console.log(myArray);
-      let catalogArr = JSON.stringify(myArray)
+      let catalogArr = JSON.stringify(myArray);
       $.post("/catalog", { catalog: catalogArr }, data => {
+        console.log(data);
+        text.push(data);
         window.location = "/listpage";
       });
     });
   });
 }
-
+console.log(text) 
 $(document).ready(function() {
   const url = inputURL();
   handleCatalog(urlInfo);

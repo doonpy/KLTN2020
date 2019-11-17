@@ -15,7 +15,7 @@ div(style='display:flex')
         span
     input#form-input-pagination.form-control(type='text' name='url' method='post' html='{:multipart=>true}' data-remote='true' placeholder='Nhap Pagination' required='')
 div
-    iframe#iframe-plist(srcdoc=listpage frameborder='0' width='100%' height='700px')
+    iframe#iframe-plist(srcdoc=listpage[0] frameborder='0' width='100%' height='700px')
 script(src='https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js')
 //- // MyJS
 script(src='/javascripts/handle-listpage.js')

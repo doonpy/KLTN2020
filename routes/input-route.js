@@ -6,4 +6,5 @@ router.post("/input", inputController.postURL);
 router.get("/input", inputController.getURL);
 router.post("/catalog", inputController.postCatalog);
 router.get("/listpage", inputController.getListPage);
+router.post("/detail", inputController.getDetailPage)
 module.exports = router;
