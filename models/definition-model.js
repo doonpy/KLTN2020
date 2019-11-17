@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const definitionSchema = new Schema({
-  host: String,
+  hostname: String,
   definitions: [
     {
       catalogName: String,
@@ -17,7 +17,6 @@ const definitionSchema = new Schema({
           _id: false
         }
       ],
-      _id: false,
       lastUpdate: String
     }
   ]

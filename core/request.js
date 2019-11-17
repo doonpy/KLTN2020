@@ -1,7 +1,7 @@
 const request = require("request");
 const DEFAULT_OPTION = {
   MAX_REQUEST_PER_CRAWL: 20,
-  MAX_TIMEOUT: 1000 * 3,
+    MAX_TIMEOUT: 1000 * 5,
   DEEPLIMIT: Number.MAX_SAFE_INTEGER // 1 is unlimited
 };
 

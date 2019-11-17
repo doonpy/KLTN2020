@@ -1,10 +1,17 @@
 extends ../header
 
 block content
-    if definitions.length === 0
-        p Definition is empty
+    if definitionList.length === 0
+        p Nothing in here :(
     else
-        ul.definition-list
-            for definition in definitions
-                li.definition-item
-                    a.item-url(href=definition._id)=definition.host
+        ul.hostname-list
+            for def in definitionList
+                li
+                    a(href=def._id)=def.hostname
+                    ul.definition-list
+                        if(def.definitions.length === 0)
+                            p Empty
+                        else
+                            for definition in def.definitions
+                                li
+                                    a(href=definition._id)=definition.catalogName

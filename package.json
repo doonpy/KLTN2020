@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node -r dotenv/config ./bin/www",
-    "build": "npx webpack"
+    "build": "npx webpack -w"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",

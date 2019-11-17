@@ -16,7 +16,7 @@ exports.getIndex = function(req, res, next) {
           pageName: "Definition"
         }
       ],
-      definitions: definitions
+      definitionList: definitions
     };
     res.render("definition/view", assigns);
   });
@@ -24,6 +24,7 @@ exports.getIndex = function(req, res, next) {
 
 exports.getAdd = function(req, res, next) {
   let url = req.query.url;
+  let catalogName = req.query.catalogName;
   let assigns = {
     title: "Add Definition",
     breadcrumb: [
@@ -36,7 +37,8 @@ exports.getAdd = function(req, res, next) {
         pageName: "Add Definition"
       }
     ],
-    url: url
+    url: url,
+    catalogName: catalogName
   };
   if (url) {
     requestCore

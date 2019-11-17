@@ -1,5 +1,5 @@
 const fs = require("fs");
-const crawlHandle = require("./crawl-handle");
+const crawlHandle = require("./definition-handler");
 const fileHelper = require("../helper/file-helper");
 
 exports.getHtmls = (req, res, next) => {
@@ -16,13 +16,15 @@ exports.getHtmls = (req, res, next) => {
 };
 
 exports.postDefinition = (req, res, next) => {
-  let url = req.body.url;
-  let host = req.body.host;
-  let data = JSON.parse(req.body.dataString);
+  let filename = req.body.filename;
+  let hostname = req.body.hostname;
+  let catalogName = req.body.catalogName;
+  let data = JSON.parse(req.body.data);
 
-  crawlHandle.saveDefinition(host, url, data);
+  crawlHandle.saveDefinition(hostname, filename, catalogName, data);
 
   res.json({
-    status: "success"
+    message: "Add definition success!",
+    status: true
   });
 };

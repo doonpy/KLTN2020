@@ -1,19 +1,23 @@
 const $ = require("jquery");
-const handleIframe = require("./handle-iframe");
+const handleIframe = require("./_handle-iframe-event");
 
 $(document).ready(() => {
-    let hostname = $("#hostname").text();
-    let filename = $("#filename").text();
-
-    $("#live-iframe").attr("src", `/api/get-html/${hostname}/${filename}`);
-
-    //init handle iframe
+    // init handle iframe
     handleIframe.init();
 
-    //toggle right-side
-    $("#swift-right").click(e => {
-        if (e.which === 1) {
-            $("#right").toggle("fast");
-        }
+    // window resize handle
+    $(window).resize(() => {
+        resizeIframe();
     });
+
+    // Resize iframe
+    const resizeIframe = () => {
+        const $liveIframe = $("#live-iframe");
+        const $loading = $("#loading-progress");
+        let maxWidth = $liveIframe.parent().width();
+        let maxHeight = $(window).width();
+        $liveIframe.width(maxWidth).height(maxHeight);
+        $loading.width(maxWidth).height(maxHeight);
+    };
+    resizeIframe();
 });
