@@ -22,7 +22,7 @@ block content
                 img#loading-progress(src="/images/svg/puff.svg" style="position:absolute; background-color: #343a40;")
                 iframe#live-iframe(src=`/api/get-html/${hostname}/${fileName}`)
             #right-content.col.card.p-3
-                #define-data
+                #define-data.card-body
                     #table-data-alert.alert.alert-danger.d-none(role='alert')
                     table#table-data.table.table-hover
                         thead

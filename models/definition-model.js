@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const moment = require('moment')
+const moment = require("moment");
 
 const definitionSchema = new Schema({
   hostname: String,
@@ -23,12 +23,12 @@ const definitionSchema = new Schema({
   ]
 });
 
-definitionSchema.path('definitions').schema.pre('save',function(){
-  this.lastUpdate = new Date().valueOf();
-})
-
-definitionSchema.path('definitions').schema.virtual('lastUpdate_formatted').get(function(){
-  return moment(this.lastUpdate).format('L LTS');
-})
+definitionSchema
+  .path("definitions")
+  .schema.virtual("lastUpdateFormatted")
+  .get(function() {
+    console.log(this.lastUpdate);
+    return moment(this.lastUpdate).format("L LTS");
+  });
 
 module.exports = mongoose.model("definition", definitionSchema);

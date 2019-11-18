@@ -71,6 +71,12 @@ exports.getAdd = function(req, res, next) {
   }
 };
 
+/**
+ * get detail of definition
+ * @param req
+ * @param res
+ * @param next
+ */
 exports.getDetail = (req, res, next) => {
   let definitionId = req.params.id;
   let assigns = {

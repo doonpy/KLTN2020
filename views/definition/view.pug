@@ -14,6 +14,6 @@ block content
                         else
                             for definition in def.definitions
                                 a(href=`/definition/detail/${definition._id}`).list-group-item.list-group-item-primary.list-group-item-action
-                                    small.float-right Last update: #{definition.lastUpdate_formatted}
+                                    small.float-right Last update: #{definition.lastUpdateFormatted}
                                     h6=definition.catalogName
 
