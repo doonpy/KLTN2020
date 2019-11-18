@@ -4,14 +4,16 @@ block content
     if definitionList.length === 0
         p Nothing in here :(
     else
-        ul.hostname-list
+        ul.list-group
             for def in definitionList
-                li
-                    a(href=def._id)=def.hostname
-                    ul.definition-list
+                li.list-group-item.list-group-item-info
+                    h5=def.hostname
+                    .list-group
                         if(def.definitions.length === 0)
                             p Empty
                         else
                             for definition in def.definitions
-                                li
-                                    a(href=definition._id)=definition.catalogName
+                                a(href=`/definition/detail/${definition._id}`).list-group-item.list-group-item-primary.list-group-item-action
+                                    small.float-right Last update: #{definition.lastUpdate_formatted}
+                                    h6=definition.catalogName
+

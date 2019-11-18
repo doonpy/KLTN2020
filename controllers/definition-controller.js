@@ -22,6 +22,12 @@ exports.getIndex = function(req, res, next) {
   });
 };
 
+/**
+ * add definition - get
+ * @param req
+ * @param res
+ * @param next
+ */
 exports.getAdd = function(req, res, next) {
   let url = req.query.url;
   let catalogName = req.query.catalogName;
@@ -34,7 +40,7 @@ exports.getAdd = function(req, res, next) {
       },
       {
         href: "/definition/add",
-        pageName: "Add Definition"
+        pageName: "Add"
       }
     ],
     url: url,
@@ -63,4 +69,39 @@ exports.getAdd = function(req, res, next) {
   } else {
     res.send("URL NULL");
   }
+};
+
+exports.getDetail = (req, res, next) => {
+  let definitionId = req.params.id;
+  let assigns = {
+    title: "Detail Definition",
+    breadcrumb: [
+      {
+        href: "/definition",
+        pageName: "Definition"
+      },
+      {
+        href: "/definition/detail",
+        pageName: "Detail"
+      }
+    ]
+  };
+  Definition.findOne({ "definitions._id": definitionId }, (err, data) => {
+    if (err) {
+      throw err;
+    }
+    if (!data) {
+      next();
+      return;
+    } else {
+      let definition = data.definitions.id(definitionId);
+      if (!definition) {
+        next();
+        return;
+      }
+      assigns.definition = definition;
+      assigns.hostname = data.hostname;
+      res.render("definition/detail", assigns);
+    }
+  });
 };

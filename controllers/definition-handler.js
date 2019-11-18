@@ -81,10 +81,7 @@ exports.saveDefinition = (hostname, filename, catalogName, definitions) => {
                     acreagexPath: acreageDef,
                     addressxPath: addressDef,
                     other: otherDef,
-                    lastUpdate: moment
-                        .utc(new Date())
-                        .unix()
-                        .valueOf()
+                    lastUpdate:""
                 };
 
                 Definition.findOne({hostname: hostname}, {}, (err, data) => {
@@ -125,10 +122,6 @@ exports.saveDefinition = (hostname, filename, catalogName, definitions) => {
                     addressDef
                 );
                 definition.other = mergeObjArray(definition.other, otherDef);
-                definition.lastUpdate = moment
-                    .utc(new Date())
-                    .unix()
-                    .valueOf();
 
                 found.save(err => {
                     if (err) {

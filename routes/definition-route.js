@@ -12,4 +12,9 @@ router.get("/", definitionController.getIndex);
  */
 router.get("/add", definitionController.getAdd);
 
+/**
+ * get detail definition
+ */
+router.get("/detail/:id",definitionController.getDetail);
+
 module.exports = router;
