@@ -26,7 +26,6 @@ exports.getIndex = (req, res, next) => {
             let found = definitionList.definitions.find(
               def => def.catalogName === catalog.catalogName
             );
-            console.log(found);
             if (found) {
               catalog.isDefined = true;
             } else {

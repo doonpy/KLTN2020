@@ -27,7 +27,8 @@ module.exports = {
     mode: "development",
     entry: {
         "def-main": "./source/def-data/main.js",
-        "crawl-main": "./source/crawl/main.js"
+        "crawl-main": "./source/crawl/main.js",
+        "ext-main": "./source/extract/main.js"
     },
 
     output: {

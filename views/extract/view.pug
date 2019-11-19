@@ -1,6 +1,9 @@
 extends ../header
 
 block content
+    script(src='/javascripts/ext-main.js')
+    script(src="/socket.io/socket.io.js")
+
     if detailUrls.length === 0
         p Nothing in here :(
     else
@@ -16,14 +19,17 @@ block content
                                         for catalog,index in detailUrl.catalogList
                                             .list-group-item.list-group-item-action.list-group-item-info(id=`catalogList-${index}` data-toggle='list', href=`#list-catalog-${index}`, role='tab', aria-controls=`catalogList-${index}`)=catalog.catalogName
                                                 if catalog.isDefined
-                                                    button.btn.btn-success.btn-sm.float-right.text-white Extract now!
+                                                    button.extract-btn.btn.btn-success.btn-sm.float-right.text-white(data-catalog-name=catalog.catalogName)  Extract now!
                                                 else
                                                     button.btn.btn-danger.btn-sm.float-right.text-white(onclick=`window.location.href="/definition/add?url=${catalog.urlList[0].url}&catalogName=${catalog.catalogName}"`) Define now!
                                 .col-9
                                     #nav-tabContent.tab-content
                                         for catalog,index in detailUrl.catalogList
                                             .tab-pane.fade.list-group(id=`list-catalog-${index}` role='tabpanel', aria-labelledby=`list-catalog-${index}`)
-                                                for u in catalog.urlList
-                                                    if !u.isExtracted
-                                                        p.list-group-item.list-group-item-action.list-group-item-primary=u.url
+                                                if catalog.urlList.length > 0
+                                                    for u in catalog.urlList
+                                                        if !u.isExtracted
+                                                            p.list-group-item.list-group-item-action.list-group-item-primary=u.url
+                                                else
+                                                    p Nothing for extract...
 

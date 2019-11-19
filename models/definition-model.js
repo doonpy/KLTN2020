@@ -27,7 +27,6 @@ definitionSchema
   .path("definitions")
   .schema.virtual("lastUpdateFormatted")
   .get(function() {
-    console.log(this.lastUpdate);
     return moment(this.lastUpdate).format("L LTS");
   });
 
