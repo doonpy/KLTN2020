@@ -42,12 +42,7 @@ const scrapePagination = async (
       };
       parsedResults.push(metadata);
     });
-    console.log(
-      "At the page: " +
-        `${chalk.bold.blue(catalog)}` +
-        " At number Page: " +
-        `${chalk.bold.yellow(index)}`
-    );
+   
   }
   exportResults(parsedResults);
 };

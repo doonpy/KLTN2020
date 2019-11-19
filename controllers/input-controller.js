@@ -3,6 +3,7 @@ const chalk = require("chalk");
 const cheerio = require("cheerio");
 const Promise = require("bluebird");
 const extract = require("../core/extractDetail");
+const scrape = require("../core/scrapePagination");
 let urlPage;
 let listCatalog = [];
 let objCatalog = [];
@@ -103,12 +104,16 @@ let handleListPage = (urls, res) => {
     listpage: urls
   });
 };
-let getDetailPage = (req, res) => {
-  console.log(listCatalog);
+let getDetailPage = async (req, res) => {
   let xpath = JSON.parse(req.body.xPathArray);
-  let paginationXpath = JSON.parse(req.body.paginationXpath);
-  let classMap = extract.extractDetail(listCatalog[0], xpath[0]);
-  res.send("Success!");
+  let paginationArr = JSON.parse(req.body.paginationXpath);
+  let urlDetect = listCatalog[0];
+  let xPath = xpath[0];
+  //
+  let paginationXpath = paginationArr[0];
+  let textClass = await extract.getDetail(urlDetect, xPath);
+  let pagination = await extract.getPagination(paginationXpath, urlDetect);
+  scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
 };
 module.exports = {
   getInput: getInput,

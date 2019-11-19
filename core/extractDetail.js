@@ -1,38 +1,38 @@
 const request = require("request-promise");
 const cheerio = require("cheerio");
 const chalk = require("chalk");
-const options = {
+let options = {
+  headers: {
+    "User-Agent": "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
+  },
   resolveWithFullResponse: true,
   timeout: 60000,
-  jar: true,
-  headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36"
-  }
+  jar: true
 };
-const extractDetail = (url, xpath) => {
-  let resultDetail = "";
-  request(url, options, (err, request, body) => {
-    if (err) console.error(err);
-    else {
-      resultDetail = getAttrByXpath(body, xpath);
-    }
+//
+module.exports.getDetail = getDetail = (url, xpath) => {
+  return new Promise((resolve, reject) => {
+    return request(url, options, (error, request, body) => {
+      if (error) console.log(error);
+      result = getAttrbyXpath(body, xpath);
+      resolve(result);
+    });
   });
-  console.log(chalk.bold.red(resultDetail));
-  // return resultDetail;
 };
-// const extractPagination = (url, paginationXpath) => {
-//   request(url, options, (err, request, body) => {
-//     if (err) console.error(err);
-//     else {
-//       getPagination(body, paginationXpath);
-//     }
-//   });
-// };
-
-function getAttrByXpath(body, xpath) {
+//
+module.exports.getPagination = getPagination = (paginationXpath, url) => {
+  return new Promise((resolve, reject) => {
+    return request(url, options, (error, request, body) => {
+      if (error) console.log(error);
+      result = getPaginationbyXpath(body, paginationXpath);
+      resolve(result);
+    });
+  });
+};
+//
+function getAttrbyXpath(body, xpath) {
   const $ = cheerio.load(body);
-  let selector = extractXpath(xpath, $)
+  let selector = getContentbyXpath($, xpath);
   let sibling = $(selector);
   let flagCheckHasParent = true;
   let classParrent = "";
@@ -43,24 +43,26 @@ function getAttrByXpath(body, xpath) {
       classParrent = $(sibling).attr("class");
     }
   }
-  console.log(chalk.bold.blue(classParrent));
   return classParrent;
 }
-function getPagination(body, paginationXpath) {
-  let $ = cheerio.load(body);
-  let paginationQuery = extractXpath(body, paginationXpath);
-  let flagcheckPagination = true;
+//
+function getPaginationbyXpath(body, paginationXpath) {
+  const $ = cheerio.load(body);
+  let selector = getContentbyXpath($, paginationXpath);
+  let pagination = $(selector);
   let textPagination = "";
+  let flagcheckPagination = true;
   while (flagcheckPagination) {
-    paginationQuery = $(paginationQuery).parent();
-    if ($(paginationQuery).attr("href") !== undefined) {
+    pagination = $(pagination).parent();
+    if ($(pagination).attr("href") !== undefined) {
       flagcheckPagination = false;
-      textPagination = $(paginationQuery).attr("href");
+      textPagination = $(pagination).attr("href");
     }
   }
   return textPagination;
 }
-function extractXpath(xpath, $) {
+//
+function getContentbyXpath($, xpath) {
   let xpathArray = xpath.split("/");
   let tagName = "";
   let index = 0;
@@ -78,7 +80,3 @@ function extractXpath(xpath, $) {
   }
   return selector;
 }
-module.exports = {
-  extractDetail: extractDetail
-  // extractPagination: extractPagination
-};

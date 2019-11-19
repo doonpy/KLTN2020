@@ -1,16 +1,17 @@
 var linkCatalog = [];
 let urlInfo = "";
 var text = [];
+//
 function inputURL() {
   return new Promise((resolve, reject) => {
     return $("#form-input-url").bind("change", function() {
       urlInfo = $(this).val();
       if (!urlInfo) return reject("err  urlInfo");
-      console.log(urlInfo);
       return resolve(urlInfo);
     });
   });
 }
+//
 const mouseoverHandle = body => {
   const classesToAdd = "crawler-border-solid-hover crawler-border-color-hover";
   $(body)
@@ -21,8 +22,8 @@ const mouseoverHandle = body => {
       $(e.target).removeClass(classesToAdd);
     });
 };
-
-function handleCatalog(url) {
+//
+function handleCatalog() {
   var myArray = [];
   $("#iframe-id").on("load", function() {
     let html = $("#iframe-id")
@@ -54,7 +55,10 @@ function handleCatalog(url) {
     //   });
 
     $(html).click(e => {
+     
       e.preventDefault();
+      console.log(e.target);
+   
       //Lấy hết thẻ của catalog
       let targetList = $(e.target)
         .contents()
@@ -100,8 +104,8 @@ function handleCatalog(url) {
     });
   });
 }
-console.log(text) 
+
 $(document).ready(function() {
-  const url = inputURL();
-  handleCatalog(urlInfo);
+  // const url = inputURL();
+  handleCatalog();
 });
