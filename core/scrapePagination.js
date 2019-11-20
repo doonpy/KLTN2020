@@ -3,14 +3,14 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const chalk = require("chalk");
 const DetailModel = require("../models/detail-url-model");
-//
-const outputFile = "raw.JSON";
+
 let config = {
   headers: {
     "User-Agent": "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
   }
 };
 //
+const detailModel = new DetailModel();
 module.exports.scrapeDetail = scrapeDetail = (
   textClass, //Test class
   domain, //batdonsan.com.vn
@@ -37,6 +37,7 @@ module.exports.scrapeDetail = scrapeDetail = (
 //
 let parsedResults = [];
 const crawlerPagination = async (textClass, type, rawData, num, domain) => {
+  let urlmodel = domain.split(/^https?\:\/\//i);
   let checkLoop = true;
   let flagIndex = 0;
   let url;
@@ -45,7 +46,7 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
     let textDetail = url + type;
     console.log(chalk.bold.blue(url));
     let arrLink = [];
-    for (let index = 1; index <= 3; index++) {
+    for (let index = 1; index <= 100; index++) {
       const html = await request.get(textDetail.replace(num, index), config);
       const $ = await cheerio.load(html);
       //
@@ -61,14 +62,14 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
         });
       });
       arrLink.push(link);
-      console.log("At the number:  " + index);
-      if ($("body").find(".p-title").length === 0) {
-        flagIndex += 1;
-        break;
-      }
-      // if (index === 3) {
+      console.log("At the number:  " + chalk.bold.blue(index));
+      // if ($("body").find(`.${textClass}`).length === 0) {
       //   flagIndex += 1;
+      //   break;
       // }
+      if (index === 100) {
+        flagIndex += 1;
+      }
       if (flagIndex == rawData.length - 1) {
         checkLoop = false;
         console.log(chalk.bold.red("BAN DA HOAN THANH!!!!"));
@@ -76,6 +77,7 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
       // let val = url.split(domain);
       // let name = val[1].replace("/", "");
     }
+
     let mergeLinkArr = [].concat.apply([], arrLink);
 
     let catalogList = {
@@ -83,13 +85,17 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
       urlList: mergeLinkArr
     };
     parsedResults.push(catalogList);
+    DetailModel.findOneAndUpdate(
+      { domain: urlmodel[1] },
+      {
+        $push: {
+          catalogList: parsedResults
+        }
+      }
+    ).exec();
+    parsedResults = [];
   }
-
-  const detailModel = new DetailModel({
-    domain: "batdongsan.com.vn",
-    catalogList: parsedResults
-  });
-  await detailModel.save();
+  // console.log(urlmodel[1]);
 };
 //
 // const exportResults = parsedResults => {

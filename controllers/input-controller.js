@@ -4,6 +4,7 @@ const cheerio = require("cheerio");
 const Promise = require("bluebird");
 const extract = require("../core/extractDetail");
 const scrape = require("../core/scrapePagination");
+const DetailModel = require("../models/detail-url-model");
 let urlPage;
 let listCatalog = [];
 let objCatalog = [];
@@ -22,9 +23,17 @@ let getInput = (req, res) => {
   return res.render("input");
 };
 
-let postURL = (req, res) => {
+let postURL = async (req, res) => {
   urlPage = req.body.url;
-  console.log(urlPage);
+
+  let urlmodel = urlPage.split(/^https?\:\/\//i);
+  console.log(chalk.bold.red(urlmodel[1]));
+//Check if exits
+  const detailModel = new DetailModel({
+    domain: urlmodel[1]
+  });
+  await detailModel.save();
+
   let options = {
     url: urlPage,
     headers: {
