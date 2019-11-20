@@ -7,6 +7,9 @@ exports.init = () => {
         process.env.DB_PORT !== "" ? `:${process.env.DB_PORT}` : ""
     }/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
+    
+    // const connString = 'mongodb://localhost:27017/tlcn_2019';
+
     mongoose
         .connect(connString, {
             useNewUrlParser: true,

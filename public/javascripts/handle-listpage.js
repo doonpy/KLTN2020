@@ -43,7 +43,6 @@ function handleListPage() {
           paginationXpath.push(xpath);
         }
       }
-    
     });
   });
   $("#form-input-pagination").bind("change", function() {
@@ -52,12 +51,17 @@ function handleListPage() {
   });
   $("#button-plist").click(() => {
     xPathArray = JSON.stringify(xPathArr);
-    paginationXpath = JSON.stringify(paginationXpath)
+    paginationXpath = JSON.stringify(paginationXpath);
     console.log(xPathArray);
-    $.post("/detail", { xPathArray: xPathArray, paginationXpath: paginationXpath  }, data => {
-      // window.location = "/listpage";
-      // console.log(data);
-    });
+
+    $.post(
+      "/detail",
+      { xPathArray: xPathArray, paginationXpath: paginationXpath },
+      data => {
+        // window.location = "/listpage";
+        console.log(data);
+      }
+    );
   });
 }
 

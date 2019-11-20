@@ -2,7 +2,9 @@ const request = require("request-promise");
 const cheerio = require("cheerio");
 const fs = require("fs");
 const chalk = require("chalk");
-const outputFile = "database.JSON";
+const DetailModel = require("../models/detail-url-model");
+//
+const outputFile = "raw.JSON";
 let config = {
   headers: {
     "User-Agent": "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
@@ -10,13 +12,14 @@ let config = {
 };
 //
 module.exports.scrapeDetail = scrapeDetail = (
-  textClass,
-  domain,
+  textClass, //Test class
+  domain, //batdonsan.com.vn
   pagination,
   urlDetect,
   dataCatalog
 ) => {
   console.log(textClass);
+  let rawData = [];
   let paginationType = domain + pagination;
   let typePagination = paginationType.split(urlDetect);
   let type = typePagination[1];
@@ -24,30 +27,28 @@ module.exports.scrapeDetail = scrapeDetail = (
   console.log(chalk.bold.yellow(num));
   dataCatalog.forEach(value => {
     let catalog = value.urlCatalogs;
-    console.log(catalog);
-    crawlerPagination(textClass, type, paginationType, catalog, num, domain);
+    rawData.push(catalog);
+    // crawlerPagination(textClass, type, paginationType, catalog, num, domain);
   });
+  rawData = [].concat.apply([], rawData);
+
+  crawlerPagination(textClass, type, rawData, num, domain);
 };
 //
 let parsedResults = [];
-const crawlerPagination = (
-  textClass,
-  type,
-  paginationType,
-  catalog,
-  num,
-  domain
-) => {
-  //
-  catalog.forEach(async value => {
-    let textDetail = value + type;
-    console.log(textDetail);
-    for (let index = 1; ; index++) {
+const crawlerPagination = async (textClass, type, rawData, num, domain) => {
+  let checkLoop = true;
+  let flagIndex = 0;
+  let url;
+  while (checkLoop) {
+    url = rawData[flagIndex];
+    let textDetail = url + type;
+    console.log(chalk.bold.blue(url));
+    let arrLink = [];
+    for (let index = 1; index <= 3; index++) {
       const html = await request.get(textDetail.replace(num, index), config);
-      const $ = cheerio.load(html);
-      if ($("body").find(`.${textClass}`).length == 0) {
-        break;
-      }
+      const $ = await cheerio.load(html);
+      //
       let link = [];
       $(`.${textClass}`).each(function() {
         link.push({
@@ -59,45 +60,51 @@ const crawlerPagination = (
           isExtracted: false
         });
       });
-      let val = value.split(domain);
-      let name = val[1].replace("/", "");
-      //
-      let catalogList = {
-        catalogName: name,
-        urlList: link
-      };
-
-      // let database = {
-      //   domain: domain,
-      //   catalogList: [
-      //     {
-      //       catalogName: name,
-      //       urlList: link //Array
-      //       // isExtracted: false
-      //     }
-      //   ]
-      // };
-
-      console.log(" At number Page: " + `${chalk.bold.yellow(index)}`);
-      parsedResults.push(catalogList);
+      arrLink.push(link);
+      console.log("At the number:  " + index);
+      if ($("body").find(".p-title").length === 0) {
+        flagIndex += 1;
+        break;
+      }
+      // if (index === 3) {
+      //   flagIndex += 1;
+      // }
+      if (flagIndex == rawData.length - 1) {
+        checkLoop = false;
+        console.log(chalk.bold.red("BAN DA HOAN THANH!!!!"));
+      }
+      // let val = url.split(domain);
+      // let name = val[1].replace("/", "");
     }
-    exportResults(parsedResults);
+    let mergeLinkArr = [].concat.apply([], arrLink);
+
+    let catalogList = {
+      catalogName: url,
+      urlList: mergeLinkArr
+    };
+    parsedResults.push(catalogList);
+  }
+
+  const detailModel = new DetailModel({
+    domain: "batdongsan.com.vn",
+    catalogList: parsedResults
   });
+  await detailModel.save();
 };
 //
-const exportResults = parsedResults => {
-  fs.writeFile(outputFile, JSON.stringify(parsedResults, null, 4), err => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(
-      chalk.yellow.bgBlue(
-        `\n ${chalk.underline.bold(
-          parsedResults.length
-        )} Results exported successfully to ${chalk.underline.bold(
-          outputFile
-        )}\n`
-      )
-    );
-  });
-};
+// const exportResults = parsedResults => {
+//   fs.writeFile(outputFile, JSON.stringify(parsedResults, null, 4), err => {
+//     if (err) {
+//       console.log(err);
+//     }
+//     console.log(
+//       chalk.yellow.bgBlue(
+//         `\n ${chalk.underline.bold(
+//           parsedResults.length
+//         )} Results exported successfully to ${chalk.underline.bold(
+//           outputFile
+//         )}\n`
+//       )
+//     );
+//   });
+// };

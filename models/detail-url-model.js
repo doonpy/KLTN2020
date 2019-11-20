@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
 const detailUrlModel = new Schema({
   domain: String,
   catalogList: [

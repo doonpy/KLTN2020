@@ -110,10 +110,15 @@ let getDetailPage = async (req, res) => {
   let urlDetect = listCatalog[0];
   let xPath = xpath[0];
   //
+  res.send("Success!");
   let paginationXpath = paginationArr[0];
   let textClass = await extract.getDetail(urlDetect, xPath);
   let pagination = await extract.getPagination(paginationXpath, urlDetect);
-  scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
+  console.log(pagination);
+  console.log(objCatalog);
+  setTimeout(() => {
+    scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
+  }, 1000);
 };
 module.exports = {
   getInput: getInput,
