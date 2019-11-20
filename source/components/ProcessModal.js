@@ -1,4 +1,5 @@
-const $ = require("jquery");
+import SocketClient from "../services/SocketClient";
+
 const DEFAULT_SETING = {
     id: {
         modalName: "js-process-modal"
@@ -8,16 +9,23 @@ const DEFAULT_SETING = {
     }
 };
 
-export class ProcessModal {
-    constructor(params) {
+export default class ProcessModal {
+    constructor(params={}) {
         this.header = params.header;
-        this.socket = params.socket;
-        this._render(params);
+        this.html = params.html;
+        this.processName = params.processName;
+        this._setTemplate();
+        SocketClient.initInstance();
+        this.socket = SocketClient.getInstance();
         this._bindSocketEvent();
     }
 
-    _render() {
-        let modal = `<!-- The Modal -->
+    _getTemplate(){
+        return this.html;
+    }
+
+    _setTemplate() {
+        this.html = `<!-- The Modal -->
                 <div class="modal" id="${DEFAULT_SETING.id.modalName}">
                   <div class="modal-dialog">
                     <div class="modal-content">
@@ -41,12 +49,17 @@ export class ProcessModal {
                     </div>
                   </div>
                 </div>`;
-        $("body").append(modal);
     }
 
     _bindSocketEvent() {
         this.socket.on("test", data => {
             console.log(data);
         });
+    }
+
+    render($body){
+        if($body){
+            $body.append(this._getTemplate());
+        }
     }
 }

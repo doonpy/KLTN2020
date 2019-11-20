@@ -1,5 +1,5 @@
 const $ = require("jquery");
-import {ProcessModal} from "../components/ProcessModal";
+import ProcessModal from "../components/ProcessModal";
 
 $(document).ready(() => {
     // function sendPostRequest(url, data){
@@ -7,7 +7,6 @@ $(document).ready(() => {
     //         handleSuccess(res);
     //     })
     // }
-    const socket = io();
 
     // Click extract button event
     $(".extract-btn").click(e => {
@@ -15,9 +14,9 @@ $(document).ready(() => {
             let listCatalogId = $(e.target).data().catalogName;
             let params = {
                 header: "Extracting Process",
-                socket: socket
+                processName:'extract'
             };
-            let temp = new ProcessModal(params);
+            let temp = new ProcessModal(params).render($('body'));
             console.log(temp);
         }
     });

@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.7.0",
     "@babel/preset-env": "^7.6.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
@@ -36,6 +37,12 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.9.0"
+  },
+  "babel": {
+    "presets": [],
+    "plugins": [["@babel/plugin-proposal-class-properties", {
+      "loose": true
+    }]]
   },
   "description": "My webpack project"
 }
