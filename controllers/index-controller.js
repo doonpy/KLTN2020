@@ -79,7 +79,7 @@ exports.getExtract = (req, res, next) => {
                                     folderPath,
                                     fileName
                                 );
-                                extractCore.extractByDefinition(hostname, found.url, content);
+                                extractCore.main(hostname, found.url, content);
                             }
                         }
                     );

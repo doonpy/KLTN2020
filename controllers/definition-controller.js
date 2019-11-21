@@ -30,7 +30,9 @@ exports.getIndex = function(req, res, next) {
  */
 exports.getAdd = function(req, res, next) {
   let url = req.query.url;
+  let catalogId = req.query.catalogId;
   let catalogName = req.query.catalogName;
+
   let assigns = {
     title: "Add Definition",
     breadcrumb: [
@@ -44,7 +46,8 @@ exports.getAdd = function(req, res, next) {
       }
     ],
     url: url,
-    catalogName: catalogName
+    catalogName: catalogName,
+    catalogId: catalogId
   };
   if (url) {
     requestCore

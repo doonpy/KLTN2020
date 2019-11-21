@@ -1,5 +1,7 @@
 const $ = require("jquery");
 const handleIframe = require("./_handle-iframe-event");
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap";
 
 $(document).ready(() => {
     // init handle iframe

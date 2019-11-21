@@ -2,8 +2,6 @@ extends ../header
 
 block content
     script(src='/javascripts/ext-main.js')
-    script(src="/socket.io/socket.io.js")
-
     if detailUrls.length === 0
         p Nothing in here :(
     else
@@ -21,7 +19,7 @@ block content
                                                 if catalog.isDefined
                                                     button.extract-btn.btn.btn-success.btn-sm.float-right.text-white(data-catalog-name=catalog.catalogName)  Extract now!
                                                 else
-                                                    button.btn.btn-danger.btn-sm.float-right.text-white(onclick=`window.location.href="/definition/add?url=${catalog.urlList[0].url}&catalogName=${catalog.catalogName}"`) Define now!
+                                                    button.btn.btn-danger.btn-sm.float-right.text-white(onclick=`window.location.href="/definition/add?url=${catalog.urlList[0].url}&catalogName=${catalog.catalogName}&catalogId=${catalog._id}"`) Define now!
                                 .col-9
                                     #nav-tabContent.tab-content
                                         for catalog,index in detailUrl.catalogList

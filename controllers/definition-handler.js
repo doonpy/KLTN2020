@@ -36,7 +36,13 @@ function mergeObjArray(array, data) {
   return result;
 }
 
-exports.saveDefinition = (hostname, filename, catalogName, definitions) => {
+exports.saveDefinition = (
+    hostname,
+    filename,
+    catalogName,
+    catalogId,
+    definitions
+) => {
   // remove null definition
   definitions = definitions.filter(e => {
     return e.def !== "undef";
@@ -76,6 +82,7 @@ exports.saveDefinition = (hostname, filename, catalogName, definitions) => {
       if (!found) {
         let definition = {
           catalogName: catalogName,
+          catalogId: catalogId,
           titlexPath: titleDef,
           pricexPath: priceDef,
           acreagexPath: acreageDef,

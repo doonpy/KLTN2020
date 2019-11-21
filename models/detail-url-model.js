@@ -6,9 +6,13 @@ const detailUrlModel = new Schema({
   catalogList: [
     {
       catalogName: String,
-      urlList: [{ url: String, isExtracted: Boolean }]
+      urlList: [{url: String, isExtracted: Boolean, _id: false}]
     }
   ]
 });
+
+detailUrlModel.methods.getCatalogListById = function (catalogId) {
+  return this.catalogList.find(catalog => catalog._id == catalogId);
+};
 
 module.exports = mongoose.model("detail_url", detailUrlModel);

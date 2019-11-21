@@ -93,6 +93,7 @@ exports.init = () => {
         url: "/api/definition",
         data: {
           catalogName: $("#catalogName").text(),
+          catalogId: $("#catalogId").text(),
           hostname: $("#hostname").text(),
           filename: $("#filename").text(),
           data: JSON.stringify(completeDefs)

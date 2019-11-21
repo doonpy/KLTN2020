@@ -69,5 +69,8 @@ data/
 #.idea
 .idea/
 
+# public js
+./public/javascripts
+
 # test.js
 test.js

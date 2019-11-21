@@ -24,7 +24,7 @@ exports.getIndex = (req, res, next) => {
         if (definitionList) {
           detailUrl.catalogList.forEach(catalog => {
             let found = definitionList.definitions.find(
-              def => def.catalogName === catalog.catalogName
+                def => def.catalogId == catalog._id
             );
             if (found) {
               catalog.isDefined = true;
