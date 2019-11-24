@@ -1,18 +1,21 @@
 extends ../header
 
 block content
-    h5.float-right
-        span.badge.badge-primary Last update:
-        | &nbsp;
-        span=definition.lastUpdateFormatted
-    h5
-        span.badge.badge-primary Hostname:
-        | &nbsp;
-        span=hostname
-    h5
-        span.badge.badge-primary Catalog name:
-        |&nbsp;
-        span=definition.catalogName
+    .row
+        .col
+            h5
+                span.badge.badge-primary Hostname:
+                small &nbsp;#{hostname}
+            h5
+                span.badge.badge-primary Catalog name:
+                small &nbsp;#{catalogName}
+        .col
+            h5
+                span.badge.badge-primary Create:
+                small &nbsp;#{definition.cTimeFormatted}
+            h5
+                span.badge.badge-primary Last update:
+                small &nbsp;#{definition.mTimeFormatted}
 
     .container-fluid.pt-2
         #accordion
@@ -21,28 +24,28 @@ block content
                 #collapse-title-xpath.collapse(aria-labelledby='title-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
-                            for e in definition.titlexPath
+                            for e in definition.title
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
                 button#price-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-price-xpath', aria-expanded='true', aria-controls='collapse-price-xpath') Price xPaths
                 #collapse-price-xpath.collapse(aria-labelledby='price-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
-                            for e in definition.pricexPath
+                            for e in definition.price
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
                 button#acreage-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-acreage-xpath', aria-expanded='true', aria-controls='collapse-acreage-xpath') Acreage xPaths
                 #collapse-acreage-xpath.collapse(aria-labelledby='acreage-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
-                            for e in definition.acreagexPath
+                            for e in definition.acreage
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
                 button#address-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-address-xpath', aria-expanded='true', aria-controls='collapse-address-xpath') Address xPaths
                 #collapse-address-xpath.collapse(aria-labelledby='address-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
-                            for e in definition.addressxPath
+                            for e in definition.address
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
                 button#other-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-other-xpath', aria-expanded='true', aria-controls='collapse-other-xpath') Other xPaths
@@ -51,13 +54,13 @@ block content
                         .row
                             .col-4
                                 #list-tab.list-group(role='tablist')
-                                    for e,index in definition.other
+                                    for e,index in definition.others
                                         a.list-group-item.list-group-item-action.list-group-item-info(id=`other-${index}` data-toggle='list', href=`#list-other-${index}`, role='tab', aria-controls=`other-${index}`)=e.name
                             .col-8
                                 #nav-tabContent.tab-content
-                                    for e,index in definition.other
+                                    for e,index in definition.others
                                         .tab-pane.fade.list-group(id=`list-other-${index}` role='tabpanel', aria-labelledby=`list-${index}-list`)
-                                            for xpath in e.xPath
+                                            for xpath in e.xpath
                                                 p.list-group-item.list-group-item-action.list-group-item-info=xpath
 
 

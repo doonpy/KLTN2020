@@ -2,32 +2,32 @@ extends ../header
 
 block content
     script(src='/javascripts/ext-main.js')
-    if detailUrls.length === 0
+    if data.length === 0
         p Nothing in here :(
     else
         #accordion
-            for detailUrl, index in detailUrls
+            for host, index in data
                 .card
-                    button.btn.btn-block.btn-info(id=`detail-url-${index}` data-toggle='collapse', data-target=`#collapse-detail-url-${index}`, aria-expanded='true', aria-controls=`collapse-detail-url-${index}`)=detailUrl.hostname
+                    button.btn.btn-block.btn-info(id=`detail-url-${index}` data-toggle='collapse', data-target=`#collapse-detail-url-${index}`, aria-expanded='true', aria-controls=`collapse-detail-url-${index}`)=host.hostname
                     .collapse(id=`collapse-detail-url-${index}` aria-labelledby=`detail-url-${index}`, data-parent='#accordion')
                         .card-body
                             .row
                                 .col-3
                                     #list-tab.list-group(role='tablist')
-                                        for catalog,index in detailUrl.catalogList
+                                        for catalog,index in host.catalogs
                                             .list-group-item.list-group-item-action.list-group-item-info(id=`catalogList-${index}` data-toggle='list', href=`#list-catalog-${index}`, role='tab', aria-controls=`catalogList-${index}`)=catalog.catalogName
                                                 if catalog.isDefined
-                                                    button.extract-btn.btn.btn-success.btn-sm.float-right.text-white(data-catalog-name=catalog.catalogName)  Extract now!
+                                                    button.extract-btn.btn.btn-success.btn-sm.float-right.text-white(data-catalog-name=catalog.catalogName data-catalog-id=catalog.catalogId)  Extract now!
                                                 else
-                                                    button.btn.btn-danger.btn-sm.float-right.text-white(onclick=`window.location.href="/definition/add?url=${catalog.urlList[0].url}&catalogName=${catalog.catalogName}&catalogId=${catalog._id}"`) Define now!
+                                                    button.btn.btn-danger.btn-sm.float-right.text-white(onclick=`window.location.href="/definition/add?url=${catalog.urls[0].url}&catalogId=${catalog.catalogId}"`) Define now!
                                 .col-9
-                                    #nav-tabContent.tab-content
-                                        for catalog,index in detailUrl.catalogList
+                                    #nav-tabContent.tab-content(style="height:50vh; overflow:auto;")
+                                        for catalog,index in host.catalogs
                                             .tab-pane.fade.list-group(id=`list-catalog-${index}` role='tabpanel', aria-labelledby=`list-catalog-${index}`)
-                                                if catalog.urlList.length > 0
-                                                    for u in catalog.urlList
-                                                        if !u.isExtracted
-                                                            p.list-group-item.list-group-item-action.list-group-item-primary=u.url
+                                                if catalog.urls.length > 0
+                                                    for url in catalog.urls
+                                                        if !url.isExtracted
+                                                            p.list-group-item.list-group-item-action.list-group-item-primary=url.url
                                                 else
                                                     p Nothing for extract...
 

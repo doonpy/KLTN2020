@@ -1,19 +1,25 @@
 extends ../header
 
 block content
-    if definitionList.length === 0
+    if data.length === 0
         p Nothing in here :(
     else
         ul.list-group
-            for def in definitionList
+            for d in data
                 li.list-group-item.list-group-item-info
-                    h5=def.hostname
+                    h5=d.hostname
                     .list-group
-                        if(def.definitions.length === 0)
+                        if(d.catalogs.length === 0)
                             p Empty
                         else
-                            for definition in def.definitions
-                                a(href=`/definition/detail/${definition._id}`).list-group-item.list-group-item-primary.list-group-item-action
-                                    small.float-right Last update: #{definition.lastUpdateFormatted}
-                                    h6=definition.catalogName
+                            for catalog in d.catalogs
+                                a(href=`/definition/detail/${catalog.definitionId}`).list-group-item.list-group-item-primary.list-group-item-action
+                                    .float-right.small
+                                        p
+                                            b Create:&nbsp;
+                                            | #{catalog.cTime}
+                                        p
+                                            b Last update:&nbsp;
+                                            | #{catalog.mTime}
+                                    h4=catalog.catalogName
 

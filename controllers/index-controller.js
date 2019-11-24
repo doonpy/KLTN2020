@@ -2,7 +2,7 @@ const crawler = require("../core/crawler");
 const DefData = require("../models/definition-model");
 const CrawlHistory = require("../models/crawl-history-model");
 const fs = require("fs");
-const extractCore = require("../core/extract");
+// const extractCore = require("../core/extract");
 const fileHelper = require("../helper/file-helper");
 
 exports.postCrawl = (req, res, next) => {
@@ -53,39 +53,39 @@ exports.getDefinition = (req, res, next) => {
     });
 };
 
-exports.getExtract = (req, res, next) => {
-    let hostname = req.params.hostname;
-
-    DefData.findOne({host: hostname}, async (err, found) => {
-        if (err) next(err);
-
-        if (!found) {
-            res.redirect(`/definition/${hostname}`);
-            return;
-        }
-
-        let folderPath = hostname;
-        let isFolderExist = await fileHelper.isFolderExist(folderPath);
-        if (isFolderExist) {
-            let files = await fileHelper.getAllFileInFolder(folderPath);
-            if (files.length > 0) {
-                files.forEach(fileName => {
-                    CrawlHistory.findOne(
-                        {filename: fileName.replace(/\.html$/g, "")},
-                        async (err, found) => {
-                            if (err) next(err);
-                            if (found) {
-                                let content = await fileHelper.getFileContent(
-                                    folderPath,
-                                    fileName
-                                );
-                                extractCore.main(hostname, found.url, content);
-                            }
-                        }
-                    );
-                });
-                res.send("OK");
-            }
-        }
-    });
-};
+// exports.getExtract = (req, res, next) => {
+//     let hostname = req.params.hostname;
+//
+//     DefData.findOne({host: hostname}, async (err, found) => {
+//         if (err) next(err);
+//
+//         if (!found) {
+//             res.redirect(`/definition/${hostname}`);
+//             return;
+//         }
+//
+//         let folderPath = hostname;
+//         let isFolderExist = await fileHelper.isFolderExist(folderPath);
+//         if (isFolderExist) {
+//             let files = await fileHelper.getAllFileInFolder(folderPath);
+//             if (files.length > 0) {
+//                 files.forEach(fileName => {
+//                     CrawlHistory.findOne(
+//                         {filename: fileName.replace(/\.html$/g, "")},
+//                         async (err, found) => {
+//                             if (err) next(err);
+//                             if (found) {
+//                                 let content = await fileHelper.getFileContent(
+//                                     folderPath,
+//                                     fileName
+//                                 );
+//                                 extractCore.main(hostname, found.url, content);
+//                             }
+//                         }
+//                     );
+//                 });
+//                 res.send("OK");
+//             }
+//         }
+//     });
+// };

@@ -19,8 +19,8 @@ $(document).ready(() => {
     // Click extract button event
     $(".extract-btn").click(e => {
         if (e.which === 1) {
-            let listCatalogId = $(e.target).data().catalogName;
-            processModal.start(listCatalogId);
+            let data = $(e.target).data();
+            processModal.start(data.catalogName, data.catalogId);
             processModal.show();
         }
     });

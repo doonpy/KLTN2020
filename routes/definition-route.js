@@ -11,10 +11,11 @@ router.get("/", definitionController.getIndex);
  * add definition
  */
 router.get("/add", definitionController.getAdd);
+router.post("/add", definitionController.postAdd);
 
 /**
  * get detail definition
  */
-router.get("/detail/:id",definitionController.getDetail);
+router.get("/detail/:id", definitionController.getDetail);
 
 module.exports = router;

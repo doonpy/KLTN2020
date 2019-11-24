@@ -1,18 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const detailUrlModel = new Schema({
-  hostname: String,
-  catalogList: [
+const detailUrlModel = new Schema(
     {
-      catalogName: String,
-      urlList: [{url: String, isExtracted: Boolean, _id: false}]
-    }
-  ]
-});
-
-detailUrlModel.methods.getCatalogListById = function (catalogId) {
-  return this.catalogList.find(catalog => catalog._id == catalogId);
-};
+        url: Schema.Types.String,
+        isExtracted: {type: Schema.Types.Boolean, default: false},
+        catalogId: {type: Schema.Types.ObjectId, ref: "catalog"}
+    },
+    {timestamps: {createdAt: "cTime", updatedAt: "eTime"}}
+);
 
 module.exports = mongoose.model("detail_url", detailUrlModel);

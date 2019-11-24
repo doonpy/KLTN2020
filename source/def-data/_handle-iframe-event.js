@@ -90,20 +90,18 @@ exports.init = () => {
 
       $.ajax({
         type: "POST",
-        url: "/api/definition",
+          url: "/definition/add",
         data: {
-          catalogName: $("#catalogName").text(),
           catalogId: $("#catalogId").text(),
-          hostname: $("#hostname").text(),
-          filename: $("#filename").text(),
           data: JSON.stringify(completeDefs)
         },
         success: function(res) {
-          alert(res.message);
-          window.location.href = "/definition";
-        },
-        failed: function(err) {
-          console.log(err);
+            if (res.status) {
+                alert(res.message);
+                // window.location.href = "/definition";
+            } else {
+                alert(res.message);
+            }
         }
       });
     }

@@ -13,6 +13,6 @@ router.post("/crawl", indexController.postCrawl);
 
 router.get("/definition/:hostname", indexController.getDefinition);
 
-router.get("/extract/:hostname", indexController.getExtract);
+// router.get("/extract/:hostname", indexController.getExtract);
 
 module.exports = router;
