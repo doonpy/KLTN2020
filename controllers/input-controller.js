@@ -4,7 +4,8 @@ const cheerio = require("cheerio");
 const Promise = require("bluebird");
 const extract = require("../core/extractDetail");
 const scrape = require("../core/scrapePagination");
-const DetailModel = require("../models/detail-url-model");
+const HostnameModel = require("../models/hostname-model");
+const CatalogModel = require("../models/catalog-model");
 let urlPage;
 let listCatalog = [];
 let objCatalog = [];
@@ -25,21 +26,24 @@ let getInput = (req, res) => {
 
 let postURL = async (req, res) => {
   urlPage = req.body.url;
-
   let urlmodel = urlPage.split(/^https?\:\/\//i);
   console.log(chalk.bold.red(urlmodel[1]));
-//Check if exits
-  const detailModel = new DetailModel({
-    domain: urlmodel[1]
-  });
-  await detailModel.save();
 
+  const countUrl = await HostnameModel.countDocuments({
+    name: urlmodel[1]
+  });
+  if (!countUrl) {
+    HostnameModel.create({
+      name: urlmodel[1]
+    });
+  }
   let options = {
     url: urlPage,
     headers: {
       "User-Agent": "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
     }
   };
+
   request(options, (error, request, body) => {
     if (error) console.log(error);
     else {
@@ -54,14 +58,13 @@ let getURL = (url, res) => {
   return res.render("iframecatalog", { html: url });
 };
 
-let postCatalog = (req, res) => {
+let postCatalog = async (req, res) => {
   let item = JSON.parse(req.body.catalog);
   item.forEach((value, index) => {
     let url = [];
     value.targetList.forEach(el => {
       if (url.includes(urlPage + el) !== true) url.push(urlPage + el);
     });
-
     if (value !== "/" && value !== "") {
       if (urlPage !== undefined) {
         obj = {
@@ -72,12 +75,32 @@ let postCatalog = (req, res) => {
       if (objCatalog.includes(obj) !== true) objCatalog.push(obj);
     }
   });
+  let urlmodel = urlPage.split(/^https?\:\/\//i);
+  const host = await HostnameModel.findOne({ name: urlmodel[1] });
+
   objCatalog.forEach(el => {
     listCatalog.push(el.urlCatalogs[0]);
+    el.urlCatalogs.forEach(async val => {
+      let name = val.split(urlPage);
+      let catalogname = name[1].replace("/", "");
+      const countUrl = await CatalogModel.countDocuments({
+        name: catalogname
+      });
+      if (!countUrl) {
+        CatalogModel.create({
+          name: catalogname,
+          hostId: host._id
+        });
+      }
+    });
   });
-  res.send(listCatalog);
-  console.log(listCatalog);
-  // console.log(objCatalog)
+  const catalogId = await CatalogModel.find({ hostnameId: host._id });
+  let resultCatalog = [];
+  resultCatalog.push(catalogId._id);
+  HostnameModel.create({
+    catalog: resultCatalog
+  });
+  res.send("Success!");
 };
 //
 let getListPage = (req, res) => {
@@ -123,8 +146,7 @@ let getDetailPage = async (req, res) => {
   let paginationXpath = paginationArr[0];
   let textClass = await extract.getDetail(urlDetect, xPath);
   let pagination = await extract.getPagination(paginationXpath, urlDetect);
-  console.log(pagination);
-  console.log(objCatalog);
+  console.log(chalk.bold.blue("RUNNNNNN"));
   setTimeout(() => {
     scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
   }, 1000);

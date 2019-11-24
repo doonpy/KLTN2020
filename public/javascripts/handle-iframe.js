@@ -24,6 +24,7 @@ const mouseoverHandle = body => {
 };
 //
 function handleCatalog() {
+
   var myArray = [];
   $("#iframe-id").on("load", function() {
     let html = $("#iframe-id")
@@ -55,10 +56,9 @@ function handleCatalog() {
     //   });
 
     $(html).click(e => {
-     
       e.preventDefault();
       console.log(e.target);
-   
+
       //Lấy hết thẻ của catalog
       let targetList = $(e.target)
         .contents()
@@ -106,6 +106,8 @@ function handleCatalog() {
 }
 
 $(document).ready(function() {
-  // const url = inputURL();
+  inputURL().then(data => {
+  
+  });
   handleCatalog();
 });
