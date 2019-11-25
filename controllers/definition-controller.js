@@ -191,7 +191,6 @@ exports.getDetail = (req, res, next) => {
       }
     ]
   };
-    console.log(definitionId);
     Definition.findById(definitionId)
         .populate({path: "catalogId", populate: {path: "hostId"}})
         .exec((err, definition) => {
