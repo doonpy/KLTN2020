@@ -4,20 +4,16 @@ const DetailUrl = require("../../models/detail-url-model");
 const cheerio = require("cheerio");
 const async = require("async");
 const requestModule = require("../module/request");
-const saveModule = require("../module/save");
 const NODE_TYPE_TEXT = 3;
 const MAX_REQUEST_SENT = 10;
 const ErrorCode = require("../../helper/error-code");
 const {parentPort} = require("worker_threads");
-const {SaveSchedule} = require("../../configs/schedule-config");
+const saveSchedule = require("../module/save");
 require("../../configs/database-config").init();
 
 let requestCount = 0;
 let isPause = false;
-
-//
-(function () {
-})();
+let requestLoop = null;
 
 function getContentByXPath(body, xpath) {
   const $ = cheerio.load(body);
@@ -106,7 +102,6 @@ function extractData(body, definition) {
 }
 
 function main(catalogId) {
-  let saveSchedule = new SaveSchedule();
   async.parallel(
       {
         detailUrls: function (callback) {
@@ -127,10 +122,10 @@ function main(catalogId) {
         let definition = results.definition;
         let detailUrls = results.detailUrls;
         if (detailUrls.length > 0) {
-          let loop = setInterval(() => {
+          requestLoop = setInterval(() => {
             if (detailUrls.length === 0) {
-              clearInterval(loop);
-              sendMessage({type: "finish"});
+              clearInterval(requestLoop);
+              sendMessage({type: "extract-finish"});
               return;
             }
 
@@ -147,10 +142,9 @@ function main(catalogId) {
                     let rawData = new RawData(data);
                     detailUrl.isExtracted = true;
                     saveSchedule.addQueue(rawData);
-                    // saveModule.queue.push(detailUrl);
-
+                    saveSchedule.addQueue(detailUrl);
                     sendMessage({
-                      type: "success",
+                      type: "extract-success",
                       data: {
                         url: res.request.uri.href,
                         statusCode: res.statusCode
@@ -174,7 +168,7 @@ function sendMessage(message) {
 
 // send error to parent
 function sendError(err) {
-  parentPort.postMessage({type: "error", data: err});
+  parentPort.postMessage({type: "extract-error", data: err.message});
 }
 
 // listen message from parent
@@ -182,18 +176,25 @@ parentPort.on("message", message => {
   let messageData = message.data;
   let messageType = message.type;
   switch (messageType) {
-    case "start":
+    case "extract-start":
       main(messageData.catalogId);
       break;
-    case "pause":
+    case "extract-pause":
       isPause = true;
-      sendMessage({type: "info", data: `Pause extract data success...`});
+      sendMessage({type: "extract-info", data: `Pause extract data success...`});
       break;
-    case "continue":
+    case "extract-continue":
       isPause = false;
-      sendMessage({type: "info", data: `Continue extract data success...`});
+      sendMessage({type: "extract-info", data: `Continue extract data success...`});
       break;
-    default:
-      sendError(new Error("Message type is invalid."));
+    case "extract-terminate":
+      clearInterval(requestLoop);
+      let checkLoop = setInterval(() => {
+        if (saveSchedule.getRemainAmountQueue() === 0) {
+          clearInterval(checkLoop);
+          sendMessage({type: "extract-terminate", data: true});
+        }
+      }, 0);
+      break;
   }
 });

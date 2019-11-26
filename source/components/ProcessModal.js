@@ -74,6 +74,8 @@ export default class ProcessModal {
     });
     this._bindSocketEvent();
     $(`#${DEFAULT_NAME.id.continueButton}`).prop("disabled", true);
+    $(`#${DEFAULT_NAME.id.pauseButton}`).prop("disabled", false);
+    $(`#${DEFAULT_NAME.id.stopButton}`).prop("disabled", false);
   }
 
   show() {
@@ -96,10 +98,10 @@ export default class ProcessModal {
     let $content = this.$modal.find(`#${DEFAULT_NAME.id.content}`);
     let item = ``;
     switch (payload.type) {
-      case "success":
+      case "extract-success":
         item = `<p class="text-success">=&gt; ${payload.message}</p>`;
         break;
-      case "error":
+      case "extract-error":
         item = `<p class="text-error">=&gt; ${payload.message}</p>`;
         break;
       default:

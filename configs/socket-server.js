@@ -23,11 +23,10 @@ exports.init = server => {
           const modulePath = require.resolve("../core/extract/extract");
           let threadInstance = new ExtractThread({
             modulePath: modulePath,
-            socket: socket
+            socket: socket,
+            catalogId: payload.catalogId
           });
-          threadInstance.initInstance();
           threadList.push(threadInstance);
-          threadInstance.start(payload.catalogId);
           break;
         case "crawl":
           break;
@@ -89,6 +88,13 @@ exports.init = server => {
 
     // disconnect
     socket.on("disconnect", reason => {
+      // stop extract thread
+      let extractThread = getThreadBySocketId(socket.id);
+      if (extractThread) {
+        extractThread.terminate();
+        let index = threadList.indexOf(extractThread);
+        threadList.splice(index, 1);
+      }
       console.log(
           `=> [W${process.pid} - ${require("moment")().format(
               "L LTS"
