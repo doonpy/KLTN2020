@@ -70,7 +70,7 @@ const getFileContent = (folderPath, fileName) => {
     return new Promise((resolve, reject) => {
         fs.readFile(
             `${folderPath}/${fileName}`,
-            { encoding: READ_FILE_OPTION_ENCODING },
+            {encoding: READ_FILE_OPTION_ENCODING},
             (err, content) => {
                 if (err) reject(err);
                 resolve(content);
@@ -117,7 +117,7 @@ const createFile = (folderPath, fileName, content, encryption = false) => {
             fs.writeFile(
                 `${folderPath}/${fileName}.${extension}`,
                 content,
-                { encoding: "utf-8" },
+                {encoding: "utf-8"},
                 err => {
                     if (err) {
                         reject(err);
@@ -127,6 +127,19 @@ const createFile = (folderPath, fileName, content, encryption = false) => {
                 }
             );
         });
+    });
+};
+
+/**
+ * Delete file
+ * @param folderPath
+ * @param fileName
+ */
+const deleteFile = (folderPath, fileName) => {
+    fs.access(`${folderPath}/${fileName}`, err => {
+        if (!err) {
+            fs.unlinkSync(`${folderPath}/${fileName}`);
+        }
     });
 };
 
@@ -157,5 +170,6 @@ module.exports = {
   getFileContent: getFileContent,
   createFolder: createFolder,
     createFile: createFile,
-    deleteAll: deleteAll
+    deleteAll: deleteAll,
+    deleteFile: deleteFile
 };

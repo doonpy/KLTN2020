@@ -13,7 +13,6 @@ exports.init = () => {
     $(body).click(e => {
       if (e.which === 1) {
         let tableData = handleTable.main(e.target);
-        console.log(tableData);
         if (tableData.length > 1) {
           tableData.forEach(data => {
             data.contentList.forEach((content, index) => {
@@ -29,7 +28,6 @@ exports.init = () => {
         } else if (!helper.isSelected(e.target)) {
           let dataNode = handleIframeData.getAllDataNodes(e.target);
           dataNode.forEach((data, index) => {
-            console.log(data);
             let target = helper.getTagByXPath(data.xPath);
             if (!helper.isSelected(target)) {
               helper.markupArea(target);
@@ -46,7 +44,6 @@ exports.init = () => {
   // Submit button event
   $("#submit-table-data").click(e => {
     $("#table-data-alert").addClass("d-none");
-    console.log($("#table-data tr"));
     if (e.which === 1 && $("#table-data tr").length > 1) {
       let xPathInputs = $("#table-data input[name=xpath]").toArray();
       let defInputs = [];
@@ -79,8 +76,6 @@ exports.init = () => {
         });
       }
 
-      console.log(completeDefs);
-
       if (!helper.isEnoughDefRequire(completeDefs)) {
         $("#table-data-alert")
           .text("Title, price, acreage, address are require information!")
@@ -90,18 +85,20 @@ exports.init = () => {
 
       $.ajax({
         type: "POST",
-          url: "/definition/add",
+        url: "/definition/add",
         data: {
           catalogId: $("#catalogId").text(),
+          fileName: $("#fileName").text(),
+          hostName: $("#hostName").text(),
           data: JSON.stringify(completeDefs)
         },
         success: function(res) {
-            if (res.status) {
-                alert(res.message);
-                // window.location.href = "/definition";
-            } else {
-                alert(res.message);
-            }
+          if (res.status) {
+            alert(res.message);
+            // window.location.href = "/definition";
+          } else {
+            alert(res.message);
+          }
         }
       });
     }

@@ -145,9 +145,13 @@ exports.getAdd = function(req, res, next) {
  */
 exports.postAdd = (req, res, next) => {
     let catalogId = req.body.catalogId.trim();
+    let hostName = req.body.hostName.trim();
+    let fileName = req.body.fileName.trim();
     let data = JSON.parse(req.body.data);
 
     if (!catalogId || catalogId === "") {
+        const folderPath = `${process.env.STORAGE_PATH}/${hostName}`;
+        fileHelper.deleteFile(folderPath, fileName);
         res.json({
             message: "Catalog ID is invalid!",
             status: false
@@ -156,6 +160,7 @@ exports.postAdd = (req, res, next) => {
         crawlHandle
             .saveDefinition(catalogId, data)
             .then(() => {
+                fileHelper.deleteFile();
                 res.json({
                     message: "Add definition success!",
                     status: true

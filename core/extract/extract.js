@@ -45,8 +45,8 @@ function getContentByXPath(body, xpath) {
           let text = $(this)
               .text()
               .trim()
-              .replace(/\n\r/g, "");
-          if (text !== "" || text !== null) textData += text;
+              .replace(/(\r\n|\n|\r)/gm, "");
+          if (text !== "" || text !== null) textData += ` ${text.trim()}`;
         }
       });
 
@@ -136,13 +136,24 @@ function main(catalogId) {
                   .send(detailUrl.url)
                   .then(res => {
                     requestCount--;
-                    let data = extractData(res.body, definition);
-                    data.detailUrlId = detailUrl._id;
+                    let data = {};
+                    let dataEntries = Object.entries(
+                        extractData(res.body, definition)
+                    );
 
+                    for (const [key, value] of dataEntries) {
+                      value.filter(v => {
+                        return v.length > 0 && v.length !== undefined;
+                      });
+                      data[key] = value;
+                    }
+                    data.detailUrlId = detailUrl._id;
                     let rawData = new RawData(data);
                     detailUrl.isExtracted = true;
+
                     saveSchedule.addQueue(rawData);
                     saveSchedule.addQueue(detailUrl);
+
                     sendMessage({
                       type: "extract-success",
                       data: {
@@ -181,11 +192,17 @@ parentPort.on("message", message => {
       break;
     case "extract-pause":
       isPause = true;
-      sendMessage({type: "extract-info", data: `Pause extract data success...`});
+      sendMessage({
+        type: "extract-info",
+        data: `Pause extract data success...`
+      });
       break;
     case "extract-continue":
       isPause = false;
-      sendMessage({type: "extract-info", data: `Continue extract data success...`});
+      sendMessage({
+        type: "extract-info",
+        data: `Continue extract data success...`
+      });
       break;
     case "extract-terminate":
       clearInterval(requestLoop);
