@@ -70,11 +70,6 @@ class ExtractThread {
                         });
                     }
                     break;
-                case "extract-terminate":
-                    if (message.data) {
-                        this.worker.terminate();
-                    }
-                    break;
                 case "extract-finish":
                     // finish
                     this.socket.emit("thread-message", {
