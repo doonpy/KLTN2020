@@ -4,7 +4,7 @@ import io from "socket.io-client";
 const SocketClient = {
   getInstance: function () {
     if (!instance) {
-      instance = io("http://localhost:3000", {transports: ["websocket"]});
+      instance = io({transports: ["websocket"]});
     }
     return instance;
   },

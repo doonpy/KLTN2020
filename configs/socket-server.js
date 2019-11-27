@@ -30,9 +30,6 @@ exports.init = server => {
           break;
         case "crawl":
           break;
-        default:
-          console.log("nothing");
-          break;
       }
     });
 

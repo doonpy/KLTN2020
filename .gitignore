@@ -74,3 +74,6 @@ data/
 
 # test.js
 test.js
+
+#pm2 ecosystem
+ecosystem.config.js
