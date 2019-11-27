@@ -41,13 +41,13 @@ function getContentByXPath(body, xpath) {
   $(selector)
       .contents()
       .each(function () {
-        if (this.nodeType === NODE_TYPE_TEXT) {
-          let text = $(this)
-              .text()
-              .trim()
-              .replace(/(\r\n|\n|\r)/gm, "");
-          if (text !== "" || text !== null) textData += ` ${text.trim()}`;
-        }
+          if (this.nodeType === NODE_TYPE_TEXT) {
+              let text = $(this)
+                  .text()
+                  .trim()
+                  .replace(/(\r\n|\n|\r)/gm, "");
+              if (text !== "" || text !== null) textData += ` ${text.trim()}`;
+          }
       });
 
   return textData;
@@ -104,70 +104,70 @@ function extractData(body, definition) {
 function main(catalogId) {
   async.parallel(
       {
-        detailUrls: function (callback) {
-          DetailUrl.find({catalogId: catalogId, isExtracted: false}).exec(
-              callback
-          );
-        },
-        definition: function (callback) {
-          Definition.findOne({catalogId: catalogId}).exec(callback);
-        }
+          detailUrls: function (callback) {
+              DetailUrl.find({catalogId: catalogId, isExtracted: false}).exec(
+                  callback
+              );
+          },
+          definition: function (callback) {
+              Definition.findOne({catalogId: catalogId}).exec(callback);
+          }
       },
       (err, results) => {
-        if (err) {
-          sendError(new Error(ErrorCode.DATABASE.DB_ERROR_1));
-          return;
-        }
-
-        let definition = results.definition;
-        let detailUrls = results.detailUrls;
-        if (detailUrls.length > 0) {
-          requestLoop = setInterval(() => {
-            if (detailUrls.length === 0) {
-              clearInterval(requestLoop);
-              sendMessage({type: "extract-finish"});
+          if (err) {
+              sendError(new Error(ErrorCode.DATABASE.DB_ERROR_1));
               return;
-            }
+          }
 
-            if (!isPause && requestCount < MAX_REQUEST_SENT) {
-              requestCount++;
-              let detailUrl = detailUrls.shift();
-              requestModule
-                  .send(detailUrl.url)
-                  .then(res => {
-                    requestCount--;
-                    let data = {};
-                    let dataEntries = Object.entries(
-                        extractData(res.body, definition)
-                    );
+          let definition = results.definition;
+          let detailUrls = results.detailUrls;
+          if (detailUrls.length > 0) {
+              requestLoop = setInterval(() => {
+                  if (detailUrls.length === 0) {
+                      clearInterval(requestLoop);
+                      sendMessage({type: "extract-finish"});
+                      return;
+                  }
 
-                    for (const [key, value] of dataEntries) {
-                      value.filter(v => {
-                        return v.length > 0 && v.length !== undefined;
-                      });
-                      data[key] = value;
-                    }
-                    data.detailUrlId = detailUrl._id;
-                    let rawData = new RawData(data);
-                    detailUrl.isExtracted = true;
+                  if (!isPause && requestCount < MAX_REQUEST_SENT) {
+                      requestCount++;
+                      let detailUrl = detailUrls.shift();
+                      requestModule
+                          .send(detailUrl.url)
+                          .then(res => {
+                              requestCount--;
+                              let data = {};
+                              let dataEntries = Object.entries(
+                                  extractData(res.body, definition)
+                              );
 
-                    saveSchedule.addQueue(rawData);
-                    saveSchedule.addQueue(detailUrl);
+                              for (const [key, value] of dataEntries) {
+                                  value.filter(v => {
+                                      return v.length > 0 && v.length !== undefined;
+                                  });
+                                  data[key] = value;
+                              }
+                              data.detailUrlId = detailUrl._id;
+                              let rawData = new RawData(data);
+                              detailUrl.isExtracted = true;
 
-                    sendMessage({
-                      type: "extract-success",
-                      data: {
-                        url: res.request.uri.href,
-                        statusCode: res.statusCode
-                      }
-                    });
-                  })
-                  .catch(err => {
-                    sendError(err);
-                  });
-            }
-          });
-        }
+                              saveSchedule.addQueue(rawData);
+                              saveSchedule.addQueue(detailUrl);
+
+                              sendMessage({
+                                  type: "extract-success",
+                                  data: {
+                                      url: res.request.uri.href,
+                                      statusCode: res.statusCode
+                                  }
+                              });
+                          })
+                          .catch(err => {
+                              sendError(err);
+                          });
+                  }
+              });
+          }
       }
   );
 }
@@ -179,7 +179,7 @@ function sendMessage(message) {
 
 // send error to parent
 function sendError(err) {
-  parentPort.postMessage({type: "extract-error", data: err.message});
+    parentPort.postMessage({type: "extract-error", data: err.message});
 }
 
 // listen message from parent
@@ -209,7 +209,8 @@ parentPort.on("message", message => {
       let checkLoop = setInterval(() => {
         if (saveSchedule.getRemainAmountQueue() === 0) {
           clearInterval(checkLoop);
-          sendMessage({type: "extract-terminate", data: true});
+            process.exit();
+            // sendMessage({type: "extract-terminate", data: true});
         }
       }, 0);
       break;
