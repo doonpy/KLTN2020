@@ -17,7 +17,7 @@ exports.init = () => {
     })
     .then(() => {
       console.log("=> Connect database success!");
-    })
+    })  
     .catch(err => {
       console.log("=> Connect database failed!\n", err);
     });
