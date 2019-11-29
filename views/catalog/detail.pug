@@ -1,0 +1,20 @@
+extends ../header
+
+block content
+    h5
+        span.badge.badge-primary Host:
+        small &nbsp;#{data.hostName}
+    h5
+        span.badge.badge-primary Catalog name:
+        small &nbsp;#{data.name}
+    h5
+        span.badge.badge-primary Detail url amount:
+        small &nbsp;#{data.detailUrls}
+    if data.definitionId
+        h5
+            span.badge.badge-primary Definition:
+            a.text-success(href=`/definition/detail/${data.definitionId}`) &nbsp;Click here to see data definition of this catalog.
+    else
+        h5
+            span.badge.badge-primary Definition:
+            a.text-danger(href=`/definition/add?url=${urlForDefinition}&catalogId=${data._id}&enableScript=0`) &nbsp;Click here to add data definition for this catalog.

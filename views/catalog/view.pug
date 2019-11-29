@@ -1,0 +1,26 @@
+extends ../header
+
+block content
+    if data.length === 0
+        p Nothing in here :(
+    else
+        ul.list-group
+            for d in data
+                li.list-group-item.list-group-item-info
+                    h5=d.hostName
+                    .list-group
+                        if(d.catalogs.length === 0)
+                            p Empty
+                        else
+                            for catalog in d.catalogs
+                                if catalog.isDefined
+                                    a(href=`/catalog/detail/${catalog.id}`).list-group-item.list-group-item-success.list-group-item-action
+                                        .float-right.small
+                                            h6 Defined
+                                        h5=catalog.name
+                                else
+                                    a(href=`/catalog/detail/${catalog.id}`).list-group-item.list-group-item-danger.list-group-item-action
+                                        .float-right.small
+                                            h6 No definition yet
+                                        h5=catalog.name
+

@@ -69,7 +69,6 @@ exports.getIndex = function(req, res, next) {
       next(err);
       return;
     } else {
-      // res.send(data);
       let assigns = {
         title: "Definition",
         breadcrumb: [
@@ -157,8 +156,6 @@ exports.postAdd = (req, res, next) => {
   let data = JSON.parse(req.body.data);
 
   if (!catalogId || catalogId === "") {
-    const folderPath = `${process.env.STORAGE_PATH}/${hostName}`;
-    fileHelper.deleteFile(folderPath, fileName);
     res.json({
       message: "Catalog ID is invalid!",
       status: false
@@ -166,16 +163,19 @@ exports.postAdd = (req, res, next) => {
   } else {
     crawlHandle
       .saveDefinition(catalogId, data)
-      .then(() => {
-        fileHelper.deleteFile();
+      .then((definitionId) => {
+        const folderPath = `${process.env.STORAGE_PATH}/${hostName}`;
+        fileHelper.deleteFile(folderPath, fileName);
         res.json({
           message: "Add definition success!",
+          redirectUrl:`/definition/detail/${definitionId}`,
           status: true
         });
       })
       .catch(err => {
         res.json({
-          message: err.message,
+          message: err.err.message,
+          redirectUrl:err.redirectUrl,
           status: false
         });
       });

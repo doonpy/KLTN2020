@@ -60,8 +60,11 @@ block content
                                 #nav-tabContent.tab-content
                                     for e,index in definition.others
                                         .tab-pane.fade.list-group(id=`list-other-${index}` role='tabpanel', aria-labelledby=`list-${index}-list`)
-                                            for xpath in e.xpath
-                                                p.list-group-item.list-group-item-action.list-group-item-info=xpath
+                                            if e.xpath.length > 0
+                                                for xpath in e.xpath
+                                                    p.list-group-item.list-group-item-action.list-group-item-info=xpath
+                                            else
+                                                p Nothing here...
 
 
 

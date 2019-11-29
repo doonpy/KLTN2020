@@ -95,9 +95,10 @@ exports.init = () => {
         success: function(res) {
           if (res.status) {
             alert(res.message);
-            // window.location.href = "/definition";
+            window.location.href = res.redirectUrl;
           } else {
             alert(res.message);
+            window.location.href = res.redirectUrl;
           }
         }
       });
