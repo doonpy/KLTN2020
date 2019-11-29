@@ -4,7 +4,7 @@ block content
     script(src='/javascripts/def-main.js')
 
     if error
-        p=JSON.stringify(error)
+        p.text-danger #{url} - #{error.message}
     else
         .row.target-info.mb-2
             .col-8
@@ -14,6 +14,7 @@ block content
                     span#fileName.badge.badge-primary=fileName
                 span#catalogId.d-none=catalogId
             .col.text-right
+                a#enable-script.btn.btn-primary.mr-2(href=`/definition/add?url=${url}&catalogId=${catalogId}&enableScript=${(enableScript ? 0 : 1)}`)= enableScript ? "Disable JS" : "Enable JS"
                 button#reset-table-data.btn.btn-danger.mr-2 Reset
                 button#submit-table-data.btn.btn-primary Submit
         .row.main-content

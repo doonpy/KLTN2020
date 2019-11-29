@@ -1,6 +1,6 @@
 const request = require("request");
 const DEFAULT_OPTION = {
-    MAX_TIMEOUT: 1000 * 5
+    MAX_TIMEOUT: 1000 * 15
 };
 
 exports.send = url => {

@@ -2,19 +2,17 @@ let instance = null;
 import io from "socket.io-client";
 
 const SocketClient = {
-  getInstance: function () {
+  getInstance: function() {
     if (!instance) {
-      instance = io({transports: ["websocket"]});
+      instance = io({ transports: ["websocket"] });
     }
     return instance;
   },
-  disconnect: function () {
-    if (instance.connected) {
-      instance.close();
-      instance = null;
-    }
+  disconnect: function() {
+    instance = null;
+    return instance;
   },
-  emitEvent: function (name, payload = {}) {
+  emitEvent: function(name, payload = {}) {
     instance.emit(name, payload);
   }
 };

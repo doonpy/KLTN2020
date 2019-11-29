@@ -10,12 +10,14 @@ const DEFAULT_NAME = {
     stopButton: "js-thread-modal-stop-button",
     pauseButton: "js-thread-modal-pause-button",
     continueButton: "js-thread-modal-continue-button",
-    threadInfo: "js-thread-modal-thread-info"
+    threadInfo: "js-thread-modal-thread-info",
+    showModalButton: "js-thread-show-modal-button",
+    closeModalBUtton: "js-thread-close-modal-button"
   },
   class: {
     processLog: "js-thread-log"
   },
-  socket: {type: "extract"}
+  socket: { type: "extract" }
 };
 let threadId = null;
 
@@ -32,9 +34,6 @@ export default class ProcessModal {
                 <div class="modal-content">
                   <div class="modal-header">
                     <h3 class="modal-title" id="${DEFAULT_NAME.id.labelName}">${this.header}</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
                   </div>
                   <div class="modal-body">
                     <h5>
@@ -50,7 +49,7 @@ export default class ProcessModal {
                     <button type="button" class="btn btn-warning" id="${DEFAULT_NAME.id.pauseButton}">Pause</button>
                     <button type="button" class="btn btn-success" id="${DEFAULT_NAME.id.continueButton}">Continue</button>
                     <button type="button" class="btn btn-danger" id="${DEFAULT_NAME.id.stopButton}">Stop</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" id="${DEFAULT_NAME.id.closeModalBUtton}">Close</button>
                   </div>
                 </div>
               </div>
@@ -60,26 +59,50 @@ export default class ProcessModal {
   render() {
     $("body").append(this._getTemplate());
     this.$modal = $(`#${DEFAULT_NAME.id.modalName}`);
+    this.$continueBtn = this.$modal.find(`#${DEFAULT_NAME.id.continueButton}`);
+    this.$pauseBtn = this.$modal.find(`#${DEFAULT_NAME.id.pauseButton}`);
+    this.$stopBtn = this.$modal.find(`#${DEFAULT_NAME.id.stopButton}`);
+    this.$showModalBtn = $(`#${DEFAULT_NAME.id.showModalButton}`);
+    this.$closeModalBtn = this.$modal.find(
+      `#${DEFAULT_NAME.id.closeModalBUtton}`
+    );
+    this.$catalogName = this.$modal.find($(`#${DEFAULT_NAME.id.catalogName}`));
+    this.$content = this.$modal.find(`#${DEFAULT_NAME.id.content}`);
+    this.$threadInfo = this.$modal.find(`#${DEFAULT_NAME.id.threadInfo}`);
     this._bindEvent();
   }
 
   start(catalogName, catalogId) {
     // set catalog name
+    if (this.socket) {
+      alert("You can run only one Thread in the same time.");
+      return;
+    }
+
     $(`#${DEFAULT_NAME.id.content}`).empty();
-    this.$modal.find($(`#${DEFAULT_NAME.id.catalogName}`)).text(catalogName);
+    this.$catalogName.text(catalogName);
     this.socket = SocketClient.getInstance();
     SocketClient.emitEvent("thread-start", {
       type: DEFAULT_NAME.socket.type,
       catalogId: catalogId
     });
     this._bindSocketEvent();
-    $(`#${DEFAULT_NAME.id.continueButton}`).prop("disabled", true);
-    $(`#${DEFAULT_NAME.id.pauseButton}`).prop("disabled", false);
-    $(`#${DEFAULT_NAME.id.stopButton}`).prop("disabled", false);
+    this.$continueBtn.prop("disabled", true);
+    this.$pauseBtn.prop("disabled", false);
+    this.$stopBtn.prop("disabled", false);
+    this.show();
   }
 
   show() {
     this.$modal.modal("show");
+    this.$showModalBtn.addClass("d-none");
+  }
+
+  close() {
+    this.$modal.modal("hide");
+    if (this.socket) {
+      this.$showModalBtn.removeClass("d-none");
+    }
   }
 
   _bindSocketEvent() {
@@ -87,67 +110,78 @@ export default class ProcessModal {
       this._updateContent(payload);
     });
     this.socket.on("thread-info", payload => {
-      $(`#${DEFAULT_NAME.id.threadInfo}`).text(
-          `Process: ${payload.processId} - Thread: ${payload.threadId}`
+      this.$threadInfo.text(
+        `Process: ${payload.processId} - Thread: ${payload.threadId}`
       );
       threadId = payload.threadId;
     });
   }
 
   _updateContent(payload) {
-    let $content = this.$modal.find(`#${DEFAULT_NAME.id.content}`);
     let item = ``;
     switch (payload.type) {
       case "extract-success":
         item = `<p class="text-success">=&gt; ${payload.message}</p>`;
         break;
       case "extract-error":
-        item = `<p class="text-error">=&gt; ${payload.message}</p>`;
+        item = `<p class="text-danger">=&gt; ${payload.message}</p>`;
         break;
       default:
         item = `<p class="text-info">=&gt; ${payload.message}</p>`;
         break;
     }
-    $content.append(item).scrollTop($content[0].scrollHeight);
+    this.$content.append(item).scrollTop(this.$content.scrollHeight);
   }
 
   _bindEvent() {
-    // on modal closed
-    this.$modal.on("hidden.bs.modal", function () {
-      // alert("modal closed");
-    });
-
     // stop button clicked
-    this.$modal.find(`#${DEFAULT_NAME.id.stopButton}`).click(function (e) {
+    this.$stopBtn.click(e => {
       if (e.which === 1) {
         SocketClient.emitEvent("thread-stop", {
           type: DEFAULT_NAME.socket.type
         });
-        $(`#${DEFAULT_NAME.id.continueButton}`).prop("disabled", true);
-        $(`#${DEFAULT_NAME.id.pauseButton}`).prop("disabled", true);
-        $(e.target).prop("disabled", true);
+        this.socket = SocketClient.disconnect();
+        this.$continueBtn.prop("disabled", true);
+        this.$pauseBtn.prop("disabled", true);
+        this.$stopBtn.prop("disabled", true);
       }
     });
 
     // pause button clicked
-    this.$modal.find(`#${DEFAULT_NAME.id.pauseButton}`).click(function (e) {
+    this.$pauseBtn.click(e => {
       if (e.which === 1) {
         SocketClient.emitEvent("thread-pause", {
           type: DEFAULT_NAME.socket.type
         });
-        $(`#${DEFAULT_NAME.id.continueButton}`).prop("disabled", false);
-        $(e.target).prop("disabled", true);
+        this.$continueBtn.prop("disabled", false);
+        this.$pauseBtn.prop("disabled", true);
+        this.$showModalBtn.removeClass("btn-success").addClass("btn-warning");
       }
     });
 
     // continue button clicked
-    this.$modal.find(`#${DEFAULT_NAME.id.continueButton}`).click(function (e) {
+    this.$continueBtn.click(e => {
       if (e.which === 1) {
         SocketClient.emitEvent("thread-continue", {
           type: DEFAULT_NAME.socket.type
         });
-        $(`#${DEFAULT_NAME.id.pauseButton}`).prop("disabled", false);
-        $(e.target).prop("disabled", true);
+        this.$pauseBtn.prop("disabled", false);
+        this.$continueBtn.prop("disabled", true);
+        this.$showModalBtn.removeClass("btn-warning").addClass("btn-success");
+      }
+    });
+
+    // show modal button
+    this.$showModalBtn.click(e => {
+      if (e.which === 1) {
+        this.show();
+      }
+    });
+
+    // close modal button
+    this.$closeModalBtn.click(e => {
+      if (e.which === 1) {
+        this.close();
       }
     });
   }

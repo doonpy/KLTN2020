@@ -2,9 +2,17 @@
 
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
+const {Worker} = require('worker_threads')
 
 if (cluster.isMaster) {
     console.log(`=> [M${process.pid} - ${require("moment")().format("L LTS")}] Master ${process.pid} is running`);
+
+    // extract scheduler
+    let extractWorker = new Worker(require.resolve('../core/extract/extract-schedule'));
+    extractWorker.on("exit",()=>{
+        console.log(`=> [M${process.pid} - ${require("moment")().format("L LTS")}] Save worker terminated.`);
+        extractWorker = new Worker(require.resolve('../core/extract/extract-schedule'));
+    })
 
     // Fork workers.
     for (let i = 0; i < numCPUs; i++) {
