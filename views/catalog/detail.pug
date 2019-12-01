@@ -17,4 +17,7 @@ block content
     else
         h5
             span.badge.badge-primary Definition:
-            a.text-danger(href=`/definition/add?url=${urlForDefinition}&catalogId=${data._id}&enableScript=0`) &nbsp;Click here to add data definition for this catalog.
+            if !urlForDefinition
+                span.text-danger &nbsp;This catalog don't have any detail URL
+            else
+                a.text-danger(href=`/definition/add?url=${urlForDefinition}&catalogId=${data._id}&enableScript=0`) &nbsp;Click here to add data definition for this catalog.

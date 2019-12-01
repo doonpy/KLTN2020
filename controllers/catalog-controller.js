@@ -212,7 +212,8 @@ exports.getDetail = (req, res, next) => {
       } else {
         assigns.data = catalog[0];
         if (!catalog.definitionId) {
-          assigns.urlForDefinition = detailUrl.url;
+          assigns.urlForDefinition = detailUrl ? detailUrl.url :
+              undefined;
         }
         res.render("catalog/detail", assigns);
       }

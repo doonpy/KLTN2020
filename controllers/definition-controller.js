@@ -5,6 +5,12 @@ const crawlHandle = require("./definition-handler");
 const momentTimezone = require("moment-timezone");
 const cheerio = require("cheerio");
 
+const EMBEDDED_LINK_PATTERN = new RegExp(/^\//, "g");
+const HOST_DOMAIN_PATTERN = new RegExp(
+    /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/,
+    "g"
+);
+
 /**
  * get all definition
  */
@@ -118,12 +124,10 @@ exports.getAdd = function(req, res, next) {
         .send(url)
         .then(response => {
           const folderPath = `${process.env.STORAGE_PATH}/${response.request.uri.host}`;
-          const $ = cheerio.load(response.body);
-          if (!enableScript) {
-            $("script").remove();
-          }
+          const bodyHtml = bodyHandle(response, enableScript);
+
           fileHelper
-            .createFile(folderPath, `${url}.html`, $.root().html(), true)
+              .createFile(folderPath, `${url}.html`, bodyHtml, true)
             .then(fileName => {
               assigns.fileName = fileName;
               assigns.hostname = response.request.uri.host;
@@ -138,7 +142,7 @@ exports.getAdd = function(req, res, next) {
           res.render("definition/add", assigns);
         });
     } else {
-      res.send("URL NULL");
+      next(new Error("URL null!"));
     }
   }
 };
@@ -163,19 +167,19 @@ exports.postAdd = (req, res, next) => {
   } else {
     crawlHandle
       .saveDefinition(catalogId, data)
-      .then((definitionId) => {
+        .then(definitionId => {
         const folderPath = `${process.env.STORAGE_PATH}/${hostName}`;
         fileHelper.deleteFile(folderPath, fileName);
         res.json({
           message: "Add definition success!",
-          redirectUrl:`/definition/detail/${definitionId}`,
+          redirectUrl: `/definition/detail/${definitionId}`,
           status: true
         });
       })
       .catch(err => {
         res.json({
           message: err.err.message,
-          redirectUrl:err.redirectUrl,
+          redirectUrl: err.redirectUrl,
           status: false
         });
       });
@@ -221,3 +225,33 @@ exports.getDetail = (req, res, next) => {
       }
     });
 };
+
+function bodyHandle(res, enableScript = false) {
+  const $ = cheerio.load(res.body);
+  const hostDomain = res.request.uri.href.match(HOST_DOMAIN_PATTERN);
+
+  // Edit css link
+  $("link").each(function () {
+    const $el = $(this);
+    const href = $el.attr("href");
+    if (!EMBEDDED_LINK_PATTERN.test(href)) {
+      $el.attr("href", `${hostDomain}${href}`);
+    }
+  });
+
+  // Edit img, javascript link
+  $("img, script").each(function () {
+    const $el = $(this);
+    const href = $el.attr("src");
+    if (!EMBEDDED_LINK_PATTERN.test(href)) {
+      $el.attr("src", `${hostDomain}${href}`);
+    }
+  });
+
+  // Disable Js
+  if (!enableScript) {
+    $("script").remove();
+  }
+
+  return $.root().html();
+}
