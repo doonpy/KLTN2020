@@ -13,7 +13,7 @@ const MAX_REQUEST_SENT = 10;
 const REPEAT_TIME = {
   EXTRACT: 60 * 60 // minutes
 };
-const SAVE_AMOUNT = 100
+const SAVE_AMOUNT = 100;
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
@@ -110,6 +110,11 @@ let detailUrlUpdateQueue = [];
             requestModule
               .send(detailUrl.url)
               .then(res => {
+                  console.log(
+                      `=> [M${process.pid} - ${require("moment")().format(
+                          "L LTS"
+                      )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
+                  );
                 requestCount--;
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
@@ -140,6 +145,11 @@ let detailUrlUpdateQueue = [];
                 successAmount++;
               })
               .catch(err => {
+                  console.log(
+                      `=> [M${process.pid} - ${require("moment")().format(
+                          "L LTS"
+                      )}] Extract "${detailUrl.url}" - ${err.message}`
+                  );
                 requestCount--;
                 urls.push({ id: detailUrl._id, isSuccess: false });
                 failedAmount++;
