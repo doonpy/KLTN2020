@@ -11,11 +11,11 @@ const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
 const MAX_REQUEST_SENT = 10;
 const REPEAT_TIME = {
-  EXTRACT: 60 * 60, // minutes
-  SAVE: 10 //seconds
+  EXTRACT: 60 * 60 // minutes
 };
-const SAVE_AMOUNT = 20;
-let saveQueue = [];
+const SAVE_AMOUNT = 100
+let rawDataSaveQueue = [];
+let detailUrlUpdateQueue = [];
 
 (function extractLoop() {
   const hrStart = process.hrtime();
@@ -25,9 +25,48 @@ let saveQueue = [];
         Definition.find().exec(callback);
       },
       detailUrls: function(callback) {
-        DetailUrl.find({ isExtracted: false })
-          .limit(MAX_URL_TO_GET)
-          .exec(callback);
+        DetailUrl.aggregate([
+          [
+            {
+              $match: {
+                isExtracted: false
+              }
+            },
+            {
+              $lookup: {
+                from: "definitions",
+                localField: "catalogId",
+                foreignField: "catalogId",
+                as: "definition"
+              }
+            },
+            {
+              $project: {
+                url: 1,
+                isExtracted: 1,
+                catalogId: 1,
+                cTime: 1,
+                eTime: 1,
+                isDefined: {
+                  $gt: [
+                    {
+                      $size: "$definition"
+                    },
+                    0
+                  ]
+                }
+              }
+            },
+            {
+              $match: {
+                isDefined: true
+              }
+            },
+            {
+              $limit: MAX_URL_TO_GET
+            }
+          ]
+        ]).exec(callback);
       }
     },
     (err, data) => {
@@ -75,8 +114,27 @@ let saveQueue = [];
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
 
-                saveQueue.push(new RawData(dataExtracted));
-                saveQueue.push(detailUrl);
+                rawDataSaveQueue.push(new RawData(dataExtracted));
+                if (rawDataSaveQueue.length === SAVE_AMOUNT) {
+                  RawData.insertMany(rawDataSaveQueue, err => {
+                    if (err) {
+                      throw err;
+                    }
+                    rawDataSaveQueue = [];
+                  });
+                }
+
+                detailUrlUpdateQueue.push(detailUrl);
+                if (detailUrlUpdateQueue.length === SAVE_AMOUNT) {
+                  detailUrlUpdateQueue.forEach(d => {
+                    DetailUrl.findByIdAndUpdate(d._id, d, err => {
+                      if (err) {
+                        throw err;
+                      }
+                    });
+                  });
+                  detailUrlUpdateQueue = [];
+                }
 
                 urls.push({ id: detailUrl._id, isSuccess: true });
                 successAmount++;
@@ -92,38 +150,6 @@ let saveQueue = [];
     }
   );
   setTimeout(extractLoop, REPEAT_TIME.EXTRACT * 1000);
-})();
-
-(function saveLoop() {
-  if (saveQueue.length > 0) {
-    let data;
-
-    if (saveQueue.length < SAVE_AMOUNT) {
-      data = saveQueue.splice(0, saveQueue.length);
-    } else {
-      data = saveQueue.splice(0, SAVE_AMOUNT);
-    }
-
-    data.forEach(e => {
-      e.save(err => {
-        if (err) {
-          console.log(
-            `=> [W${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Save worker: ${err.message}`
-          );
-        }
-      });
-    });
-    console.log(
-      `=> [W${process.pid} - ${require("moment")().format(
-        "L LTS"
-      )}] Save worker was executed. Queue remain amount is ${
-        saveQueue.length
-      }`
-    );
-  }
-  setTimeout(saveLoop, REPEAT_TIME.SAVE * 1000);
 })();
 
 function getContentByXPath(body, xpath) {

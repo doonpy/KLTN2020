@@ -9,17 +9,22 @@ exports.init = () => {
 
   mongoose
       .connect(connString, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          useFindAndModify: false, useCreateIndex: true,
       })
       .then(() => {
-        console.log(`=> [W${process.pid} - ${require("moment")().format("L LTS")}] Connect database success`);
-        require("../models/catalog-model");
-        require("../models/host-model");
-        require("../models/definition-model");
-        require("../models/raw-data-model");
+          console.log(
+              `=> [W${process.pid} - ${require("moment")().format(
+                  "L LTS"
+              )}] Connect database success`
+          );
+          require("../models/catalog-model");
+          require("../models/host-model");
+          require("../models/definition-model");
+          require("../models/raw-data-model");
       })
       .catch(err => {
-        console.log("=> Connect database failed!\n", err);
+          console.log("=> Connect database failed!\n", err);
       });
 };

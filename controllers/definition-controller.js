@@ -5,10 +5,9 @@ const crawlHandle = require("./definition-handler");
 const momentTimezone = require("moment-timezone");
 const cheerio = require("cheerio");
 
-const EMBEDDED_LINK_PATTERN = new RegExp(/^\//, "g");
 const HOST_DOMAIN_PATTERN = new RegExp(
     /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/,
-    "g"
+    "gi"
 );
 
 /**
@@ -226,15 +225,20 @@ exports.getDetail = (req, res, next) => {
     });
 };
 
-function bodyHandle(res, enableScript = false) {
+function bodyHandle(res, enableScript) {
   const $ = cheerio.load(res.body);
   const hostDomain = res.request.uri.href.match(HOST_DOMAIN_PATTERN);
+
+  // Disable Js
+  if (!enableScript) {
+    $("script, iframe").remove();
+  }
 
   // Edit css link
   $("link").each(function () {
     const $el = $(this);
     const href = $el.attr("href");
-    if (!EMBEDDED_LINK_PATTERN.test(href)) {
+    if (href && !href.match(HOST_DOMAIN_PATTERN)) {
       $el.attr("href", `${hostDomain}${href}`);
     }
   });
@@ -242,16 +246,11 @@ function bodyHandle(res, enableScript = false) {
   // Edit img, javascript link
   $("img, script").each(function () {
     const $el = $(this);
-    const href = $el.attr("src");
-    if (!EMBEDDED_LINK_PATTERN.test(href)) {
-      $el.attr("src", `${hostDomain}${href}`);
+    const src = $el.attr("src");
+    if (src && !src.match(HOST_DOMAIN_PATTERN)) {
+      $el.attr("src", `${hostDomain}${src}`);
     }
   });
-
-  // Disable Js
-  if (!enableScript) {
-    $("script").remove();
-  }
 
   return $.root().html();
 }
