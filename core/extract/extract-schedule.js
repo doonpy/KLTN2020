@@ -11,7 +11,7 @@ const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
 const MAX_REQUEST_SENT = 10;
 const REPEAT_TIME = {
-  EXTRACT: 60 * 60 // minutes
+  EXTRACT: 60 * 10 // minutes
 };
 const SAVE_AMOUNT = 100;
 let rawDataSaveQueue = [];
@@ -93,10 +93,11 @@ let detailUrlUpdateQueue = [];
             executeTime: hrEnd
           }).save();
           console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Extractor was ran within ${secondsToHms(hrEnd)}`
+              `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+              )}] Extractor was ran within ${secondsToHms(hrEnd)}`
           );
+          setTimeout(extractLoop, REPEAT_TIME.EXTRACT * 1000);
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
@@ -159,7 +160,6 @@ let detailUrlUpdateQueue = [];
       }, 0);
     }
   );
-  setTimeout(extractLoop, REPEAT_TIME.EXTRACT * 1000);
 })();
 
 function getContentByXPath(body, xpath) {
