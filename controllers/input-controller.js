@@ -20,6 +20,9 @@ let formatBody = $ => {
   </style>`);
 };
 
+let formatPage  = $ =>{
+  
+}
 let getInput = (req, res) => {
   return res.render("input");
 };
@@ -78,10 +81,13 @@ let postCatalog = async (req, res) => {
   let urlmodel = urlPage.split(/^https?\:\/\//i);
   const host = await HostnameModel.findOne({ name: urlmodel[1] });
 
+  console.log(objCatalog);
   objCatalog.forEach(el => {
     listCatalog.push(el.urlCatalogs[0]);
+    console.log(listCatalog)
     el.urlCatalogs.forEach(async val => {
       let name = val.split(urlPage);
+      
       let catalogname = name[1].replace("/", "");
       const countUrl = await CatalogModel.countDocuments({
         name: catalogname
@@ -142,10 +148,16 @@ let getDetailPage = async (req, res) => {
   let urlDetect = listCatalog[0];
   let xPath = xpath[0];
   //
+  // console.log(paginationArr);
+  // console.log(urlDetect);
+  // console.log(xpath)
   res.send("Success!");
   let paginationXpath = paginationArr[0];
+
   let textClass = await extract.getDetail(urlDetect, xPath);
+  console.log("Class : " +textClass)
   let pagination = await extract.getPagination(paginationXpath, urlDetect);
+  console.log("Pagination : " + pagination )
   console.log(chalk.bold.blue("RUNNNNNN"));
   setTimeout(() => {
     scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);

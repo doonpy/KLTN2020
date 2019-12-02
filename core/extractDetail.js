@@ -11,6 +11,8 @@ let options = {
 };
 //
 module.exports.getDetail = getDetail = (url, xpath) => {
+  console.log(url);
+  console.log(xpath);
   return new Promise((resolve, reject) => {
     return request(url, options, (error, request, body) => {
       if (error) console.log(error);
@@ -21,6 +23,8 @@ module.exports.getDetail = getDetail = (url, xpath) => {
 };
 //
 module.exports.getPagination = getPagination = (paginationXpath, url) => {
+  console.log(paginationXpath);
+  console.log(url);
   return new Promise((resolve, reject) => {
     return request(url, options, (error, request, body) => {
       if (error) console.log(error);
@@ -47,18 +51,30 @@ function getAttrbyXpath(body, xpath) {
 }
 //
 function getPaginationbyXpath(body, paginationXpath) {
+  console.log(chalk.bold.yellow(paginationXpath));
   const $ = cheerio.load(body);
+
   let selector = getContentbyXpath($, paginationXpath);
+
   let pagination = $(selector);
+
   let textPagination = "";
   let flagcheckPagination = true;
-  while (flagcheckPagination) {
-    pagination = $(pagination).parent();
-    if ($(pagination).attr("href") !== undefined) {
-      flagcheckPagination = false;
-      textPagination = $(pagination).attr("href");
+  let textData = $(selector).attr("href");
+  
+  if (textData !== undefined) {
+    textPagination = textData;
+  } else {
+    while (flagcheckPagination) {
+      pagination = $(pagination).parent();
+      if ($(pagination).attr("href") !== undefined) {
+        flagcheckPagination = false;
+        textPagination = $(pagination).attr("href");
+      }
     }
+    console.log("textPagination : " + chalk.bold.red(textPagination));
   }
+
   return textPagination;
 }
 //

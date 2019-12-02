@@ -92,6 +92,7 @@ function handleCatalog() {
       }
     });
 
+    console.log(myArray)
     $("#button-catalog").click(e => {
       e.preventDefault();
       console.log(myArray);
@@ -106,8 +107,8 @@ function handleCatalog() {
 }
 
 $(document).ready(function() {
-  inputURL().then(data => {
+  // inputURL().then(data => {
   
-  });
+  // });
   handleCatalog();
 });

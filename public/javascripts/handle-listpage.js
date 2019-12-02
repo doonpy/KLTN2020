@@ -42,6 +42,8 @@ function handleListPage() {
         if (count === 2) {
           paginationXpath.push(xpath);
         }
+        console.log(paginationXpath);
+        console.log(xPathArr)
       }
     });
   });
@@ -54,6 +56,7 @@ function handleListPage() {
     paginationXpath = JSON.stringify(paginationXpath);
     console.log(xPathArray);
 
+    
     $.post(
       "/detail",
       { xPathArray: xPathArray, paginationXpath: paginationXpath },

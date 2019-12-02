@@ -11,51 +11,83 @@ let config = {
   }
 };
 //
-let outputFile = "database.json";
-const detailModel = new DetailModel();
 module.exports.scrapeDetail = scrapeDetail = (
-  textClass, //Test class
+  textClass, //Test classoi
   domain, //batdonsan.com.vn
   pagination,
   urlDetect,
   dataCatalog
 ) => {
-  console.log(textClass);
   let rawData = [];
   let paginationType = domain + pagination;
-  let typePagination = paginationType.split(urlDetect);
-  let type = typePagination[1];
-  let num = type.replace(/[^0-9]/g, "");
-  console.log(chalk.bold.yellow(num));
+
+  let typePagination = "";
+
+  let type = "";
+  if (urlDetect.includes(".html")) {
+    let testtypePagination = urlDetect.split(".html");
+    typePagination = paginationType.split(testtypePagination[0]);
+    type = typePagination[1];
+  } else if (urlDetect.includes(".htm")) {
+    let testtypePagination = urlDetect.split(".htm");
+    typePagination = paginationType.split(testtypePagination[0]);
+    type = typePagination[1];
+  } else {
+    typePagination = paginationType.split(urlDetect);
+    type = typePagination[1];
+  }
+  // console.log("types : " + typePagination);
+  // console.log("Pagination Type : " + paginationType);
+  //console.log(num);
+  console.log("Type Undefine: " + chalk.bold.red(type)); // undefine
+  //Hàm tách số
+  let num = getNumberPagi(type);
+  //
+
+  console.log("NUMBER" + chalk.bold.yellow(num));
   dataCatalog.forEach(value => {
     let catalog = value.urlCatalogs;
     rawData.push(catalog);
     // crawlerPagination(textClass, type, paginationType, catalog, num, domain);
   });
   rawData = [].concat.apply([], rawData);
+  console.log(rawData);
 
   crawlerPagination(textClass, type, rawData, num, domain);
 };
 //
-let parsedResults = [];
+
 const crawlerPagination = async (textClass, type, rawData, num, domain) => {
-  //domain là tên cái hostname nè a :))
   let urlmodel = domain.split(/^https?\:\/\//i);
   let checkLoop = true;
   let flagIndex = 0;
   let url;
 
   while (checkLoop) {
+    //
     url = rawData[flagIndex];
-    let textDetail = url + type;
+    let textDetail = "";
+    if (url.includes(".html")) {
+      let testUrl = url.split(".html");
+      textDetail = testUrl[0].trim() + type.trim();
+    } else if (url.includes(".htm")) {
+      let testUrl = url.split(".htm");
+      textDetail = testUrl[0].trim() + type.trim();
+    } else {
+      textDetail = url + type.trim();
+    }
+    console.log(textDetail);
     console.log(chalk.bold.blue(url));
+   
     let val = url.split(domain);
     let catalogname = val[1].replace("/", "");
     let arrLink = [];
     const catalogName = await CatalogModel.findOne({ name: catalogname });
-    
-    for (let index = 1; index <= 100; index++) {
+
+    for (let index = 1; index <= 200; index++) {
+      console.log(chalk.bold.red(textDetail.replace(num, index)));
       const html = await request.get(textDetail.replace(num, index), config);
+
       const $ = await cheerio.load(html);
 
       let link = [];
@@ -73,17 +105,17 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
       });
       arrLink.push(link);
 
-      console.log("At the number:  " + chalk.bold.blue(index));
-      // if ($("body").find(`.${textClass}`).length === 0) {
-      //   flagIndex += 1;
-      //   break;
-      // }
-      if (index === 100) {
+      // console.log("At the number:  " + chalk.bold.blue(index));
+      if ($("body").find(`.${textClass}`).length === 0) {
+   
+        flagIndex += 1;
+        break;
+      }
+      if (index === 200) {
         flagIndex += 1;
       }
       if (flagIndex == rawData.length - 1) {
         checkLoop = false;
-        console.log(chalk.bold.red("BAN DA HOAN THANH!!!!"));
       }
       // let val = url.split(domain);
       // let name = val[1].replace("/", "");
@@ -91,6 +123,25 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
 
     let mergeLinkArr = [].concat.apply([], arrLink);
     console.log(mergeLinkArr.length);
-    await DetailModel.create(mergeLinkArr);
+    
+    await DetailModel.create(mergeLinkArr)
+      .then(() => {
+        console.log(`=> Save Data in ${url} successful!`);
+      })
+      .catch(err => {
+        console.log("=> Save data failed!\n", err);
+      });
   }
 };
+function getNumberPagi(strTypePagination) {
+  let textData = "";
+  for (var x = 0, c = ""; (c = strTypePagination.charAt(x)); x++) {
+    // console.log(c);
+    if (!isNaN(c)) {
+      textData = c;
+      //  console.log(c);
+      break;
+    }
+  }
+  return textData;
+}
