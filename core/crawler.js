@@ -136,7 +136,7 @@ const main = urlList => {
                             let host = response.request.uri.host;
                             let url = response.request.uri.href;
                             if (isHostDefined) {
-                                require("./extract").main(host, url, response.body);
+                                require("./extract/extract-schedule").main(host, url, response.body);
                                 global.io.emit("success", {
                                     url: url,
                                     host: host,

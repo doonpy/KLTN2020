@@ -1,40 +1,91 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
+const numCPUs = require("os").cpus().length;
+const cluster = require("cluster");
+const {Worker} = require("worker_threads");
 
-var app = require("../app");
-var debug = require("debug")("crawl-extract:server");
-var http = require("http");
+if (numCPUs === 1) {
+    startServer();
+    startExtractScheduler();
+} else {
+    if (cluster.isMaster) {
+        console.log(
+            `=> [M${process.pid} - ${require("moment")().format("L LTS")}] Master ${
+                process.pid
+            } is running`
+        );
 
-/**
- * Get port from environment and store in Express.
- */
+        startExtractScheduler();
 
-var port = normalizePort(process.env.PORT || "3000");
-app.set("port", port);
+    // Fork workers.
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
 
-/**
- * Create HTTP server.
- */
+    cluster.on("exit", (worker, code, signal) => {
+        console.log(
+            `=> [M${process.pid} - ${require("moment")().format("L LTS")}] Worker ${
+                worker.process.pid
+            } died`
+        );
+    });
+    } else {
+        startServer();
+    }
+}
 
-var server = http.createServer(app);
-require("../configs/socket-server").init(server);
+function startExtractScheduler() {
+    let extractWorker = new Worker(
+        require.resolve("../core/extract/extract-schedule")
+    );
+    extractWorker.on("exit", () => {
+        console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Save worker terminated.`
+        );
+        extractWorker = new Worker(
+            require.resolve("../core/extract/extract-schedule")
+        );
+    });
+}
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+function startServer() {
+    /**
+     * Module dependencies.
+     */
 
-server.listen(port);
-server.on("error", onError);
-server.on("listening", onListening);
+    var app = require("../app");
+    var debug = require("debug")("crawl-extract:server");
+    var http = require("http");
 
-/**
- * Normalize a port into a number, string, or false.
- */
+    /**
+     * Get port from environment and store in Express.
+     */
 
-function normalizePort(val) {
+    var port = normalizePort(process.env.PORT || "3000");
+    app.set("port", port);
+
+    /**
+     * Create HTTP server.
+     */
+
+    var server = http.createServer(app);
+    require("../configs/socket-server").init(server);
+
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+
+    server.listen(port);
+    server.on("error", onError);
+    server.on("listening", onListening);
+
+    /**
+     * Normalize a port into a number, string, or false.
+     */
+
+    function normalizePort(val) {
     var port = parseInt(val, 10);
 
     if (isNaN(port)) {
@@ -48,13 +99,13 @@ function normalizePort(val) {
     }
 
     return false;
-}
+    }
 
-/**
- * Event listener for HTTP server "error" event.
- */
+    /**
+     * Event listener for HTTP server "error" event.
+     */
 
-function onError(error) {
+    function onError(error) {
     if (error.syscall !== "listen") {
         throw error;
     }
@@ -74,14 +125,21 @@ function onError(error) {
         default:
             throw error;
     }
-}
+    }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+    /**
+     * Event listener for HTTP server "listening" event.
+     */
 
-function onListening() {
+    function onListening() {
     var addr = server.address();
     var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
     debug("Listening on " + bind);
+    }
+
+    console.log(
+        `=> [W${process.pid} - ${require("moment")().format("L LTS")}] Worker ${
+            process.pid
+        } started`
+    );
 }

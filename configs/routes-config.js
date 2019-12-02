@@ -1,4 +1,5 @@
 const indexRouter = require("../routes/index");
+const catalogRouter = require("../routes/catalog-route");
 const definitionRouter = require("../routes/definition-route");
 const apiRouter = require("../routes/api-route");
 const inputRouter = require("../routes/input-route");
@@ -9,10 +10,12 @@ const createError = require("http-errors");
  * @param app
  */
 exports.init = app => {
-  app.use("/index", indexRouter);
-  app.use("/definition", definitionRouter);
-  app.use("/api", apiRouter);
+  // app.use("/", indexRouter);
   app.use("/", inputRouter);
+  app.use("/definition", definitionRouter);
+  app.use("/catalog", catalogRouter);
+  app.use("/api", apiRouter);
+
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     next(createError(404));

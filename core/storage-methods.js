@@ -1,12 +1,5 @@
 const fs = require("fs");
 
-// init storage folder
-fs.access(process.env.STORAGE_PATH, err => {
-    if (err) {
-        if (err.code === "ENOENT") fs.mkdirSync(process.env.STORAGE_PATH);
-    }
-});
-
 exports.createFolder = foldername => {
     return new Promise((resolve, reject) => {
         fs.access(`${process.env.STORAGE_PATH}/${foldername}`, err => {

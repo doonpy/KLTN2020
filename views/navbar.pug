@@ -2,14 +2,19 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
     a.navbar-brand(href='#') PK
     button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
         span.navbar-toggler-icon
-    #navbarSupportedContent.collapse.navbar-collapse
+    #navbar.collapse.navbar-collapse
         ul.navbar-nav.mr-auto
-            li.nav-item.active
+            li.nav-item(class="Home"===breadcrumb[0].pageName?`active`:``)
                 a.nav-link(href='/')
                     | Home
                     span.sr-only (current)
-            li.nav-item
+
+            li.nav-item(class="Definition"===breadcrumb[0].pageName?`active`:``)
                 a.nav-link(href='/definition') Definition
+
+            li.nav-item(class="Catalog"===breadcrumb[0].pageName?`active`:``)
+                a.nav-link(href='/catalog') Catalog
+
             li.nav-item.dropdown
                 a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
                     | Dropdown
@@ -23,3 +28,4 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
         //form.form-inline.my-2.my-lg-0
         //    input.form-control.mr-sm-2(type='search', placeholder='Search', aria-label='Search')
         //    button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Search
+
