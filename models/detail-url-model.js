@@ -1,15 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const detailUrlModel = new Schema({
-    domain: String,
-    catalogList: [
-        {
-            catalogName: String,
-            xPath: String,
-            urlList: [{url: String, isExtracted: Boolean}]
-        }
-    ]
-});
+const DetailURLSchema = new Schema(
+  {
+    url: String,
+    isExtracted: Boolean,
+    catalogId: { type: Schema.Types.ObjectId, ref: " catalog" }
+  },
+  { timestamps: { createdAt: "cTime", updatedAt: "eTime" } }
+);
 
-module.exports = mongoose.model("detail_url", detailUrlModel);
+module.exports = mongoose.model("detail_url", DetailURLSchema);
