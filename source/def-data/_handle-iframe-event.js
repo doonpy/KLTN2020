@@ -13,7 +13,9 @@ exports.init = () => {
     $(body).click(e => {
       if (e.which === 1) {
         let tableData = handleTable.main(e.target);
-        if (tableData.length > 1) {
+        let enableAutoDetect = $("#enableAutoDetect").is(":checked");
+
+        if (tableData.length > 1 && enableAutoDetect) {
           tableData.forEach(data => {
             data.contentList.forEach((content, index) => {
               let target = helper.getTagByXPath(content.xPath);
@@ -126,38 +128,16 @@ exports.init = () => {
     // update check
     let definitionId = $("#definitionId").text();
     if (definitionId) {
-      initUpdateValue(body, definitionId);
+      initUpdateValue(definitionId);
     }
   });
 
   // Initialize value for update
-  function initUpdateValue(body, definitionId) {
-    function getContentByXPath(xpath) {
-      let xpathArray = xpath.split("/");
-      let selector = $(body);
-      let tagName = "";
-      let index = 0;
-
-      xpathArray.splice(0, 3); //remove null and html element
-      while (xpathArray.length > 0) {
-        let firstElement = xpathArray.shift();
-
-        tagName = firstElement.match(/[a-z]+([1-6])?/g)[0];
-        index = firstElement.match(/\[[0-9]+\]/g)
-          ? firstElement.match(/\[[0-9]+\]/g)[0].replace(/\[+|\]+/g, "") - 1
-          : 0;
-        selector = $(selector)
-          .children(tagName)
-          .get(index);
-      }
-
-      return selector;
-    }
-
+  function initUpdateValue(definitionId) {
     function getDataByTypeXPath(xPathType, xPathArray) {
       let result = [];
       xPathArray.forEach(xPath => {
-        let el = getContentByXPath(xPath);
+        let el = helper.getTagByXPath(xPath);
         let contentList = [];
         if (el) {
           helper.markupArea(el);

@@ -15,7 +15,10 @@ block content
                 h6 Filename:&nbsp;
                     span#fileName.badge.badge-primary=fileName
                 span#catalogId.d-none=catalogId
-            .col.text-right
+            .col.d-flex.justify-content-end.align-items-center
+                .form-check.mr-4
+                    input#enableAutoDetect.form-check-input(type='checkbox' checked)
+                    label.form-check-label(for='enableAutoDetect') Auto detect
                 a#enable-script.btn.btn-primary.mr-2(href=`/definition/add?url=${url}&catalogId=${catalogId}&enableScript=${(enableScript ? 0 : 1)}`)= enableScript ? "Disable JS" : "Enable JS"
                 button#reset-table-data.btn.btn-danger.mr-2 Reset
                 button#submit-table-data.btn.btn-primary Submit
