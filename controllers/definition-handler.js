@@ -58,7 +58,6 @@ exports.saveDefinition = (catalogId, targetUrl, data) => {
           return;
         }
         const { definition, targetUrl } = data;
-        console.log(targetUrl);
         if (!targetUrl) {
           reject({
             redirectUrl: ``,
