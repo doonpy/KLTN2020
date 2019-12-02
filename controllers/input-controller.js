@@ -62,7 +62,9 @@ let getURL = (url, res) => {
 };
 
 let postCatalog = async (req, res) => {
+
   let item = JSON.parse(req.body.catalog);
+  console.log(chalk.bold.yellow(item))
   item.forEach((value, index) => {
     let url = [];
     value.targetList.forEach(el => {

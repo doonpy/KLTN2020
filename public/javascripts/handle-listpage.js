@@ -12,7 +12,6 @@ const mouseoverHandle = body => {
 };
 
 function handleListPage() {
-  var myList = [];
   listClass = [];
   let pagination = "";
 

@@ -24,7 +24,6 @@ const mouseoverHandle = body => {
 };
 //
 function handleCatalog() {
-
   var myArray = [];
   $("#iframe-id").on("load", function() {
     let html = $("#iframe-id")
@@ -64,17 +63,27 @@ function handleCatalog() {
         .contents()
         .find("a")
         .get();
-
       let targetHref = [];
-      $(targetList).each((index, value) => {
-        let k = value.href.split("http://localhost:3000");
-        targetHref.push(k[1]);
-      });
+      console.log(targetList);
+      if (targetList.length !== 0) {
+        $(targetList).each((index, value) => {
+          let k = value.href.split("http://localhost:3000");
+          targetHref.push(k[1]);
+        });
+      } else {
+        let attr = $(e.target)
+          .find("a")
+          .attr("href");
+        targetHref.push(attr);
+      }
+
+      console.log(targetHref);
       let targetName = $(e.target)
         .find("a")
         .first()
         .text();
       //
+
       let objCatalog = {
         targetName: targetName,
         targetList: targetHref
@@ -86,13 +95,16 @@ function handleCatalog() {
         // Remove
         myArray = myArray.filter(el => el.targetName !== objCatalog.targetName);
       } else {
-        $(e.target).addClass("bg-red");
-        // Add
-        myArray.push(objCatalog);
+        if (objCatalog.targetList[0] == undefined) {
+          alert("Sai! Moi Chon Lai!");
+        } else {
+          $(e.target).addClass("bg-red");
+          // Add
+          myArray.push(objCatalog);
+        }
       }
     });
 
-    console.log(myArray)
     $("#button-catalog").click(e => {
       e.preventDefault();
       console.log(myArray);
@@ -108,7 +120,7 @@ function handleCatalog() {
 
 $(document).ready(function() {
   // inputURL().then(data => {
-  
+
   // });
   handleCatalog();
 });
