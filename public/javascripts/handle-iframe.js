@@ -109,7 +109,7 @@ function handleCatalog() {
       e.preventDefault();
       console.log(myArray);
       let catalogArr = JSON.stringify(myArray);
-      $.post("/catalog", { catalog: catalogArr }, data => {
+      $.post("/catalogarr", { catalog: catalogArr }, data => {
         console.log(data);
         text.push(data);
         window.location = "/listpage";

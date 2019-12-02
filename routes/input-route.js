@@ -7,7 +7,7 @@ router.get('/raw-data/:page', dataController.getAllRawData );
 router.get("/", inputController.getInput);
 router.post("/input", inputController.postURL);
 router.get("/input", inputController.getURL);
-router.post("/catalog", inputController.postCatalog);
+router.post("/catalogarr", inputController.postCatalog);
 router.get("/listpage", inputController.getListPage);
 router.post("/detail", inputController.getDetailPage)
 module.exports = router;
