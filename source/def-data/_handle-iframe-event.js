@@ -88,6 +88,7 @@ exports.init = () => {
         url: "/definition/add",
         data: {
           catalogId: $("#catalogId").text(),
+          targetUrl: $("#targetUrl").text(),
           fileName: $("#fileName").text(),
           hostName: $("#hostName").text(),
           data: JSON.stringify(completeDefs)
@@ -121,5 +122,89 @@ exports.init = () => {
     helper.mouseoverHandle(body);
     clickHandle(body);
     $("#loading-progress").fadeOut();
+
+    // update check
+    let definitionId = $("#definitionId").text();
+    if (definitionId) {
+      initUpdateValue(body, definitionId);
+    }
   });
+
+  // Initialize value for update
+  function initUpdateValue(body, definitionId) {
+    function getContentByXPath(xpath) {
+      let xpathArray = xpath.split("/");
+      let selector = $(body);
+      let tagName = "";
+      let index = 0;
+
+      xpathArray.splice(0, 3); //remove null and html element
+      while (xpathArray.length > 0) {
+        let firstElement = xpathArray.shift();
+
+        tagName = firstElement.match(/[a-z]+([1-6])?/g)[0];
+        index = firstElement.match(/\[[0-9]+\]/g)
+          ? firstElement.match(/\[[0-9]+\]/g)[0].replace(/\[+|\]+/g, "") - 1
+          : 0;
+        selector = $(selector)
+          .children(tagName)
+          .get(index);
+      }
+
+      return selector;
+    }
+
+    function getDataByTypeXPath(xPathType, xPathArray) {
+      let result = [];
+      xPathArray.forEach(xPath => {
+        let el = getContentByXPath(xPath);
+        let contentList = [];
+        if (el) {
+          helper.markupArea(el);
+          contentList = handleIframeData.getAllDataNodes(el);
+        } else {
+          const mockElement = document.createElement("p");
+          contentList = [
+            {
+              node: mockElement,
+              text: [
+                "<b class='text-danger'>This element corresponding to this xPath not exist!</b>"
+              ],
+              xPath: xPath
+            }
+          ];
+        }
+        result.push({
+          header: xPathType,
+          contentList: contentList
+        });
+      });
+      return result;
+    }
+
+    $.get(`/api/definition/${definitionId}`, res => {
+      if (res.status) {
+        const data = res.data;
+        const titleArray = getDataByTypeXPath("title", data.title);
+        handleIframeData.exportData(titleArray, true);
+
+        const priceArray = getDataByTypeXPath("price", data.price);
+        handleIframeData.exportData(priceArray, true);
+
+        const acreageArray = getDataByTypeXPath("acreage", data.acreage);
+        handleIframeData.exportData(acreageArray, true);
+
+        const addressArray = getDataByTypeXPath("address", data.address);
+        handleIframeData.exportData(addressArray, true);
+
+        data.others.forEach(other => {
+          const othersArray = getDataByTypeXPath(other.name, other.xpath);
+          handleIframeData.exportData(othersArray, true);
+        });
+      } else {
+        alert(res.error.message);
+        window.location.href = "";
+      }
+    });
+  }
 };

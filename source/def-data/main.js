@@ -16,10 +16,12 @@ $(document).ready(() => {
     const resizeIframe = () => {
         const $liveIframe = $("#live-iframe");
         const $loading = $("#loading-progress");
+        const $defineData = $("#define-data")
         let maxWidth = $liveIframe.parent().width();
         let maxHeight = $(window).width();
         $liveIframe.width(maxWidth).height(maxHeight);
         $loading.width(maxWidth).height(maxHeight);
+        $defineData.css("max-height",maxHeight);
     };
     resizeIframe();
 });

@@ -5,17 +5,26 @@ block content
         .col
             h5
                 span.badge.badge-primary Hostname:
-                small &nbsp;#{hostname}
+                small &nbsp;#{host.name}
             h5
                 span.badge.badge-primary Catalog name:
-                small &nbsp;#{catalogName}
+                small &nbsp;#{catalog.name}
+            h5
+                span.badge.badge-primary Target URL:
+                small &nbsp;#{definition.targetUrl.url}
         .col
             h5
                 span.badge.badge-primary Create:
-                small &nbsp;#{definition.cTimeFormatted}
+                small &nbsp;#{definition.cTime}
             h5
                 span.badge.badge-primary Last update:
-                small &nbsp;#{definition.mTimeFormatted}
+                small &nbsp;#{definition.mTime}
+            h5
+                span.badge.badge-primary Action
+                span &nbsp;
+                    a.small.text-primary(href='#', data-toggle='modal', data-target='#choose-url-modal') Edit
+                span &nbsp;
+                    a.small.text-danger(href=`/definition/delete/${definition._id}`) Delete
 
     .container-fluid.pt-2
         #accordion
@@ -67,5 +76,20 @@ block content
                                                 p Nothing here...
 
 
-
+    //Choose URL Modal
+    #choose-url-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='choose-url-modal', aria-hidden='true')
+        .modal-dialog.modal-dialog-centered.modal-lg(role='document')
+            .modal-content
+                .modal-header
+                    h3#exampleModalCenterTitle.modal-title Choose URL
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                .modal-body
+                    p.text-info *Choose URL you want to be pattern.
+                    if urlForDefinition.length===0
+                        p.text-danger Don't have any URL in this catalog :(
+                    else
+                        .list-group(style="max-height:70vh; overflow:auto; ")
+                            for e in urlForDefinition
+                                a.list-group-item.list-group-item-action(href=`/definition/update?url=${e.url}&catalogId=${catalog._id}&enableScript=0&definitionId=${definition._id}`)=e.url
 

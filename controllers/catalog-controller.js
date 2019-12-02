@@ -98,13 +98,13 @@ exports.getDetail = (req, res, next) => {
         pageName: "Catalog"
       },
       {
-        href: "/catalog/detail",
+        href: `/catalog/detail/${catalogId}`,
         pageName: "Detail"
       }
     ]
   };
   async.parallel(
-    {
+      {
       catalog: function(callback) {
         Catalog.aggregate([
           {
@@ -194,14 +194,14 @@ exports.getDetail = (req, res, next) => {
           }
         ]).exec(callback);
       },
-      detailUrl: function(callback) {
-        DetailUrl.findOne({ catalogId: catalogId, isExtracted: false }).exec(
+      detailUrls: function(callback) {
+        DetailUrl.find({ catalogId: catalogId, isExtracted: false }).exec(
           callback
         );
       }
     },
     (err, data) => {
-      let { catalog, detailUrl } = data;
+      let { catalog, detailUrls } = data;
       if (err) {
         next(err);
         return;
@@ -211,10 +211,8 @@ exports.getDetail = (req, res, next) => {
         return;
       } else {
         assigns.data = catalog[0];
-        if (!catalog.definitionId) {
-          assigns.urlForDefinition = detailUrl ? detailUrl.url :
-              undefined;
-        }
+        assigns.urlForDefinition = detailUrls;
+
         res.render("catalog/detail", assigns);
       }
     }

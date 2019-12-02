@@ -184,7 +184,6 @@ function exportData(dataList, isTable = false) {
         }
         </td>
         <td>
-          <input type="hidden" name="data" value="${nodeText}">
           <input type="hidden" name="xpath" value="${content.xPath}">
           <select name="def-suggestion" class="form-control">
             ${option}
@@ -217,7 +216,6 @@ function exportData(dataList, isTable = false) {
       }
         </td>
         <td>
-          <input type="hidden" name="data" value="${nodeText}">
           <input type="hidden" name="xpath" value="${data.xPath}">
           <select name="def-suggestion" class="form-control">
             ${option}
