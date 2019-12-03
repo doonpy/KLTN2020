@@ -4,8 +4,8 @@ const moment = require("moment");
 
 const definitionSchema = new Schema(
   {
-    catalogId: { type: Schema.Types.ObjectId, ref: "catalog" },
-    targetUrl: { type: Schema.Types.ObjectId, ref: "detail_url" },
+    catalogId: { type: Schema.Types.ObjectId, ref: "catalog", index: true },
+    targetUrl: { type: Schema.Types.ObjectId, ref: "detail_url"},
     title: [Schema.Types.String],
     price: [Schema.Types.String],
     acreage: [Schema.Types.String],

@@ -7,7 +7,8 @@ const extractLogSchema = new Schema(
       {
         _id: false,
         id: { type: Schema.Types.ObjectId, ref: "detail_url" },
-        isSuccess: Schema.Types.Boolean
+        isSuccess: Schema.Types.Boolean,
+        errorMsg: { type: Schema.Types.String, default: "" }
       }
     ],
     requestAmount: { type: Schema.Types.Number, default: 0, min: 0 },

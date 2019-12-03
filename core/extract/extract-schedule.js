@@ -10,10 +10,8 @@ const requestModule = require("../module/request");
 const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
 const MAX_REQUEST_SENT = 10;
-const REPEAT_TIME = {
-  EXTRACT: 60 * 10 // minutes
-};
-const SAVE_AMOUNT = 100;
+const MAX_REQUEST_RETRIES = 3;
+const SAVE_AMOUNT = 10;
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
@@ -33,6 +31,11 @@ let detailUrlUpdateQueue = [];
               }
             },
             {
+              $match: {
+                requestRetries: { $lt: MAX_REQUEST_RETRIES }
+              }
+            },
+            {
               $lookup: {
                 from: "definitions",
                 localField: "catalogId",
@@ -47,6 +50,7 @@ let detailUrlUpdateQueue = [];
                 catalogId: 1,
                 cTime: 1,
                 eTime: 1,
+                requestRetries: 1,
                 isDefined: {
                   $gt: [
                     {
@@ -93,11 +97,11 @@ let detailUrlUpdateQueue = [];
             executeTime: hrEnd
           }).save();
           console.log(
-              `=> [M${process.pid} - ${require("moment")().format(
-                  "L LTS"
-              )}] Extractor was ran within ${secondsToHms(hrEnd)}`
+            `=> [M${process.pid} - ${require("moment")().format(
+              "L LTS"
+            )}] Extractor was ran within ${secondsToHms(hrEnd)}`
           );
-          setTimeout(extractLoop, REPEAT_TIME.EXTRACT * 1000);
+          extractLoop();
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
@@ -111,48 +115,40 @@ let detailUrlUpdateQueue = [];
             requestModule
               .send(detailUrl.url)
               .then(res => {
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
-                  );
-                requestCount--;
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
+                );
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
 
-                rawDataSaveQueue.push(new RawData(dataExtracted));
-                if (rawDataSaveQueue.length === SAVE_AMOUNT) {
-                  RawData.insertMany(rawDataSaveQueue, err => {
-                    if (err) {
-                      throw err;
-                    }
-                    rawDataSaveQueue = [];
-                  });
-                }
-
+                detailUrl.requestRetries++;
+                rawDataSaveQueue.push(dataExtracted);
                 detailUrlUpdateQueue.push(detailUrl);
-                if (detailUrlUpdateQueue.length === SAVE_AMOUNT) {
-                  detailUrlUpdateQueue.forEach(d => {
-                    DetailUrl.findByIdAndUpdate(d._id, d, err => {
-                      if (err) {
-                        throw err;
-                      }
-                    });
-                  });
-                  detailUrlUpdateQueue = [];
-                }
 
+                // log
+                requestCount--;
                 urls.push({ id: detailUrl._id, isSuccess: true });
                 successAmount++;
               })
               .catch(err => {
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Extract "${detailUrl.url}" - ${err.message}`
-                  );
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Extract "${detailUrl.url}" - ${err.message}`
+                );
+
+                detailUrl.requestRetries++;
+                detailUrlUpdateQueue.push(detailUrl);
+
+                // log
                 requestCount--;
-                urls.push({ id: detailUrl._id, isSuccess: false });
+                urls.push({
+                  id: detailUrl._id,
+                  isSuccess: false,
+                  errorCode: err.message
+                });
                 failedAmount++;
               });
           }
@@ -161,6 +157,39 @@ let detailUrlUpdateQueue = [];
     }
   );
 })();
+
+/**
+ * Loop update database
+ */
+setInterval(() => {
+  if (rawDataSaveQueue.length >= SAVE_AMOUNT) {
+    RawData.insertMany(rawDataSaveQueue, { ordered: false }, err => {
+      if (err) {
+        console.log(
+          `=> [M${process.pid} - ${require("moment")().format(
+            "L LTS"
+          )}] Extract > Save error: ${err.message}`
+        );
+      }
+      rawDataSaveQueue = [];
+    });
+  }
+
+  if (detailUrlUpdateQueue.length >= SAVE_AMOUNT) {
+    detailUrlUpdateQueue.forEach(d => {
+      DetailUrl.findByIdAndUpdate(d._id, d, err => {
+        if (err) {
+          console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+              "L LTS"
+            )}] Extract > Save error: ${err.message}`
+          );
+        }
+      });
+    });
+    detailUrlUpdateQueue = [];
+  }
+}, 100);
 
 function getContentByXPath(body, xpath) {
   const $ = cheerio.load(body);
