@@ -70,10 +70,13 @@ data/
 .idea/
 
 # public js
-./public/javascripts
+public/javascripts
 
 # test.js
 test.js
 
 #pm2 ecosystem
 ecosystem.config.js
+
+#package-lock.json
+package-lock.json

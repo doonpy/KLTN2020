@@ -12,28 +12,28 @@ html(lang="en")
     title RawData
     body
     div
-        if (pages > 0) 
+        if (pages > 0)
             ul(class="pagination")
-                if current  = 1
+                if current = 1
                     li(class="disabled")
                         a First
                 else
                     li
                         a(href ="/raw-data/1") First
                 -var i = (Number(current) > 5 ? Number(current) - 4 : 1)
-                if i !== 1  
+                if i !== 1
                     li(class="disabled")
                         a ...
                 - for (; i <= (Number(current) + 4) && i <= pages; i++)
-                    if i==current
-                        li(class="active")
-                            a= i
-                    else
-                        li
-                            a(href="/raw-data/" + i)=i
-                    if i == Number(current) + 4 && i < pages
-                        li(class = "disabled")
-                            a ...
+                if i == current
+                    li(class="active")
+                        a= i
+                else
+                    li
+                        a(href="/raw-data/" + i)=i
+                if i == Number(current) + 4 && i < pages
+                    li(class = "disabled")
+                        a ...
                 if current == pages
                     li(class = "disabled")
                         a Last
@@ -71,33 +71,39 @@ html(lang="en")
 
     script(type='text/javascript', src='jquery.lazy.min.js')
     script.
-        | $(function() {
-        | $('#lazy-container .lazy').lazy({
-        | appendScroll: $('#lazy-container')
-        | });
-        | });
+        | $(function () {
+        |
+            $('#lazy-container .lazy').lazy({
+                | appendScroll
+        :
+            $('#lazy-container')
+            |
+        })
+            ;
+        |
+        });
 
         jQuery.fn.extend({
-        setMenu: function() {
-        return this.each(function() {
-        var containermenu = $(this);
-        var itemmenu = containermenu.find(".ctmenu-item");
-        itemmenu.click(function() {
-        var submenuitem = containermenu.find(".ctmenu-sub");
-        submenuitem.slideToggle(500);
-        });
-        $(document).click(function(e) {
-        if (
-        !containermenu.is(e.target) &&
-        containermenu.has(e.target).length === 0
-        ) {
-        var isopened = containermenu.find(".ctmenu-sub").css("display");
-        if (isopened == "block") {
-        containermenu.find(".ctmenu-sub").slideToggle(500);
-        }
-        }
-        });
-        });
-        }
+            setMenu: function () {
+                return this.each(function () {
+                    var containermenu = $(this);
+                    var itemmenu = containermenu.find(".ctmenu-item");
+                    itemmenu.click(function () {
+                        var submenuitem = containermenu.find(".ctmenu-sub");
+                        submenuitem.slideToggle(500);
+                    });
+                    $(document).click(function (e) {
+                        if (
+                            !containermenu.is(e.target) &&
+                            containermenu.has(e.target).length === 0
+                        ) {
+                            var isopened = containermenu.find(".ctmenu-sub").css("display");
+                            if (isopened == "block") {
+                                containermenu.find(".ctmenu-sub").slideToggle(500);
+                            }
+                        }
+                    });
+                });
+            }
         });
         $(".ct-menu").setMenu();
