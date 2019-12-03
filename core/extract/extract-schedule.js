@@ -13,7 +13,7 @@ const MAX_REQUEST_SENT = 20;
 const MAX_REQUEST_RETRIES = 3;
 const SAVE_AMOUNT = 10;
 const REPEAT_TIME = {
-  SAVE: 10 //seconds
+  SAVE: 50 //seconds
 };
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
@@ -178,16 +178,22 @@ let detailUrlUpdateQueue = [];
  * Loop update database
  */
 setInterval(() => {
-  let rawDataContainer = rawDataSaveQueue.splice(0, SAVE_AMOUNT);
-  let detailUrlContainer = detailUrlUpdateQueue.splice(0, SAVE_AMOUNT);
+  let rawDataContainer =
+      rawDataSaveQueue.length > SAVE_AMOUNT
+          ? rawDataSaveQueue.splice(0, SAVE_AMOUNT)
+          : rawDataSaveQueue.splice(0, rawDataSaveQueue.length);
+  let detailUrlContainer =
+      detailUrlUpdateQueue.length > SAVE_AMOUNT
+          ? detailUrlUpdateQueue.splice(0, SAVE_AMOUNT)
+          : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueue.length);
 
   rawDataContainer.forEach(d => {
     d.save(err => {
       if (err) {
         console.log(
-          `=> [M${process.pid} - ${require("moment")().format(
-            "L LTS"
-          )}] Extract > Save error: ${err.message}`
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Extract > Save error: ${err.message}`
         );
       }
     });
@@ -197,9 +203,9 @@ setInterval(() => {
     DetailUrl.findByIdAndUpdate(d._id, d, err => {
       if (err) {
         console.log(
-          `=> [M${process.pid} - ${require("moment")().format(
-            "L LTS"
-          )}] Extract > Save error: ${err.message}`
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Extract > Save error: ${err.message}`
         );
       }
     });
@@ -256,13 +262,12 @@ function getContentByXPath(body, xpath) {
       if (this.nodeType === NODE_TYPE_TEXT) {
         let text = $(this)
           .text()
-          .trim()
           .replace(/(\r\n|\n|\r)/gm, "");
-        if (text !== "" || text !== null) textData += ` ${text.trim()}`;
+        if (text !== "" || text !== null) textData += `${text} `;
       }
     });
 
-  return textData;
+  return textData.trim();
 }
 
 function extractData(body, definition) {

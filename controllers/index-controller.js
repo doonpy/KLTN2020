@@ -1,6 +1,5 @@
 const crawler = require("../core/crawler");
 const DefData = require("../models/definition-model");
-const CrawlHistory = require("../models/crawl-history-model");
 const fs = require("fs");
 // const extractCore = require("../core/extract");
 const fileHelper = require("../helper/file-helper");

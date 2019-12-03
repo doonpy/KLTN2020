@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node -r dotenv/config ./bin/www",
-    "build": "npx webpack -w"
+    "build": "npx webpack -w",
+    "data": "node -r dotenv/config data-synthensis.js"
   },
   "dependencies": {
     "async": "^3.1.0",

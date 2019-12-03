@@ -15,7 +15,13 @@ exports.init = () => {
       useCreateIndex: true
     })
     .then(() => {
-      console.log("=> Connect database success!");
+        require("../models/host-model");
+        require("../models/catalog-model");
+        require("../models/definition-model");
+        require("../models/extract-log-model");
+        require("../models/detail-url-model");
+        require("../models/raw-data-model");
+        console.log("=> Connect database success!");
     })
     .catch(err => {
       console.log("=> Connect database failed!\n", err);

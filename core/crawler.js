@@ -8,7 +8,7 @@ const crypto = require("crypto");
 const moment = require("moment");
 const CrawHistory = require("../models/crawl-history-model");
 
-var numChildProcess = 0;
+let numChildProcess = 0;
 
 const forkProcess = urlList => {
     return new Promise((resolve, reject) => {
