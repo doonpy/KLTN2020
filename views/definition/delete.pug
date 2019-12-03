@@ -1,0 +1,10 @@
+extends ../header
+
+block content
+    h5 Do you want to delete definition of catalog&nbsp;
+        span.font-weight-bolder.text-primary=definition.catalogId.name
+    p.text-danger *Note: This data can't restore!
+    form(action="/definition/delete", method="POST")
+        input(type="hidden" name="definitionId" value=definition._id)
+        input.btn.btn-danger.mr-4(type="submit", value="Submit")
+        a.btn.btn-secondary(href=`/definition/detail/${definition._id}`) Cancel

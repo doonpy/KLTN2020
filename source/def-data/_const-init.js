@@ -6,7 +6,7 @@ const REQUIRE_DEFINITIONS = [
     "Address",
     "Other"
 ];
-const MULTI_LANGUAGE = ["tiêu đề", "giá", "diện tích", "địa chỉ"];
+const MULTI_LANGUAGE = ["tiêu đề, title", "giá, price, giá cả", "diện tích, acreage, square", "địa chỉ, address"];
 const IGNORE_TAGS = ["br", "hr"];
 
 module.exports = {

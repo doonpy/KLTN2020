@@ -3,7 +3,11 @@ const Schema = mongoose.Schema;
 
 const rawDataSchema = new Schema(
   {
-    detailUrlId: { type: Schema.Types.ObjectId, ref: "detail_url" },
+    detailUrlId: {
+      type: Schema.Types.ObjectId,
+      ref: "detail_url",
+      index: true
+    },
     title: [String],
     price: [String],
     acreage: [String],

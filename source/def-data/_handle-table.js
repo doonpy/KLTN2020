@@ -1,6 +1,13 @@
 const $ = require("jquery");
 const handleData = require("./_handle-data");
 
+function removeSpeacialCharacter(string) {
+    return string
+        .replace(/[\r\n]/g, "")
+        .replace(/[^\w\d\s\u00C0-\u1EF9]/g, " ")
+        .trim();
+}
+
 /**
  *
  * @param parent
@@ -45,6 +52,22 @@ function getAllNearRow(target) {
         return getAllNearRow($currElement.parent());
     }
 
+    let siblingCount = 0;
+    siblings.forEach((sibling, index) => {
+        if (
+            $(sibling).tagName === $currElement.tagName &&
+            $(sibling).children().length === $currElement.children().length
+        ) {
+            siblingCount++;
+        } else {
+            siblings.splice(index, 1);
+        }
+    });
+
+    if (siblingCount === 0) {
+        return getAllNearRow($currElement.parent());
+    }
+
     let rowElement = [];
     let currChildTag = getChildTag($currElement);
     siblings.push($currElement);
@@ -55,10 +78,7 @@ function getAllNearRow(target) {
             $(sibling)
                 .children()
                 .each(function () {
-                    let text = $(this)
-                        .text()
-                        .trim()
-                        .replace(/[\n\r]/g, "");
+                    let text = removeSpeacialCharacter($(this).text());
                     if (header === "") {
                         header = text;
                     } else {
@@ -85,26 +105,40 @@ function getAllNearRow(target) {
  */
 function tableHandle(target) {
     let table = $(target).closest("table");
+    let $thTags = $(table).find("th");
     let data = [];
-    $(table)
-        .find("th")
-        .each(function () {
+    if ($thTags.length > 0) {
+        $thTags.each(function () {
             data.push({
-                header: $(this)
-                    .text()
-                    .trim()
-                    .replace(/[\r\n]/g, ""),
+                header: removeSpeacialCharacter($(this).text()),
                 contentList: []
             });
-        })
-        .find("td")
-        .each(function () {
-            let index = $(this)
-                .parent()
-                .children()
-                .index(this);
-            data[index].contentList.push(handleData.getAllDataNodes(this));
         });
+        $(table)
+            .find("td")
+            .each(function () {
+                let index = $(this)
+                    .parent()
+                    .children()
+                    .index(this);
+                data[index].contentList.push(handleData.getAllDataNodes(this));
+            });
+    } else {
+        let header = "";
+        $(table)
+            .find("td")
+            .each(function (index) {
+                if (index % 2 !== 0) {
+                    data.push({
+                        header: header,
+                        contentList: handleData.getAllDataNodes(this)
+                    });
+                    header = "";
+                } else {
+                    header = removeSpeacialCharacter($(this).text());
+                }
+            });
+    }
     return data;
 }
 
@@ -121,15 +155,27 @@ function listHandle(target) {
     $(parent)
         .children("li")
         .each(function () {
-            let header = $(this)
-                .text()
-                .trim()
-                .replace(/[\r\n]/g, "");
-            let contentList = handleData.getAllDataNodes($(this).children());
-            data.push({
-                header: header,
-                contentList: contentList
-            });
+            let liChildren = $(this)
+                .children()
+                .toArray();
+            if (liChildren.length === 0) {
+                let header = removeSpeacialCharacter($(this).text());
+                let contentList = handleData.getAllDataNodes($(this));
+                data.push({
+                    header: header,
+                    contentList: contentList
+                });
+            } else {
+                let firstChild = liChildren.shift();
+                let header = removeSpeacialCharacter($(firstChild).text());
+                liChildren.forEach(child => {
+                    let contentList = handleData.getAllDataNodes($(child));
+                    data.push({
+                        header: header,
+                        contentList: contentList
+                    });
+                });
+            }
         });
 
     return data;
