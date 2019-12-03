@@ -11,4 +11,4 @@ const detailUrlModel = new Schema(
   { timestamps: { createdAt: "cTime", updatedAt: "eTime" } }
 );
 
-module.exports = mongoose.model("detail_url", DetailURLSchema);
+module.exports = mongoose.model("detail_url", detailUrlModel);
