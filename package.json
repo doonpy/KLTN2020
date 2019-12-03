@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon -r dotenv/config ./bin/www",
-    "build": "npx webpack"
+    "start": "node -r dotenv/config ./bin/www",
+    "build": "npx webpack -w"
   },
   "dependencies": {
-    "bluebird": "^3.7.1",
+    "async": "^3.1.0",
+    "bootstrap": "^4.3.1",
     "cheerio": "^1.0.0-rc.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -17,17 +18,23 @@
     "http-errors": "~1.6.3",
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.27",
     "mongoose": "^5.7.7",
     "morgan": "~1.9.1",
+    "node-schedule": "^1.3.2",
     "nodemon": "^1.19.4",
+    "popper.js": "^1.16.0",
     "pug": "2.0.0-beta11",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "requestretry": "^4.0.2",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
+    "socket.io-redis": "^5.2.0",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-class-properties": "^7.7.0",
     "@babel/preset-env": "^7.6.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
@@ -37,6 +44,17 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.9.0"
+  },
+  "babel": {
+    "presets": [],
+    "plugins": [
+      [
+        "@babel/plugin-proposal-class-properties",
+        {
+          "loose": true
+        }
+      ]
+    ]
   },
   "description": "My webpack project"
 }

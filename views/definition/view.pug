@@ -1,18 +1,25 @@
-include ../header
+extends ../header
 
-body
-    include ../navbar
-    include ../breadcrumb
+block content
+    if data.length === 0
+        p Nothing in here :(
+    else
+        ul.list-group
+            for d in data
+                li.list-group-item.list-group-item-info
+                    h5=d.hostname
+                    .list-group
+                        if(d.catalogs.length === 0)
+                            p Empty
+                        else
+                            for catalog in d.catalogs
+                                a(href=`/definition/detail/${catalog.definitionId}`).list-group-item.list-group-item-primary.list-group-item-action
+                                    .float-right.small
+                                        p
+                                            b Create:&nbsp;
+                                            | #{catalog.cTime}
+                                        p
+                                            b Last update:&nbsp;
+                                            | #{catalog.mTime}
+                                    h4=catalog.catalogName
 
-    .container-fluid
-        h2 Definition list
-        if definitions.length === 0
-            p Definition is empty
-        else
-            ul.definition-list
-                for definition in definitions
-                    li.definition-item
-                        a.item-url(href=definition._id)=definition.host
-
-
-include ../footer

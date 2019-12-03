@@ -55,7 +55,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-#.env
+.env
 
 # next.js build output
 .next
@@ -69,5 +69,11 @@ data/
 #.idea
 .idea/
 
+# public js
+./public/javascripts
+
 # test.js
 test.js
+
+#pm2 ecosystem
+ecosystem.config.js

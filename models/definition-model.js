@@ -1,26 +1,44 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const moment = require("moment");
 
-const definitionSchema = new Schema({
-  host: String,
-  definitions: [
+const definitionSchema = new Schema(
     {
-      catalogName: String,
-      titlexPath: [String],
-      pricexPath: [String],
-      acreagexPath: [String],
-      addressxPath: [String],
-      other: [
-        {
-          name: String,
-          xPath: [String],
-          _id: false
-        }
-      ],
-      _id: false,
-      lastUpdate: String
-    }
-  ]
+        catalogId: {type: Schema.Types.ObjectId, ref: "catalog"},
+        title: [Schema.Types.String],
+        price: [Schema.Types.String],
+        acreage: [Schema.Types.String],
+        address: [Schema.Types.String],
+        others: [
+            {
+                name: Schema.Types.String,
+                xpath: [Schema.Types.String],
+                _id: false
+            }
+        ]
+    },
+    {timestamps: {createdAt: "cTime", updatedAt: "mTime"}}
+);
+
+// format create time
+definitionSchema.virtual("cTimeFormatted").get(function () {
+    return moment(this.cTime).format("L LTS");
 });
+
+// format update time
+definitionSchema.virtual("mTimeFormatted").get(function () {
+    return moment(this.mTime).format("L LTS");
+});
+
+/**
+ * Get definition by catalog Id
+ * @param catalogId
+ * @returns {T}
+ */
+definitionSchema.methods.getDefinitionByCatalogId = function (catalogId) {
+    return this.definitions.find(
+        definition => definition.catalogId === catalogId
+    );
+};
 
 module.exports = mongoose.model("definition", definitionSchema);

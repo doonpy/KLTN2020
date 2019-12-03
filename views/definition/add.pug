@@ -1,0 +1,34 @@
+extends ../header
+
+block content
+    script(src='/javascripts/def-main.js')
+
+    if error
+        p.text-danger #{url} - #{error.message}
+    else
+        .row.target-info.mb-2
+            .col-8
+                h6 Hostname:&nbsp;
+                    span#hostName.badge.badge-primary=hostname
+                h6 Filename:&nbsp;
+                    span#fileName.badge.badge-primary=fileName
+                span#catalogId.d-none=catalogId
+            .col.text-right
+                a#enable-script.btn.btn-primary.mr-2(href=`/definition/add?url=${url}&catalogId=${catalogId}&enableScript=${(enableScript ? 0 : 1)}`)= enableScript ? "Disable JS" : "Enable JS"
+                button#reset-table-data.btn.btn-danger.mr-2 Reset
+                button#submit-table-data.btn.btn-primary Submit
+        .row.main-content
+            #left-content.col-7.mr-2
+                img#loading-progress(src="/images/svg/puff.svg" style="position:absolute; background-color: #343a40;")
+                iframe#live-iframe(src=`/api/get-html/${hostname}/${fileName}`)
+            #right-content.col.card.p-3
+                #define-data.card-body
+                    #table-data-alert.alert.alert-danger.d-none(role='alert')
+                    table#table-data.table.table-hover
+                        thead
+                            tr
+                                th(scope='col') Data
+                                th(scope='col') Definition
+                                th(scope='col') Action
+                        tbody
+
