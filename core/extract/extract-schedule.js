@@ -123,7 +123,7 @@ let detailUrlUpdateQueue = [];
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
                 detailUrl.requestRetries++;
-                dataExtracted.detailUrl=detailUrl._id;
+                dataExtracted.detailUrlId = detailUrl._id;
 
                 if (!isNullData(dataExtracted)) {
                   rawDataSaveQueue.push(dataExtracted);
