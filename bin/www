@@ -6,7 +6,7 @@ const {Worker} = require("worker_threads");
 
 if (numCPUs === 1) {
     startServer();
-    startExtractScheduler();
+    // startExtractScheduler();
 } else {
     if (cluster.isMaster) {
         console.log(
@@ -15,7 +15,7 @@ if (numCPUs === 1) {
             } is running`
         );
 
-        startExtractScheduler();
+        // startExtractScheduler();
 
     // Fork workers.
     for (let i = 0; i < numCPUs; i++) {

@@ -31,28 +31,6 @@ function handleCatalog() {
       .find("body");
     // .get(0);
     mouseoverHandle(html);
-    // $(html)
-    //   .find("body")
-    //   .append(
-    //     `<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>`
-    //   );
-    // $(html)
-    //   .find("script, link, img")
-    //   .each(function() {
-    //     console.log("this", this);
-    //     let tagName = $(this)
-    //       .prop("tagName")
-    //       .toLowerCase();
-    //     if (tagName === "script" || tagName === "img") {
-    //       let src = $(this).attr("src");
-    //       $(this).attr("src", "https://nhadat24h.net" + src);
-    //     }
-
-    //     if (tagName === "link") {
-    //       let href = $(this).attr("href");
-    //       $(this).attr("href", "https://nhadat24h.net" + href);
-    //     }
-    //   });
 
     $(html).click(e => {
       e.preventDefault();
@@ -68,12 +46,21 @@ function handleCatalog() {
       if (targetList.length !== 0) {
         $(targetList).each((index, value) => {
           let k = value.href.split("http://localhost:3000");
+
           targetHref.push(k[1]);
         });
       } else {
         let attr = $(e.target)
           .find("a")
           .attr("href");
+        let name = $(e.target)
+          .find("a")
+          .text();
+        let obj = {
+          name: name,
+          href: attr
+        }
+        console.log(obj)
         targetHref.push(attr);
       }
 

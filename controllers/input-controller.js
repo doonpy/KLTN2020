@@ -19,12 +19,8 @@ let formatBody = $ => {
     .bg-red {background-color: #F39C12 !important}
   </style>`);
 };
-
-let formatPage  = $ =>{
-  
-}
 let getInput = (req, res) => {
-  return res.render("input");
+  return res.render("input/input");
 };
 
 let postURL = async (req, res) => {
@@ -58,13 +54,11 @@ let postURL = async (req, res) => {
 };
 
 let getURL = (url, res) => {
-  return res.render("iframecatalog", { html: url });
+  return res.render("input/iframecatalog", { html: url });
 };
 
 let postCatalog = async (req, res) => {
-
   let item = JSON.parse(req.body.catalog);
-  console.log(chalk.bold.yellow(item))
   item.forEach((value, index) => {
     let url = [];
     value.targetList.forEach(el => {
@@ -82,17 +76,16 @@ let postCatalog = async (req, res) => {
   });
   let urlmodel = urlPage.split(/^https?\:\/\//i);
   const host = await HostnameModel.findOne({ name: urlmodel[1] });
-
-  console.log(objCatalog);
   objCatalog.forEach(el => {
     listCatalog.push(el.urlCatalogs[0]);
-    console.log(listCatalog)
+
     el.urlCatalogs.forEach(async val => {
       let name = val.split(urlPage);
-      
+      console.log(val);
       let catalogname = name[1].replace("/", "");
       const countUrl = await CatalogModel.countDocuments({
-        name: catalogname
+        name: catalogname, 
+        hostId: host._id
       });
       if (!countUrl) {
         CatalogModel.create({
@@ -140,7 +133,7 @@ let getListPage = (req, res) => {
 //
 let handleListPage = (urls, res) => {
   myMap.set("urls", urls);
-  return res.render("pagelist", {
+  return res.render("input/pagelist", {
     listpage: urls
   });
 };
@@ -157,9 +150,9 @@ let getDetailPage = async (req, res) => {
   let paginationXpath = paginationArr[0];
 
   let textClass = await extract.getDetail(urlDetect, xPath);
-  console.log("Class : " +textClass)
+  console.log("Class : " + textClass);
   let pagination = await extract.getPagination(paginationXpath, urlDetect);
-  console.log("Pagination : " + pagination )
+  console.log("Pagination : " + pagination);
   console.log(chalk.bold.blue("RUNNNNNN"));
   setTimeout(() => {
     scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
