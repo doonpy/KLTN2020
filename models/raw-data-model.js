@@ -8,14 +8,15 @@ const rawDataSchema = new Schema(
       ref: "detail_url",
       index: true
     },
-    title: [String],
-    price: [String],
-    acreage: [String],
-    address: [String],
+    isGrouped: { type: Schema.Types.Bool, default: false },
+    title: [{ type: Schema.Types.String, default: "" }],
+    price: [{ type: Schema.Types.String, default: "" }],
+    acreage: [{ type: Schema.Types.String, default: "" }],
+    address: [{ type: Schema.Types.String, default: "" }],
     others: [
       {
-        name: String,
-        data: [String],
+        name: { type: Schema.Types.String, default: "" },
+        data: [{ type: Schema.Types.String, default: "" }],
         _id: false
       }
     ]

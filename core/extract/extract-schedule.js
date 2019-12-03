@@ -9,9 +9,9 @@ const requestModule = require("../module/request");
 
 const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
-const MAX_REQUEST_SENT = 10;
+const MAX_REQUEST_SENT = 20;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 10;
+const SAVE_AMOUNT = 60;
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
@@ -122,15 +122,28 @@ let detailUrlUpdateQueue = [];
                 );
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
-
                 detailUrl.requestRetries++;
-                rawDataSaveQueue.push(dataExtracted);
-                detailUrlUpdateQueue.push(detailUrl);
+                dataExtracted.detailUrlId = detailUrl._id;
 
-                // log
-                requestCount--;
-                urls.push({ id: detailUrl._id, isSuccess: true });
-                successAmount++;
+                if (!isNullData(dataExtracted)) {
+                  rawDataSaveQueue.push(dataExtracted);
+                  detailUrlUpdateQueue.push(detailUrl);
+
+                  // log
+                  requestCount--;
+                  urls.push({ id: detailUrl._id, isSuccess: true });
+                  successAmount++;
+                } else {
+                  detailUrlUpdateQueue.push(detailUrl);
+                  // log
+                  requestCount--;
+                  urls.push({
+                    id: detailUrl._id,
+                    isSuccess: false,
+                    errorCode: new Error("Null data")
+                  });
+                  failedAmount++;
+                }
               })
               .catch(err => {
                 console.log(
@@ -191,6 +204,19 @@ setInterval(() => {
   }
 }, 100);
 
+function isNullData(data) {
+  const { title, price, acreage, address } = data;
+  if (
+    title.length === 0 &&
+    price.length === 0 &&
+    acreage.length === 0 &&
+    address.length === 0
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function getContentByXPath(body, xpath) {
   const $ = cheerio.load(body);
   let xpathArray = xpath.split("/");
@@ -238,34 +264,47 @@ function extractData(body, definition) {
 
   //title
   definition.title.forEach(xpath => {
-    title.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      title.push(getContentByXPath(body, xpath));
+    }
   });
 
   //price
   definition.price.forEach(xpath => {
-    price.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      price.push(getContentByXPath(body, xpath));
+    }
   });
 
   //acreage
   definition.acreage.forEach(xpath => {
-    acreage.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      acreage.push(getContentByXPath(body, xpath));
+    }
   });
 
   //address
   definition.address.forEach(xpath => {
-    address.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      address.push(getContentByXPath(body, xpath));
+    }
   });
 
   //other
   definition.others.forEach(e => {
     let data = [];
     e.xpath.forEach(xpath => {
-      data.push(getContentByXPath(body, xpath));
+      if (getContentByXPath(body, xpath) !== "") {
+        data.push(getContentByXPath(body, xpath));
+      }
     });
-    othersData.push({
-      name: e.name,
-      data: data
-    });
+
+    if (data.length !== 0) {
+      othersData.push({
+        name: e.name,
+        data: data
+      });
+    }
   });
 
   return {
