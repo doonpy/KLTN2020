@@ -78,7 +78,7 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
     }
     console.log(textDetail);
     console.log(chalk.bold.blue(url));
-   
+
     let val = url.split(domain);
     let catalogname = val[1].replace("/", "");
     let arrLink = [];
@@ -92,22 +92,36 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
 
       let link = [];
       $(`.${textClass}`).each(function() {
-        link.push({
-          url:
-            domain +
-            $(this)
-              .find("a")
-              .attr("href"),
-          isExtracted: false,
-
-          catalogId: catalogName._id
-        });
+        let href = $(this)
+          .find("a")
+          .attr("href")
+          .includes(domain);
+        if (!href) {
+          link.push({
+            url:
+              domain +
+              $(this)
+                .find("a")
+                .attr("href"),
+            isExtracted: false,
+            catalogId: catalogName._id
+          });
+        }
+        else{
+          link.push({
+            url:
+              $(this)
+                .find("a")
+                .attr("href"),
+            isExtracted: false,
+            catalogId: catalogName._id
+          });
+        }
       });
       arrLink.push(link);
 
       // console.log("At the number:  " + chalk.bold.blue(index));
       if ($("body").find(`.${textClass}`).length === 0) {
-   
         flagIndex += 1;
         break;
       }
@@ -123,7 +137,7 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
 
     let mergeLinkArr = [].concat.apply([], arrLink);
     console.log(mergeLinkArr.length);
-    
+
     await DetailModel.create(mergeLinkArr)
       .then(() => {
         console.log(`=> Save Data in ${url} successful!`);
