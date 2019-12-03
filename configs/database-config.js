@@ -7,24 +7,18 @@ exports.init = () => {
       process.env.DB_PORT !== "" ? `:${process.env.DB_PORT}` : ""
   }/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
+  // const connString = "mongodb://localhost:27017/tlcn_2019";
+
   mongoose
-      .connect(connString, {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-          useFindAndModify: false, useCreateIndex: true,
-      })
-      .then(() => {
-          console.log(
-              `=> [W${process.pid} - ${require("moment")().format(
-                  "L LTS"
-              )}] Connect database success`
-          );
-          require("../models/catalog-model");
-          require("../models/host-model");
-          require("../models/definition-model");
-          require("../models/raw-data-model");
-      })
-      .catch(err => {
-          console.log("=> Connect database failed!\n", err);
-      });
+    .connect(connString, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false
+    })
+    .then(() => {
+      console.log("=> Connect database success!");
+    })  
+    .catch(err => {
+      console.log("=> Connect database failed!\n", err);
+    });
 };

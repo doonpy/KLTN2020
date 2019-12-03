@@ -2,6 +2,7 @@ const indexRouter = require("../routes/index");
 const catalogRouter = require("../routes/catalog-route");
 const definitionRouter = require("../routes/definition-route");
 const apiRouter = require("../routes/api-route");
+const inputRouter = require("../routes/input-route");
 const createError = require("http-errors");
 
 /**
@@ -10,6 +11,7 @@ const createError = require("http-errors");
  */
 exports.init = app => {
   // app.use("/", indexRouter);
+  app.use("/", inputRouter);
   app.use("/definition", definitionRouter);
   app.use("/catalog", catalogRouter);
   app.use("/api", apiRouter);

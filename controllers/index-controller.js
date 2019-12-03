@@ -6,51 +6,51 @@ const fs = require("fs");
 const fileHelper = require("../helper/file-helper");
 
 exports.postCrawl = (req, res, next) => {
-    let links = req.body.links.split(/\n+|\r+/);
+  let links = req.body.links.split(/\n+|\r+/);
 
-    links = links.filter(link => {
-        return link !== "";
-    });
+  links = links.filter(link => {
+    return link !== "";
+  });
 
-    crawler.main(links);
-    res.render("crawl");
+  crawler.main(links);
+  res.render("crawl");
 };
 
 exports.getCrawl = (req, res, next) => {
-    res.render("crawl");
+  res.render("crawl");
 };
 
 exports.getDefinition = (req, res, next) => {
-    let hostname = req.params.hostname;
+  let hostname = req.params.hostname;
 
-    DefData.findOne({hostname: hostname}, (err, def) => {
-        if (err) throw err;
+  DefData.findOne({ hostname: hostname }, (err, def) => {
+    if (err) throw err;
 
-        if (!def) {
-            let folderPath = `${process.env.STORAGE_PATH}/${hostname}`;
+    if (!def) {
+      let folderPath = `${process.env.STORAGE_PATH}/${hostname}`;
 
-            fs.access(folderPath, err => {
-                if (err && err.code === "ENOENT") {
-                    res.send("Host has not crawl yet!");
-                    return;
-                }
-                fs.readdir(folderPath, (err, files) => {
-                    if (err) throw err;
-
-                    if (files.length === 0)
-                        res.send(`${hostname} not have file to extract!`);
-                    else
-                        res.render("not-definition", {
-                            hostname: hostname,
-                            file: files[0]
-                        });
-                });
-            });
-        } else {
-            // res.render("definition", { definition: def });
-            res.json(def);
+      fs.access(folderPath, err => {
+        if (err && err.code === "ENOENT") {
+          res.send("Host has not crawl yet!");
+          return;
         }
-    });
+        fs.readdir(folderPath, (err, files) => {
+          if (err) throw err;
+
+          if (files.length === 0)
+            res.send(`${hostname} not have file to extract!`);
+          else
+            res.render("not-definition", {
+              hostname: hostname,
+              file: files[0]
+            });
+        });
+      });
+    } else {
+      // res.render("definition", { definition: def });
+      res.json(def);
+    }
+  });
 };
 
 // exports.getExtract = (req, res, next) => {

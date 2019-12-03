@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible' content='ie=edge')
+    link(rel='stylesheet' href='/stylesheets/raw-data.css')
+    link(href='https://fonts.googleapis.com/css?family=Roboto&display=swap&subset=latin-ext,vietnamese' rel='stylesheet')
+    link(href='https://fonts.googleapis.com/icon?family=Material+Icons' rel='stylesheet')
+    link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin='anonymous')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js')
+    title RawData
+    body
+    div
+        if (pages > 0) 
+            ul(class="pagination")
+                if current  = 1
+                    li(class="disabled")
+                        a First
+                else
+                    li
+                        a(href ="/raw-data/1") First
+                -var i = (Number(current) > 5 ? Number(current) - 4 : 1)
+                if i !== 1  
+                    li(class="disabled")
+                        a ...
+                - for (; i <= (Number(current) + 4) && i <= pages; i++)
+                    if i==current
+                        li(class="active")
+                            a= i
+                    else
+                        li
+                            a(href="/raw-data/" + i)=i
+                    if i == Number(current) + 4 && i < pages
+                        li(class = "disabled")
+                            a ...
+                if current == pages
+                    li(class = "disabled")
+                        a Last
+                else
+                    li
+                        a(href="/raw-data/" + pages) Last
+
+    .raw-container
+        .raw-right
+            table#lazy-container
+                tbody
+                    tr
+                        th.table-item Title
+                        th.table-item Price
+                        th.table-item Acreage
+                        th.table-item Address
+                        th.table-item Orders
+                        each rawdata,index in rawdatas
+                            tr.lazy
+                                td #{rawdata.title[0]}
+                                td #{rawdata.price[0]}
+                                td #{rawdata.acreage[0]}
+                                td #{rawdata.address[0]}
+                                td
+                                    .menu1.ct-menu
+                                        .ctmenu-item
+                                            i.material-icons(style='color:white')
+                                                | expand_more
+                                        .ctmenu-sub
+
+                                            .order-item
+                                                .order-item-title.item-border Mặt tiền
+                                                .order-item-title 7m
+
+
+    script(type='text/javascript', src='jquery.lazy.min.js')
+    script.
+        | $(function() {
+        | $('#lazy-container .lazy').lazy({
+        | appendScroll: $('#lazy-container')
+        | });
+        | });
+
+        jQuery.fn.extend({
+        setMenu: function() {
+        return this.each(function() {
+        var containermenu = $(this);
+        var itemmenu = containermenu.find(".ctmenu-item");
+        itemmenu.click(function() {
+        var submenuitem = containermenu.find(".ctmenu-sub");
+        submenuitem.slideToggle(500);
+        });
+        $(document).click(function(e) {
+        if (
+        !containermenu.is(e.target) &&
+        containermenu.has(e.target).length === 0
+        ) {
+        var isopened = containermenu.find(".ctmenu-sub").css("display");
+        if (isopened == "block") {
+        containermenu.find(".ctmenu-sub").slideToggle(500);
+        }
+        }
+        });
+        });
+        }
+        });
+        $(".ct-menu").setMenu();
