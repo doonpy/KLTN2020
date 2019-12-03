@@ -11,7 +11,10 @@ const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
 const MAX_REQUEST_SENT = 20;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 60;
+const SAVE_AMOUNT = 10;
+const REPEAT_TIME = {
+  SAVE: 10 //seconds
+};
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
@@ -115,18 +118,18 @@ let detailUrlUpdateQueue = [];
             requestModule
               .send(detailUrl.url)
               .then(res => {
-                console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                  )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
-                );
+                // console.log(
+                //   `=> [M${process.pid} - ${require("moment")().format(
+                //     "L LTS"
+                //   )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
+                // );
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
                 detailUrl.requestRetries++;
                 dataExtracted.detailUrlId = detailUrl._id;
 
                 if (!isNullData(dataExtracted)) {
-                  rawDataSaveQueue.push(dataExtracted);
+                  rawDataSaveQueue.push(new RawData(dataExtracted));
                   detailUrlUpdateQueue.push(detailUrl);
 
                   // log
@@ -146,11 +149,11 @@ let detailUrlUpdateQueue = [];
                 }
               })
               .catch(err => {
-                console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                  )}] Extract "${detailUrl.url}" - ${err.message}`
-                );
+                // console.log(
+                //   `=> [M${process.pid} - ${require("moment")().format(
+                //     "L LTS"
+                //   )}] Extract "${detailUrl.url}" - ${err.message}`
+                // );
 
                 detailUrl.requestRetries++;
                 detailUrlUpdateQueue.push(detailUrl);
@@ -175,8 +178,11 @@ let detailUrlUpdateQueue = [];
  * Loop update database
  */
 setInterval(() => {
-  if (rawDataSaveQueue.length >= SAVE_AMOUNT) {
-    RawData.insertMany(rawDataSaveQueue, { ordered: false }, err => {
+  let rawDataContainer = rawDataSaveQueue.splice(0, SAVE_AMOUNT);
+  let detailUrlContainer = detailUrlUpdateQueue.splice(0, SAVE_AMOUNT);
+
+  rawDataContainer.forEach(d => {
+    d.save(err => {
       if (err) {
         console.log(
           `=> [M${process.pid} - ${require("moment")().format(
@@ -184,25 +190,29 @@ setInterval(() => {
           )}] Extract > Save error: ${err.message}`
         );
       }
-      rawDataSaveQueue = [];
     });
-  }
+  });
 
-  if (detailUrlUpdateQueue.length >= SAVE_AMOUNT) {
-    detailUrlUpdateQueue.forEach(d => {
-      DetailUrl.findByIdAndUpdate(d._id, d, err => {
-        if (err) {
-          console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Extract > Save error: ${err.message}`
-          );
-        }
-      });
+  detailUrlContainer.forEach(d => {
+    DetailUrl.findByIdAndUpdate(d._id, d, err => {
+      if (err) {
+        console.log(
+          `=> [M${process.pid} - ${require("moment")().format(
+            "L LTS"
+          )}] Extract > Save error: ${err.message}`
+        );
+      }
     });
-    detailUrlUpdateQueue = [];
-  }
-}, 100);
+  });
+
+  console.log(
+    `=> [M${process.pid} - ${require("moment")().format(
+      "L LTS"
+    )}] Extract > Remaining queue: Data(s): ${
+      rawDataSaveQueue.length
+    } - detail url(s): ${detailUrlUpdateQueue.length}`
+  );
+}, 1000 * REPEAT_TIME.SAVE);
 
 function isNullData(data) {
   const { title, price, acreage, address } = data;

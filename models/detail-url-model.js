@@ -5,7 +5,7 @@ const detailUrlModel = new Schema(
   {
     url: { type: Schema.Types.String, index: true },
     isExtracted: { type: Schema.Types.Boolean, default: false },
-    catalogId: { type: Schema.Types.ObjectId, ref: "catalog", index: true },
+    catalogId: { type: Schema.Types.ObjectId, ref: "catalog" },
     requestRetries: { type: Schema.Types.Number, default: 0, min: 0 }
   },
   { timestamps: { createdAt: "cTime", updatedAt: "eTime" } }
