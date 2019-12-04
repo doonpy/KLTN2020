@@ -11,9 +11,9 @@ const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
 const MAX_REQUEST_SENT = 20;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 10;
+const SAVE_AMOUNT = 100;
 const REPEAT_TIME = {
-  SAVE: 50 //seconds
+  SAVE: 10 //seconds
 };
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
