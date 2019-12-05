@@ -59,42 +59,66 @@ let getURL = (url, res) => {
 
 let postCatalog = async (req, res) => {
   let item = JSON.parse(req.body.catalog);
-  item.forEach((value, index) => {
-    let url = [];
-    value.targetList.forEach(el => {
-      if (url.includes(urlPage + el) !== true) url.push(urlPage + el);
-    });
-    if (value !== "/" && value !== "") {
-      if (urlPage !== undefined) {
-        obj = {
-          catalog: value.targetName,
-          urlCatalogs: url
-        };
-      }
-      if (objCatalog.includes(obj) !== true) objCatalog.push(obj);
-    }
-  });
   let urlmodel = urlPage.split(/^https?\:\/\//i);
   const host = await HostnameModel.findOne({ name: urlmodel[1] });
-  objCatalog.forEach(el => {
-    listCatalog.push(el.urlCatalogs[0]);
-
-    el.urlCatalogs.forEach(async val => {
-      let name = val.split(urlPage);
-      console.log(val);
-      let catalogname = name[1].replace("/", "");
-      const countUrl = await CatalogModel.countDocuments({
-        name: catalogname, 
-        hostId: host._id
-      });
-      if (!countUrl) {
-        CatalogModel.create({
-          name: catalogname,
-          hostId: host._id
-        });
-      }
+  console.log("HOST : " + host);
+  item.forEach(async (value, index) => {
+    listCatalog.push(urlPage + value.href);
+    const countUrl = await CatalogModel.countDocuments({
+      name: value.name,
+      link: value.href,
+      hostId: host._id
     });
+    if (!countUrl) {
+      CatalogModel.create({
+        name: value.name,
+        link: value.href,
+        hostId: host._id
+      })
+        .then(() => {
+          console.log(`=> Save Data in ${value.name} successful!`);
+        })
+        .catch(err => {
+          console.log("=> Save data failed!\n", err);
+        });
+    }
   });
+  console.log(listCatalog);
+  // item.forEach((value, index) => {
+  //   let url = [];
+  //   value.targetList.forEach(el => {
+  //     if (url.includes(urlPage + el) !== true) url.push(urlPage + el);
+  //   });
+  //   if (value !== "/" && value !== "") {
+  //     if (urlPage !== undefined) {
+  //       obj = {
+  //         catalog: value.targetName,
+  //         urlCatalogs: url
+  //       };
+  //     }
+  //     if (objCatalog.includes(obj) !== true) objCatalog.push(obj);
+  //   }
+  // });
+
+  // objCatalog.forEach(el => {
+  //   listCatalog.push(el.urlCatalogs[0]);
+
+  //   el.urlCatalogs.forEach(async val => {
+  //     let name = val.split(urlPage);
+  //     console.log(val);
+  //     let catalogname = name[1].replace("/", "");
+  //     const countUrl = await CatalogModel.countDocuments({
+  //       name: catalogname,
+  //       hostId: host._id
+  //     });
+  //     if (!countUrl) {
+  //       CatalogModel.create({
+  //         name: catalogname,
+  //         hostId: host._id
+  //       });
+  //     }
+  //   });
+  // });
   const catalogId = await CatalogModel.find({ hostnameId: host._id });
   let resultCatalog = [];
   resultCatalog.push(catalogId._id);
@@ -154,9 +178,9 @@ let getDetailPage = async (req, res) => {
   let pagination = await extract.getPagination(paginationXpath, urlDetect);
   console.log("Pagination : " + pagination);
   console.log(chalk.bold.blue("RUNNNNNN"));
-  setTimeout(() => {
-    scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
-  }, 1000);
+  // setTimeout(() => {
+  //   scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
+  // }, 1000);
 };
 module.exports = {
   getInput: getInput,

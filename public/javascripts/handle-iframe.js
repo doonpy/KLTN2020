@@ -29,12 +29,10 @@ function handleCatalog() {
     let html = $("#iframe-id")
       .contents()
       .find("body");
-    // .get(0);
     mouseoverHandle(html);
 
     $(html).click(e => {
       e.preventDefault();
-      console.log(e.target);
 
       //Lấy hết thẻ của catalog
       let targetList = $(e.target)
@@ -46,8 +44,12 @@ function handleCatalog() {
       if (targetList.length !== 0) {
         $(targetList).each((index, value) => {
           let k = value.href.split("http://localhost:3000");
-
-          targetHref.push(k[1]);
+          let obj = {
+            name: $(value).text(),
+            href: k[1]
+          };
+          console.log(obj);
+          targetHref.push(obj);
         });
       } else {
         let attr = $(e.target)
@@ -59,9 +61,9 @@ function handleCatalog() {
         let obj = {
           name: name,
           href: attr
-        }
-        console.log(obj)
-        targetHref.push(attr);
+        };
+        console.log(obj);
+        targetHref.push(obj);
       }
 
       console.log(targetHref);
@@ -94,8 +96,8 @@ function handleCatalog() {
 
     $("#button-catalog").click(e => {
       e.preventDefault();
-      console.log(myArray);
-      let catalogArr = JSON.stringify(myArray);
+      console.log(myArray[0].targetList);
+      let catalogArr = JSON.stringify(myArray[0].targetList);
       $.post("/catalogarr", { catalog: catalogArr }, data => {
         console.log(data);
         text.push(data);

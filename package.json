@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node -r dotenv/config ./bin/www",
+    "start": "nodemon -r dotenv/config ./bin/www",
     "build": "npx webpack -w"
   },
   "dependencies": {
