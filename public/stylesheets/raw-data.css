@@ -76,6 +76,7 @@ table {
   }
   
   .ctmenu-item {
+    cursor: pointer;
     background-color: orange;
     color: white;
     padding: 8px;

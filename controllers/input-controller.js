@@ -6,10 +6,10 @@ const extract = require("../core/extractDetail");
 const scrape = require("../core/scrapePagination");
 const HostnameModel = require("../models/hostname-model");
 const CatalogModel = require("../models/catalog-model");
-let urlPage;
 let listCatalog = [];
-let objCatalog = [];
+
 const myMap = new Map();
+const myHost = new Map();
 let formatBody = $ => {
   $("head").append(`<style>
     .crawler-border-solid-selected { border: 2px solid #dee2e6 !important }
@@ -19,26 +19,25 @@ let formatBody = $ => {
     .bg-red {background-color: #F39C12 !important}
   </style>`);
 };
-
-let formatPage  = $ =>{
-  
-}
 let getInput = (req, res) => {
-  return res.render("input");
+  return res.render("input/input");
 };
 
 let postURL = async (req, res) => {
-  urlPage = req.body.url;
-  let urlmodel = urlPage.split(/^https?\:\/\//i);
-  console.log(chalk.bold.red(urlmodel[1]));
+  let urlPage = req.body.url;
+  
+  let urlmodel = await urlPage.split(/^https?\:\/\//i);
+  global.urlPage = urlPage;
 
-  const countUrl = await HostnameModel.countDocuments({
-    name: urlmodel[1]
-  });
-  if (!countUrl) {
+  let result = await HostnameModel.findOne({ name: urlmodel[1] });
+  myHost.set("host", urlmodel[1]);
+  console.log(result);
+  if (!result) {
     HostnameModel.create({
       name: urlmodel[1]
     });
+  } else {
+    console.log("Already Exist!");
   }
   let options = {
     url: urlPage,
@@ -58,56 +57,38 @@ let postURL = async (req, res) => {
 };
 
 let getURL = (url, res) => {
-  return res.render("iframecatalog", { html: url });
+  return res.render("input/iframecatalog", { html: url });
 };
 
 let postCatalog = async (req, res) => {
-
   let item = JSON.parse(req.body.catalog);
-  console.log(chalk.bold.yellow(item))
-  item.forEach((value, index) => {
-    let url = [];
-    value.targetList.forEach(el => {
-      if (url.includes(urlPage + el) !== true) url.push(urlPage + el);
+  let hostname = myHost.get("host");
+  const host = await HostnameModel.findOne({ name: hostname });
+
+  let catalogs = [];
+  item.forEach(async (value, index) => {
+    catalogs.push(urlPage + value.href);
+    const countUrl = await CatalogModel.countDocuments({
+      name: value.name,
+      link: urlPage + value.href,
+      hostId: host._id
     });
-    if (value !== "/" && value !== "") {
-      if (urlPage !== undefined) {
-        obj = {
-          catalog: value.targetName,
-          urlCatalogs: url
-        };
-      }
-      if (objCatalog.includes(obj) !== true) objCatalog.push(obj);
+    if (!countUrl) {
+      CatalogModel.create({
+        name: value.name,
+        link: urlPage + value.href,
+        hostId: host._id
+      })
+        .then(() => {
+          console.log(`=> Save Data in ${value.name} successful!`);
+        })
+        .catch(err => {
+          console.log("=> Save data failed!\n", err);
+        });
     }
   });
-  let urlmodel = urlPage.split(/^https?\:\/\//i);
-  const host = await HostnameModel.findOne({ name: urlmodel[1] });
-
-  console.log(objCatalog);
-  objCatalog.forEach(el => {
-    listCatalog.push(el.urlCatalogs[0]);
-    console.log(listCatalog)
-    el.urlCatalogs.forEach(async val => {
-      let name = val.split(urlPage);
-      
-      let catalogname = name[1].replace("/", "");
-      const countUrl = await CatalogModel.countDocuments({
-        name: catalogname
-      });
-      if (!countUrl) {
-        CatalogModel.create({
-          name: catalogname,
-          hostId: host._id
-        });
-      }
-    });
-  });
-  const catalogId = await CatalogModel.find({ hostnameId: host._id });
-  let resultCatalog = [];
-  resultCatalog.push(catalogId._id);
-  HostnameModel.create({
-    catalog: resultCatalog
-  });
+  listCatalog.push(catalogs[0]);
+  global.catalogs = catalogs;
   res.send("Success!");
 };
 //
@@ -140,7 +121,7 @@ let getListPage = (req, res) => {
 //
 let handleListPage = (urls, res) => {
   myMap.set("urls", urls);
-  return res.render("pagelist", {
+  return res.render("input/pagelist", {
     listpage: urls
   });
 };
@@ -149,6 +130,7 @@ let getDetailPage = async (req, res) => {
   let paginationArr = JSON.parse(req.body.paginationXpath);
   let urlDetect = listCatalog[0];
   let xPath = xpath[0];
+
   //
   // console.log(paginationArr);
   // console.log(urlDetect);
@@ -157,12 +139,15 @@ let getDetailPage = async (req, res) => {
   let paginationXpath = paginationArr[0];
 
   let textClass = await extract.getDetail(urlDetect, xPath);
-  console.log("Class : " +textClass)
+  console.log("Class : " + textClass);
   let pagination = await extract.getPagination(paginationXpath, urlDetect);
-  console.log("Pagination : " + pagination )
+  console.log("Pagination : " + pagination);
   console.log(chalk.bold.blue("RUNNNNNN"));
+  console.log(catalogs);
+  let hostname = myHost.get("host");
+  console.log(hostname);
   setTimeout(() => {
-    scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, objCatalog);
+    scrape.scrapeDetail(textClass, urlPage, pagination, urlDetect, catalogs);
   }, 1000);
 };
 module.exports = {
