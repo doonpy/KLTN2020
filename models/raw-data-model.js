@@ -7,7 +7,6 @@ const rawDataSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "detail_url"
     },
-    isGrouped: { type: Schema.Types.Bool, default: false },
     title: [{ type: Schema.Types.String, default: "" }],
     price: [{ type: Schema.Types.String, default: "" }],
     acreage: [{ type: Schema.Types.String, default: "" }],

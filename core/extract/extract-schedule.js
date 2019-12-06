@@ -7,12 +7,16 @@ const cheerio = require("cheerio");
 const async = require("async");
 const requestModule = require("../module/request");
 
+let curDate = new Date();
+curDate.setDate(curDate.getDate() - 7)
+const DATE_LIMIT = new Date(curDate); // 1 week from present
 const NODE_TYPE_TEXT = 3;
-const MAX_URL_TO_GET = 6000;
-const MAX_REQUEST_SENT = 20;
+const MAX_URL_TO_GET = 5000;
+const MAX_REQUEST_SENT = 100;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 100;
+const SAVE_AMOUNT = 50;
 const REPEAT_TIME = {
+  EXTRACT: 30,
   SAVE: 10 //seconds
 };
 let rawDataSaveQueue = [];
@@ -21,8 +25,8 @@ let detailUrlUpdateQueue = [];
 (function extractLoop() {
   const hrStart = process.hrtime();
   async.parallel(
-    {
-      definitions: function(callback) {
+      {
+        definitions: function (callback) {
         Definition.find().exec(callback);
       },
       detailUrls: function(callback) {
@@ -30,12 +34,17 @@ let detailUrlUpdateQueue = [];
           [
             {
               $match: {
+                cTime: {$gte: DATE_LIMIT}
+              }
+            },
+            {
+              $match: {
                 isExtracted: false
               }
             },
             {
               $match: {
-                requestRetries: { $lt: MAX_REQUEST_RETRIES }
+                requestRetries: {$lt: MAX_REQUEST_RETRIES}
               }
             },
             {
@@ -100,11 +109,15 @@ let detailUrlUpdateQueue = [];
             executeTime: hrEnd
           }).save();
           console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Extractor was ran within ${secondsToHms(hrEnd)}`
+              `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+              )}] Extract worker was ran within ${secondsToHms(
+                  hrEnd
+              )}! Next time at ${require("moment")()
+                  .add(REPEAT_TIME.EXTRACT, "seconds")
+                  .format("L LTS")}`
           );
-          extractLoop();
+          setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
@@ -193,7 +206,7 @@ setInterval(() => {
         console.log(
             `=> [M${process.pid} - ${require("moment")().format(
                 "L LTS"
-            )}] Extract > Save error: ${err.message}`
+            )}] Extract worker > Save error: ${err.message}`
         );
       }
     });
@@ -205,18 +218,18 @@ setInterval(() => {
         console.log(
             `=> [M${process.pid} - ${require("moment")().format(
                 "L LTS"
-            )}] Extract > Save error: ${err.message}`
+            )}] Extract worker > Save error: ${err.message}`
         );
       }
     });
   });
 
   console.log(
-    `=> [M${process.pid} - ${require("moment")().format(
-      "L LTS"
-    )}] Extract > Remaining queue: Data(s): ${
-      rawDataSaveQueue.length
-    } - detail url(s): ${detailUrlUpdateQueue.length}`
+      `=> [M${process.pid} - ${require("moment")().format(
+          "L LTS"
+      )}] Extract worker> Remaining queue: Data(s): ${
+          rawDataSaveQueue.length
+      } - detail url(s): ${detailUrlUpdateQueue.length}`
   );
 }, 1000 * REPEAT_TIME.SAVE);
 

@@ -6,7 +6,7 @@ const {Worker} = require("worker_threads");
 
 if (numCPUs === 1) {
   startServer();
-  startExtractScheduler();
+  startScheduler();
 } else {
   if (cluster.isMaster) {
     console.log(
@@ -15,7 +15,7 @@ if (numCPUs === 1) {
         } is running`
     );
 
-    startExtractScheduler();
+    startScheduler();
 
     // Fork workers.
     for (let i = 0; i < numCPUs; i++) {
@@ -34,7 +34,8 @@ if (numCPUs === 1) {
   }
 }
 
-function startExtractScheduler() {
+function startScheduler() {
+  // Extract data worker
   let extractWorker = new Worker(
       require.resolve("../core/extract/extract-schedule")
   );
@@ -42,12 +43,27 @@ function startExtractScheduler() {
     console.log(
         `=> [M${process.pid} - ${require("moment")().format(
             "L LTS"
-        )}] Save worker terminated.`
+        )}] Extract data worker terminated.`
     );
     extractWorker = new Worker(
         require.resolve("../core/extract/extract-schedule")
     );
   });
+
+  // Compile data worker
+  // let compileWorker = new Worker(
+  //   require.resolve("../core/compile-data/compile-schedule")
+  // );
+  // compileWorker.on("exit", () => {
+  //   console.log(
+  //     `=> [M${process.pid} - ${require("moment")().format(
+  //       "L LTS"
+  //     )}] Compile data worker terminated.`
+  //   );
+  //   compileWorker = new Worker(
+  //     require.resolve("../core/extract/extract-schedule")
+  //   );
+  // });
 }
 
 function startServer() {

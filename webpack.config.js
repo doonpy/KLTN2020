@@ -28,6 +28,7 @@ module.exports = {
     entry: {
         "def-main": "./source/def-data/main.js",
         "crawl-main": "./source/crawl/main.js",
+        "comp-main": "./source/compile-data/main.js"
     },
 
     output: {
@@ -94,6 +95,14 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"]
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                use: [
+                    {
+                        loader: "file-loader"
+                    }
+                ]
             }
         ]
     },
@@ -115,6 +124,6 @@ module.exports = {
     },
 
     devServer: {
-        open: true
+        open: false
     }
 };
