@@ -12,6 +12,7 @@ const mouseoverHandle = body => {
 };
 
 function handleListPage() {
+  $.notify("Welcome to The List Page");
   listClass = [];
   let pagination = "";
 

@@ -11,6 +11,11 @@ function inputURL() {
     });
   });
 }
+function passingPage() {
+  $("#button-raw").click(e => {
+    window.location = "/raw-data";
+  });
+}
 //
 const mouseoverHandle = body => {
   const classesToAdd = "crawler-border-solid-hover crawler-border-color-hover";
@@ -24,6 +29,7 @@ const mouseoverHandle = body => {
 };
 //
 function handleCatalog() {
+  $.notify("Welcome to The Catalog Page");
   var myArray = [];
   $("#iframe-id").on("load", function() {
     let html = $("#iframe-id")
@@ -33,7 +39,6 @@ function handleCatalog() {
 
     $(html).click(e => {
       e.preventDefault();
-
       //Lấy hết thẻ của catalog
       let targetList = $(e.target)
         .contents()
@@ -48,7 +53,6 @@ function handleCatalog() {
             name: $(value).text(),
             href: k[1]
           };
-          console.log(obj);
           targetHref.push(obj);
         });
       } else {
@@ -62,11 +66,8 @@ function handleCatalog() {
           name: name,
           href: attr
         };
-        console.log(obj);
         targetHref.push(obj);
       }
-
-      console.log(targetHref);
       let targetName = $(e.target)
         .find("a")
         .first()
@@ -81,7 +82,9 @@ function handleCatalog() {
 
       if ($(e.target).hasClass("bg-red")) {
         $(e.target).removeClass("bg-red");
-        // Remove
+        $("#list-catalog-id")
+          .find("p")
+          .remove();
         myArray = myArray.filter(el => el.targetName !== objCatalog.targetName);
       } else {
         if (objCatalog.targetList[0] == undefined) {
@@ -90,13 +93,15 @@ function handleCatalog() {
           $(e.target).addClass("bg-red");
           // Add
           myArray.push(objCatalog);
+          myArray[0].targetList.forEach(value => {
+            $("#list-catalog-id").append(`<p>${value.name}</p>`);
+          });
         }
       }
     });
 
     $("#button-catalog").click(e => {
       e.preventDefault();
-      console.log(myArray[0].targetList);
       let catalogArr = JSON.stringify(myArray[0].targetList);
       $.post("/catalogarr", { catalog: catalogArr }, data => {
         console.log(data);
@@ -108,8 +113,6 @@ function handleCatalog() {
 }
 
 $(document).ready(function() {
-  // inputURL().then(data => {
-
-  // });
+  passingPage();
   handleCatalog();
 });
