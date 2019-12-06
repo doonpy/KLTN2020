@@ -9,11 +9,9 @@ const requestModule = require("../module/request");
 
 const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 6000;
-const MAX_REQUEST_SENT = 10;
-const REPEAT_TIME = {
-  EXTRACT: 60 * 60 // minutes
-};
-const SAVE_AMOUNT = 100;
+const MAX_REQUEST_SENT = 20;
+const MAX_REQUEST_RETRIES = 3;
+const SAVE_AMOUNT = 60;
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
@@ -33,6 +31,11 @@ let detailUrlUpdateQueue = [];
               }
             },
             {
+              $match: {
+                requestRetries: { $lt: MAX_REQUEST_RETRIES }
+              }
+            },
+            {
               $lookup: {
                 from: "definitions",
                 localField: "catalogId",
@@ -47,6 +50,7 @@ let detailUrlUpdateQueue = [];
                 catalogId: 1,
                 cTime: 1,
                 eTime: 1,
+                requestRetries: 1,
                 isDefined: {
                   $gt: [
                     {
@@ -97,6 +101,7 @@ let detailUrlUpdateQueue = [];
               "L LTS"
             )}] Extractor was ran within ${secondsToHms(hrEnd)}`
           );
+          extractLoop();
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
@@ -110,48 +115,53 @@ let detailUrlUpdateQueue = [];
             requestModule
               .send(detailUrl.url)
               .then(res => {
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
-                  );
-                requestCount--;
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
+                );
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
+                detailUrl.requestRetries++;
+                dataExtracted.detailUrlId = detailUrl._id;
 
-                rawDataSaveQueue.push(new RawData(dataExtracted));
-                if (rawDataSaveQueue.length === SAVE_AMOUNT) {
-                  RawData.insertMany(rawDataSaveQueue, err => {
-                    if (err) {
-                      throw err;
-                    }
-                    rawDataSaveQueue = [];
+                if (!isNullData(dataExtracted)) {
+                  rawDataSaveQueue.push(dataExtracted);
+                  detailUrlUpdateQueue.push(detailUrl);
+
+                  // log
+                  requestCount--;
+                  urls.push({ id: detailUrl._id, isSuccess: true });
+                  successAmount++;
+                } else {
+                  detailUrlUpdateQueue.push(detailUrl);
+                  // log
+                  requestCount--;
+                  urls.push({
+                    id: detailUrl._id,
+                    isSuccess: false,
+                    errorCode: new Error("Null data")
                   });
+                  failedAmount++;
                 }
-
-                detailUrlUpdateQueue.push(detailUrl);
-                if (detailUrlUpdateQueue.length === SAVE_AMOUNT) {
-                  detailUrlUpdateQueue.forEach(d => {
-                    DetailUrl.findByIdAndUpdate(d._id, d, err => {
-                      if (err) {
-                        throw err;
-                      }
-                    });
-                  });
-                  detailUrlUpdateQueue = [];
-                }
-
-                urls.push({ id: detailUrl._id, isSuccess: true });
-                successAmount++;
               })
               .catch(err => {
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Extract "${detailUrl.url}" - ${err.message}`
-                  );
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Extract "${detailUrl.url}" - ${err.message}`
+                );
+
+                detailUrl.requestRetries++;
+                detailUrlUpdateQueue.push(detailUrl);
+
+                // log
                 requestCount--;
-                urls.push({ id: detailUrl._id, isSuccess: false });
+                urls.push({
+                  id: detailUrl._id,
+                  isSuccess: false,
+                  errorCode: err.message
+                });
                 failedAmount++;
               });
           }
@@ -159,8 +169,53 @@ let detailUrlUpdateQueue = [];
       }, 0);
     }
   );
-  setTimeout(extractLoop, REPEAT_TIME.EXTRACT * 1000);
 })();
+
+/**
+ * Loop update database
+ */
+setInterval(() => {
+  if (rawDataSaveQueue.length >= SAVE_AMOUNT) {
+    RawData.insertMany(rawDataSaveQueue, { ordered: false }, err => {
+      if (err) {
+        console.log(
+          `=> [M${process.pid} - ${require("moment")().format(
+            "L LTS"
+          )}] Extract > Save error: ${err.message}`
+        );
+      }
+      rawDataSaveQueue = [];
+    });
+  }
+
+  if (detailUrlUpdateQueue.length >= SAVE_AMOUNT) {
+    detailUrlUpdateQueue.forEach(d => {
+      DetailUrl.findByIdAndUpdate(d._id, d, err => {
+        if (err) {
+          console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+              "L LTS"
+            )}] Extract > Save error: ${err.message}`
+          );
+        }
+      });
+    });
+    detailUrlUpdateQueue = [];
+  }
+}, 100);
+
+function isNullData(data) {
+  const { title, price, acreage, address } = data;
+  if (
+    title.length === 0 &&
+    price.length === 0 &&
+    acreage.length === 0 &&
+    address.length === 0
+  ) {
+    return true;
+  }
+  return false;
+}
 
 function getContentByXPath(body, xpath) {
   const $ = cheerio.load(body);
@@ -209,34 +264,47 @@ function extractData(body, definition) {
 
   //title
   definition.title.forEach(xpath => {
-    title.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      title.push(getContentByXPath(body, xpath));
+    }
   });
 
   //price
   definition.price.forEach(xpath => {
-    price.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      price.push(getContentByXPath(body, xpath));
+    }
   });
 
   //acreage
   definition.acreage.forEach(xpath => {
-    acreage.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      acreage.push(getContentByXPath(body, xpath));
+    }
   });
 
   //address
   definition.address.forEach(xpath => {
-    address.push(getContentByXPath(body, xpath));
+    if (getContentByXPath(body, xpath) !== "") {
+      address.push(getContentByXPath(body, xpath));
+    }
   });
 
   //other
   definition.others.forEach(e => {
     let data = [];
     e.xpath.forEach(xpath => {
-      data.push(getContentByXPath(body, xpath));
+      if (getContentByXPath(body, xpath) !== "") {
+        data.push(getContentByXPath(body, xpath));
+      }
     });
-    othersData.push({
-      name: e.name,
-      data: data
-    });
+
+    if (data.length !== 0) {
+      othersData.push({
+        name: e.name,
+        data: data
+      });
+    }
   });
 
   return {

@@ -8,4 +8,3 @@ const rawCatalog = new Schema({
 });
 let rawCatalog = mongoose.model("raw_catalog_history", rawCatalog);
 module.exports = rawCatalog;
-// 

@@ -18,4 +18,15 @@ router.post("/add", definitionController.postAdd);
  */
 router.get("/detail/:id", definitionController.getDetail);
 
+/**
+ * update definition (same add)
+ */
+router.get("/update", definitionController.getAdd);
+
+/**
+ * delete definition
+ */
+router.get("/delete/:definitionId", definitionController.getDelete);
+router.post("/delete", definitionController.postDelete);
+
 module.exports = router;

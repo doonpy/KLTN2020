@@ -17,7 +17,24 @@ block content
     else
         h5
             span.badge.badge-primary Definition:
-            if !urlForDefinition
+            if urlForDefinition.length===0
                 span.text-danger &nbsp;This catalog don't have any detail URL
             else
-                a.text-danger(href=`/definition/add?url=${urlForDefinition}&catalogId=${data._id}&enableScript=0`) &nbsp;Click here to add data definition for this catalog.
+                a.text-danger(href='#', data-toggle='modal', data-target='#choose-url-modal') &nbsp;Add data definition for this catalog.
+
+    //Choose URL Modal
+    #choose-url-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='choose-url-modal', aria-hidden='true')
+        .modal-dialog.modal-dialog-centered.modal-lg(role='document')
+            .modal-content
+                .modal-header
+                    h3#exampleModalCenterTitle.modal-title Choose URL
+                    button.close(type='button', data-dismiss='modal', aria-label='Close')
+                        span(aria-hidden='true') ×
+                .modal-body
+                    p.text-info *Choose URL you want to be pattern.
+                    if urlForDefinition.length===0
+                        p.text-danger Don't have any URL in this catalog :(
+                    else
+                        .list-group(style="max-height:70vh; overflow:auto; ")
+                            for e in urlForDefinition
+                                a.list-group-item.list-group-item-action(href=`/definition/add?url=${e.url}&catalogId=${data._id}&enableScript=0`)=e.url
