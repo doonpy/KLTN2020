@@ -29,7 +29,7 @@ const mouseoverHandle = body => {
 };
 //
 function handleCatalog() {
-  $.notify("Welcome to The Catalog Page");
+  $.notify("Welcome to The Catalog Page", "info");
   var myArray = [];
   $("#iframe-id").on("load", function() {
     let html = $("#iframe-id")
@@ -39,13 +39,12 @@ function handleCatalog() {
 
     $(html).click(e => {
       e.preventDefault();
+      let targetHref = [];
       //Lấy hết thẻ của catalog
       let targetList = $(e.target)
         .contents()
         .find("a")
         .get();
-      let targetHref = [];
-      console.log(targetList);
       if (targetList.length !== 0) {
         $(targetList).each((index, value) => {
           let k = value.href.split("http://localhost:3000");
@@ -79,23 +78,25 @@ function handleCatalog() {
         targetList: targetHref
       };
       //
-
       if ($(e.target).hasClass("bg-red")) {
         $(e.target).removeClass("bg-red");
+        myArray = [];
         $("#list-catalog-id")
           .find("p")
           .remove();
-        myArray = myArray.filter(el => el.targetName !== objCatalog.targetName);
       } else {
-        if (objCatalog.targetList[0] == undefined) {
-          alert("Sai! Moi Chon Lai!");
+        if (objCatalog.targetName == "" || objCatalog.targetList[0].href == undefined) {
+          $.notify("Please choose the right catalog!");
         } else {
-          $(e.target).addClass("bg-red");
-          // Add
-          myArray.push(objCatalog);
-          myArray[0].targetList.forEach(value => {
-            $("#list-catalog-id").append(`<p>${value.name}</p>`);
-          });
+          if (myArray.length === 0) {
+            $(e.target).addClass("bg-red");
+            myArray.push(objCatalog);
+            myArray[0].targetList.forEach(value => {
+              $("#list-catalog-id").append(`<p>${value.name}</p>`);
+            });
+          } else {
+            $.notify("Please uncheck before selecting catalog new!");
+          }
         }
       }
     });
