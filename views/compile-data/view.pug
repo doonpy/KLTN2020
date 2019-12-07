@@ -1,69 +1,74 @@
 extends ../header
 
 block content
-    .row
-        .col
-            h5
-                span.badge.badge-primary Last update:
-                small &nbsp;#{compileLog.cTimeFormatted}
-        .col
-            h5
-                span.badge.badge-primary Raw data amount:
-                small &nbsp;#{compileLog.rawDataAmount}
-        .col
-            h5
-                span.badge.badge-primary Execute time:
-                small &nbsp;#{compileLog.executeTime} second(s)
-
-    // Data table
-    .container-fluid
+    if compileLog.length === 0 || compileDatas.length === 0
+        p.text-danger Nothing in here :(
+    else
         .row
-            h5
-                span.badge.badge-primary Select catalog group:
-                span &nbsp;
-            select#groupCatalog-select.nav.nav-tabs(role='tablist')
-                each compileData, compileDataIndex in compileDatas
-                    - var groupCatalogName="";
-                    each cGroup in compileData.catalogGroup
-                        - var hostFound = compileData.hostGroup.find(hGroup=>cGroup.hostId.toString()===hGroup._id.toString())
-                        - groupCatalogName+=`${cGroup.name} (${hostFound?hostFound.name:"null"})  `
-                    option.nav-item(value=`#comp-data-${compileDataIndex}`)=groupCatalogName
-        hr
-        #groupData-tab.tab-content
-            each compileData,compileDataIndex in compileDatas
-                .tab-pane.fade(id=`comp-data-${compileDataIndex}`, class=`${compileDataIndex === 0 ? "active show" : ""}`, role='tabpanel', aria-labelledby=`gCatalog-tab-${compileDataIndex}`)
-                    .row.mt-2.w-100
-                        table#data-table.table.table-striped.table-bordered.table-hover(style="width:100%")
-                            thead
-                                tr
-                                    th(scope="col") Group index
-                                    th(scope="col") Title
-                                    th(scope="col") Price
-                                    th(scope="col") Acreage
-                                    th(scope="col") Address
-                                    th(scope="col") Others
-                                    th(scope="col") Catalog
-                                    th(scope="col") Host
-                            tbody
-                                each gData, groupIndex in compileData.dataGroup
-                                    each data,index in gData.data
-                                        tr
-                                            td=groupIndex + 1
-                                            td(style="width:20%")=data.title.join(" ")
-                                            td(style="width:5%")=data.price.join(" ")
-                                            td(style="width:5%")=data.acreage.join(" ")
-                                            td(style="width:30%")=data.address.join(" ")
-                                            td(style="width:30%")
-                                                each o in data.others
-                                                    p.small <b>#{o.name}:</b> #{o.data.join(" ")}
-                                            - var catalogFound = compileData.catalogGroup.find(cGroup=>cGroup._id.toString()===gData.detailUrl[index].catalogId.toString())
-                                            - var hostFound = compileData.hostGroup.find(hGroup=>catalogFound.hostId.toString()===hGroup._id.toString())
-                                            td(style="width:30%") #{catalogFound ? catalogFound.name : "null"}
-                                            td(style="width:30%")
-                                                p Domain: #{hostFound ? hostFound.name : "null"}
-                                                if gData.detailUrl[index]
-                                                    a(href=gData.detailUrl[index].url target="_blank" rel="noopener noreferrer") Click here for redirect to the detail page
-                                                else
-                                                    p null
+            .col
+                h5
+                    span.badge.badge-primary Last update:
+                    small &nbsp;#{compileLog.cTimeFormatted}
+            .col
+                h5
+                    span.badge.badge-primary Raw data amount:
+                    small &nbsp;#{compileLog.rawDataAmount}
+            .col
+                h5
+                    span.badge.badge-primary Execute time:
+                    small &nbsp;#{compileLog.executeTime} second(s)
 
-    script(type='text/javascript', charset='utf8', src="/javascripts/comp-main.js")
+        // Data table
+        .container-fluid
+            .row
+                h5
+                    span.badge.badge-primary Select catalog group:
+                    span &nbsp;
+                select#groupCatalog-select.nav.nav-tabs(role='tablist')
+                    each compileData, compileDataIndex in compileDatas
+                        - var groupCatalogName="";
+                        each cGroup in compileData.catalogGroup
+                            - var hostFound = compileData.hostGroup.find(hGroup=>cGroup.hostId.toString()===hGroup._id.toString())
+                            - groupCatalogName+=`${cGroup.name} (${hostFound?hostFound.name:"null"})  `
+                        option.nav-item(value=`#comp-data-${compileDataIndex}`)=groupCatalogName
+            hr
+            #groupData-tab.tab-content
+                each compileData,compileDataIndex in compileDatas
+                    .tab-pane.fade(id=`comp-data-${compileDataIndex}`, class=`${compileDataIndex === 0 ? "active show" : ""}`, role='tabpanel', aria-labelledby=`gCatalog-tab-${compileDataIndex}`)
+                        .row.mt-2.w-100
+                            table#data-table.table.table-striped.table-bordered.table-hover(style="width:100%")
+                                thead
+                                    tr
+                                        th(scope="col") Group index
+                                        th(scope="col") Title
+                                        th(scope="col") Price
+                                        th(scope="col") Acreage
+                                        th(scope="col") Address
+                                        th(scope="col") Others
+                                        th(scope="col") Catalog
+                                        th(scope="col") Host
+                                tbody
+                                    each gData, groupIndex in compileData.dataGroup
+                                        each data,index in gData.data
+                                            tr
+                                                td=groupIndex + 1
+                                                td(style="width:20%")=data.title.join(" ")
+                                                td(style="width:5%")=data.price.join(" ")
+                                                td(style="width:5%")=data.acreage.join(" ")
+                                                td(style="width:20%")=data.address.join(" ")
+                                                td(style="width:20%")
+                                                    each o in data.others
+                                                        p <b>#{o.name}:</b> #{o.data.join(" ")}
+                                                - var detailUrlId = gData.detailUrl[index]?gData.detailUrl[index].catalogId.toString():""
+                                                - var catalogFound = compileData.catalogGroup.find(cGroup=>cGroup._id.toString()===detailUrlId)
+                                                - var hostId = catalogFound?catalogFound.hostId.toString():"";
+                                                - var hostFound = compileData.hostGroup.find(hGroup=>hGroup._id.toString()===hostId)
+                                                td(style="width:10%") #{catalogFound ? catalogFound.name : "null"}
+                                                td(style="width:20%")
+                                                    p Domain: #{hostFound ? hostFound.name : "null"}
+                                                    if gData.detailUrl[index]
+                                                        a(href=gData.detailUrl[index].url target="_blank" rel="noopener noreferrer") Click here for redirect to the detail page
+                                                    else
+                                                        p null
+
+        script(type='text/javascript', charset='utf8', src="/javascripts/comp-main.js")

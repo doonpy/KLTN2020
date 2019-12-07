@@ -34,26 +34,28 @@ exports.init = () => {
             if (!helper.isSelected(target)) {
               helper.markupArea(target);
             } else {
-              dataNode.splice(index, 1);
+                dataNode.splice(index, 1);
             }
           });
-          handleIframeData.exportData(dataNode);
+            handleIframeData.exportData(dataNode);
         }
       }
     });
   }
 
-  // Submit button event
-  $("#submit-table-data").click(e => {
-    $("#table-data-alert").addClass("d-none");
-    if (e.which === 1 && $("#table-data tr").length > 1) {
-      let xPathInputs = $("#table-data input[name=xpath]").toArray();
-      let defInputs = [];
-      let completeDefs = [];
+    /**
+     * Submit table data button
+     */
+    $("#submit-table-data").click(e => {
+        $("#table-data-alert").addClass("d-none");
+        if (e.which === 1 && $("#table-data tr").length > 1) {
+            let xPathInputs = $("#table-data input[name=xpath]").toArray();
+            let defInputs = [];
+            let completeDefs = [];
 
-      $("#table-data option:selected").each(function() {
-        let val = $(this).val();
-        let def = val;
+            $("#table-data option:selected").each(function () {
+                let val = $(this).val();
+                let def = val;
 
         if (val === constInit.REQUIRE_DEFINITIONS[0]) {
           def = "undef";

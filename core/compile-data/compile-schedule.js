@@ -8,7 +8,7 @@ const async = require("async");
 const helper = require("./helper");
 
 let curDate = new Date();
-curDate.setDate(curDate.getDate() - 7)
+curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const REPEAT_TIME = 60 * 60 * 12; //12 hours
 const SIMILAR_RATES = {
@@ -44,19 +44,24 @@ const POINT_EACH_ATTR = {
         }
       },
       (err, data) => {
-        if (err) {
-          throw err;
-        }
-        const {rawData, catalogs} = data;
-        let groupedCatalogs = groupedCatalog(catalogs);
-        let rawDataByGroupedCatalog = getDataByGroupedCatalog(
-            groupedCatalogs,
-            rawData
-        );
-        let threadCount = 0;
-        let compileLog = {
-          groupDataIds: []
-        };
+          if (err) {
+              throw err;
+          }
+          const {rawData, catalogs} = data;
+          if (rawData.length <= 1) {
+              setTimeout(main, 1000 * REPEAT_TIME);
+              return;
+          }
+
+          let groupedCatalogs = groupedCatalog(catalogs);
+          let rawDataByGroupedCatalog = getDataByGroupedCatalog(
+              groupedCatalogs,
+              rawData
+          );
+          let threadCount = 0;
+          let compileLog = {
+              groupDataIds: []
+          };
 
         rawDataByGroupedCatalog.forEach(rd => {
           if (rd.rawData.length > 0) {

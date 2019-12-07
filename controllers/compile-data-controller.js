@@ -18,16 +18,19 @@ exports.getLastCompile = (req, res, next) => {
               });
         },
         function (compileLog, callback) {
-          CompileData.aggregate([
-            {
-              $match: {
-                _id: {
-                  $in: compileLog.groupDataIds
+          if (!compileLog) {
+            callback(null, [], []);
+          } else {
+            CompileData.aggregate([
+              {
+                $match: {
+                  _id: {
+                    $in: compileLog.groupDataIds
+                  }
                 }
-              }
-            },
-            {
-              $lookup: {
+              },
+              {
+                $lookup: {
                 from: "raw_datas",
                 localField: "groupData",
                 foreignField: "_id",
@@ -85,13 +88,14 @@ exports.getLastCompile = (req, res, next) => {
                 path: "$hostGroup"
               }
             }
-          ]).exec((err, compileDatas) => {
-            if (err) {
-              next(err);
-              return;
-            }
-            callback(null, compileDatas, compileLog);
-          });
+            ]).exec((err, compileDatas) => {
+              if (err) {
+                next(err);
+                return;
+              }
+              callback(null, compileDatas, compileLog);
+            });
+          }
         }
       ],
       (err, compileDatas, compileLog) => {
@@ -99,7 +103,6 @@ exports.getLastCompile = (req, res, next) => {
           next(err);
           return;
         }
-        // res.json(compileDatas);
         let assigns = {
           title: "Compile data",
           breadcrumb: [

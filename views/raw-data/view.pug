@@ -9,22 +9,22 @@ block content
                 th Address
                 th Orders
             tbody
-                each rawdata,index in rawdatas
+                each rawData,index in rawDatas
                     tr
-                        td #{rawdata.title[0]}  
-                        td #{rawdata.price[0]}
-                        td #{rawdata.acreage[0]}
-                        td #{rawdata.address[0]}
+                        td #{rawData.title[0]}
+                        td #{rawData.price[0]}
+                        td #{rawData.acreage[0]}
+                        td #{rawData.address[0]}
                         td
                             .menu1.ct-menu
-                                        .ctmenu-item
-                                            i.material-icons(style='color:white')
-                                                | expand_more
-                                        .ctmenu-sub
-                                            each data in rawdata.others
-                                                .order-item
-                                                    .order-item-title.item-border #{data.name}
-                                                    .order-item-title #{data.data[0]}
+                                .ctmenu-item
+                                    i.material-icons(style='color:white')
+                                        | expand_more
+                                .ctmenu-sub
+                                    each data in rawData.others
+                                        .order-item
+                                            .order-item-title.item-border #{data.name}
+                                            .order-item-title #{data.data[0]}
             tfoot
                 tr
                 th Title

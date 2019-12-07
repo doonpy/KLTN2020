@@ -8,16 +8,16 @@ const async = require("async");
 const requestModule = require("../module/request");
 
 let curDate = new Date();
-curDate.setDate(curDate.getDate() - 7)
+curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const NODE_TYPE_TEXT = 3;
-const MAX_URL_TO_GET = 5000;
-const MAX_REQUEST_SENT = 100;
+const MAX_URL_TO_GET = 10000;
+const MAX_REQUEST_SENT = 50;
 const MAX_REQUEST_RETRIES = 3;
 const SAVE_AMOUNT = 50;
 const REPEAT_TIME = {
-  EXTRACT: 30,
-  SAVE: 10 //seconds
+    EXTRACT: 60 * 60, //seconds
+    SAVE: 10 //seconds
 };
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
@@ -26,17 +26,17 @@ let detailUrlUpdateQueue = [];
   const hrStart = process.hrtime();
   async.parallel(
       {
-        definitions: function (callback) {
-        Definition.find().exec(callback);
-      },
-      detailUrls: function(callback) {
-        DetailUrl.aggregate([
-          [
-            {
-              $match: {
-                cTime: {$gte: DATE_LIMIT}
-              }
-            },
+          definitions: function (callback) {
+              Definition.find().exec(callback);
+          },
+          detailUrls: function (callback) {
+              DetailUrl.aggregate([
+                  [
+                      {
+                          $match: {
+                              cTime: {$gte: DATE_LIMIT}
+                          }
+                      },
             {
               $match: {
                 isExtracted: false
@@ -44,7 +44,7 @@ let detailUrlUpdateQueue = [];
             },
             {
               $match: {
-                requestRetries: {$lt: MAX_REQUEST_RETRIES}
+                  requestRetries: {$lt: MAX_REQUEST_RETRIES}
               }
             },
             {
@@ -87,25 +87,30 @@ let detailUrlUpdateQueue = [];
     },
     (err, data) => {
       if (err) {
-        throw err;
+          throw err;
       }
 
-      let { definitions, detailUrls } = data;
-      let urls = [];
-      let requestAmount = detailUrls.length;
-      let successAmount = 0;
-      let failedAmount = 0;
-      let requestCount = 0;
+        let {definitions, detailUrls} = data;
+        let urls = [];
+        let requestAmount = detailUrls.length;
+        let successAmount = 0;
+        let failedAmount = 0;
+        let requestCount = 0;
 
-      let requestLoop = setInterval(() => {
         if (detailUrls.length === 0) {
-          clearInterval(requestLoop);
-          const hrEnd = process.hrtime(hrStart)[0];
-          new ExtractLog({
-            urls: urls,
-            requestAmount: requestAmount,
-            successAmount: successAmount,
-            failedAmount: failedAmount,
+            setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
+            return;
+        }
+
+        let requestLoop = setInterval(() => {
+            if (detailUrls.length === 0) {
+                clearInterval(requestLoop);
+                const hrEnd = process.hrtime(hrStart)[0];
+                new ExtractLog({
+                    urls: urls,
+                    requestAmount: requestAmount,
+                    successAmount: successAmount,
+                    failedAmount: failedAmount,
             executeTime: hrEnd
           }).save();
           console.log(
@@ -191,14 +196,14 @@ let detailUrlUpdateQueue = [];
  * Loop update database
  */
 setInterval(() => {
-  let rawDataContainer =
-      rawDataSaveQueue.length > SAVE_AMOUNT
-          ? rawDataSaveQueue.splice(0, SAVE_AMOUNT)
-          : rawDataSaveQueue.splice(0, rawDataSaveQueue.length);
-  let detailUrlContainer =
-      detailUrlUpdateQueue.length > SAVE_AMOUNT
-          ? detailUrlUpdateQueue.splice(0, SAVE_AMOUNT)
-          : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueue.length);
+    let rawDataContainer =
+        rawDataSaveQueue.length > SAVE_AMOUNT
+            ? rawDataSaveQueue.splice(0, SAVE_AMOUNT)
+            : rawDataSaveQueue.splice(0, rawDataSaveQueue.length);
+    let detailUrlContainer =
+        detailUrlUpdateQueue.length > SAVE_AMOUNT
+            ? detailUrlUpdateQueue.splice(0, SAVE_AMOUNT)
+            : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueue.length);
 
   rawDataContainer.forEach(d => {
     d.save(err => {
@@ -214,23 +219,25 @@ setInterval(() => {
 
   detailUrlContainer.forEach(d => {
     DetailUrl.findByIdAndUpdate(d._id, d, err => {
-      if (err) {
-        console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-                "L LTS"
-            )}] Extract worker > Save error: ${err.message}`
-        );
-      }
+        if (err) {
+            console.log(
+                `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                )}] Extract worker > Save error: ${err.message}`
+            );
+        }
     });
   });
 
-  console.log(
-      `=> [M${process.pid} - ${require("moment")().format(
-          "L LTS"
-      )}] Extract worker> Remaining queue: Data(s): ${
-          rawDataSaveQueue.length
-      } - detail url(s): ${detailUrlUpdateQueue.length}`
-  );
+    if (rawDataContainer.length !== 0 && detailUrlContainer.length !== 0) {
+        console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Extract worker > Remaining queue: Data(s): ${
+                rawDataSaveQueue.length
+            } - detail url(s): ${detailUrlUpdateQueue.length}`
+        );
+    }
 }, 1000 * REPEAT_TIME.SAVE);
 
 function isNullData(data) {

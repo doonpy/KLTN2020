@@ -104,7 +104,7 @@ exports.getDetail = (req, res, next) => {
     ]
   };
   async.parallel(
-      {
+    {
       catalog: function(callback) {
         Catalog.aggregate([
           {

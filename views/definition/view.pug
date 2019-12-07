@@ -2,7 +2,7 @@ extends ../header
 
 block content
     if data.length === 0
-        p Nothing in here :(
+        p.text-danger Nothing in here :(
     else
         ul.list-group
             for d in data

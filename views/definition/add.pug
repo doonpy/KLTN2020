@@ -26,7 +26,7 @@ block content
             #left-content.col-7.mr-2
                 img#loading-progress(src="/images/svg/puff.svg" style="position:absolute; background-color: #343a40;")
                 iframe#live-iframe(src=`/api/get-html/${hostname}/${fileName}`)
-            #right-content.col.card.p-3
+            #right-content.col.card
                 #define-data.card-body(style="overflow:auto;")
                     #table-data-alert.alert.alert-danger.d-none(role='alert')
                     table#table-data.table.table-hover
