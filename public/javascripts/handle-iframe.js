@@ -11,6 +11,11 @@ function inputURL() {
     });
   });
 }
+function passingPage() {
+  $("#button-raw").click(e => {
+    window.location = "/raw-data";
+  });
+}
 //
 const mouseoverHandle = body => {
   const classesToAdd = "crawler-border-solid-hover crawler-border-color-hover";
@@ -24,60 +29,44 @@ const mouseoverHandle = body => {
 };
 //
 function handleCatalog() {
+  $.notify("Welcome to The Catalog Page", "info");
   var myArray = [];
   $("#iframe-id").on("load", function() {
     let html = $("#iframe-id")
       .contents()
       .find("body");
-    // .get(0);
     mouseoverHandle(html);
-    // $(html)
-    //   .find("body")
-    //   .append(
-    //     `<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>`
-    //   );
-    // $(html)
-    //   .find("script, link, img")
-    //   .each(function() {
-    //     console.log("this", this);
-    //     let tagName = $(this)
-    //       .prop("tagName")
-    //       .toLowerCase();
-    //     if (tagName === "script" || tagName === "img") {
-    //       let src = $(this).attr("src");
-    //       $(this).attr("src", "https://nhadat24h.net" + src);
-    //     }
-
-    //     if (tagName === "link") {
-    //       let href = $(this).attr("href");
-    //       $(this).attr("href", "https://nhadat24h.net" + href);
-    //     }
-    //   });
 
     $(html).click(e => {
       e.preventDefault();
-      console.log(e.target);
-
+      let targetHref = [];
       //Lấy hết thẻ của catalog
       let targetList = $(e.target)
         .contents()
         .find("a")
         .get();
-      let targetHref = [];
-      console.log(targetList);
       if (targetList.length !== 0) {
         $(targetList).each((index, value) => {
           let k = value.href.split("http://localhost:3000");
-          targetHref.push(k[1]);
+          let obj = {
+            name: $(value).text(),
+            href: k[1]
+          };
+          targetHref.push(obj);
         });
       } else {
         let attr = $(e.target)
           .find("a")
           .attr("href");
-        targetHref.push(attr);
+        let name = $(e.target)
+          .find("a")
+          .text();
+        let obj = {
+          name: name,
+          href: attr
+        };
+        targetHref.push(obj);
       }
-
-      console.log(targetHref);
       let targetName = $(e.target)
         .find("a")
         .first()
@@ -89,26 +78,32 @@ function handleCatalog() {
         targetList: targetHref
       };
       //
-
       if ($(e.target).hasClass("bg-red")) {
         $(e.target).removeClass("bg-red");
-        // Remove
-        myArray = myArray.filter(el => el.targetName !== objCatalog.targetName);
+        myArray = [];
+        $("#list-catalog-id")
+          .find("p")
+          .remove();
       } else {
-        if (objCatalog.targetList[0] == undefined) {
-          alert("Sai! Moi Chon Lai!");
+        if (objCatalog.targetName == "" || objCatalog.targetList[0].href == undefined) {
+          $.notify("Please choose the right catalog!");
         } else {
-          $(e.target).addClass("bg-red");
-          // Add
-          myArray.push(objCatalog);
+          if (myArray.length === 0) {
+            $(e.target).addClass("bg-red");
+            myArray.push(objCatalog);
+            myArray[0].targetList.forEach(value => {
+              $("#list-catalog-id").append(`<p>${value.name}</p>`);
+            });
+          } else {
+            $.notify("Please uncheck before selecting catalog new!");
+          }
         }
       }
     });
 
     $("#button-catalog").click(e => {
       e.preventDefault();
-      console.log(myArray);
-      let catalogArr = JSON.stringify(myArray);
+      let catalogArr = JSON.stringify(myArray[0].targetList);
       $.post("/catalogarr", { catalog: catalogArr }, data => {
         console.log(data);
         text.push(data);
@@ -119,8 +114,6 @@ function handleCatalog() {
 }
 
 $(document).ready(function() {
-  // inputURL().then(data => {
-
-  // });
+  passingPage();
   handleCatalog();
 });

@@ -1,0 +1,44 @@
+.frame {
+  display: flex;
+}
+.row-iframe {
+  width: 70%;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+}
+.row-show {
+  width: 30%;
+  position: relative;
+}
+.row-show-container {
+  padding: 90px;
+}
+#button-catalog {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+}
+.bg-container {
+  width: 100%;
+  position: relative;
+  height: 100vh;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  background-image: url("/images/bg.jpeg");
+}
+.form-container {
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  padding: 100px 50px;
+  background: #ffffff;
+  width: 50%;
+}
+#button-raw {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}

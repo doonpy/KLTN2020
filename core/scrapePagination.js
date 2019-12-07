@@ -18,9 +18,7 @@ module.exports.scrapeDetail = scrapeDetail = (
   urlDetect,
   dataCatalog
 ) => {
-  let rawData = [];
   let paginationType = domain + pagination;
-
   let typePagination = "";
 
   let type = "";
@@ -45,20 +43,12 @@ module.exports.scrapeDetail = scrapeDetail = (
   //
 
   console.log("NUMBER" + chalk.bold.yellow(num));
-  dataCatalog.forEach(value => {
-    let catalog = value.urlCatalogs;
-    rawData.push(catalog);
-    // crawlerPagination(textClass, type, paginationType, catalog, num, domain);
-  });
-  rawData = [].concat.apply([], rawData);
-  console.log(rawData);
 
-  crawlerPagination(textClass, type, rawData, num, domain);
+  crawlerPagination(textClass, type, dataCatalog, num, domain);
 };
 //
 
 const crawlerPagination = async (textClass, type, rawData, num, domain) => {
-  let urlmodel = domain.split(/^https?\:\/\//i);
   let checkLoop = true;
   let flagIndex = 0;
   let url;
@@ -78,12 +68,9 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
     }
     console.log(textDetail);
     console.log(chalk.bold.blue(url));
-
-    let val = url.split(domain);
-    let catalogname = val[1].replace("/", "");
     let arrLink = [];
-    const catalogName = await CatalogModel.findOne({ name: catalogname });
-
+    const catalogName = await CatalogModel.findOne({ link: url });
+    console.log(catalogName);
     for (let index = 1; index <= 200; index++) {
       console.log(chalk.bold.red(textDetail.replace(num, index)));
       const html = await request.get(textDetail.replace(num, index), config);
@@ -106,13 +93,11 @@ const crawlerPagination = async (textClass, type, rawData, num, domain) => {
             isExtracted: false,
             catalogId: catalogName._id
           });
-        }
-        else{
+        } else {
           link.push({
-            url:
-              $(this)
-                .find("a")
-                .attr("href"),
+            url: $(this)
+              .find("a")
+              .attr("href"),
             isExtracted: false,
             catalogId: catalogName._id
           });

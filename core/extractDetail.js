@@ -53,15 +53,11 @@ function getAttrbyXpath(body, xpath) {
 function getPaginationbyXpath(body, paginationXpath) {
   console.log(chalk.bold.yellow(paginationXpath));
   const $ = cheerio.load(body);
-
   let selector = getContentbyXpath($, paginationXpath);
-
   let pagination = $(selector);
-
   let textPagination = "";
   let flagcheckPagination = true;
   let textData = $(selector).attr("href");
-  
   if (textData !== undefined) {
     textPagination = textData;
   } else {
@@ -74,7 +70,6 @@ function getPaginationbyXpath(body, paginationXpath) {
     }
     console.log("textPagination : " + chalk.bold.red(textPagination));
   }
-
   return textPagination;
 }
 //
