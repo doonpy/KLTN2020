@@ -9,16 +9,37 @@ exports.init = () => {
 
   const connString = "mongodb://localhost:27017/tlcn_2019";
   mongoose
-    .connect(connString, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true
-    })
-    .then(() => {
-      console.log("=> Connect database success!");
-    })
-    .catch(err => {
-      console.log("=> Connect database failed!\n", err);
-    });
+      .connect(connString, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
+      })
+      .then(() => {
+        initModel();
+        console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Connect database success!`
+        );
+      })
+      .catch(err => {
+        console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Connect database failed!\n`,
+            err
+        );
+      });
 };
+
+function initModel() {
+  require("../models/host-model");
+  require("../models/catalog-model");
+  require("../models/definition-model");
+  require("../models/extract-log-model");
+  require("../models/detail-url-model");
+  require("../models/raw-data-model");
+  require("../models/compile-data-model");
+  require("../models/compile-log-model");
+}

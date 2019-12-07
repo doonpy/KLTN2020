@@ -4,7 +4,7 @@ const cheerio = require("cheerio");
 const Promise = require("bluebird");
 const extract = require("../core/extractDetail");
 const scrape = require("../core/scrapePagination");
-const HostnameModel = require("../models/hostname-model");
+const HostnameModel = require("../models/host-model");
 const CatalogModel = require("../models/catalog-model");
 let listCatalog = [];
 

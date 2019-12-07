@@ -7,19 +7,26 @@ const cheerio = require("cheerio");
 const async = require("async");
 const requestModule = require("../module/request");
 
+let curDate = new Date();
+curDate.setDate(curDate.getDate() - 7)
+const DATE_LIMIT = new Date(curDate); // 1 week from present
 const NODE_TYPE_TEXT = 3;
-const MAX_URL_TO_GET = 6000;
-const MAX_REQUEST_SENT = 20;
+const MAX_URL_TO_GET = 5000;
+const MAX_REQUEST_SENT = 100;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 60;
+const SAVE_AMOUNT = 50;
+const REPEAT_TIME = {
+  EXTRACT: 30,
+  SAVE: 10 //seconds
+};
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
 (function extractLoop() {
   const hrStart = process.hrtime();
   async.parallel(
-    {
-      definitions: function(callback) {
+      {
+        definitions: function (callback) {
         Definition.find().exec(callback);
       },
       detailUrls: function(callback) {
@@ -27,12 +34,17 @@ let detailUrlUpdateQueue = [];
           [
             {
               $match: {
+                cTime: {$gte: DATE_LIMIT}
+              }
+            },
+            {
+              $match: {
                 isExtracted: false
               }
             },
             {
               $match: {
-                requestRetries: { $lt: MAX_REQUEST_RETRIES }
+                requestRetries: {$lt: MAX_REQUEST_RETRIES}
               }
             },
             {
@@ -97,11 +109,15 @@ let detailUrlUpdateQueue = [];
             executeTime: hrEnd
           }).save();
           console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Extractor was ran within ${secondsToHms(hrEnd)}`
+              `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+              )}] Extract worker was ran within ${secondsToHms(
+                  hrEnd
+              )}! Next time at ${require("moment")()
+                  .add(REPEAT_TIME.EXTRACT, "seconds")
+                  .format("L LTS")}`
           );
-          extractLoop();
+          setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
@@ -115,18 +131,18 @@ let detailUrlUpdateQueue = [];
             requestModule
               .send(detailUrl.url)
               .then(res => {
-                console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                  )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
-                );
+                // console.log(
+                //   `=> [M${process.pid} - ${require("moment")().format(
+                //     "L LTS"
+                //   )}] Extract "${res.request.uri.href}" - ${res.statusCode}`
+                // );
                 let dataExtracted = extractData(res.body, definition);
                 detailUrl.isExtracted = true;
                 detailUrl.requestRetries++;
                 dataExtracted.detailUrlId = detailUrl._id;
 
                 if (!isNullData(dataExtracted)) {
-                  rawDataSaveQueue.push(dataExtracted);
+                  rawDataSaveQueue.push(new RawData(dataExtracted));
                   detailUrlUpdateQueue.push(detailUrl);
 
                   // log
@@ -146,11 +162,11 @@ let detailUrlUpdateQueue = [];
                 }
               })
               .catch(err => {
-                console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                  )}] Extract "${detailUrl.url}" - ${err.message}`
-                );
+                // console.log(
+                //   `=> [M${process.pid} - ${require("moment")().format(
+                //     "L LTS"
+                //   )}] Extract "${detailUrl.url}" - ${err.message}`
+                // );
 
                 detailUrl.requestRetries++;
                 detailUrlUpdateQueue.push(detailUrl);
@@ -175,34 +191,47 @@ let detailUrlUpdateQueue = [];
  * Loop update database
  */
 setInterval(() => {
-  if (rawDataSaveQueue.length >= SAVE_AMOUNT) {
-    RawData.insertMany(rawDataSaveQueue, { ordered: false }, err => {
+  let rawDataContainer =
+      rawDataSaveQueue.length > SAVE_AMOUNT
+          ? rawDataSaveQueue.splice(0, SAVE_AMOUNT)
+          : rawDataSaveQueue.splice(0, rawDataSaveQueue.length);
+  let detailUrlContainer =
+      detailUrlUpdateQueue.length > SAVE_AMOUNT
+          ? detailUrlUpdateQueue.splice(0, SAVE_AMOUNT)
+          : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueue.length);
+
+  rawDataContainer.forEach(d => {
+    d.save(err => {
       if (err) {
         console.log(
-          `=> [M${process.pid} - ${require("moment")().format(
-            "L LTS"
-          )}] Extract > Save error: ${err.message}`
+            `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+            )}] Extract worker > Save error: ${err.message}`
         );
       }
-      rawDataSaveQueue = [];
     });
-  }
+  });
 
-  if (detailUrlUpdateQueue.length >= SAVE_AMOUNT) {
-    detailUrlUpdateQueue.forEach(d => {
-      DetailUrl.findByIdAndUpdate(d._id, d, err => {
-        if (err) {
-          console.log(
+  detailUrlContainer.forEach(d => {
+    DetailUrl.findByIdAndUpdate(d._id, d, err => {
+      if (err) {
+        console.log(
             `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Extract > Save error: ${err.message}`
-          );
-        }
-      });
+                "L LTS"
+            )}] Extract worker > Save error: ${err.message}`
+        );
+      }
     });
-    detailUrlUpdateQueue = [];
-  }
-}, 100);
+  });
+
+  console.log(
+      `=> [M${process.pid} - ${require("moment")().format(
+          "L LTS"
+      )}] Extract worker> Remaining queue: Data(s): ${
+          rawDataSaveQueue.length
+      } - detail url(s): ${detailUrlUpdateQueue.length}`
+  );
+}, 1000 * REPEAT_TIME.SAVE);
 
 function isNullData(data) {
   const { title, price, acreage, address } = data;
@@ -246,13 +275,12 @@ function getContentByXPath(body, xpath) {
       if (this.nodeType === NODE_TYPE_TEXT) {
         let text = $(this)
           .text()
-          .trim()
           .replace(/(\r\n|\n|\r)/gm, "");
-        if (text !== "" || text !== null) textData += ` ${text.trim()}`;
+        if (text !== "" || text !== null) textData += `${text} `;
       }
     });
 
-  return textData;
+  return textData.trim();
 }
 
 function extractData(body, definition) {
