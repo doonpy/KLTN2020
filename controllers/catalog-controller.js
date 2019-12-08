@@ -2,6 +2,9 @@ const Catalog = require("../models/catalog-model");
 const DetailUrl = require("../models/detail-url-model");
 const async = require("async");
 const mongoose = require("mongoose");
+const targetHtmlHelper = require("../helper/target-html-handle");
+const requestModule = require("../core/module/request");
+const fileHelper = require("../helper/file-helper");
 
 /**
  * get index controller
@@ -217,4 +220,68 @@ exports.getDetail = (req, res, next) => {
       }
     }
   );
+};
+
+/**
+ * get add controller
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.getAdd = (req, res, next) => {
+  let target = req.query.target.trim();
+  let enableScript = parseInt(req.query.enableScript);
+  if (!targetHtmlHelper.isValidTarget(target)) {
+    let assigns = {
+      title: "Home",
+      breadcrumb: [
+        {
+          href: "/",
+          pageName: "Home"
+        }
+      ],
+      error: `${target} - domain or protocol is invalid!`
+    };
+    res.render("index/view", assigns);
+  } else {
+    let assigns = {
+      title: "Add catalog",
+      breadcrumb: [
+        {
+          href: "/catalog",
+          pageName: "Catalog"
+        },
+        {
+          href: `/catalog/add?target=${target}`,
+          pageName: "Add"
+        }
+      ],
+      target: target,
+      enableScript: enableScript
+    };
+
+    requestModule
+        .send(target)
+        .then(response => {
+          const folderPath = `${process.env.STORAGE_PATH}/${response.request.uri.host}`;
+          const bodyHtml = targetHtmlHelper.handleLinkFile(
+              response,
+              enableScript
+          );
+          fileHelper
+              .createFile(folderPath, `${target}.html`, bodyHtml, true)
+              .then(fileName => {
+                assigns.fileName = fileName;
+                assigns.hostname = response.request.uri.host;
+                res.render("catalog/add", assigns);
+              })
+              .catch(err => {
+                next(err);
+              });
+        })
+        .catch(err => {
+          assigns.error = err;
+          res.render("index/view", assigns);
+        });
+  }
 };

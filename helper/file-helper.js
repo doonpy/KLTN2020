@@ -152,23 +152,33 @@ const deleteAll = folderPath => {
     let files = fs.readdirSync(folderPath);
     files.forEach(file => {
       fs.unlink(`${folderPath}/${file}`, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+          if (err) {
+              reject(err);
+          } else {
+              resolve();
+          }
       });
     });
   });
 };
 
+/**
+ * get file name was encrypted
+ * @param fileName
+ * @returns {*}
+ */
+const getFileNameEncrypted = fileName => {
+    return uuidv3(fileName, NAMESPACE_FILE);
+};
+
 module.exports = {
-  initTempFolder: initTempFolder,
-  isFolderExist: isFolderExist,
-  getAllFileInFolder: getAllFileInFolder,
-  getFileContent: getFileContent,
-  createFolder: createFolder,
-  createFile: createFile,
-  deleteAll: deleteAll,
-  deleteFile: deleteFile
+    initTempFolder: initTempFolder,
+    isFolderExist: isFolderExist,
+    getAllFileInFolder: getAllFileInFolder,
+    getFileContent: getFileContent,
+    createFolder: createFolder,
+    createFile: createFile,
+    deleteAll: deleteAll,
+    deleteFile: deleteFile,
+    getFileNameEncrypted: getFileNameEncrypted
 };
