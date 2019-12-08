@@ -176,22 +176,22 @@ function exportData(dataList, isTable = false) {
       data.contentList.forEach(content => {
         let nodeText = content.text.join("</p><p>");
         tr += `<tr>
-        <td>
+        <td style ="width:60%">
           ${
             content.node.tagName === "img"
                 ? `<img src="${nodeText}" width="30%">`
                 : `<p>${nodeText}</p>`
         }
         </td>
-        <td>
-          <input type="hidden" name="xpath" value="${content.xPath}">
-          <select name="def-suggestion" class="form-control">
+        <td style="width:30%">
+          <input  style="font-size:"14px" type="hidden" name="xpath" value="${content.xPath}">
+          <select name="def-suggestion" class="form-control" style="font-size:"14px">
             ${option}
           </select>
           ${inputTag}
         </td> 
-        <td>
-          <button class="btn btn-danger delete-data-row">Delete</button>
+        <td style="width:30%">
+          <button class="btn btn-danger delete-data-row"><i class="material-icons text-light">delete</i></button>
         </td>
       </tr>`;
       });
@@ -222,7 +222,7 @@ function exportData(dataList, isTable = false) {
           </select>
         </td> 
         <td>
-          <button class="btn btn-danger delete-data-row">Delete</button>
+          <button class="btn btn-danger delete-data-row"><i class="material-icons text-light">delete</i></button>
         </td>
       </tr>`;
 

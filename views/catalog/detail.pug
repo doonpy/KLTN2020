@@ -2,27 +2,27 @@ extends ../header
 
 block content
     h5
-        span.badge.badge-primary Host:
+        span.badge.badge-orange.text-light Host:
         small &nbsp;#{data.hostName}
     h5
-        span.badge.badge-primary Catalog name:
+        span.badge.badge-orange.text-light Catalog name:
         small &nbsp;#{data.name}
     h5
-        span.badge.badge-primary Detail url amount:
+        span.badge.badge-orange.text-light Detail url amount:
         small &nbsp;#{data.detailUrls}
     if data.definitionId
         h5
-            span.badge.badge-primary Definition:
+            span.badge.badge-orange.text-light Definition:
             a.text-success(href=`/definition/detail/${data.definitionId}`) &nbsp;Click here to see data definition of this catalog.
     else
         h5
-            span.badge.badge-primary Definition:
+            span.badge.badge-orange.text-light Definition:
             if urlForDefinition.length===0
                 span.text-danger &nbsp;This catalog don't have any detail URL
             else
                 a.text-danger(href='#', data-toggle='modal', data-target='#choose-url-modal') &nbsp;Add data definition for this catalog.
 
-    //Choose URL Modal
+    //- //Choose URL Modal
     #choose-url-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='choose-url-modal', aria-hidden='true')
         .modal-dialog.modal-dialog-centered.modal-lg(role='document')
             .modal-content

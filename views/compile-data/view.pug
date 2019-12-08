@@ -7,22 +7,22 @@ block content
         .row
             .col
                 h5
-                    span.badge.badge-primary Last update:
+                    span.badge.badge-orange.text-light Last update:
                     small &nbsp;#{compileLog.cTimeFormatted}
             .col
                 h5
-                    span.badge.badge-primary Raw data amount:
+                    span.badge.badge-orange.text-light Raw data amount:
                     small &nbsp;#{compileLog.rawDataAmount}
             .col
                 h5
-                    span.badge.badge-primary Execute time:
+                    span.badge.badge-orange.text-light Execute time:
                     small &nbsp;#{compileLog.executeTime} second(s)
 
         // Data table
         .container-fluid
             .row
                 h5
-                    span.badge.badge-primary Select catalog group:
+                    span.badge.badge-orange.text-light Select catalog group:
                     span &nbsp;
                 select#groupCatalog-select.nav.nav-tabs(role='tablist')
                     each compileData, compileDataIndex in compileDatas
@@ -67,7 +67,7 @@ block content
                                                 td(style="width:20%")
                                                     p Domain: #{hostFound ? hostFound.name : "null"}
                                                     if gData.detailUrl[index]
-                                                        a(href=gData.detailUrl[index].url target="_blank" rel="noopener noreferrer") Click here for redirect to the detail page
+                                                        a.text-ridirect(href=gData.detailUrl[index].url target="_blank" rel="noopener noreferrer") Click here for redirect to the detail page
                                                     else
                                                         p null
 

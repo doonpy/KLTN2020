@@ -15,12 +15,14 @@ block content
                             for catalog in d.catalogs
                                 if catalog.isDefined
                                     a(href=`/catalog/detail/${catalog.id}`).list-group-item.list-group-item-success.list-group-item-action
-                                        .float-right.small
+                                        .float-right.small.box-check
                                             h6 Defined
+                                            i.material-icons.text-success.icon-check check_circle
                                         h5=catalog.name
                                 else
                                     a(href=`/catalog/detail/${catalog.id}`).list-group-item.list-group-item-danger.list-group-item-action
-                                        .float-right.small
+                                        .float-right.small.box-check
                                             h6 No definition yet
+                                            i.material-icons.text-danger.icon-check error
                                         h5=catalog.name
 

@@ -4,23 +4,23 @@ block content
     .row
         .col
             h5
-                span.badge.badge-primary Hostname:
+                span.badge.badge-orange.text-light Hostname:
                 small &nbsp;#{host.name}
             h5
-                span.badge.badge-primary Catalog name:
+                span.badge.badge-orange.text-light Catalog name:
                 small &nbsp;#{catalog.name}
             h5
-                span.badge.badge-primary Target URL:
+                span.badge.badge-orange.text-light Target URL:
                 small &nbsp;#{definition.targetUrl.url}
         .col
             h5
-                span.badge.badge-primary Create:
+                span.badge.badge-orange.text-light Create:
                 small &nbsp;#{definition.cTime}
             h5
-                span.badge.badge-primary Last update:
+                span.badge.badge-orange.text-light Last update:
                 small &nbsp;#{definition.mTime}
             h5
-                span.badge.badge-primary Action
+                span.badge.badge-orange.text-light Action
                 span &nbsp;
                     a.small.text-primary(href='#', data-toggle='modal', data-target='#choose-url-modal') Edit
                 span &nbsp;
@@ -29,35 +29,35 @@ block content
     .container-fluid.pt-2
         #accordion
             .card
-                button#title-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-title-xpath', aria-expanded='true', aria-controls='collapse-title-xpath') Title xPaths
+                button#title-xpath.btn.btn-block.btn-orange.text-light.font-weight-bold(data-toggle='collapse', data-target='#collapse-title-xpath', aria-expanded='true', aria-controls='collapse-title-xpath') Title xPaths
                 #collapse-title-xpath.collapse(aria-labelledby='title-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
                             for e in definition.title
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
-                button#price-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-price-xpath', aria-expanded='true', aria-controls='collapse-price-xpath') Price xPaths
+                button#price-xpath.btn.btn-block.btn-orange.text-light.font-weight-bold(data-toggle='collapse', data-target='#collapse-price-xpath', aria-expanded='true', aria-controls='collapse-price-xpath') Price xPaths
                 #collapse-price-xpath.collapse(aria-labelledby='price-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
                             for e in definition.price
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
-                button#acreage-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-acreage-xpath', aria-expanded='true', aria-controls='collapse-acreage-xpath') Acreage xPaths
+                button#acreage-xpath.btn.btn-block.btn-orange.text-light.font-weight-bold(data-toggle='collapse', data-target='#collapse-acreage-xpath', aria-expanded='true', aria-controls='collapse-acreage-xpath') Acreage xPaths
                 #collapse-acreage-xpath.collapse(aria-labelledby='acreage-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
                             for e in definition.acreage
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
-                button#address-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-address-xpath', aria-expanded='true', aria-controls='collapse-address-xpath') Address xPaths
+                button#address-xpath.btn.btn-block.btn-orange.text-light.font-weight-bold(data-toggle='collapse', data-target='#collapse-address-xpath', aria-expanded='true', aria-controls='collapse-address-xpath') Address xPaths
                 #collapse-address-xpath.collapse(aria-labelledby='address-xpath', data-parent='#accordion')
                     .card-body
                         .list-group
                             for e in definition.address
                                 .list-group-item.list-group-item-info.list-group-item-action=e
             .card
-                button#other-xpath.btn.btn-block.btn-info(data-toggle='collapse', data-target='#collapse-other-xpath', aria-expanded='true', aria-controls='collapse-other-xpath') Other xPaths
+                button#other-xpath.btn.btn-block.btn-orange.text-light.font-weight-bold(data-toggle='collapse', data-target='#collapse-other-xpath', aria-expanded='true', aria-controls='collapse-other-xpath') Other xPaths
                 #collapse-other-xpath.collapse(aria-labelledby='other-xpath', data-parent='#accordion')
                     .card-body
                         .row
