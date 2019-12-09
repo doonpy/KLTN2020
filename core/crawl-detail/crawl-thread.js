@@ -43,6 +43,7 @@ function main() {
         .catch(err => {
           requestAmount--;
           if (nextUrl.retries < MAX_REQUEST_RETRIES) {
+            nextUrl.retries++;
             urlQueue.waiting.push(nextUrl);
             return;
           }
@@ -62,63 +63,59 @@ function handleSuccessRequest(res) {
 
   // Get detail link
   $("a").each(function() {
-    let cssSelector = getCssSelector($(this));
-    console.log(cssSelector)
-    if (
-      getSimilarPercentageCssSelector(detailUrlCssSelector, cssSelector) >
-      SIMILAR_PERCENT
-    ) {
-      let detailHref = makeupHref($(this).attr("href"),host.domain)
-      console.log(detailHref);
-    }
+    let cssSelector = getCssSelector($, $(this));
+    console.log(cssSelector);
+    //TODO: Fix bug can't get css selector of paging element
+    // if (
+    //   getSimilarPercentageCssSelector(detailUrlCssSelector, cssSelector) >
+    //   SIMILAR_PERCENT
+    // ) {
+    //   let detailHref = makeupHref($(this).attr("href"), host.domain);
+    //   // console.log(detailHref);
+    // }
   });
 
   // Get paging href
-  $(pageNumberCssSelector).children('a').each(function(){
-    let pagingHref = makeupHref($(this).attr("href"),host.domain)
-    console.log(pagingHref);
-  })
+  // console.log(pageNumberCssSelector);
+  // $(pageNumberCssSelector)
+  //   .children("a")
+  //   .each(function() {
+  //     let pagingHref = makeupHref($(this).attr("href"), host.domain);
+  //     console.log(pagingHref);
+  //     if (
+  //       !urlQueue.waiting.find(e => e.url === pagingHref) &&
+  //       !urlQueue.success.find(e => e.url === pagingHref) &&
+  //       !urlQueue.failed.find(e => e.url === pagingHref)
+  //     ) {
+  //       urlQueue.waiting.push({
+  //         url: pagingHref,
+  //         retries: 0
+  //       });
+  //     }
+  //   });
 }
 
-function getCssSelector(node) {
+function getCssSelector($, node) {
+  let el = node;
+  let parents = el.parents();
+  if (!parents[0]) {
+    // Element doesn't have any parents
+    return ":root";
+  }
+  let selector = getElementSelector(el);
+  let i = 0;
+  let elementSelector;
 
-  if (this.length != 1) {
-    return ""
-  };
-
-  let path = "";
-  while (node.length) {
-    let realNode = node[0];
-    let name = (
-
-        // IE9 and non-IE
-        realNode.localName ||
-
-        // IE <= 8
-        realNode.tagName ||
-        realNode.nodeName
-
-    );
-
-    // on IE8, nodeName is '#document' at the top level, but we don't need that
-    if (!name || name == '#document') break;
-
-    name = name.toLowerCase();
-    if (realNode.id) {
-      // As soon as an id is found, there's no need to specify more.
-      return name + '#' + realNode.id + (path ? '>' + path : '');
-    } else if (realNode.className) {
-      name += '.' + realNode.className.split(/\s+/).join('.');
-    }
-
-    let parent = node.parent(), siblings = parent.children(name);
-    if (siblings.length > 1) name += ':eq(' + siblings.index(node) + ')';
-    path = name + (path ? '>' + path : '');
-
-    node = parent;
+  if (selector[0] === "#" || selector === "body") {
+    return selector;
   }
 
-  return path;
+  do {
+    elementSelector = getElementSelector($(parents[i]));
+    selector = elementSelector + ">" + selector;
+    i++;
+  } while (i < parents.length - 1 && elementSelector[0] !== "#"); // Stop before we reach the html element parent
+  return selector;
 }
 
 function getSimilarPercentageCssSelector(firstCssSelector, secondCssSelector) {
@@ -143,9 +140,47 @@ function getSimilarPercentageCssSelector(firstCssSelector, secondCssSelector) {
   return parseFloat(((similarCount * 100) / maxLength).toFixed(2));
 }
 
-function makeupHref(href,domain){
-  if(/^\//g.test(href.trim())){
-    href=domain+href;
+function makeupHref(href, domain) {
+  if (/^\//g.test(href.trim())) {
+    href = domain + href;
   }
   return href.trim();
+}
+
+function getElementSelector(el) {
+  if (el.attr("id")) {
+    return "#" + el.attr("id");
+  } else {
+    let tagName = el.get(0).tagName.toLowerCase();
+    if (tagName === "body") {
+      return tagName;
+    }
+    if (el.attr("class")) {
+      let classSiblings = el.siblings(
+          `.${el
+              .attr("class")
+              .split(/\s+/g)
+              .join(".")}`
+      );
+      if (classSiblings.length <= 0) {
+        return `${el.get(0).tagName.toLowerCase()}.${el
+            .attr("class")
+            .split(/\s+/g)
+            .join(".")}`;
+      } else {
+        return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() +
+        1})`;
+      }
+    }
+    if (el.siblings().length === 0) {
+      return el.get(0).tagName.toLowerCase();
+    }
+    if (el.index() === 0) {
+      return `${el.get(0).tagName.toLowerCase()}:first-child`;
+    }
+    if (el.index() === el.siblings().length) {
+      return `${el.get(0).tagName.toLowerCase()}:last-child`;
+    }
+    return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() + 1})`;
+  }
 }
