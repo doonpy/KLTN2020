@@ -6,33 +6,41 @@ import "datatables.net-rowgroup-bs4";
 // Extend $ to get CSS selector string
 $.fn.extend({
   getCssSelector: function() {
-    let path,
+    if (this.length != 1) {
+      return "";
+    }
+
+    let path = "",
       node = this;
     while (node.length) {
-      let realNode = node[0],
-        name = realNode.localName;
-      if (name === "html") {
-        break;
-      }
-      if (!name) break;
+      let realNode = node[0];
+      let name =
+        // IE9 and non-IE
+        realNode.localName ||
+        // IE <= 8
+        realNode.tagName ||
+        realNode.nodeName;
+
+      // on IE8, nodeName is '#document' at the top level, but we don't need that
+      if (!name || name == "#document") break;
+
       name = name.toLowerCase();
-
-      let parent = node.parent();
-
-      let sameTagSiblings = parent.children(name);
-      if (sameTagSiblings.length > 1) {
-        let allSiblings = parent.children();
-        let index = allSiblings.index(realNode) + 1;
-        if (index > 1) {
-          name += ":nth-child(" + index + ")";
-        }
+      if (realNode.id) {
+        // As soon as an id is found, there's no need to specify more.
+        return name + "#" + realNode.id + (path ? ">" + path : "");
+      } else if (realNode.className) {
+        name += "." + realNode.className.split(/\s+/).join(".");
       }
 
+      let parent = node.parent(),
+        siblings = parent.children(name);
+      if (siblings.length > 1) name += ":eq(" + siblings.index(node) + ")";
       path = name + (path ? ">" + path : "");
+
       node = parent;
     }
 
-    return path.trim();
+    return path;
   }
 });
 
@@ -101,6 +109,7 @@ export default class TargetIframe {
     this.posElement = props.posElement.trim();
     this.type = props.type.trim();
     this.isDetectMode = false;
+    this.originalHostName = "";
   }
 
   init() {
@@ -204,6 +213,13 @@ export default class TargetIframe {
       if (this.isDetectMode) {
         this._initDetectMode();
       }
+      if (this.originalHostName === "") {
+        this.originalHostName = this.$iframeContent
+          .find("title")
+          .text()
+          .replace(/\n\r/g, "")
+          .trim();
+      }
     });
   }
 
@@ -244,6 +260,7 @@ export default class TargetIframe {
 
   _loadOriginalSrc() {
     this.src = this.originalSrc;
+    this.originalHostName = "";
     this.$loadingImg.fadeIn("fast");
     this.$iframe.attr("src", this.src);
     this.$backToHomeBtn.attr("disabled", true);
@@ -373,10 +390,14 @@ export default class TargetIframe {
 
     // Submit
     this.$submitBtn.click(e => {
-      let hostname = $("#org-domain")
+      let domain = $("#target")
         .text()
         .trim();
       let rowAmount = this.$tableData.$("tr").length;
+      if (rowAmount === 0) {
+        alert("Nothing to save!");
+        return;
+      }
       for (let i = 0; i < rowAmount; i++) {
         if (
           this.$tableData.cell(i, NAME_DEFINE.settings.checkColumn).data() === 0
@@ -385,26 +406,33 @@ export default class TargetIframe {
           return;
         }
       }
-      let catalogData = [];
-      for (let i = 0; i < rowAmount; i++) {
-        catalogData.push(
-          JSON.parse(
-            this.$tableData.cell(i, NAME_DEFINE.settings.dataColumn).data()
-          )
+      let rs = confirm("Are you sure?");
+      if (rs) {
+        let catalogData = [];
+        for (let i = 0; i < rowAmount; i++) {
+          catalogData.push(
+            JSON.parse(
+              this.$tableData.cell(i, NAME_DEFINE.settings.dataColumn).data()
+            )
+          );
+        }
+        $.post(
+          NAME_DEFINE.commandUrl.postAddCatalog,
+          {
+            hostname: this.originalHostName,
+            domain: domain,
+            catalogData: JSON.stringify(catalogData)
+          },
+          res => {
+            if (res.status) {
+              alert(res.message);
+              window.location.href = "/catalog";
+            } else {
+              alert(res.message);
+            }
+          }
         );
       }
-      $.post(
-        NAME_DEFINE.commandUrl.postAddCatalog,
-        { hostname: hostname, catalogData: JSON.stringify(catalogData) },
-        res => {
-          if (res.status) {
-            alert(res.message);
-            window.location.href = "/catalog";
-          } else {
-            alert(res.message);
-          }
-        }
-      );
     });
   }
 
@@ -615,12 +643,16 @@ export default class TargetIframe {
     if (trSelected.length === 0) {
       alert("Please select catalog row before!");
     } else {
-      let detailUrlDetected = $(trSelected)
-        .find(`input[name=detail-url]`)
-        .val();
-      let pageNumberDetected = $(trSelected)
-        .find(`input[name=page-number]`)
-        .val();
+      let inputData = JSON.parse(
+        this.$tableData
+          .cell(
+            this.$tableData.row(trSelected).index(),
+            NAME_DEFINE.settings.dataColumn
+          )
+          .data()
+      );
+      let detailUrlDetected = inputData.detailUrl;
+      let pageNumberDetected = inputData.pageNumber;
       if (
         !this.$iframeContent
           .find(detailUrlDetected)

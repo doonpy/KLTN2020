@@ -9,11 +9,10 @@ block content
         .row.target-info.mb-2
             .col-8
                 h6 Target:&nbsp;
-                    span#hostName.badge.badge-primary=target
+                    span#target.badge.badge-primary=target
                 h6 Filename:&nbsp;
                     span#fileName.badge.badge-primary=fileName
                 p#iframe-src.d-none=`/api/get-html/${hostname}/${fileName}`
-                p#org-domain.d-none=hostname
             .col.d-flex.justify-content-end.align-items-center
                 a#enable-script.btn.btn-primary.mr-2(href=`/catalog/add?target=${target}&enableScript=${(enableScript ? 0 : 1)}`)= enableScript ? "Disable JS" : "Enable JS"
         #main-content

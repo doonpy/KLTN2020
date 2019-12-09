@@ -29,7 +29,7 @@ function removeLastSplash(string) {
  * @returns []
  */
 function getAllCatalogElement(target) {
-  let targetDomain = $("#hostName").text();
+  let targetDomain = $("#target").text();
   let $parent = $(target);
   if ($(target).tagName !== "li") {
     $parent = $(target).closest("li");

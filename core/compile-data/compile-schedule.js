@@ -45,7 +45,12 @@ const POINT_EACH_ATTR = {
       },
       (err, data) => {
           if (err) {
-              throw err;
+              console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                      "L LTS"
+                  )}] Compile error: ${err.message}`
+              );
+              setTimeout(main, 1000 * REPEAT_TIME);
           }
           const {rawData, catalogs} = data;
           if (rawData.length <= 1) {

@@ -295,16 +295,16 @@ exports.getAdd = (req, res, next) => {
  */
 exports.ajaxPostAdd = (req, res, next) => {
   let data = req.body;
-  let { hostname, catalogData } = data;
-  if (!targetHtmlHelper.isValidDomain(hostname)) {
+  let { hostname, domain, catalogData } = data;
+  if (!targetHtmlHelper.isValidTarget(domain)) {
     res.json({
       status: false,
-      message: "Hostname is invalid!"
+      message: "Domain is invalid!"
     });
     return;
   }
 
-  Host.findOne({ name: hostname }, (err, hostFound) => {
+  Host.findOne({ domain: domain }, (err, hostFound) => {
     if (err) {
       res.json({
         status: false,
@@ -314,6 +314,8 @@ exports.ajaxPostAdd = (req, res, next) => {
     }
     catalogData = JSON.parse(catalogData);
     if (hostFound) {
+      hostFound.name = hostname;
+      hostFound.save();
       let isError = false;
       for (let i = 0; i < catalogData.length; i++) {
         catalogData[i].hostId = hostFound._id;
@@ -341,7 +343,7 @@ exports.ajaxPostAdd = (req, res, next) => {
         });
       }
     } else {
-      new Host({ name: hostname }).save((err, doc) => {
+      new Host({ name: hostname, domain: domain }).save((err, doc) => {
         if (err) {
           res.json({
             status: false,
