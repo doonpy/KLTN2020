@@ -5,12 +5,12 @@ import "datatables.net-rowgroup-bs4";
 
 // Extend $ to get CSS selector string
 $.fn.extend({
-  getCssSelector: function () {
+  getCssSelector: function() {
     let path,
-        node = this;
+      node = this;
     while (node.length) {
       let realNode = node[0],
-          name = realNode.localName;
+        name = realNode.localName;
       if (name === "html") {
         break;
       }
@@ -79,6 +79,18 @@ const NAME_DEFINE = {
     rowDetected: "bg-primary text-white",
     badgeNotDetected: "text-light badge badge-danger",
     badgeDetected: "text-light badge badge-success"
+  },
+  settings: {
+    dataColumn: 0,
+    checkColumn: 1,
+    urlColumn: 3
+  },
+  commandUrl: {
+    postAddCatalog: "/catalog/ajax-add"
+  },
+  data: {
+    notMark: 0,
+    marked: 1
   }
 };
 
@@ -99,7 +111,10 @@ export default class TargetIframe {
     this.$tableData = $(`#${NAME_DEFINE.id.tableData}`).DataTable({
       columnDefs: [
         {
-          targets: [0],
+          targets: [
+            NAME_DEFINE.settings.dataColumn,
+            NAME_DEFINE.settings.checkColumn
+          ],
           visible: false,
           searchable: false
         }
@@ -123,12 +138,12 @@ export default class TargetIframe {
 
     template = `<div id="${NAME_DEFINE.id.componentName}" class="row">
                     <div id="${NAME_DEFINE.id.leftCol}" class="${
-        NAME_DEFINE.class.leftCol
+      NAME_DEFINE.class.leftCol
     }">
                         ${this._getIframeTemplate()}
                     </div>
                     <div id="${NAME_DEFINE.id.rightCol}" class="${
-        NAME_DEFINE.class.rightCol
+      NAME_DEFINE.class.rightCol
     }">
                         ${this._getTableTemplate()}
                     </div>
@@ -151,6 +166,7 @@ export default class TargetIframe {
     if (this.type === "catalog") {
       headers = `
                 <th scope="col">Input</th>
+                <th scope="col">Check</th>
                 <th scope="col">Catalog</th>
                 <th scope="col">URL</th>
                 <th scope="col">Detect info</th>`;
@@ -204,12 +220,12 @@ export default class TargetIframe {
 
     // mouse over event
     this.$iframeContent
-        .mouseover(e => {
-          $(e.target).addClass(NAME_DEFINE.class.mouseHover);
-        })
-        .mouseout(e => {
-          $(e.target).removeClass(NAME_DEFINE.class.mouseHover);
-        });
+      .mouseover(e => {
+        $(e.target).addClass(NAME_DEFINE.class.mouseHover);
+      })
+      .mouseout(e => {
+        $(e.target).removeClass(NAME_DEFINE.class.mouseHover);
+      });
 
     // mouse click
     this.$iframeContent.click(e => {
@@ -221,63 +237,69 @@ export default class TargetIframe {
     // back to home button
     this.$backToHomeBtn.click(e => {
       if (e.which === 1) {
-        this.src = this.originalSrc;
-        this.$loadingImg.fadeIn("fast");
-        this.$iframe.attr("src", this.src);
-        this.$backToHomeBtn.attr("disabled", true);
-        this.isDetectMode = false;
+        this._loadOriginalSrc();
       }
     });
+  }
+
+  _loadOriginalSrc() {
+    this.src = this.originalSrc;
+    this.$loadingImg.fadeIn("fast");
+    this.$iframe.attr("src", this.src);
+    this.$backToHomeBtn.attr("disabled", true);
+    this.isDetectMode = false;
   }
 
   _initTableEvent() {
     // table click
     $(`#${NAME_DEFINE.id.tableData}`)
-        .find("tbody")
-        .on("click", "tr", e => {
-          if ($(e.currentTarget).hasClass(NAME_DEFINE.css.rowDetected)) {
-            alert("This catalog was detected!");
-            return;
-          }
-          if ($(e.currentTarget).hasClass(NAME_DEFINE.css.rowSelected)) {
-            $(e.currentTarget).removeClass(NAME_DEFINE.css.rowSelected);
-          } else {
-            this.$tableData
-                .$(`tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`)
-                .removeClass(NAME_DEFINE.css.rowSelected);
-            $(e.currentTarget).addClass(NAME_DEFINE.css.rowSelected);
+      .find("tbody")
+      .on("click", "tr", e => {
+        if ($(e.currentTarget).hasClass(NAME_DEFINE.css.rowDetected)) {
+          alert("This catalog was detected!");
+          return;
+        }
+        if ($(e.currentTarget).hasClass(NAME_DEFINE.css.rowSelected)) {
+          $(e.currentTarget).removeClass(NAME_DEFINE.css.rowSelected);
+        } else {
+          this.$tableData
+            .$(`tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`)
+            .removeClass(NAME_DEFINE.css.rowSelected);
+          $(e.currentTarget).addClass(NAME_DEFINE.css.rowSelected);
 
-            this.$rightCol.toggle("fast");
-            let url = this.$tableData.row(e.currentTarget).data()[2];
-            let enableScript = $("#enable-script")
-                .text()
-                .includes("Enable");
+          this.$rightCol.toggle("fast");
+          let url = this.$tableData.row(e.currentTarget).data()[
+            NAME_DEFINE.settings.urlColumn
+          ];
+          let enableScript = $("#enable-script")
+            .text()
+            .includes("Enable");
 
-            $.get(
-                `/api/create-temp-html?url=${url}&enableScript=${
-                    enableScript ? 0 : 1
-                }`,
-                data => {
-                  if (data.status) {
-                    this.src = data.filePath;
-                    this.$loadingImg.fadeIn("fast");
-                    this.$iframe.attr("src", this.src);
-                    this.$backToHomeBtn.attr("disabled", false);
-                    this.isDetectMode = true;
-                  } else {
-                    alert(`Error: ${data.error}`);
-                  }
-                  this.$rightCol.toggle("fast");
-                }
-            );
-          }
-        });
+          $.get(
+            `/api/create-temp-html?url=${decodeURI(url)}&enableScript=${
+              enableScript ? 0 : 1
+            }`,
+            data => {
+              if (data.status) {
+                this.src = data.filePath;
+                this.$loadingImg.fadeIn("fast");
+                this.$iframe.attr("src", this.src);
+                this.$backToHomeBtn.attr("disabled", false);
+                this.isDetectMode = true;
+              } else {
+                alert(`Error: ${data.error}`);
+              }
+              this.$rightCol.toggle("fast");
+            }
+          );
+        }
+      });
 
     // Delete row
     this.$deleteBtn.click(e => {
       if (e.which === 1) {
         let trSelected = this.$tableData.$(
-            `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
+          `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
         );
         if (trSelected.length === 0) {
           alert("Please select catalog row before!");
@@ -286,7 +308,9 @@ export default class TargetIframe {
           if (rs) {
             // remove markup
             let cssSelector = JSON.parse(
-                this.$tableData.row(trSelected).data()[0]
+              this.$tableData.row(trSelected).data()[
+                NAME_DEFINE.settings.dataColumn
+              ]
             ).cssSelector;
 
             let catalogElement = this.$iframeContent.find(cssSelector).first();
@@ -304,9 +328,9 @@ export default class TargetIframe {
         if (rs) {
           this.$tableData.clear().draw();
           this.$iframeContent
-              .find(NAME_DEFINE.class.mouseSelected.replace(/\s+/g, ",."))
-              .removeClass(NAME_DEFINE.class.mouseSelected);
-          this.$backToHomeBtn.trigger("click");
+            .find(NAME_DEFINE.class.mouseSelected.replace(/\s+/g, ",."))
+            .removeClass(NAME_DEFINE.class.mouseSelected);
+          this._loadOriginalSrc();
         }
       }
     });
@@ -315,15 +339,18 @@ export default class TargetIframe {
     this.$detectBtn.click(e => {
       if (e.which === 1) {
         let trSelected = this.$tableData.$(
-            `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
+          `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
         );
         if (trSelected.length === 0) {
           alert("Please select catalog row before!");
         } else {
           let inputData = JSON.parse(
-              this.$tableData
-                  .cell(this.$tableData.row(trSelected).index(), 0)
-                  .data()
+            this.$tableData
+              .cell(
+                this.$tableData.row(trSelected).index(),
+                NAME_DEFINE.settings.dataColumn
+              )
+              .data()
           );
           if (inputData.detailUrl === "" || inputData.pageNumber === "") {
             alert("You haven't detected Detail URL or Page Number!");
@@ -331,10 +358,53 @@ export default class TargetIframe {
           }
           let rs = confirm("Are you sure?");
           if (rs) {
+            let rowIndex = this.$tableData.row(trSelected).index();
+            this.$tableData
+              .cell(rowIndex, NAME_DEFINE.settings.checkColumn)
+              .data(NAME_DEFINE.data.marked);
+            this.$tableData
+              .$(`tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`)
+              .removeClass(NAME_DEFINE.css.rowSelected);
             $(trSelected).addClass(NAME_DEFINE.css.rowDetected);
           }
         }
       }
+    });
+
+    // Submit
+    this.$submitBtn.click(e => {
+      let hostname = $("#org-domain")
+        .text()
+        .trim();
+      let rowAmount = this.$tableData.$("tr").length;
+      for (let i = 0; i < rowAmount; i++) {
+        if (
+          this.$tableData.cell(i, NAME_DEFINE.settings.checkColumn).data() === 0
+        ) {
+          alert("Please markup all row before submit!");
+          return;
+        }
+      }
+      let catalogData = [];
+      for (let i = 0; i < rowAmount; i++) {
+        catalogData.push(
+          JSON.parse(
+            this.$tableData.cell(i, NAME_DEFINE.settings.dataColumn).data()
+          )
+        );
+      }
+      $.post(
+        NAME_DEFINE.commandUrl.postAddCatalog,
+        { hostname: hostname, catalogData: JSON.stringify(catalogData) },
+        res => {
+          if (res.status) {
+            alert(res.message);
+            window.location.href = "/catalog";
+          } else {
+            alert(res.message);
+          }
+        }
+      );
     });
   }
 
@@ -351,7 +421,7 @@ export default class TargetIframe {
 
   _addCustomizeCss() {
     this.$iframeContent.append(
-        `<style>
+      `<style>
       .${NAME_DEFINE.css.borderSelectedStyle} { border: 1.5px solid #dee2e6 !important }
       .${NAME_DEFINE.css.borderSelectedColor} { border-color: #28a745!important }
       .${NAME_DEFINE.css.borderHoverStyle} { border: 0.5px solid #dee2e6 !important }
@@ -368,13 +438,13 @@ export default class TargetIframe {
           data = detector.getAllCatalogElement(target);
           if (data.length === 0) {
             alert(
-                "Detect failed! Make sure you select catalog area correctly."
+              "Detect failed! Make sure you select catalog area correctly."
             );
           }
           data.forEach(d => {
             let catalogElement = this.$iframeContent
-                .find(d.cssSelector)
-                .first();
+              .find(d.cssSelector)
+              .first();
             if (catalogElement.hasClass(NAME_DEFINE.class.mouseHover)) {
               catalogElement.removeClass(NAME_DEFINE.class.mouseHover);
             }
@@ -394,34 +464,42 @@ export default class TargetIframe {
   }
 
   _detectDetailUrlAndPageNumber(target) {
-    if ($(target).prop("tagName") !== "A") {
-      alert(`Detect failed! Make sure you select <a> tag correctly!`);
-      return;
+    while ($(target).prop("tagName") !== "A") {
+      if ($(target).prop("tagName") === "BODY") {
+        alert(`Detect failed! Make sure you select <a> tag correctly!`);
+        return;
+      }
+      target = $(target).parent();
     }
     let trSelected = this.$tableData.$(
-        `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
+      `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
     );
     if (trSelected.length === 0) {
       alert("Please select catalog row before!");
     } else {
       let $detailUrlBadge = $(trSelected).find(
-          `.${NAME_DEFINE.class.detailUrlBadge}`
+        `.${NAME_DEFINE.class.detailUrlBadge}`
       );
       let $pageNumberBadge = $(trSelected).find(
-          `.${NAME_DEFINE.class.pageNumberBadge}`
+        `.${NAME_DEFINE.class.pageNumberBadge}`
       );
       let targetCssSelector = $(target).getCssSelector();
       let inputData = JSON.parse(
-          this.$tableData.cell(this.$tableData.row(trSelected).index(), 0).data()
+        this.$tableData
+          .cell(
+            this.$tableData.row(trSelected).index(),
+            NAME_DEFINE.settings.dataColumn
+          )
+          .data()
       );
 
       if (inputData.detailUrl === targetCssSelector) {
         inputData.detailUrl = "";
         this._updateInputColDataTable(inputData);
         $detailUrlBadge
-            .text("Detail URL: No")
-            .removeClass(NAME_DEFINE.css.badgeDetected)
-            .addClass(NAME_DEFINE.css.badgeNotDetected);
+          .text("Detail URL: No")
+          .removeClass(NAME_DEFINE.css.badgeDetected)
+          .addClass(NAME_DEFINE.css.badgeNotDetected);
         if ($(target).hasClass(NAME_DEFINE.class.mouseSelected)) {
           $(target).removeClass(NAME_DEFINE.class.mouseSelected);
         }
@@ -433,9 +511,9 @@ export default class TargetIframe {
         inputData.pageNumber = "";
         this._updateInputColDataTable(inputData);
         $pageNumberBadge
-            .text("Page number: No")
-            .removeClass(NAME_DEFINE.css.badgeDetected)
-            .addClass(NAME_DEFINE.css.badgeNotDetected);
+          .text("Page number: No")
+          .removeClass(NAME_DEFINE.css.badgeDetected)
+          .addClass(NAME_DEFINE.css.badgeNotDetected);
         if ($parent.hasClass(NAME_DEFINE.class.mouseSelected)) {
           $parent.removeClass(NAME_DEFINE.class.mouseSelected);
         }
@@ -452,9 +530,9 @@ export default class TargetIframe {
           inputData.detailUrl = targetCssSelector;
           this._updateInputColDataTable(inputData);
           $detailUrlBadge
-              .text("Detail URL: Yes")
-              .removeClass(NAME_DEFINE.css.badgeNotDetected)
-              .addClass(NAME_DEFINE.css.badgeDetected);
+            .text("Detail URL: Yes")
+            .removeClass(NAME_DEFINE.css.badgeNotDetected)
+            .addClass(NAME_DEFINE.css.badgeDetected);
           if ($(target).hasClass(NAME_DEFINE.class.mouseHover)) {
             $(target).removeClass(NAME_DEFINE.class.mouseHover);
           }
@@ -477,9 +555,9 @@ export default class TargetIframe {
           inputData.pageNumber = targetCssSelector;
           this._updateInputColDataTable(inputData);
           $pageNumberBadge
-              .text("Page number: Yes")
-              .removeClass(NAME_DEFINE.css.badgeNotDetected)
-              .addClass(NAME_DEFINE.css.badgeDetected);
+            .text("Page number: Yes")
+            .removeClass(NAME_DEFINE.css.badgeNotDetected)
+            .addClass(NAME_DEFINE.css.badgeDetected);
           if ($parent.hasClass(NAME_DEFINE.class.mouseHover)) {
             $parent.removeClass(NAME_DEFINE.class.mouseHover);
           }
@@ -502,14 +580,15 @@ export default class TargetIframe {
           pageNumber: ""
         };
         this.$tableData.row
-            .add([
-              JSON.stringify(input),
-              data.header,
-              data.href,
-              `<p class="${NAME_DEFINE.class.detailUrlBadge} ${NAME_DEFINE.css.badgeNotDetected}">Detail URL: No</p>
+          .add([
+            JSON.stringify(input),
+            NAME_DEFINE.data.notMark,
+            data.header,
+            data.href,
+            `<p class="${NAME_DEFINE.class.detailUrlBadge} ${NAME_DEFINE.css.badgeNotDetected}">Detail URL: No</p>
             <p class="${NAME_DEFINE.class.pageNumberBadge} ${NAME_DEFINE.css.badgeNotDetected}">Page number: No</p>`
-            ])
-            .draw(false);
+          ])
+          .draw(false);
         break;
       case "definition":
         break;
@@ -520,9 +599,9 @@ export default class TargetIframe {
     switch (this.type) {
       case "catalog":
         this.$tableData
-            .row(tr)
-            .remove()
-            .draw();
+          .row(tr)
+          .remove()
+          .draw();
         break;
       case "definition":
         break;
@@ -531,50 +610,52 @@ export default class TargetIframe {
 
   _initDetectMode() {
     let trSelected = this.$tableData.$(
-        `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
+      `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
     );
     if (trSelected.length === 0) {
       alert("Please select catalog row before!");
     } else {
       let detailUrlDetected = $(trSelected)
-          .find(`input[name=detail-url]`)
-          .val();
+        .find(`input[name=detail-url]`)
+        .val();
       let pageNumberDetected = $(trSelected)
-          .find(`input[name=page-number]`)
-          .val();
+        .find(`input[name=page-number]`)
+        .val();
       if (
-          !this.$iframeContent
-              .find(detailUrlDetected)
-              .first()
-              .hasClass(NAME_DEFINE.class.mouseSelected)
+        !this.$iframeContent
+          .find(detailUrlDetected)
+          .first()
+          .hasClass(NAME_DEFINE.class.mouseSelected)
       ) {
         this.$iframeContent
-            .find(detailUrlDetected)
-            .first()
-            .addClass(NAME_DEFINE.class.mouseSelected);
+          .find(detailUrlDetected)
+          .first()
+          .addClass(NAME_DEFINE.class.mouseSelected);
       }
       if (
-          !this.$iframeContent
-              .find(pageNumberDetected)
-              .first()
-              .hasClass(NAME_DEFINE.class.mouseSelected)
+        !this.$iframeContent
+          .find(pageNumberDetected)
+          .first()
+          .hasClass(NAME_DEFINE.class.mouseSelected)
       ) {
         this.$iframeContent
-            .find(pageNumberDetected)
-            .first()
-            .addClass(NAME_DEFINE.class.mouseSelected);
+          .find(pageNumberDetected)
+          .first()
+          .addClass(NAME_DEFINE.class.mouseSelected);
       }
     }
   }
 
   _updateInputColDataTable(newData) {
     let trSelected = this.$tableData.$(
-        `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
+      `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
     );
     if (trSelected.length === 0) {
       return;
     }
     let rowIndex = this.$tableData.row(trSelected).index();
-    this.$tableData.cell(rowIndex, 0).data(JSON.stringify(newData));
+    this.$tableData
+      .cell(rowIndex, NAME_DEFINE.settings.dataColumn)
+      .data(JSON.stringify(newData));
   }
 }

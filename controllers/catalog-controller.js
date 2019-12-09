@@ -1,5 +1,6 @@
 const Catalog = require("../models/catalog-model");
 const DetailUrl = require("../models/detail-url-model");
+const Host = require("../models/host-model");
 const async = require("async");
 const mongoose = require("mongoose");
 const targetHtmlHelper = require("../helper/target-html-handle");
@@ -261,27 +262,110 @@ exports.getAdd = (req, res, next) => {
     };
 
     requestModule
-        .send(target)
-        .then(response => {
-          const folderPath = `${process.env.STORAGE_PATH}/${response.request.uri.host}`;
-          const bodyHtml = targetHtmlHelper.handleLinkFile(
-              response,
-              enableScript
-          );
-          fileHelper
-              .createFile(folderPath, `${target}.html`, bodyHtml, true)
-              .then(fileName => {
-                assigns.fileName = fileName;
-                assigns.hostname = response.request.uri.host;
-                res.render("catalog/add", assigns);
-              })
-              .catch(err => {
-                next(err);
-              });
-        })
-        .catch(err => {
-          assigns.error = err;
-          res.render("index/view", assigns);
-        });
+      .send(target)
+      .then(response => {
+        const folderPath = `${process.env.STORAGE_PATH}/${response.request.uri.host}`;
+        const bodyHtml = targetHtmlHelper.handleLinkFile(
+          response,
+          enableScript
+        );
+        fileHelper
+          .createFile(folderPath, `${target}.html`, bodyHtml, true)
+          .then(fileName => {
+            assigns.fileName = fileName;
+            assigns.hostname = response.request.uri.host;
+            res.render("catalog/add", assigns);
+          })
+          .catch(err => {
+            next(err);
+          });
+      })
+      .catch(err => {
+        assigns.error = err;
+        res.render("index/view", assigns);
+      });
   }
+};
+
+/**
+ * Ajax post add catalog
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.ajaxPostAdd = (req, res, next) => {
+  let data = req.body;
+  let { hostname, catalogData } = data;
+  if (!targetHtmlHelper.isValidDomain(hostname)) {
+    res.json({
+      status: false,
+      message: "Hostname is invalid!"
+    });
+    return;
+  }
+
+  Host.findOne({ name: hostname }, (err, hostFound) => {
+    if (err) {
+      res.json({
+        status: false,
+        message: err.message
+      });
+      return;
+    }
+    catalogData = JSON.parse(catalogData);
+    if (hostFound) {
+      let isError = false;
+      for (let i = 0; i < catalogData.length; i++) {
+        catalogData[i].hostId = hostFound._id;
+        Catalog.findOneAndUpdate(
+          { hostId: catalogData[i].hostId, header: catalogData[i].header },
+          catalogData[i],
+          { upsert: true }
+        ).exec(err => {
+          if (err) {
+            res.json({
+              status: false,
+              message: err.message
+            });
+            isError = true;
+          }
+        });
+        if (isError) {
+          break;
+        }
+      }
+      if (!isError) {
+        res.json({
+          status: true,
+          message: "Save catalog success!"
+        });
+      }
+    } else {
+      new Host({ name: hostname }).save((err, doc) => {
+        if (err) {
+          res.json({
+            status: false,
+            message: err.message
+          });
+          return;
+        }
+        catalogData.forEach(cd => {
+          cd.hostId = doc._id;
+        });
+        Catalog.insertMany(catalogData, err => {
+          if (err) {
+            res.json({
+              status: false,
+              message: err.message
+            });
+            return;
+          }
+          res.json({
+            status: true,
+            message: "Save catalog success!"
+          });
+        });
+      });
+    }
+  });
 };
