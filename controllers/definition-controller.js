@@ -4,12 +4,7 @@ const requestModule = require("../core/module/request");
 const fileHelper = require("../helper/file-helper");
 const crawlHandle = require("./definition-handler");
 const momentTimezone = require("moment-timezone");
-const cheerio = require("cheerio");
-
-const HOST_DOMAIN_PATTERN = new RegExp(
-  /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/,
-  "gi"
-);
+const targetHtmlHelper = require("../helper/target-html-handle")
 
 /**
  * get all definition
@@ -150,17 +145,17 @@ exports.getAdd = function(req, res, next) {
         .send(url)
         .then(response => {
           const folderPath = `${process.env.STORAGE_PATH}/${response.request.uri.host}`;
-          const bodyHtml = bodyHandle(response, enableScript);
+          const bodyHtml = targetHtmlHelper.handleLinkFile(response, enableScript);
 
           fileHelper
-            .createFile(folderPath, `${url}.html`, bodyHtml, true)
-            .then(fileName => {
-              assigns.fileName = fileName;
-              assigns.hostname = response.request.uri.host;
-              res.render("definition/add", assigns);
-            })
-            .catch(err => {
-              next(err);
+              .createFile(folderPath, `${url}.html`, bodyHtml, true)
+              .then(fileName => {
+                assigns.fileName = fileName;
+                assigns.hostname = response.request.uri.host;
+                res.render("definition/add", assigns);
+              })
+              .catch(err => {
+                next(err);
             });
         })
         .catch(err => {
@@ -332,36 +327,6 @@ exports.getDetail = (req, res, next) => {
   });
 };
 
-function bodyHandle(res, enableScript) {
-  const $ = cheerio.load(res.body);
-  const hostDomain = res.request.uri.href.match(HOST_DOMAIN_PATTERN);
-
-  // Disable Js
-  if (!enableScript) {
-    $("script, iframe").remove();
-  }
-
-  // Edit css link
-  $("link").each(function() {
-    const $el = $(this);
-    const href = $el.attr("href");
-    if (href && !href.match(HOST_DOMAIN_PATTERN)) {
-      $el.attr("href", `${hostDomain}${href}`);
-    }
-  });
-
-  // Edit img, javascript link
-  $("img, script").each(function() {
-    const $el = $(this);
-    const src = $el.attr("src");
-    if (src && !src.match(HOST_DOMAIN_PATTERN)) {
-      $el.attr("src", `${hostDomain}${src}`);
-    }
-  });
-
-  return $.root().html();
-}
-
 /**
  * get delete definition
  * @param req
@@ -401,9 +366,15 @@ exports.getDelete = (req, res, next) => {
   }).populate("catalogId");
 };
 
+/**
+ * handle POST delete
+ * @param req
+ * @param res
+ * @param next
+ */
 exports.postDelete = (req, res, next) => {
   const definitionId = req.body.definitionId;
-  Definition.findOne({ _id: definitionId }, (err, definition) => {
+  Definition.findOne({_id: definitionId}, (err, definition) => {
     if (err) {
       next(err);
       return;
@@ -412,7 +383,7 @@ exports.postDelete = (req, res, next) => {
       next(new Error("Definition not found!"));
       return;
     }
-    Definition.deleteOne({ _id: definitionId }, err => {
+    Definition.deleteOne({_id: definitionId}, err => {
       if (err) {
         next(err);
         return;

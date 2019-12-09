@@ -1,7 +1,11 @@
 const Catalog = require("../models/catalog-model");
 const DetailUrl = require("../models/detail-url-model");
+const Host = require("../models/host-model");
 const async = require("async");
 const mongoose = require("mongoose");
+const targetHtmlHelper = require("../helper/target-html-handle");
+const requestModule = require("../core/module/request");
+const fileHelper = require("../helper/file-helper");
 
 /**
  * get index controller
@@ -217,4 +221,153 @@ exports.getDetail = (req, res, next) => {
       }
     }
   );
+};
+
+/**
+ * get add controller
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.getAdd = (req, res, next) => {
+  let target = req.query.target.trim();
+  let enableScript = parseInt(req.query.enableScript);
+  if (!targetHtmlHelper.isValidTarget(target)) {
+    let assigns = {
+      title: "Home",
+      breadcrumb: [
+        {
+          href: "/",
+          pageName: "Home"
+        }
+      ],
+      error: `${target} - domain or protocol is invalid!`
+    };
+    res.render("index/view", assigns);
+  } else {
+    let assigns = {
+      title: "Add catalog",
+      breadcrumb: [
+        {
+          href: "/catalog",
+          pageName: "Catalog"
+        },
+        {
+          href: `/catalog/add?target=${target}`,
+          pageName: "Add"
+        }
+      ],
+      target: target,
+      enableScript: enableScript
+    };
+
+    requestModule
+      .send(target)
+      .then(response => {
+        const folderPath = `${process.env.STORAGE_PATH}/${response.request.uri.host}`;
+        const bodyHtml = targetHtmlHelper.handleLinkFile(
+          response,
+          enableScript
+        );
+        fileHelper
+          .createFile(folderPath, `${target}.html`, bodyHtml, true)
+          .then(fileName => {
+            assigns.fileName = fileName;
+            assigns.hostname = response.request.uri.host;
+            res.render("catalog/add", assigns);
+          })
+          .catch(err => {
+            next(err);
+          });
+      })
+      .catch(err => {
+        assigns.error = err;
+        res.render("index/view", assigns);
+      });
+  }
+};
+
+/**
+ * Ajax post add catalog
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.ajaxPostAdd = (req, res, next) => {
+  let data = req.body;
+  let { hostname, domain, catalogData } = data;
+  if (!targetHtmlHelper.isValidTarget(domain)) {
+    res.json({
+      status: false,
+      message: "Domain is invalid!"
+    });
+    return;
+  }
+
+  Host.findOne({ domain: domain }, (err, hostFound) => {
+    if (err) {
+      res.json({
+        status: false,
+        message: err.message
+      });
+      return;
+    }
+    catalogData = JSON.parse(catalogData);
+    if (hostFound) {
+      hostFound.name = hostname;
+      hostFound.save();
+      let isError = false;
+      for (let i = 0; i < catalogData.length; i++) {
+        catalogData[i].hostId = hostFound._id;
+        Catalog.findOneAndUpdate(
+          { hostId: catalogData[i].hostId, header: catalogData[i].header },
+          catalogData[i],
+          { upsert: true }
+        ).exec(err => {
+          if (err) {
+            res.json({
+              status: false,
+              message: err.message
+            });
+            isError = true;
+          }
+        });
+        if (isError) {
+          break;
+        }
+      }
+      if (!isError) {
+        res.json({
+          status: true,
+          message: "Save catalog success!"
+        });
+      }
+    } else {
+      new Host({ name: hostname, domain: domain }).save((err, doc) => {
+        if (err) {
+          res.json({
+            status: false,
+            message: err.message
+          });
+          return;
+        }
+        catalogData.forEach(cd => {
+          cd.hostId = doc._id;
+        });
+        Catalog.insertMany(catalogData, err => {
+          if (err) {
+            res.json({
+              status: false,
+              message: err.message
+            });
+            return;
+          }
+          res.json({
+            status: true,
+            message: "Save catalog success!"
+          });
+        });
+      });
+    }
+  });
 };

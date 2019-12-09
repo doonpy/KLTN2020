@@ -21,16 +21,16 @@ if (numCPUs === 1) {
     }
 
     // Fork child process for scheduler
-    // let schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
-    //
-    // schedulerProcess.on("exit", (code, signal) => {
-    //   console.log(
-    //     `=> [M${process.pid} - ${require("moment")().format(
-    //       "L LTS"
-    //     )}] Scheduler process died - code: ${code}`
-    //   );
-    //   schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
-    // });
+    let schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
+
+    schedulerProcess.on("exit", (code, signal) => {
+      console.log(
+        `=> [M${process.pid} - ${require("moment")().format(
+          "L LTS"
+        )}] Scheduler process died - code: ${code}`
+      );
+      schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
+    });
 
     cluster.on("exit", (worker, code, signal) => {
       console.log(

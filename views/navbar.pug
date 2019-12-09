@@ -1,19 +1,20 @@
-nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
-    a.navbar-brand(href='#') PK
-    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
-        span.navbar-toggler-icon
-    #navbar.collapse.navbar-collapse
-        ul.navbar-nav.mr-auto
-            li.nav-item(class="Home" === breadcrumb[0].pageName ? `active` : ``)
-                a.nav-link(href='/')
-                    | Home
-                    span.sr-only (current)
-            li.nav-item(class="Catalog" === breadcrumb[0].pageName ? `active` : ``)
-                a.nav-link(href='/catalog') Catalog
-            li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
-                a.nav-link(href='/definition') Definition
-            li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
-                a.nav-link(href='/raw-data') Raw Data
-            li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
-                a.nav-link(href='/compile-data') Compile Data
+if breadcrumb
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+        a.navbar-brand(href='#') PK
+        button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
+            span.navbar-toggler-icon
+        #navbar.collapse.navbar-collapse
+            ul.navbar-nav.mr-auto
+                li.nav-item(class="Home" === breadcrumb[0].pageName ? `active` : ``)
+                    a.nav-link(href='/')
+                        | Home
+                        span.sr-only (current)
+                li.nav-item(class="Catalog" === breadcrumb[0].pageName ? `active` : ``)
+                    a.nav-link(href='/catalog') Catalog
+                li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
+                    a.nav-link(href='/definition') Definition
+                li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
+                    a.nav-link(href='/raw-data') Raw Data
+                li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
+                    a.nav-link(href='/compile-data') Compile Data
 

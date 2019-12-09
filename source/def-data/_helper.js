@@ -2,7 +2,7 @@ let selectedTagList = [];
 const $ = require("jquery");
 const constInit = require("./_const-init");
 
-const CLASS_DEFINE = {
+const NAME_DEFINE = {
   class: {
     mouseHover: "pk-border-solid-hover pk-border-color-hover",
     mouseSelected: "pk-border-solid-selected pk-border-color-selected"
@@ -35,7 +35,7 @@ function isSelected(target) {
  * @param body
  */
 function mouseoverHandle(body) {
-  const classesToAdd = CLASS_DEFINE.class.mouseHover;
+  const classesToAdd = NAME_DEFINE.class.mouseHover;
   $(body)
     .mouseover(function(e) {
       $(e.target).addClass(classesToAdd);
@@ -50,10 +50,10 @@ function mouseoverHandle(body) {
  * @param target
  */
 function markupArea(target) {
-  if ($(target).hasClass(CLASS_DEFINE.class.mouseHover)) {
-    $(target).removeClass(CLASS_DEFINE.class.mouseHover);
+  if ($(target).hasClass(NAME_DEFINE.class.mouseHover)) {
+    $(target).removeClass(NAME_DEFINE.class.mouseHover);
   }
-  $(target).addClass(CLASS_DEFINE.class.mouseSelected);
+  $(target).addClass(NAME_DEFINE.class.mouseSelected);
   selectedTagList.push(target);
 }
 
@@ -65,7 +65,7 @@ function resetTableButtonEvent() {
     if (e.which === 1) {
       $("#table-data tbody").empty();
       selectedTagList.forEach(s => {
-        $(s).removeClass(CLASS_DEFINE.class.mouseSelected);
+        $(s).removeClass(NAME_DEFINE.class.mouseSelected);
       });
       selectedTagList = [];
     }
@@ -79,11 +79,11 @@ function resetTableButtonEvent() {
 function addCustomizeCSS(body) {
   // add mouse css
   $(body).append(
-    `<style>
-      .${CLASS_DEFINE.css.borderSelectedStyle} { border: 1px solid #dee2e6 !important }
-      .${CLASS_DEFINE.css.borderSelectedColor} { border-color: #28a745!important }
-      .${CLASS_DEFINE.css.borderHoverStyle} { border: 0.5px solid #dee2e6 !important }
-      .${CLASS_DEFINE.css.borderHoverColor} { border-color: #dc3545!important }
+      `<style>
+      .${NAME_DEFINE.css.borderSelectedStyle} { border: 1px solid #dee2e6 !important }
+      .${NAME_DEFINE.css.borderSelectedColor} { border-color: #28a745!important }
+      .${NAME_DEFINE.css.borderHoverStyle} { border: 0.5px solid #dee2e6 !important }
+      .${NAME_DEFINE.css.borderHoverColor} { border-color: #dc3545!important }
     </style>`
   );
 }
@@ -123,7 +123,7 @@ function initTableEventHandle() {
         .val();
       let target = getTagByXPath(xPath);
       if (isSelected(target)) {
-        $(target).removeClass(CLASS_DEFINE.class.mouseSelected);
+        $(target).removeClass(NAME_DEFINE.class.mouseSelected);
         let index = selectedTagList.findIndex(tag => {
           return $(tag).is(target);
         });

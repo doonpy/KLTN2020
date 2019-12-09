@@ -1,0 +1,46 @@
+extends ../header
+
+block content
+    .row.mt-2
+        .col
+            .display-4 Welcome to our project!
+            p describe here
+            hr
+            .col.mt-4
+                if error
+                    .alert.alert-danger(role='alert')
+                        span.fa.fa-exclamation-triangle &nbsp;
+                        span #{error}
+                form(method='POST', action='/')
+                    .form-row.form-group
+                        .col-auto
+                            select.custom-select-lg.mr-sm-2.form-control(name="protocol")
+                                option(value='https://') https://
+                                option(value='http://') http://
+                        .col
+                            input.form-control.form-control-lg(type='text', name="domain" placeholder='Input your target website here' required)
+                    .form-group
+                        button.btn.btn-primary.btn-block(type='submit')
+                            | Submit
+
+
+        .col-2.text-success
+            h5.text-center
+                span.fa.fa-1x.fa-check-circle &nbsp;
+                span Valid
+            ul.list-group.list-group-flush
+                li.list-group-item.list-group-item-success http(s)://example.com
+                li.list-group-item.list-group-item-success http(s)://example.com/
+                li.list-group-item.list-group-item-success example.com
+                li.list-group-item.list-group-item-success example.com/
+                li.list-group-item.list-group-item-success ex@mple.com/
+
+        .col-2.text-danger
+            h5.text-center
+                span.fa.fa-1x.fa-window-close &nbsp;
+                span Invalid
+            ul.list-group.list-group-flush
+                li.list-group-item.list-group-item-danger http(s)://example.com/bar/boo
+                li.list-group-item.list-group-item-danger http(s)://example
+                li.list-group-item.list-group-item-danger example.com/bar?foo=123
+                li.list-group-item.list-group-item-danger example

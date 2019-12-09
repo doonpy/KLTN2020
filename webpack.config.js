@@ -28,7 +28,8 @@ module.exports = {
     entry: {
         "def-main": "./source/def-data/main.js",
         "crawl-main": "./source/crawl/main.js",
-        "comp-main": "./source/compile-data/main.js"
+        "comp-main": "./source/compile-data/main.js",
+        "extr-main": "./source/extract-catalog/main.js"
     },
 
     output: {
