@@ -6,7 +6,7 @@ const MODUlE_PATH = path.join(__dirname, `./request`);
 const storageMethods = require("./storage-methods");
 const crypto = require("crypto");
 const moment = require("moment");
-const CrawHistory = require("../models/crawl-history-model");
+const CrawHistory = require("../models/crawl-detail-log-model");
 
 let numChildProcess = 0;
 

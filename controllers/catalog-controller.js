@@ -6,6 +6,9 @@ const mongoose = require("mongoose");
 const targetHtmlHelper = require("../helper/target-html-handle");
 const requestModule = require("../core/module/request");
 const fileHelper = require("../helper/file-helper");
+const moment=require("moment");
+
+const DETAIL_URL_LIMIT = 1001;
 
 /**
  * get index controller
@@ -29,7 +32,7 @@ exports.getIndex = (req, res, next) => {
         catalogs: {
           $push: {
             id: "$_id",
-            name: "$name",
+            header: "$header",
             isDefined: {
               $cond: {
                 if: {
@@ -64,6 +67,7 @@ exports.getIndex = (req, res, next) => {
     {
       $project: {
         hostName: "$host.name",
+        hostDomain: "$host.domain",
         catalogs: 1
       }
     }
@@ -112,16 +116,14 @@ exports.getDetail = (req, res, next) => {
       catalog: function(callback) {
         Catalog.aggregate([
           {
-            $match: {
-              _id: new mongoose.Types.ObjectId(catalogId)
-            }
+            $match: { _id: mongoose.Types.ObjectId(catalogId) }
           },
           {
             $lookup: {
-              from: "detail_urls",
-              localField: "_id",
-              foreignField: "catalogId",
-              as: "detailUrls"
+              from: "hosts",
+              localField: "hostId",
+              foreignField: "_id",
+              as: "host"
             }
           },
           {
@@ -133,89 +135,37 @@ exports.getDetail = (req, res, next) => {
             }
           },
           {
-            $lookup: {
-              from: "hosts",
-              localField: "hostId",
-              foreignField: "_id",
-              as: "host"
-            }
-          },
-          {
-            $project: {
-              detailUrls: {
-                $size: "$detailUrls"
-              },
-              definition: {
-                $cond: {
-                  if: {
-                    $eq: [
-                      {
-                        $size: "$definition"
-                      },
-                      0
-                    ]
-                  },
-                  then: false,
-                  else: {
-                    $arrayElemAt: ["$definition", 0]
-                  }
-                }
-              },
-              host: {
-                $cond: {
-                  if: {
-                    $eq: [
-                      {
-                        $size: "$host"
-                      },
-                      0
-                    ]
-                  },
-                  then: false,
-                  else: {
-                    $arrayElemAt: ["$host", 0]
-                  }
-                }
-              },
-              name: 1
-            }
-          },
-          {
-            $project: {
-              definitionId: {
-                $cond: {
-                  if: {
-                    $eq: ["$definition", false]
-                  },
-                  then: false,
-                  else: "$definition._id"
-                }
-              },
-              hostName: "$host.name",
-              name: 1,
-              detailUrls: 1
+            $unwind: {
+              path: "$host"
             }
           }
         ]).exec(callback);
       },
       detailUrls: function(callback) {
-        DetailUrl.find({ catalogId: catalogId, isExtracted: false }).exec(
-          callback
-        );
+        DetailUrl.find({ catalogId: catalogId })
+          .limit(DETAIL_URL_LIMIT)
+          .sort({ $natural: -1 })
+          .exec(callback);
       }
     },
     (err, data) => {
-      let { catalog, detailUrls } = data;
       if (err) {
         next(err);
         return;
       }
+      let { catalog, detailUrls } = data;
+      let detailUrlAmount =
+        detailUrls.length === DETAIL_URL_LIMIT
+          ? `${DETAIL_URL_LIMIT - 1}+`
+          : detailUrls.length.toString();
       if (catalog.length === 0) {
         next(new Error("Catalog not found!"));
-        return;
       } else {
+        catalog[0].cTime = moment(catalog[0].cTime).format("L LTS")
+        catalog[0].mTime=moment(catalog[0].mTime).format("L LTS")
         assigns.data = catalog[0];
         assigns.urlForDefinition = detailUrls;
+        assigns.detailUrlAmount = detailUrlAmount;
 
         res.render("catalog/detail", assigns);
       }

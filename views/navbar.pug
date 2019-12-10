@@ -1,6 +1,6 @@
 if breadcrumb
     nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
-        a.navbar-brand(href='#') PK
+        a.navbar-brand.font-weight-bold(href='/') PK
         button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarSupportedContent', aria-controls='navbarSupportedContent', aria-expanded='false', aria-label='Toggle navigation')
             span.navbar-toggler-icon
         #navbar.collapse.navbar-collapse
@@ -13,8 +13,6 @@ if breadcrumb
                     a.nav-link(href='/catalog') Catalog
                 li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
                     a.nav-link(href='/definition') Definition
-                li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
-                    a.nav-link(href='/raw-data') Raw Data
                 li.nav-item(class="Definition" === breadcrumb[0].pageName ? `active` : ``)
                     a.nav-link(href='/compile-data') Compile Data
 

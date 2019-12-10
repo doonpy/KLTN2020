@@ -1,26 +1,35 @@
 extends ../header
 
 block content
-    h5
-        span.badge.badge-primary Host:
-        small &nbsp;#{data.hostName}
-    h5
-        span.badge.badge-primary Catalog name:
-        small &nbsp;#{data.name}
-    h5
-        span.badge.badge-primary Detail url amount:
-        small &nbsp;#{data.detailUrls}
-    if data.definitionId
-        h5
-            span.badge.badge-primary Definition:
-            a.text-success(href=`/definition/detail/${data.definitionId}`) &nbsp;Click here to see data definition of this catalog.
-    else
-        h5
-            span.badge.badge-primary Definition:
-            if urlForDefinition.length===0
-                span.text-danger &nbsp;This catalog don't have any detail URL
+    .row
+        .col
+            h5
+                span.badge.badge-primary Host:
+                small &nbsp;#{data.host.name} (#{data.host.domain})
+            h5
+                span.badge.badge-primary Catalog name:
+                small &nbsp;#{data.header}
+            h5
+                span.badge.badge-primary Detail url amount:
+                small &nbsp;#{detailUrlAmount}
+            if data.definition.length > 0
+                h5
+                    span.badge.badge-primary Definition:
+                    a.text-success(href=`/definition/detail/${data.definition[0]._id}`) &nbsp;Click here to see data definition of this catalog.
             else
-                a.text-danger(href='#', data-toggle='modal', data-target='#choose-url-modal') &nbsp;Add data definition for this catalog.
+                h5
+                    span.badge.badge-primary Definition:
+                    if urlForDefinition.length===0
+                        span.text-danger &nbsp;This catalog don't have any detail URL
+                    else
+                        a.text-danger(href='#', data-toggle='modal', data-target='#choose-url-modal') &nbsp;Add data definition for this catalog.
+        .col
+            h5
+                span.badge.badge-primary Create at:
+                small &nbsp;#{data.cTime}
+            h5
+                span.badge.badge-primary Last update:
+                small &nbsp;#{data.mTime}
 
     //Choose URL Modal
     #choose-url-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='choose-url-modal', aria-hidden='true')

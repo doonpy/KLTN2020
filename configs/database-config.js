@@ -35,6 +35,7 @@ exports.init = () => {
 function initModel() {
   require("../models/host-model");
   require("../models/catalog-model");
+  require("../models/crawl-detail-log-model");
   require("../models/definition-model");
   require("../models/extract-log-model");
   require("../models/detail-url-model");

@@ -1,52 +1,69 @@
 require("../../configs/database-config").init();
 const Catalog = require("../../models/catalog-model");
 const { Worker } = require("worker_threads");
+const nodeSchedule = require("node-schedule");
 
-const MAX_WORKER_EXECUTING = 1;
+const MAX_WORKER_EXECUTING = 5;
 const REPEAT_TIME = {
-  CRAWL: 60 * 60, //seconds
-  SAVE: 10 //seconds
+  CRAWL: "0 0 23 * * * *" //Execute at 23:00 everyday
 };
 
-(function crawlLoop() {
-  Catalog.find().populate("hostId").exec((err, catalogs) => {
-    if (err) {
-      console.log(
-        `=> [M${process.pid} - ${require("moment")().format(
-          "L LTS"
-        )}] Compile error: ${err.message}`
-      );
-      setTimeout(crawlLoop, 1000 * REPEAT_TIME.CRAWL);
-    }
-    let workerCount = 0;
-    let loop = setInterval(() => {
-      if (catalogs.length === 0) {
-        clearInterval(loop);
-        return;
-      }
-      if (workerCount < MAX_WORKER_EXECUTING) {
-        let catalog = catalogs.shift();
-        const worker = new Worker(require.resolve("./crawl-thread"), {
-          workerData: JSON.stringify(catalog)
-        });
-        workerCount++;
-        worker.on("error", err => {
-          console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Crawler child worker error: ${err.message}`
-          );
-        });
+nodeSchedule.scheduleJob(REPEAT_TIME.CRAWL, crawlLoop);
 
-        worker.on("exit", code => {
-          if (code !== 0)
+function crawlLoop() {
+  Catalog.find()
+    .populate("hostId")
+    .exec((err, catalogs) => {
+      if (err) {
+        console.log(
+          `=> [M${process.pid} - ${require("moment")().format(
+            "L LTS"
+          )}] Compile error: ${err.message}`
+        );
+      }
+      let workerCount = 0;
+      let loop = setInterval(() => {
+        if (catalogs.length === 0) {
+          clearInterval(loop);
+          return;
+        }
+        if (workerCount < MAX_WORKER_EXECUTING) {
+          let catalog = catalogs.shift();
+          const worker = new Worker(require.resolve("./crawl-thread"), {
+            workerData: JSON.stringify(catalog)
+          });
+          workerCount++;
+          worker.on("message", message => {
+            let data = JSON.parse(message);
+            if (data.status) {
+              worker.terminate();
+              workerCount--;
+            }
+            // else {
+            //   catalogs.push(data.catalog);
+            // }
+          });
+
+          worker.on("error", err => {
             console.log(
               `=> [M${process.pid} - ${require("moment")().format(
                 "L LTS"
-              )}] Crawler child worker stopped with exit code ${code}`
+              )}] Crawler child worker error: ${err.message}`
             );
-        });
-      }
-    }, 0);
-  });
-})();
+            workerCount--;
+          });
+
+          worker.on("exit", code => {
+            if (code !== 0) {
+              console.log(
+                `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+                )}] Crawler child worker stopped with exit code ${code}`
+              );
+            }
+            workerCount--;
+          });
+        }
+      }, 0);
+    });
+}

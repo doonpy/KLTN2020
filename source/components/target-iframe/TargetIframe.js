@@ -6,41 +6,65 @@ import "datatables.net-rowgroup-bs4";
 // Extend $ to get CSS selector string
 $.fn.extend({
   getCssSelector: function() {
-    if (this.length != 1) {
-      return "";
+    let el = this;
+    let parents = el.parents();
+    if (!parents[0]) {
+      // Element doesn't have any parents
+      return ":root";
+    }
+    let selector = this.getElementSelector(el);
+    let i = 0;
+    let elementSelector;
+
+    if (selector[0] === "#" || selector === "body") {
+      return selector;
     }
 
-    let path = "",
-      node = this;
-    while (node.length) {
-      let realNode = node[0];
-      let name =
-        // IE9 and non-IE
-        realNode.localName ||
-        // IE <= 8
-        realNode.tagName ||
-        realNode.nodeName;
-
-      // on IE8, nodeName is '#document' at the top level, but we don't need that
-      if (!name || name == "#document") break;
-
-      name = name.toLowerCase();
-      if (realNode.id) {
-        // As soon as an id is found, there's no need to specify more.
-        return name + "#" + realNode.id + (path ? ">" + path : "");
-      } else if (realNode.className) {
-        name += "." + realNode.className.split(/\s+/).join(".");
+    do {
+      elementSelector = this.getElementSelector($(parents[i]));
+      selector = elementSelector + ">" + selector;
+      i++;
+    } while (i < parents.length - 1 && elementSelector[0] !== "#"); // Stop before we reach the html element parent
+    return selector;
+  },
+  getElementSelector: function(el) {
+    if (el.hasClass(NAME_DEFINE.class.mouseHover)) {
+      el.removeClass(NAME_DEFINE.class.mouseHover);
+    }
+    if (el.hasClass(NAME_DEFINE.class.mouseSelected)) {
+      el.removeClass(NAME_DEFINE.class.mouseSelected);
+    }
+    if (el.attr("id")) {
+      return "#" + el.attr("id");
+    } else {
+      let tagName = el.get(0).tagName.toLowerCase();
+      if (tagName === "body") {
+        return tagName;
       }
-
-      let parent = node.parent(),
-        siblings = parent.children(name);
-      if (siblings.length > 1) name += ":eq(" + siblings.index(node) + ")";
-      path = name + (path ? ">" + path : "");
-
-      node = parent;
+      if (el.attr("class")) {
+        let className = `.${el
+          .attr("class")
+          .trim()
+          .replace(/\s+/g, ".")}`;
+        let classSiblings = el.siblings(className);
+        if (classSiblings.length <= 0) {
+          return `${el.get(0).tagName.toLowerCase()}${className}`;
+        } else {
+          return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() +
+            1})`;
+        }
+      }
+      if (el.siblings().length === 0) {
+        return el.get(0).tagName.toLowerCase();
+      }
+      if (el.index() === 0) {
+        return `${el.get(0).tagName.toLowerCase()}:first-child`;
+      }
+      if (el.index() === el.siblings().length) {
+        return `${el.get(0).tagName.toLowerCase()}:last-child`;
+      }
+      return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() + 1})`;
     }
-
-    return path;
   }
 });
 
@@ -333,6 +357,7 @@ export default class TargetIframe {
             let catalogElement = this.$iframeContent.find(cssSelector).first();
             catalogElement.removeClass(NAME_DEFINE.class.mouseSelected);
             this._removeRowTableData(trSelected);
+            this._loadOriginalSrc();
           }
         }
       }
@@ -512,6 +537,7 @@ export default class TargetIframe {
         `.${NAME_DEFINE.class.pageNumberBadge}`
       );
       let targetCssSelector = $(target).getCssSelector();
+      console.log(targetCssSelector);
       let inputData = JSON.parse(
         this.$tableData
           .cell(

@@ -3,14 +3,16 @@ const RawData = require("../../models/raw-data-model");
 const Catalog = require("../../models/catalog-model");
 const CompileData = require("../../models/compile-data-model");
 const CompileLog = require("../../models/compile-log-model");
-const {Worker} = require("worker_threads");
+const { Worker } = require("worker_threads");
 const async = require("async");
 const helper = require("./helper");
+const nodeSchedule = require("node-schedule");
 
 let curDate = new Date();
 curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const REPEAT_TIME = 60 * 60 * 12; //12 hours
+const JOB_REPEAT_TIME = "* * */12 * * * *"; //Execute every 12 hours
 const SIMILAR_RATES = {
   CATALOG: 60
 };
@@ -23,129 +25,128 @@ const POINT_EACH_ATTR = {
   OTHERS: 1
 };
 
+nodeSchedule.scheduleJob(JOB_REPEAT_TIME, main);
+
 /**
  * Main function repeat every REPEAT_TIME
  */
-(function main() {
+function main() {
   const hrStart = process.hrtime();
   isPointSheetValid();
 
   async.parallel(
-      {
-        rawData: function (callback) {
-          RawData.find({
-            cTime: {$gte: DATE_LIMIT}
-          })
-              .populate({path: "detailUrlId", populate: {path: "catalogId"}})
-              .exec(callback);
-        },
-        catalogs: function (callback) {
-          Catalog.find().exec(callback);
-        }
+    {
+      rawData: function(callback) {
+        RawData.find({
+          cTime: { $gte: DATE_LIMIT }
+        })
+          .populate({ path: "detailUrlId", populate: { path: "catalogId" } })
+          .exec(callback);
       },
-      (err, data) => {
-          if (err) {
-              console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                      "L LTS"
-                  )}] Compile error: ${err.message}`
-              );
-              setTimeout(main, 1000 * REPEAT_TIME);
-          }
-          const {rawData, catalogs} = data;
-          if (rawData.length <= 1) {
-              setTimeout(main, 1000 * REPEAT_TIME);
-              return;
-          }
-
-          let groupedCatalogs = groupedCatalog(catalogs);
-          let rawDataByGroupedCatalog = getDataByGroupedCatalog(
-              groupedCatalogs,
-              rawData
-          );
-          let threadCount = 0;
-          let compileLog = {
-              groupDataIds: []
-          };
-
-        rawDataByGroupedCatalog.forEach(rd => {
-          if (rd.rawData.length > 0) {
-            const worker = new Worker(require.resolve("./compile-thread"), {
-              workerData: JSON.stringify(rd)
-            });
-            threadCount++;
-
-            worker.on("message", data => {
-              threadCount--;
-              data = JSON.parse(data);
-              worker.terminate();
-
-              CompileData.insertMany(data, (err, docs) => {
-                if (err) {
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Compile worker > Save error: ${err.message}`
-                  );
-                }
-                docs.forEach(d => {
-                  compileLog.groupDataIds.push(d._id);
-                });
-
-                if (threadCount <= 0) {
-                  compileLog.rawDataAmount = rawData.length;
-                  compileLog.executeTime = process.hrtime(hrStart)[0];
-                  new CompileLog(compileLog).save(err => {
-                    if (err) {
-                      console.log(
-                          `=> [M${process.pid} - ${require("moment")().format(
-                              "L LTS"
-                          )}] Compile worker > Compile log save error: ${
-                              err.message
-                          }`
-                      );
-                    }
-                  });
-                  setTimeout(main, 1000 * REPEAT_TIME);
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Compile data was ran within ${
-                          process.hrtime(hrStart)[0]
-                      }s! Next time at ${require("moment")()
-                          .add(REPEAT_TIME, "seconds")
-                          .format("L LTS")}`
-                  );
-                }
-              });
-            });
-
-            worker.on("error", err => {
-              console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                      "L LTS"
-                  )}] Compile child worker error: ${err.message}`
-              );
-            });
-
-            worker.on("exit", code => {
-              if (code !== 0)
-                console.log(
-                    `=> [M${process.pid} - ${require("moment")().format(
-                        "L LTS"
-                    )}] Compile child worker stopped with exit code ${code}`
-                );
-            });
-            console.log(
-                `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                )}] Compile child worker ${worker.threadId} is running....`
-            );
-          }
-        });
+      catalogs: function(callback) {
+        Catalog.find().exec(callback);
       }
+    },
+    (err, data) => {
+      if (err) {
+        console.log(
+          `=> [M${process.pid} - ${require("moment")().format(
+            "L LTS"
+          )}] Compile error: ${err.message}`
+        );
+      }
+      const { rawData, catalogs } = data;
+      if (rawData.length <= 1) {
+        return;
+      }
+
+      let groupedCatalogs = groupedCatalog(catalogs);
+      let rawDataByGroupedCatalog = getDataByGroupedCatalog(
+        groupedCatalogs,
+        rawData
+      );
+      let threadCount = 0;
+      let compileLog = {
+        groupDataIds: []
+      };
+
+      rawDataByGroupedCatalog.forEach(rd => {
+        if (rd.rawData.length > 0) {
+          const worker = new Worker(require.resolve("./compile-thread"), {
+            workerData: JSON.stringify(rd)
+          });
+          threadCount++;
+
+          worker.on("message", data => {
+            threadCount--;
+            data = JSON.parse(data);
+            worker.terminate();
+
+            CompileData.insertMany(data, (err, docs) => {
+              if (err) {
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Compile worker > Save error: ${err.message}`
+                );
+              }
+              docs.forEach(d => {
+                compileLog.groupDataIds.push(d._id);
+              });
+
+              if (threadCount <= 0) {
+                compileLog.rawDataAmount = rawData.length;
+                compileLog.executeTime = process.hrtime(hrStart)[0];
+                new CompileLog(compileLog).save(err => {
+                  if (err) {
+                    console.log(
+                      `=> [M${process.pid} - ${require("moment")().format(
+                        "L LTS"
+                      )}] Compile worker > Compile log save error: ${
+                        err.message
+                      }`
+                    );
+                  }
+                });
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Compile data was ran within ${
+                    process.hrtime(hrStart)[0]
+                  }s! Next time at ${require("moment")()
+                    .add(REPEAT_TIME, "seconds")
+                    .format("L LTS")}`
+                );
+              }
+            });
+          });
+
+          worker.on("error", err => {
+            console.log(
+              `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+              )}] Compile child worker error: ${err.message}`
+            );
+          });
+
+          worker.on("exit", code => {
+            if (code !== 0)
+              console.log(
+                `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+                )}] Compile child worker stopped with exit code ${code}`
+              );
+          });
+          console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+              "L LTS"
+            )}] Compile child worker ${worker.threadId} is running....`
+          );
+        }
+      });
+    }
   );
-})();
+}
 
 /**
  * Check point sheet is valid
@@ -173,7 +174,7 @@ function getDataByGroupedCatalog(groupedCatalogs, rawData) {
   groupedCatalogs.forEach(gCtl => {
     let rawDataArray = rawData.filter(rd => {
       return gCtl.find(
-          ctl => rd.detailUrlId.catalogId._id.toString() === ctl.toString()
+        ctl => rd.detailUrlId.catalogId._id.toString() === ctl.toString()
       );
     });
     rawDataByGroupedCatalog.push({
@@ -197,11 +198,11 @@ function groupedCatalog(catalogs) {
     let groupCatalog = [srcCatalog._id];
     catalogs = catalogs.filter(desCatalog => {
       if (
-          isSameCatalogType(srcCatalog, desCatalog) &&
-          helper.getSimilarPercentageOfTwoString(
-              srcCatalog.name,
-              desCatalog.name
-          ) >= SIMILAR_RATES.CATALOG
+        isSameCatalogType(srcCatalog, desCatalog) &&
+        helper.getSimilarPercentageOfTwoString(
+          srcCatalog.header,
+          desCatalog.header
+        ) >= SIMILAR_RATES.CATALOG
       ) {
         groupCatalog.push(desCatalog._id);
         return false;
@@ -222,8 +223,8 @@ function groupedCatalog(catalogs) {
  * @returns {boolean}
  */
 function isSameCatalogType(firstCatalog, secondCatalog) {
-  const firstCatalogName = helper.standardizedData(firstCatalog.name);
-  const secondCatalogName = helper.standardizedData(secondCatalog.name);
+  const firstCatalogName = helper.standardizedData(firstCatalog.header);
+  const secondCatalogName = helper.standardizedData(secondCatalog.header);
 
   if (firstCatalogName.includes("bán") && secondCatalogName.includes("thuê")) {
     return false;

@@ -7,7 +7,7 @@ block content
         ul.list-group
             for d in data
                 li.list-group-item.list-group-item-info
-                    h5=d.hostName
+                    h5 #{d.hostName} (#{d.hostDomain})
                     .list-group
                         if(d.catalogs.length === 0)
                             p Empty
@@ -17,10 +17,10 @@ block content
                                     a(href=`/catalog/detail/${catalog.id}`).list-group-item.list-group-item-success.list-group-item-action
                                         .float-right.small
                                             h6 Defined
-                                        h5=catalog.name
+                                        h5=catalog.header
                                 else
                                     a(href=`/catalog/detail/${catalog.id}`).list-group-item.list-group-item-danger.list-group-item-action
                                         .float-right.small
                                             h6 No definition yet
-                                        h5=catalog.name
+                                        h5=catalog.header
 

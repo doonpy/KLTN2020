@@ -12,12 +12,12 @@ curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const NODE_TYPE_TEXT = 3;
 const MAX_URL_TO_GET = 10000;
-const MAX_REQUEST_SENT = 50;
+const MAX_REQUEST_SENT = 20;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 50;
+const SAVE_AMOUNT = 100;
 const REPEAT_TIME = {
   EXTRACT: 60 * 60, //seconds
-  SAVE: 10 //seconds
+  SAVE: 30 //seconds
 };
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
@@ -118,17 +118,26 @@ let detailUrlUpdateQueue = [];
             successAmount: successAmount,
             failedAmount: failedAmount,
             executeTime: hrEnd
-          }).save();
-          console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Extract worker was ran within ${secondsToHms(
-              hrEnd
-            )}! Next time at ${require("moment")()
-              .add(REPEAT_TIME.EXTRACT, "seconds")
-              .format("L LTS")}`
-          );
-          setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
+          }).save(err => {
+            if (err) {
+              console.log(
+                `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+                )}] Extract log > Save failed: ${err.message}`
+              );
+            } else {
+              console.log(
+                `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+                )}] Extract worker was ran within ${secondsToHms(
+                  hrEnd
+                )}! Next time at ${require("moment")()
+                  .add(REPEAT_TIME.EXTRACT, "seconds")
+                  .format("L LTS")}`
+              );
+              setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
+            }
+          });
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
@@ -202,14 +211,16 @@ let detailUrlUpdateQueue = [];
  * Loop update database
  */
 setInterval(() => {
+  let rawDataSaveQueueLength = rawDataSaveQueue.length;
+  let detailUrlUpdateQueueLength = detailUrlUpdateQueue.length;
   let rawDataContainer =
-    rawDataSaveQueue.length > SAVE_AMOUNT
+    rawDataSaveQueueLength > SAVE_AMOUNT
       ? rawDataSaveQueue.splice(0, SAVE_AMOUNT)
-      : rawDataSaveQueue.splice(0, rawDataSaveQueue.length);
+      : rawDataSaveQueue.splice(0, rawDataSaveQueueLength);
   let detailUrlContainer =
-    detailUrlUpdateQueue.length > SAVE_AMOUNT
+    detailUrlUpdateQueueLength > SAVE_AMOUNT
       ? detailUrlUpdateQueue.splice(0, SAVE_AMOUNT)
-      : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueue.length);
+      : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueueLength);
 
   rawDataContainer.forEach(d => {
     d.save(err => {
@@ -235,15 +246,15 @@ setInterval(() => {
     });
   });
 
-  if (rawDataContainer.length !== 0 && detailUrlContainer.length !== 0) {
-    console.log(
-      `=> [M${process.pid} - ${require("moment")().format(
-        "L LTS"
-      )}] Extract worker > Remaining queue: Data(s): ${
-        rawDataSaveQueue.length
-      } - detail url(s): ${detailUrlUpdateQueue.length}`
-    );
-  }
+  // if (rawDataContainer.length !== 0 && detailUrlContainer.length !== 0) {
+  //   console.log(
+  //     `=> [M${process.pid} - ${require("moment")().format(
+  //       "L LTS"
+  //     )}] Extract worker > Remaining queue: Data(s): ${
+  //       rawDataSaveQueue.length
+  //     } - detail url(s): ${detailUrlUpdateQueue.length}`
+  //   );
+  // }
 }, 1000 * REPEAT_TIME.SAVE);
 
 function isNullData(data) {

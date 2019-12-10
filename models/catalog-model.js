@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const moment=require("moment")
 const CatalogSchema = new Schema(
   {
     header: { type: Schema.Types.String },
@@ -13,5 +14,15 @@ const CatalogSchema = new Schema(
   },
   { timestamps: { createdAt: "cTime", updatedAt: "mTime" } }
 );
+
+// format create time
+CatalogSchema.virtual("cTimeFormatted").get(function() {
+    return moment(this.cTime).format("L LTS");
+});
+
+// format update time
+CatalogSchema.virtual("mTimeFormatted").get(function() {
+    return moment(this.mTime).format("L LTS");
+});
 
 module.exports = mongoose.model("catalog", CatalogSchema);
