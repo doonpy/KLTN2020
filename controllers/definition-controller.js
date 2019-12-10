@@ -37,7 +37,7 @@ exports.getIndex = function(req, res, next) {
         catalogs: {
           $addToSet: {
             catalogId: "$catalog._id",
-            catalogName: "$catalog.name",
+            catalogName: "$catalog.header",
             definitionId: "$_id",
             title: "$title",
             price: "$price",

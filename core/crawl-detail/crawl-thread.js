@@ -1,20 +1,48 @@
+require("../../configs/database-config").init();
 const DetailUrl = require("../../models/detail-url-model");
+const CrawlDetailLog = require("../../models/crawl-detail-log-model");
 const requestModule = require("../module/request");
 const { workerData, parentPort } = require("worker_threads");
 const cheerio = require("cheerio");
 
+const REPEAT_TIME = {
+  SAVE: 10 //seconds
+};
+const SAVE_AMOUNT = 500;
 const SIMILAR_PERCENT = 80;
 const MAX_REQUEST_SENT = 10;
 const MAX_REQUEST_RETRIES = 3;
+const MAX_URL_AMOUNT_PER_CRAWL = 5000;
 const catalog = JSON.parse(workerData);
+const hrStart = process.hrtime();
 let urlQueue = {
   success: [],
   waiting: [],
   failed: []
 };
+let saveQueue = [];
+let existDetailUrls = [];
+let currentSaveAmount = 0;
 
-main(catalog);
+DetailUrl.find({ catalogId: catalog._id }).exec((err, detailUrls) => {
+  if (err) {
+    console.log(
+      `=> [M${process.pid} - ${require("moment")().format(
+        "L LTS"
+      )}] Crawl detail URL worker > Get exist detail URL failed: ${
+        err.message
+      } `
+    );
+    parentPort.postMessage(JSON.stringify({ status: true, catalog: catalog }));
+  } else {
+    existDetailUrls = detailUrls;
+    main();
+  }
+});
 
+/**
+ * Main function
+ */
 function main() {
   let catalogHref = catalog.href;
   let requestAmount = 0;
@@ -25,8 +53,27 @@ function main() {
   });
 
   const loop = setInterval(() => {
-    if (urlQueue.waiting.length === 0 && requestAmount === 0) {
+    if (
+      (urlQueue.waiting.length === 0 && requestAmount === 0) ||
+      currentSaveAmount >= MAX_URL_AMOUNT_PER_CRAWL
+    ) {
       clearInterval(loop);
+      urlQueue.executeTime = process.hrtime(hrStart)[0];
+      urlQueue.urlAmount = currentSaveAmount;
+      urlQueue.catalogId = catalog._id;
+      new CrawlDetailLog(urlQueue).save(err => {
+        if (err) {
+          console.log(
+            `=> [M${process.pid} - ${require("moment")().format(
+              "L LTS"
+            )}] Crawl detail URL worker > Save log failed: ${err.message}`
+          );
+        } else {
+          parentPort.postMessage(
+            JSON.stringify({ status: true, catalog: catalog })
+          );
+        }
+      });
       return;
     }
 
@@ -37,8 +84,13 @@ function main() {
         .send(nextUrl.url)
         .then(res => {
           requestAmount--;
-          console.log(res.request.uri.href, res.statusCode);
+          // console.log(
+          //   `=> [M${process.pid} - ${require("moment")().format("L LTS")}] ${
+          //     res.request.uri.href
+          //   } - ${res.statusCode}`
+          // );
           handleSuccessRequest(res);
+          urlQueue.success.push(nextUrl);
         })
         .catch(err => {
           requestAmount--;
@@ -55,6 +107,47 @@ function main() {
   }, 0);
 }
 
+/**
+ * Save detail URL loop
+ */
+setInterval(() => {
+  let saveQueueLength = saveQueue.length;
+  let container = [];
+  if (SAVE_AMOUNT < MAX_URL_AMOUNT_PER_CRAWL) {
+    container =
+      saveQueueLength > SAVE_AMOUNT
+        ? saveQueue.splice(0, SAVE_AMOUNT)
+        : saveQueue.splice(0, saveQueueLength);
+  } else {
+    container =
+      saveQueueLength > MAX_URL_AMOUNT_PER_CRAWL
+        ? saveQueue.splice(0, MAX_URL_AMOUNT_PER_CRAWL)
+        : saveQueue.splice(0, saveQueueLength);
+  }
+  if (container.length > 0) {
+    DetailUrl.insertMany(container, { ordered: false }, err => {
+      if (err) {
+        console.log(
+          `=> [M${process.pid} - ${require("moment")().format(
+            "L LTS"
+          )}] Crawl detail URL worker > Save failed: ${err.message}`
+        );
+      } else {
+        currentSaveAmount += container.length;
+      }
+    });
+  }
+  // console.log(
+  //   `=> [M${process.pid} - ${require("moment")().format(
+  //     "L LTS"
+  //   )}] Crawl detail URL worker > Queue remaining: ${saveQueue.length}`
+  // );
+}, 1000 * REPEAT_TIME.SAVE);
+
+/**
+ * Handle when request is success (200)
+ * @param res
+ */
 function handleSuccessRequest(res) {
   let detailUrlCssSelector = catalog.detailUrl;
   let pageNumberCssSelector = catalog.pageNumber;
@@ -64,37 +157,45 @@ function handleSuccessRequest(res) {
   // Get detail link
   $("a").each(function() {
     let cssSelector = getCssSelector($, $(this));
-    console.log(cssSelector);
-    //TODO: Fix bug can't get css selector of paging element
-    // if (
-    //   getSimilarPercentageCssSelector(detailUrlCssSelector, cssSelector) >
-    //   SIMILAR_PERCENT
-    // ) {
-    //   let detailHref = makeupHref($(this).attr("href"), host.domain);
-    //   // console.log(detailHref);
-    // }
+    if (
+      getSimilarPercentageCssSelector(detailUrlCssSelector, cssSelector) >
+      SIMILAR_PERCENT
+    ) {
+      let detailHref = makeupHref($(this).attr("href"), host.domain);
+      if (!existDetailUrls.find(d => d.url === detailHref)) {
+        saveQueue.push({
+          url: detailHref,
+          catalogId: catalog._id
+        });
+      }
+    }
   });
 
   // Get paging href
-  // console.log(pageNumberCssSelector);
-  // $(pageNumberCssSelector)
-  //   .children("a")
-  //   .each(function() {
-  //     let pagingHref = makeupHref($(this).attr("href"), host.domain);
-  //     console.log(pagingHref);
-  //     if (
-  //       !urlQueue.waiting.find(e => e.url === pagingHref) &&
-  //       !urlQueue.success.find(e => e.url === pagingHref) &&
-  //       !urlQueue.failed.find(e => e.url === pagingHref)
-  //     ) {
-  //       urlQueue.waiting.push({
-  //         url: pagingHref,
-  //         retries: 0
-  //       });
-  //     }
-  //   });
+  $(pageNumberCssSelector)
+    .children("a")
+    .each(function() {
+      let pagingHref = makeupHref($(this).attr("href"), host.domain);
+      // console.log(pagingHref);
+      if (
+        !urlQueue.waiting.find(e => e.url === pagingHref) &&
+        !urlQueue.success.find(e => e.url === pagingHref) &&
+        !urlQueue.failed.find(e => e.url === pagingHref)
+      ) {
+        urlQueue.waiting.push({
+          url: pagingHref,
+          retries: 0
+        });
+      }
+    });
 }
 
+/**
+ * Get selector base on CSS Selector syntax
+ * @param $
+ * @param node
+ * @returns {string}
+ */
 function getCssSelector($, node) {
   let el = node;
   let parents = el.parents();
@@ -118,6 +219,51 @@ function getCssSelector($, node) {
   return selector;
 }
 
+/**
+ * Support of getCssSelector function, return CSS selector of this element
+ * @param el
+ * @returns {string}
+ */
+function getElementSelector(el) {
+  if (el.attr("id")) {
+    return "#" + el.attr("id");
+  } else {
+    let tagName = el.get(0).tagName.toLowerCase();
+    if (tagName === "body") {
+      return tagName;
+    }
+    if (el.attr("class")) {
+      let className = `.${el
+        .attr("class")
+        .trim()
+        .replace(/\s+/g, ".")}`;
+      let classSiblings = el.siblings(className);
+      if (classSiblings.length <= 0) {
+        return `${el.get(0).tagName.toLowerCase()}${className}`;
+      } else {
+        return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() +
+          1})`;
+      }
+    }
+    if (el.siblings().length === 0) {
+      return el.get(0).tagName.toLowerCase();
+    }
+    if (el.index() === 0) {
+      return `${el.get(0).tagName.toLowerCase()}:first-child`;
+    }
+    if (el.index() === el.siblings().length) {
+      return `${el.get(0).tagName.toLowerCase()}:last-child`;
+    }
+    return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() + 1})`;
+  }
+}
+
+/**
+ * Get similar percentage CSS selector (compare with each element of array which was splat base on '>')
+ * @param firstCssSelector
+ * @param secondCssSelector
+ * @returns {number}
+ */
 function getSimilarPercentageCssSelector(firstCssSelector, secondCssSelector) {
   firstCssSelector = firstCssSelector.trim().split(">");
   secondCssSelector = secondCssSelector.trim().split(">");
@@ -140,47 +286,15 @@ function getSimilarPercentageCssSelector(firstCssSelector, secondCssSelector) {
   return parseFloat(((similarCount * 100) / maxLength).toFixed(2));
 }
 
+/**
+ * Get full URL (domain + path)
+ * @param href
+ * @param domain
+ * @returns {*|jQuery|string}
+ */
 function makeupHref(href, domain) {
   if (/^\//g.test(href.trim())) {
     href = domain + href;
   }
   return href.trim();
-}
-
-function getElementSelector(el) {
-  if (el.attr("id")) {
-    return "#" + el.attr("id");
-  } else {
-    let tagName = el.get(0).tagName.toLowerCase();
-    if (tagName === "body") {
-      return tagName;
-    }
-    if (el.attr("class")) {
-      let classSiblings = el.siblings(
-          `.${el
-              .attr("class")
-              .split(/\s+/g)
-              .join(".")}`
-      );
-      if (classSiblings.length <= 0) {
-        return `${el.get(0).tagName.toLowerCase()}.${el
-            .attr("class")
-            .split(/\s+/g)
-            .join(".")}`;
-      } else {
-        return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() +
-        1})`;
-      }
-    }
-    if (el.siblings().length === 0) {
-      return el.get(0).tagName.toLowerCase();
-    }
-    if (el.index() === 0) {
-      return `${el.get(0).tagName.toLowerCase()}:first-child`;
-    }
-    if (el.index() === el.siblings().length) {
-      return `${el.get(0).tagName.toLowerCase()}:last-child`;
-    }
-    return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() + 1})`;
-  }
 }

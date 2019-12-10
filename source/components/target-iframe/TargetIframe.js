@@ -27,7 +27,7 @@ $.fn.extend({
     } while (i < parents.length - 1 && elementSelector[0] !== "#"); // Stop before we reach the html element parent
     return selector;
   },
-  getElementSelector: function (el) {
+  getElementSelector: function(el) {
     if (el.hasClass(NAME_DEFINE.class.mouseHover)) {
       el.removeClass(NAME_DEFINE.class.mouseHover);
     }
@@ -42,20 +42,16 @@ $.fn.extend({
         return tagName;
       }
       if (el.attr("class")) {
-        let classSiblings = el.siblings(
-            `.${el
-                .attr("class")
-                .split(/\s+/g)
-                .join(".")}`
-        );
+        let className = `.${el
+          .attr("class")
+          .trim()
+          .replace(/\s+/g, ".")}`;
+        let classSiblings = el.siblings(className);
         if (classSiblings.length <= 0) {
-          return `${el.get(0).tagName.toLowerCase()}.${el
-              .attr("class")
-              .split(/\s+/g)
-              .join(".")}`;
+          return `${el.get(0).tagName.toLowerCase()}${className}`;
         } else {
           return `${el.get(0).tagName.toLowerCase()}:nth-child(${el.index() +
-          1})`;
+            1})`;
         }
       }
       if (el.siblings().length === 0) {
