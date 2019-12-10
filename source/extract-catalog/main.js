@@ -11,7 +11,3 @@ $(document).ready(() => {
   });
   targetIframe.init();
 });
-
-function test() {
-  console.log(test);
-}

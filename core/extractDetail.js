@@ -11,8 +11,6 @@ let options = {
 };
 //
 module.exports.getDetail = getDetail = (url, xpath) => {
-  console.log(url);
-  console.log(xpath);
   return new Promise((resolve, reject) => {
     return request(url, options, (error, request, body) => {
       if (error) console.log(error);

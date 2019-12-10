@@ -246,15 +246,15 @@ setInterval(() => {
     });
   });
 
-  if (rawDataContainer.length !== 0 && detailUrlContainer.length !== 0) {
-    console.log(
-      `=> [M${process.pid} - ${require("moment")().format(
-        "L LTS"
-      )}] Extract worker > Remaining queue: Data(s): ${
-        rawDataSaveQueue.length
-      } - detail url(s): ${detailUrlUpdateQueue.length}`
-    );
-  }
+  // if (rawDataContainer.length !== 0 && detailUrlContainer.length !== 0) {
+  //   console.log(
+  //     `=> [M${process.pid} - ${require("moment")().format(
+  //       "L LTS"
+  //     )}] Extract worker > Remaining queue: Data(s): ${
+  //       rawDataSaveQueue.length
+  //     } - detail url(s): ${detailUrlUpdateQueue.length}`
+  //   );
+  // }
 }, 1000 * REPEAT_TIME.SAVE);
 
 function isNullData(data) {
