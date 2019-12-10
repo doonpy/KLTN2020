@@ -115,7 +115,8 @@ const NAME_DEFINE = {
   settings: {
     dataColumn: 0,
     checkColumn: 1,
-    urlColumn: 3
+    urlColumn: 3,
+    rowSelectName: "row-select"
   },
   commandUrl: {
     postAddCatalog: "/catalog/ajax-add"
@@ -202,7 +203,8 @@ export default class TargetIframe {
                 <th scope="col">Check</th>
                 <th scope="col">Catalog</th>
                 <th scope="col">URL</th>
-                <th scope="col">Detect info</th>`;
+                <th scope="col">Detect info</th>
+                <th scope="col">Select</th>`;
     }
     return `<div class="card-body" style="overflow:auto;">
                 <div id="${NAME_DEFINE.id.alertTableData}" class="${NAME_DEFINE.class.alertTableData}" role="alert"></div>
@@ -295,7 +297,7 @@ export default class TargetIframe {
     // table click
     $(`#${NAME_DEFINE.id.tableData}`)
       .find("tbody")
-      .on("click", "tr", e => {
+      .on("dblclick", "tr", e => {
         if ($(e.currentTarget).hasClass(NAME_DEFINE.css.rowDetected)) {
           alert("This catalog was detected!");
           return;
@@ -339,25 +341,37 @@ export default class TargetIframe {
     // Delete row
     this.$deleteBtn.click(e => {
       if (e.which === 1) {
-        let trSelected = this.$tableData.$(
-          `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
-        );
+        let trSelected = this.$tableData
+          .$(
+            `tr:has(input[name=${NAME_DEFINE.settings.rowSelectName}]:checked)`
+          )
+          .toArray();
         if (trSelected.length === 0) {
           alert("Please select catalog row before!");
         } else {
           let rs = confirm("Are you sure?");
           if (rs) {
             // remove markup
-            let cssSelector = JSON.parse(
-              this.$tableData.row(trSelected).data()[
-                NAME_DEFINE.settings.dataColumn
-              ]
-            ).cssSelector;
+            let isSelectedRow = false;
+            for (let i = 0; i < trSelected.length; i++) {
+              let cssSelector = JSON.parse(
+                this.$tableData.row(trSelected[i]).data()[
+                  NAME_DEFINE.settings.dataColumn
+                ]
+              ).cssSelector;
 
-            let catalogElement = this.$iframeContent.find(cssSelector).first();
-            catalogElement.removeClass(NAME_DEFINE.class.mouseSelected);
-            this._removeRowTableData(trSelected);
-            this._loadOriginalSrc();
+              let catalogElement = this.$iframeContent
+                .find(cssSelector)
+                .first();
+              this._removeRowTableData(trSelected[i]);
+              catalogElement.removeClass(NAME_DEFINE.class.mouseSelected);
+              if ($(trSelected[i]).hasClass(NAME_DEFINE.css.rowSelected)) {
+                isSelectedRow = true;
+              }
+            }
+            if (isSelectedRow) {
+              this._loadOriginalSrc();
+            }
           }
         }
       }
@@ -380,34 +394,71 @@ export default class TargetIframe {
     // Mark as detected
     this.$detectBtn.click(e => {
       if (e.which === 1) {
-        let trSelected = this.$tableData.$(
-          `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
-        );
+        // let trSelected = this.$tableData.$(
+        //   `tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`
+        // );
+        // if (trSelected.length === 0) {
+        //   alert("Please select catalog row before!");
+        // } else {
+        //   let inputData = JSON.parse(
+        //     this.$tableData
+        //       .cell(
+        //         this.$tableData.row(trSelected).index(),
+        //         NAME_DEFINE.settings.dataColumn
+        //       )
+        //       .data()
+        //   );
+        //   if (inputData.detailUrl === "" || inputData.pageNumber === "") {
+        //     alert("You haven't detected Detail URL or Page Number!");
+        //     return;
+        //   }
+        //   let rs = confirm("Are you sure?");
+        //   if (rs) {
+        //     let rowIndex = this.$tableData.row(trSelected).index();
+        //     this.$tableData
+        //       .cell(rowIndex, NAME_DEFINE.settings.checkColumn)
+        //       .data(NAME_DEFINE.data.marked);
+        //     this.$tableData
+        //       .$(`tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`)
+        //       .removeClass(NAME_DEFINE.css.rowSelected);
+        //     $(trSelected).addClass(NAME_DEFINE.css.rowDetected);
+        //   }
+        // }
+        let trSelected = this.$tableData
+          .$(
+            `tr:has(input[name=${NAME_DEFINE.settings.rowSelectName}]:checked)`
+          )
+          .toArray();
         if (trSelected.length === 0) {
           alert("Please select catalog row before!");
         } else {
-          let inputData = JSON.parse(
-            this.$tableData
-              .cell(
-                this.$tableData.row(trSelected).index(),
-                NAME_DEFINE.settings.dataColumn
-              )
-              .data()
-          );
-          if (inputData.detailUrl === "" || inputData.pageNumber === "") {
-            alert("You haven't detected Detail URL or Page Number!");
-            return;
-          }
           let rs = confirm("Are you sure?");
           if (rs) {
-            let rowIndex = this.$tableData.row(trSelected).index();
-            this.$tableData
-              .cell(rowIndex, NAME_DEFINE.settings.checkColumn)
-              .data(NAME_DEFINE.data.marked);
-            this.$tableData
-              .$(`tr.${NAME_DEFINE.css.rowSelected.replace(/\s+/g, ".")}`)
-              .removeClass(NAME_DEFINE.css.rowSelected);
-            $(trSelected).addClass(NAME_DEFINE.css.rowDetected);
+            // remove markup
+            let isSelectedRow = false;
+            for (let i = 0; i < trSelected.length; i++) {
+              let rowIndex = this.$tableData.row(trSelected[i]).index();
+
+              let inputData = JSON.parse(
+                this.$tableData
+                  .cell(rowIndex, NAME_DEFINE.settings.dataColumn)
+                  .data()
+              );
+              if (inputData.detailUrl === "" || inputData.pageNumber === "") {
+                alert("You haven't detected Detail URL or Page Number!");
+                return;
+              }
+              this.$tableData
+                .cell(rowIndex, NAME_DEFINE.settings.checkColumn)
+                .data(NAME_DEFINE.data.marked);
+              if ($(trSelected[i]).hasClass(NAME_DEFINE.css.rowSelected)) {
+                $(trSelected[i]).removeClass(NAME_DEFINE.css.rowSelected);
+              }
+              $(trSelected[i]).addClass(NAME_DEFINE.css.rowDetected);
+            }
+            if (isSelectedRow) {
+              this._loadOriginalSrc();
+            }
           }
         }
       }
@@ -640,7 +691,10 @@ export default class TargetIframe {
             data.header,
             data.href,
             `<p class="${NAME_DEFINE.class.detailUrlBadge} ${NAME_DEFINE.css.badgeNotDetected}">Detail URL: No</p>
-            <p class="${NAME_DEFINE.class.pageNumberBadge} ${NAME_DEFINE.css.badgeNotDetected}">Page number: No</p>`
+            <p class="${NAME_DEFINE.class.pageNumberBadge} ${NAME_DEFINE.css.badgeNotDetected}">Page number: No</p>`,
+            `<div class="form-check">
+                <input type="checkbox" class="form-check-input" name="${NAME_DEFINE.settings.rowSelectName}">
+            </div>`
           ])
           .draw(false);
         break;
