@@ -28,7 +28,6 @@ const POINT_EACH_ATTR = {
 };
 
 nodeSchedule.scheduleJob(JOB_REPEAT_TIME, main);
-main();
 
 /**
  * Main function repeat every REPEAT_TIME
@@ -51,6 +50,7 @@ function main() {
       }
     },
     (err, data) => {
+      console.log(data);
       if (err) {
         console.log(
           `=> [M${process.pid} - ${require("moment")().format(
@@ -59,6 +59,7 @@ function main() {
         );
         return;
       }
+
       const { rawData, catalogs } = data;
       if (rawData.length <= 1) {
         return;
@@ -86,10 +87,14 @@ function main() {
           });
           threadCount++;
 
+          let execTimeOut = setTimeout(() => {
+            worker.terminate();
+          }, 1000 * 60 * Math.floor((10 * rd.rawData.length) / 6000));
+
           worker.on("message", data => {
+            clearTimeout(execTimeOut);
             data = JSON.parse(data);
             worker.terminate();
-            threadCount--;
 
             CompileData.insertMany(data, (err, docs) => {
               if (err) {
@@ -102,35 +107,11 @@ function main() {
               docs.forEach(d => {
                 compileLog.groupDataIds.push(d._id);
               });
-
-              if (threadCount <= 0) {
-                compileLog.rawDataAmount = rawData.length;
-                compileLog.executeTime = process.hrtime(hrStart)[0];
-                new CompileLog(compileLog).save(err => {
-                  if (err) {
-                    console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                        "L LTS"
-                      )}] Compile worker > Compile log save error: ${
-                        err.message
-                      }`
-                    );
-                  }
-                  console.log(
-                      `=> [M${process.pid} - ${require("moment")().format(
-                          "L LTS"
-                      )}] Compile data was ran within ${timeHelper.secondsToHms(
-                          process.hrtime(hrStart)[0]
-                      )}! Next time at ${require("moment")()
-                          .add(REPEAT_TIME, "seconds")
-                          .format("L LTS")}`
-                  );
-                });
-              }
             });
           });
 
           worker.on("error", err => {
+            worker.terminate();
             console.log(
               `=> [M${process.pid} - ${require("moment")().format(
                 "L LTS"
@@ -139,12 +120,34 @@ function main() {
           });
 
           worker.on("exit", code => {
-            if (code !== 0)
-              console.log(
-                `=> [M${process.pid} - ${require("moment")().format(
-                  "L LTS"
-                )}] Compile child worker stopped with exit code ${code}`
-              );
+            threadCount--;
+            console.log(
+              `=> [M${process.pid} - ${require("moment")().format(
+                "L LTS"
+              )}] Compile child worker stopped with exit code ${code}`
+            );
+            if (threadCount <= 0) {
+              compileLog.rawDataAmount = rawData.length;
+              compileLog.executeTime = process.hrtime(hrStart)[0];
+              new CompileLog(compileLog).save(err => {
+                if (err) {
+                  console.log(
+                    `=> [M${process.pid} - ${require("moment")().format(
+                      "L LTS"
+                    )}] Compile worker > Compile log save error: ${err.message}`
+                  );
+                }
+                console.log(
+                  `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                  )}] Compile data was ran within ${timeHelper.secondsToHms(
+                    process.hrtime(hrStart)[0]
+                  )}! Next time at ${require("moment")()
+                    .add(REPEAT_TIME, "seconds")
+                    .format("L LTS")}`
+                );
+              });
+            }
           });
           console.log(
             `=> [M${process.pid} - ${require("moment")().format(

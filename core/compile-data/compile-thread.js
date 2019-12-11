@@ -34,7 +34,6 @@ function groupRawData(rawDataByCatalog) {
       totalPoint += addressPoint;
       if (totalPoint > EXPECTED_POINT) {
         similarData.push(desRawData._id);
-        desRawData.isGrouped = true;
         return false;
       }
 
