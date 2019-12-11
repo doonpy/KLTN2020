@@ -130,5 +130,5 @@ html(lang='en')
                 p
                     | Sorry but the page you are looking for does not exist, have been removed. name changed or is temporarily unavailable
                 a(href='/') Go To Homepage
-                if isDebugMode
+                if isDebugMode==="1"
                     pre.err-stack #{error.stack}
