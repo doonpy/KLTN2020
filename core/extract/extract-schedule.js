@@ -305,6 +305,15 @@ function getContentByXPath(body, xpath) {
       }
     });
 
+  if (textData === "") {
+    // get img href
+    $(selector)
+      .children("img")
+      .each(function() {
+        textData += `${$(this).attr("src")}`;
+      });
+  }
+
   return textData.trim();
 }
 
