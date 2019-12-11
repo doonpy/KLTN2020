@@ -14,6 +14,7 @@ curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const REPEAT_TIME = 60 * 60 * 6; //6 hours
 const JOB_REPEAT_TIME = "0 0 */6 * * * "; //Execute every 6 hours
+const MAX_WORKER_EXECUTING = 2;
 const SIMILAR_RATES = {
   CATALOG: 60
 };
@@ -27,6 +28,7 @@ const POINT_EACH_ATTR = {
 };
 
 nodeSchedule.scheduleJob(JOB_REPEAT_TIME, main);
+main();
 
 /**
  * Main function repeat every REPEAT_TIME
@@ -72,17 +74,22 @@ function main() {
         groupDataIds: []
       };
 
-      rawDataByGroupedCatalog.forEach(rd => {
-        if (rd.rawData.length > 0) {
+      let loop = setInterval(() => {
+        if (rawDataByGroupedCatalog.length === 0) {
+          clearInterval(loop);
+          return;
+        }
+        if (threadCount < MAX_WORKER_EXECUTING) {
+          let rd = rawDataByGroupedCatalog.shift();
           const worker = new Worker(require.resolve("./compile-thread"), {
             workerData: JSON.stringify(rd)
           });
           threadCount++;
 
           worker.on("message", data => {
-            threadCount--;
             data = JSON.parse(data);
             worker.terminate();
+            threadCount--;
 
             CompileData.insertMany(data, (err, docs) => {
               if (err) {
@@ -109,16 +116,16 @@ function main() {
                       }`
                     );
                   }
+                  console.log(
+                      `=> [M${process.pid} - ${require("moment")().format(
+                          "L LTS"
+                      )}] Compile data was ran within ${timeHelper.secondsToHms(
+                          process.hrtime(hrStart)[0]
+                      )}! Next time at ${require("moment")()
+                          .add(REPEAT_TIME, "seconds")
+                          .format("L LTS")}`
+                  );
                 });
-                console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                  )}] Compile data was ran within ${timeHelper.secondsToHms(
-                    process.hrtime(hrStart)[0]
-                  )}! Next time at ${require("moment")()
-                    .add(REPEAT_TIME, "seconds")
-                    .format("L LTS")}`
-                );
               }
             });
           });
@@ -145,7 +152,7 @@ function main() {
             )}] Compile child worker ${worker.threadId} is running....`
           );
         }
-      });
+      }, 0);
     }
   );
 }
