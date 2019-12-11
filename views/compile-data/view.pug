@@ -29,7 +29,7 @@ block content
                         - var groupCatalogName="";
                         each cGroup in compileData.catalogGroup
                             - var hostFound = compileData.hostGroup.find(hGroup=>cGroup.hostId.toString()===hGroup._id.toString())
-                            - groupCatalogName+=`${cGroup.name} (${hostFound?hostFound.name:"null"})  `
+                            - groupCatalogName+=`${cGroup.header} (${hostFound?hostFound.name:"null"})  `
                         option.nav-item(value=`#comp-data-${compileDataIndex}`)=groupCatalogName
             hr
             #groupData-tab.tab-content
@@ -63,9 +63,9 @@ block content
                                                 - var catalogFound = compileData.catalogGroup.find(cGroup=>cGroup._id.toString()===detailUrlId)
                                                 - var hostId = catalogFound?catalogFound.hostId.toString():"";
                                                 - var hostFound = compileData.hostGroup.find(hGroup=>hGroup._id.toString()===hostId)
-                                                td(style="width:10%") #{catalogFound ? catalogFound.name : "null"}
+                                                td(style="width:10%") #{catalogFound ? catalogFound.header : "null"}
                                                 td(style="width:20%")
-                                                    p Domain: #{hostFound ? hostFound.name : "null"}
+                                                    p Domain: #{hostFound ? `${hostFound.name} (${hostFound.domain})` : "null"}
                                                     if gData.detailUrl[index]
                                                         a(href=gData.detailUrl[index].url target="_blank" rel="noopener noreferrer") Click here for redirect to the detail page
                                                     else

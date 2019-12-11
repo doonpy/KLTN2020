@@ -588,7 +588,6 @@ export default class TargetIframe {
         `.${NAME_DEFINE.class.pageNumberBadge}`
       );
       let targetCssSelector = $(target).getCssSelector();
-      console.log(targetCssSelector);
       let inputData = JSON.parse(
         this.$tableData
           .cell(

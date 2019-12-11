@@ -6,23 +6,31 @@ const ExtractLog = require("../../models/extract-log-model");
 const cheerio = require("cheerio");
 const async = require("async");
 const requestModule = require("../module/request");
+const nodeSchedule = require("node-schedule");
+const timeHelper = require("../../helper/time");
 
 let curDate = new Date();
 curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const NODE_TYPE_TEXT = 3;
-const MAX_URL_TO_GET = 10000;
-const MAX_REQUEST_SENT = 20;
+const MAX_URL_TO_GET = 8000;
+const MAX_REQUEST_SENT = 10;
 const MAX_REQUEST_RETRIES = 3;
-const SAVE_AMOUNT = 100;
+const SAVE_AMOUNT = 30;
 const REPEAT_TIME = {
   EXTRACT: 60 * 60, //seconds
-  SAVE: 30 //seconds
+  SAVE: 10 //seconds
 };
+const JOB_REPEAT_TIME = "0 0 */1 * * * "; //Execute every 1 hours
 let rawDataSaveQueue = [];
 let detailUrlUpdateQueue = [];
 
-(function extractLoop() {
+nodeSchedule.scheduleJob(JOB_REPEAT_TIME, main);
+
+/**
+ * Main function
+ */
+function main() {
   const hrStart = process.hrtime();
   async.parallel(
     {
@@ -31,57 +39,57 @@ let detailUrlUpdateQueue = [];
       },
       detailUrls: function(callback) {
         DetailUrl.aggregate([
-          [
-            {
-              $match: {
-                cTime: { $gte: DATE_LIMIT }
-              }
-            },
-            {
-              $match: {
-                isExtracted: false
-              }
-            },
-            {
-              $match: {
-                requestRetries: { $lt: MAX_REQUEST_RETRIES }
-              }
-            },
-            {
-              $lookup: {
-                from: "definitions",
-                localField: "catalogId",
-                foreignField: "catalogId",
-                as: "definition"
-              }
-            },
-            {
-              $project: {
-                url: 1,
-                isExtracted: 1,
-                catalogId: 1,
-                cTime: 1,
-                eTime: 1,
-                requestRetries: 1,
-                isDefined: {
-                  $gt: [
-                    {
-                      $size: "$definition"
-                    },
-                    0
-                  ]
-                }
-              }
-            },
-            {
-              $match: {
-                isDefined: true
-              }
-            },
-            {
-              $limit: MAX_URL_TO_GET
+          {
+            $match: {
+              cTime: { $gte: DATE_LIMIT }
             }
-          ]
+          },
+          {
+            $match: {
+              isExtracted: false
+            }
+          },
+          {
+            $limit: MAX_URL_TO_GET
+          },
+          {
+            $match: {
+              requestRetries: {
+                $lt: MAX_REQUEST_RETRIES
+              }
+            }
+          },
+          {
+            $lookup: {
+              from: "definitions",
+              localField: "catalogId",
+              foreignField: "catalogId",
+              as: "definition"
+            }
+          },
+          {
+            $project: {
+              url: 1,
+              isExtracted: 1,
+              catalogId: 1,
+              cTime: 1,
+              eTime: 1,
+              requestRetries: 1,
+              isDefined: {
+                $gt: [
+                  {
+                    $size: "$definition"
+                  },
+                  0
+                ]
+              }
+            }
+          },
+          {
+            $match: {
+              isDefined: true
+            }
+          }
         ]).exec(callback);
       }
     },
@@ -92,7 +100,6 @@ let detailUrlUpdateQueue = [];
             "L LTS"
           )}] Extract error: ${err.message}`
         );
-        setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
         return;
       }
 
@@ -104,7 +111,6 @@ let detailUrlUpdateQueue = [];
       let requestCount = 0;
 
       if (detailUrls.length === 0) {
-        setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
         return;
       }
 
@@ -129,19 +135,21 @@ let detailUrlUpdateQueue = [];
               console.log(
                 `=> [M${process.pid} - ${require("moment")().format(
                   "L LTS"
-                )}] Extract worker was ran within ${secondsToHms(
+                )}] Extract worker was ran within ${timeHelper.secondsToHms(
                   hrEnd
                 )}! Next time at ${require("moment")()
                   .add(REPEAT_TIME.EXTRACT, "seconds")
                   .format("L LTS")}`
               );
-              setTimeout(extractLoop, 1000 * REPEAT_TIME.EXTRACT);
             }
           });
           return;
         }
         if (requestCount < MAX_REQUEST_SENT) {
           let detailUrl = detailUrls.shift();
+          if (detailUrl.isDefined === false) {
+            return;
+          }
           let definition = definitions.find(
             def => def.catalogId.toString() === detailUrl.catalogId.toString()
           );
@@ -162,7 +170,7 @@ let detailUrlUpdateQueue = [];
                 dataExtracted.detailUrlId = detailUrl._id;
 
                 if (!isNullData(dataExtracted)) {
-                  rawDataSaveQueue.push(new RawData(dataExtracted));
+                  rawDataSaveQueue.push(dataExtracted);
                   detailUrlUpdateQueue.push(detailUrl);
 
                   // log
@@ -205,14 +213,19 @@ let detailUrlUpdateQueue = [];
       }, 0);
     }
   );
-})();
+}
 
 /**
  * Loop update database
  */
-setInterval(() => {
+let saveLoop = setInterval(() => {
   let rawDataSaveQueueLength = rawDataSaveQueue.length;
   let detailUrlUpdateQueueLength = detailUrlUpdateQueue.length;
+
+  if (rawDataSaveQueueLength === 0 && detailUrlUpdateQueueLength === 0) {
+    return;
+  }
+
   let rawDataContainer =
     rawDataSaveQueueLength > SAVE_AMOUNT
       ? rawDataSaveQueue.splice(0, SAVE_AMOUNT)
@@ -222,16 +235,14 @@ setInterval(() => {
       ? detailUrlUpdateQueue.splice(0, SAVE_AMOUNT)
       : detailUrlUpdateQueue.splice(0, detailUrlUpdateQueueLength);
 
-  rawDataContainer.forEach(d => {
-    d.save(err => {
-      if (err) {
-        console.log(
-          `=> [M${process.pid} - ${require("moment")().format(
-            "L LTS"
-          )}] Extract worker > Save error: ${err.message}`
-        );
-      }
-    });
+  RawData.insertMany(rawDataContainer, { ordered: false }, (err, docs) => {
+    if (err) {
+      console.log(
+        `=> [M${process.pid} - ${require("moment")().format(
+          "L LTS"
+        )}] Extract worker > Save raw data error: ${err.message}`
+      );
+    }
   });
 
   detailUrlContainer.forEach(d => {
@@ -240,21 +251,11 @@ setInterval(() => {
         console.log(
           `=> [M${process.pid} - ${require("moment")().format(
             "L LTS"
-          )}] Extract worker > Save error: ${err.message}`
+          )}] Extract worker > Save detail URL error: ${err.message}`
         );
       }
     });
   });
-
-  // if (rawDataContainer.length !== 0 && detailUrlContainer.length !== 0) {
-  //   console.log(
-  //     `=> [M${process.pid} - ${require("moment")().format(
-  //       "L LTS"
-  //     )}] Extract worker > Remaining queue: Data(s): ${
-  //       rawDataSaveQueue.length
-  //     } - detail url(s): ${detailUrlUpdateQueue.length}`
-  //   );
-  // }
 }, 1000 * REPEAT_TIME.SAVE);
 
 function isNullData(data) {
@@ -366,16 +367,4 @@ function extractData(body, definition) {
     address: address,
     others: othersData
   };
-}
-
-function secondsToHms(d) {
-  d = Number(d);
-  let h = Math.floor(d / 3600);
-  let m = Math.floor((d % 3600) / 60);
-  let s = Math.floor((d % 3600) % 60);
-
-  let hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-  let mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-  let sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
-  return hDisplay + mDisplay + sDisplay;
 }

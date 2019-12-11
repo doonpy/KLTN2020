@@ -7,12 +7,13 @@ const { Worker } = require("worker_threads");
 const async = require("async");
 const helper = require("./helper");
 const nodeSchedule = require("node-schedule");
+const timeHelper = require("../../helper/time");
 
 let curDate = new Date();
 curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
-const REPEAT_TIME = 60 * 60 * 12; //12 hours
-const JOB_REPEAT_TIME = "* * */12 * * * *"; //Execute every 12 hours
+const REPEAT_TIME = 60 * 60 * 6; //6 hours
+const JOB_REPEAT_TIME = "0 0 */6 * * * "; //Execute every 6 hours
 const SIMILAR_RATES = {
   CATALOG: 60
 };
@@ -54,6 +55,7 @@ function main() {
             "L LTS"
           )}] Compile error: ${err.message}`
         );
+        return;
       }
       const { rawData, catalogs } = data;
       if (rawData.length <= 1) {
@@ -111,9 +113,9 @@ function main() {
                 console.log(
                   `=> [M${process.pid} - ${require("moment")().format(
                     "L LTS"
-                  )}] Compile data was ran within ${
+                  )}] Compile data was ran within ${timeHelper.secondsToHms(
                     process.hrtime(hrStart)[0]
-                  }s! Next time at ${require("moment")()
+                  )}! Next time at ${require("moment")()
                     .add(REPEAT_TIME, "seconds")
                     .format("L LTS")}`
                 );

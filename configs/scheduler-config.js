@@ -18,6 +18,11 @@ const { Worker } = require("worker_threads");
       require.resolve("../core/extract/extract-schedule")
     );
   });
+  console.log(
+      `=> [W${process.pid} - ${require("moment")().format("L LTS")}] Extract worker ${
+          process.pid
+      } started`
+  );
 
   // Compile data worker
   let compileWorker = new Worker(
@@ -34,7 +39,7 @@ const { Worker } = require("worker_threads");
     );
   });
   console.log(
-    `=> [W${process.pid} - ${require("moment")().format("L LTS")}] Scheduler ${
+    `=> [W${process.pid} - ${require("moment")().format("L LTS")}] Compile worker ${
       process.pid
     } started`
   );

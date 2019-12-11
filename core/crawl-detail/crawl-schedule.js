@@ -3,14 +3,17 @@ const Catalog = require("../../models/catalog-model");
 const { Worker } = require("worker_threads");
 const nodeSchedule = require("node-schedule");
 
-const MAX_WORKER_EXECUTING = 5;
+const MAX_WORKER_EXECUTING = 3;
 const REPEAT_TIME = {
-  CRAWL: "0 0 23 * * * *" //Execute at 23:00 everyday
+  CRAWL: "0 0 /12 * * * *" //Execute each 12 hours
 };
 
-nodeSchedule.scheduleJob(REPEAT_TIME.CRAWL, crawlLoop);
+nodeSchedule.scheduleJob(REPEAT_TIME.CRAWL, main);
 
-function crawlLoop() {
+/**
+ * Main function
+ */
+function main() {
   Catalog.find()
     .populate("hostId")
     .exec((err, catalogs) => {
@@ -20,6 +23,7 @@ function crawlLoop() {
             "L LTS"
           )}] Compile error: ${err.message}`
         );
+        return;
       }
       let workerCount = 0;
       let loop = setInterval(() => {

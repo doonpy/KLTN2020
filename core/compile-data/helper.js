@@ -1,4 +1,4 @@
-const DECIMAL_PATTERN = new RegExp(/^[0-9]+(\.[0-9]+)?/, "g");
+const PRICE_PATTERN = new RegExp(/^[0-9]+(\.[0-9]+)?/, "g");
 const UNIT_PATTERN = new RegExp(/[\D]+$/, "g");
 
 /**
@@ -18,19 +18,19 @@ function getSimilarPercentageOfTwoString(
   }
 
   if (isNumber) {
-    let firstAmount = standardizedData(firstString).match(DECIMAL_PATTERN)
+    let firstAmount = standardizedData(firstString).match(PRICE_PATTERN)
       ? parseFloat(
           standardizedData(firstString, true)
-            .match(DECIMAL_PATTERN)
+            .match(PRICE_PATTERN)
             .join(" ")
             .trim()
         )
       : "";
 
-    let secondAmount = standardizedData(secondString).match(DECIMAL_PATTERN)
+    let secondAmount = standardizedData(secondString).match(PRICE_PATTERN)
       ? parseFloat(
           standardizedData(secondString, true)
-            .match(DECIMAL_PATTERN)
+            .match(PRICE_PATTERN)
             .join(" ")
             .trim()
         )
@@ -38,14 +38,14 @@ function getSimilarPercentageOfTwoString(
 
     let firstCurrency = standardizedData(firstString).match(UNIT_PATTERN)
       ? standardizedData(firstString, true)
-          .replace(/²+/g, "2")
+          .replace(/²+/g, "")
           .match(UNIT_PATTERN)
           .join(" ")
           .trim()
       : "";
     let secondCurrency = standardizedData(secondString).match(UNIT_PATTERN)
       ? standardizedData(secondString, true)
-          .replace(/²+/g, "2")
+          .replace(/²+/g, "")
           .match(UNIT_PATTERN)
           .join(" ")
           .trim()
@@ -112,6 +112,6 @@ function standardizedData(originalString, isUnit = false) {
 module.exports = {
   getSimilarPercentageOfTwoString: getSimilarPercentageOfTwoString,
   standardizedData: standardizedData,
-  DECIMAL_PATTERN: DECIMAL_PATTERN,
+  DECIMAL_PATTERN: PRICE_PATTERN,
   UNIT_PATTERN: UNIT_PATTERN
 };

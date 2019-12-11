@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node -r dotenv/config ./bin/www",
+    "start": "node -r dotenv/config --max-old-space-size=4096 ./bin/www",
     "build": "npx webpack -w"
   },
   "dependencies": {

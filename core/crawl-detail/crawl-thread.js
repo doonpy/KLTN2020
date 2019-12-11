@@ -6,13 +6,13 @@ const { workerData, parentPort } = require("worker_threads");
 const cheerio = require("cheerio");
 
 const REPEAT_TIME = {
-  SAVE: 10 //seconds
+  SAVE: 30 //seconds
 };
 const SAVE_AMOUNT = 500;
 const SIMILAR_PERCENT = 80;
 const MAX_REQUEST_SENT = 10;
 const MAX_REQUEST_RETRIES = 3;
-const MAX_URL_AMOUNT_PER_CRAWL = 5000;
+const MAX_URL_AMOUNT_PER_CRAWL = 1000;
 const catalog = JSON.parse(workerData);
 const hrStart = process.hrtime();
 let urlQueue = {
@@ -125,7 +125,7 @@ setInterval(() => {
         : saveQueue.splice(0, saveQueueLength);
   }
   if (container.length > 0) {
-    DetailUrl.insertMany(container, { ordered: false }, err => {
+    DetailUrl.insertMany(container, { ordered: false }, (err, docs) => {
       if (err) {
         console.log(
           `=> [M${process.pid} - ${require("moment")().format(
@@ -133,15 +133,15 @@ setInterval(() => {
           )}] Crawl detail URL worker > Save failed: ${err.message}`
         );
       } else {
-        currentSaveAmount += container.length;
+        currentSaveAmount += docs.length;
+        // console.log(
+        //     `=> [M${process.pid} - ${require("moment")().format(
+        //         "L LTS"
+        //     )}] Crawl detail URL worker > Queue remaining: ${saveQueue.length}`,"- Current save:",currentSaveAmount
+        // );
       }
     });
   }
-  // console.log(
-  //   `=> [M${process.pid} - ${require("moment")().format(
-  //     "L LTS"
-  //   )}] Crawl detail URL worker > Queue remaining: ${saveQueue.length}`
-  // );
 }, 1000 * REPEAT_TIME.SAVE);
 
 /**
@@ -164,6 +164,10 @@ function handleSuccessRequest(res) {
       let detailHref = makeupHref($(this).attr("href"), host.domain);
       if (!existDetailUrls.find(d => d.url === detailHref)) {
         saveQueue.push({
+          url: detailHref,
+          catalogId: catalog._id
+        });
+        existDetailUrls.push({
           url: detailHref,
           catalogId: catalog._id
         });

@@ -133,7 +133,7 @@ function startServer() {
   }
 
   console.log(
-      `=> [W${process.pid} - ${require("moment")().format("L LTS")}] Worker ${
+      `=> [W${process.pid} - ${require("moment")().format("L LTS")}] HTTP worker ${
           process.pid
       } started`
   );
