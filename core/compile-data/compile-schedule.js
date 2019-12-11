@@ -28,7 +28,7 @@ const POINT_EACH_ATTR = {
 };
 
 nodeSchedule.scheduleJob(JOB_REPEAT_TIME, main);
-
+main();
 /**
  * Main function repeat every REPEAT_TIME
  */
