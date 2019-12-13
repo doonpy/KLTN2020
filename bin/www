@@ -3,47 +3,47 @@
 const numCPUs = require("os").cpus().length;
 const cluster = require("cluster");
 const {fork} = require("child_process");
-
-if (numCPUs === 1) {
-  startServer();
-  require("../configs/scheduler-config");
-} else {
-  if (cluster.isMaster) {
-    console.log(
-        `=> [M${process.pid} - ${require("moment")().format("L LTS")}] Master ${
-            process.pid
-        } is running`
-    );
-
-    // Fork workers.
-    for (let i = 0; i < numCPUs - 1; i++) {
-      cluster.fork();
-    }
-
-    // Fork child process for scheduler
-    let schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
-
-    schedulerProcess.on("exit", (code, signal) => {
-      console.log(
-        `=> [M${process.pid} - ${require("moment")().format(
-          "L LTS"
-        )}] Scheduler process died - code: ${code}`
-      );
-      schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
-    });
-
-    cluster.on("exit", (worker, code, signal) => {
-      console.log(
-          `=> [M${process.pid} - ${require("moment")().format("L LTS")}] Worker ${
-              worker.process.pid
-          } died`
-      );
-      cluster.fork();
-    });
-  } else {
-    startServer();
-  }
-}
+startServer();
+// if (numCPUs === 1) {
+//   startServer();
+//   require("../configs/scheduler-config");
+// } else {
+//   if (cluster.isMaster) {
+//     console.log(
+//         `=> [M${process.pid} - ${require("moment")().format("L LTS")}] Master ${
+//             process.pid
+//         } is running`
+//     );
+//
+//     // Fork workers.
+//     for (let i = 0; i < numCPUs - 1; i++) {
+//       cluster.fork();
+//     }
+//
+//     // Fork child process for scheduler
+//     let schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
+//
+//     schedulerProcess.on("exit", (code, signal) => {
+//       console.log(
+//         `=> [M${process.pid} - ${require("moment")().format(
+//           "L LTS"
+//         )}] Scheduler process died - code: ${code}`
+//       );
+//       schedulerProcess = fork(require.resolve("../configs/scheduler-config"));
+//     });
+//
+//     cluster.on("exit", (worker, code, signal) => {
+//       console.log(
+//           `=> [M${process.pid} - ${require("moment")().format("L LTS")}] Worker ${
+//               worker.process.pid
+//           } died`
+//       );
+//       cluster.fork();
+//     });
+//   } else {
+//     startServer();
+//   }
+// }
 
 function startServer() {
   /**

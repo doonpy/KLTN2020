@@ -36,36 +36,42 @@ function getAllCatalogElement(target) {
   }
   let data = [];
 
-  $parent.find("a").each(function () {
-    let catalogHref = $(this).attr("href");
-    data.push({
-      header: removeSpeacialCharacter($(this).text()),
-      cssSelector: $(this)
-          .closest("li")
-          .getCssSelector(),
-      href: `${removeLastSplash(targetDomain)}${catalogHref}`
+    $parent.find("a").each(function () {
+        let catalogHref = $(this).attr("href");
+        data.push({
+            header: removeSpeacialCharacter($(this).text()),
+            cssSelector: $(this)
+                .closest("li")
+                .getCssSelector(),
+            href: `${removeLastSplash(targetDomain)}${catalogHref}`
+        });
     });
-  });
 
   return data;
 }
 
 /**
- * validate page number elemment
+ * get page number element
  * @param target
- * @returns {boolean}
+ * @returns {null}
  */
-function isPageNumberElement(target) {
-  let siblings = $(target).siblings(
-      $(target)
-          .prop("tagName")
-          .toLowerCase()
-  );
-  if (siblings.length === 0) return false;
-  return true;
+function getPageNumberElement(target) {
+    if ($(target).closest("li").length !== 0) {
+        target = $(target).closest("li");
+    }
+    let siblings = $(target).siblings(
+        $(target)
+            .prop("tagName")
+            .toLowerCase()
+    );
+    if (siblings.length !== 0) {
+        return $(target).parent();
+    } else {
+        return null;
+    }
 }
 
 module.exports = {
   getAllCatalogElement: getAllCatalogElement,
-  isPageNumberElement: isPageNumberElement
+    getPageNumberElement: getPageNumberElement
 };

@@ -627,20 +627,20 @@ export default class TargetIframe {
       if (inputData.detailUrl === "") {
         let rs = confirm("Is this element of Detail URL?");
         if (rs) {
-          if (detector.isPageNumberElement(target)) {
-            alert("Some thing wrong! Make sure element is Detail URL Element");
-            return;
-          }
-          inputData.detailUrl = targetCssSelector;
-          this._updateInputColDataTable(inputData);
-          $detailUrlBadge
-            .text("Detail URL: Yes")
-            .removeClass(NAME_DEFINE.css.badgeNotDetected)
-            .addClass(NAME_DEFINE.css.badgeDetected);
-          if ($(target).hasClass(NAME_DEFINE.class.mouseHover)) {
-            $(target).removeClass(NAME_DEFINE.class.mouseHover);
-          }
-          if (!$(target).hasClass(NAME_DEFINE.class.mouseSelected)) {
+            // if (detector.isPageNumberElement(target)) {
+            //   alert("Some thing wrong! Make sure element is Detail URL Element");
+            //   return;
+            // }
+            inputData.detailUrl = targetCssSelector;
+            this._updateInputColDataTable(inputData);
+            $detailUrlBadge
+                .text("Detail URL: Yes")
+                .removeClass(NAME_DEFINE.css.badgeNotDetected)
+                .addClass(NAME_DEFINE.css.badgeDetected);
+            if ($(target).hasClass(NAME_DEFINE.class.mouseHover)) {
+                $(target).removeClass(NAME_DEFINE.class.mouseHover);
+            }
+            if (!$(target).hasClass(NAME_DEFINE.class.mouseSelected)) {
             $(target).addClass(NAME_DEFINE.class.mouseSelected);
           }
           return;
@@ -650,18 +650,22 @@ export default class TargetIframe {
       if (inputData.pageNumber === "") {
         let rs = confirm("Is this element of Page Number?");
         if (rs) {
-          if (!detector.isPageNumberElement(target)) {
-            alert("Some thing wrong! Make sure element is Page Number Element");
-            return;
-          }
-          let $parent = $(target).parent();
-          targetCssSelector = $parent.getCssSelector();
-          inputData.pageNumber = targetCssSelector;
-          this._updateInputColDataTable(inputData);
-          $pageNumberBadge
-            .text("Page number: Yes")
-            .removeClass(NAME_DEFINE.css.badgeNotDetected)
-            .addClass(NAME_DEFINE.css.badgeDetected);
+            // if (!detector.isPageNumberElement(target)) {
+            //   alert("Some thing wrong! Make sure element is Page Number Element");
+            //   return;
+            // }
+            let $parent = detector.getPageNumberElement(target);
+            if (!$parent) {
+                alert("Some thing wrong! Make sure element is Page Number Element");
+                return;
+            }
+            targetCssSelector = $parent.getCssSelector();
+            inputData.pageNumber = targetCssSelector;
+            this._updateInputColDataTable(inputData);
+            $pageNumberBadge
+                .text("Page number: Yes")
+                .removeClass(NAME_DEFINE.css.badgeNotDetected)
+                .addClass(NAME_DEFINE.css.badgeDetected);
           if ($parent.hasClass(NAME_DEFINE.class.mouseHover)) {
             $parent.removeClass(NAME_DEFINE.class.mouseHover);
           }

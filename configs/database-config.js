@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 exports.init = () => {
-    const connString = `mongodb+srv://${process.env.DB_USER}:${
-        process.env.DB_PASS
-    }@${process.env.DB_HOST}${
-        process.env.DB_PORT !== "" ? `:${process.env.DB_PORT}` : ""
-    }/${process.env.DB_NAME}?retryWrites=true&w=majority`;
-
+    // const connString = `mongodb+srv://${process.env.DB_USER}:${
+    //     process.env.DB_PASS
+    // }@${process.env.DB_HOST}${
+    //     process.env.DB_PORT !== "" ? `:${process.env.DB_PORT}` : ""
+    // }/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+    const connString = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
     mongoose
         .connect(connString, {
             useNewUrlParser: true,

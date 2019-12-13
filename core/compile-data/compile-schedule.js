@@ -3,7 +3,7 @@ const RawData = require("../../models/raw-data-model");
 const Catalog = require("../../models/catalog-model");
 const CompileData = require("../../models/compile-data-model");
 const CompileLog = require("../../models/compile-log-model");
-const { Worker } = require("worker_threads");
+const {Worker} = require("worker_threads");
 const async = require("async");
 const helper = require("./helper");
 const nodeSchedule = require("node-schedule");
@@ -13,7 +13,7 @@ let curDate = new Date();
 curDate.setDate(curDate.getDate() - 7);
 const DATE_LIMIT = new Date(curDate); // 1 week from present
 const REPEAT_TIME = 60 * 60 * 6; //6 hours
-const JOB_REPEAT_TIME = "0 0 */6 * * * "; //Execute every 6 hours
+const JOB_REPEAT_TIME = "0 0 */12 * * * "; //Execute every 6 hours
 const MAX_WORKER_EXECUTING = 2;
 const SIMILAR_RATES = {
   CATALOG: 60
@@ -28,7 +28,7 @@ const POINT_EACH_ATTR = {
 };
 
 nodeSchedule.scheduleJob(JOB_REPEAT_TIME, main);
-main();
+
 /**
  * Main function repeat every REPEAT_TIME
  */
@@ -50,7 +50,6 @@ function main() {
       }
     },
     (err, data) => {
-      console.log(data);
       if (err) {
         console.log(
           `=> [M${process.pid} - ${require("moment")().format(
@@ -87,72 +86,75 @@ function main() {
           });
           threadCount++;
 
-          let execTimeOut = setTimeout(() => {
-            worker.terminate();
-          }, 1000 * 60 * Math.floor((10 * rd.rawData.length) / 6000));
+          // let execTimeOut = setTimeout(() => {
+          //   worker.terminate();
+          // }, 1000 * 60 * Math.floor((10 * rd.rawData.length) / 6000));
 
           worker.on("message", data => {
-            clearTimeout(execTimeOut);
+            // clearTimeout(execTimeOut);
             data = JSON.parse(data);
             worker.terminate();
 
             CompileData.insertMany(data, (err, docs) => {
               if (err) {
                 console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
-                    "L LTS"
-                  )}] Compile worker > Save error: ${err.message}`
+                    `=> [M${process.pid} - ${require("moment")().format(
+                        "L LTS"
+                    )}] Compile worker > Save error: ${err.message}`
                 );
               }
               docs.forEach(d => {
                 compileLog.groupDataIds.push(d._id);
               });
+
+              if (threadCount <= 0) {
+                compileLog.rawDataAmount = rawData.length;
+                compileLog.executeTime = process.hrtime(hrStart)[0];
+                new CompileLog(compileLog).save(err => {
+                  if (err) {
+                    console.log(
+                        `=> [M${process.pid} - ${require("moment")().format(
+                            "L LTS"
+                        )}] Compile worker > Compile log save error: ${
+                            err.message
+                        }`
+                    );
+                  }
+                  console.log(
+                      `=> [M${process.pid} - ${require("moment")().format(
+                          "L LTS"
+                      )}] Compile data was ran within ${timeHelper.secondsToHms(
+                          process.hrtime(hrStart)[0]
+                      )}! Next time at ${require("moment")()
+                          .add(REPEAT_TIME, "seconds")
+                          .format("L LTS")}`
+                  );
+                });
+              }
             });
           });
 
           worker.on("error", err => {
             worker.terminate();
             console.log(
-              `=> [M${process.pid} - ${require("moment")().format(
-                "L LTS"
-              )}] Compile child worker error: ${err.message}`
+                `=> [M${process.pid} - ${require("moment")().format(
+                    "L LTS"
+                )}] Compile child worker error: ${err.message}`
             );
           });
 
           worker.on("exit", code => {
             threadCount--;
             console.log(
-              `=> [M${process.pid} - ${require("moment")().format(
-                "L LTS"
-              )}] Compile child worker stopped with exit code ${code}`
-            );
-            if (threadCount <= 0) {
-              compileLog.rawDataAmount = rawData.length;
-              compileLog.executeTime = process.hrtime(hrStart)[0];
-              new CompileLog(compileLog).save(err => {
-                if (err) {
-                  console.log(
-                    `=> [M${process.pid} - ${require("moment")().format(
-                      "L LTS"
-                    )}] Compile worker > Compile log save error: ${err.message}`
-                  );
-                }
-                console.log(
-                  `=> [M${process.pid} - ${require("moment")().format(
+                `=> [M${process.pid} - ${require("moment")().format(
                     "L LTS"
-                  )}] Compile data was ran within ${timeHelper.secondsToHms(
-                    process.hrtime(hrStart)[0]
-                  )}! Next time at ${require("moment")()
-                    .add(REPEAT_TIME, "seconds")
-                    .format("L LTS")}`
-                );
-              });
-            }
+                )}] Compile child worker stopped with exit code ${code}`
+            );
           });
           console.log(
-            `=> [M${process.pid} - ${require("moment")().format(
-              "L LTS"
-            )}] Compile child worker ${worker.threadId} is running....`
+              `=> [M${process.pid} - ${require("moment")().format(
+                  "L LTS"
+              )}] Compile child worker ${worker.threadId} is running....`
           );
         }
       }, 0);

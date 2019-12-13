@@ -3,9 +3,9 @@ const Catalog = require("../../models/catalog-model");
 const { Worker } = require("worker_threads");
 const nodeSchedule = require("node-schedule");
 
-const MAX_WORKER_EXECUTING = 3;
+const MAX_WORKER_EXECUTING = 2;
 const REPEAT_TIME = {
-  CRAWL: "0 0 /12 * * * *" //Execute each 12 hours
+  CRAWL: "0 0 */1 * * * *" //Execute each 1 hours
 };
 
 nodeSchedule.scheduleJob(REPEAT_TIME.CRAWL, main);
@@ -26,9 +26,9 @@ function main() {
         return;
       }
       let workerCount = 0;
-      let loop = setInterval(() => {
+      let workerLoop = setInterval(() => {
         if (catalogs.length === 0) {
-          clearInterval(loop);
+          clearInterval(workerLoop);
           return;
         }
         if (workerCount < MAX_WORKER_EXECUTING) {

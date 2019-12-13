@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node -r dotenv/config --max-old-space-size=4096 ./bin/www",
-    "build": "npx webpack -w"
+    "scheduler": "node -r dotenv/config --max-old-space-size=4096 ./configs/scheduler-config.js",
+    "build": "npx webpack"
   },
   "dependencies": {
     "async": "^3.1.0",

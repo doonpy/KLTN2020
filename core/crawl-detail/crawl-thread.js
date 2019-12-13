@@ -8,7 +8,7 @@ const cheerio = require("cheerio");
 const REPEAT_TIME = {
   SAVE: 30 //seconds
 };
-const SAVE_AMOUNT = 500;
+const SAVE_AMOUNT = 100;
 const SIMILAR_PERCENT = 80;
 const MAX_REQUEST_SENT = 10;
 const MAX_REQUEST_RETRIES = 3;
