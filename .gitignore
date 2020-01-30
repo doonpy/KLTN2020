@@ -67,13 +67,7 @@ temp/
 data/
 
 #.idea
-.idea/
-
-# public js
-public/javascripts
-
-# test.js
-test.js
+../.idea/
 
 #pm2 ecosystem
 ecosystem.config.js

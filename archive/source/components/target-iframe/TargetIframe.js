@@ -100,7 +100,7 @@ const NAME_DEFINE = {
     pageNumberBadge: "ti-page-number"
   },
   src: {
-    loadingImg: "/images/svg/puff.svg"
+    loadingImg: "/img/svg/puff.svg"
   },
   css: {
     borderHoverStyle: "pk-border-solid-hover",

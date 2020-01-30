@@ -28,13 +28,13 @@ module.exports = {
     entry: {
         "def-main": "./source/def-data/main.js",
         "crawl-main": "./source/crawl/main.js",
-        "comp-main": "./source/compile-data/main.js",
-        "extr-main": "./source/extract-catalog/main.js"
+        "comp-main": "./src/compile-data/main.js",
+        "extr-main": "./src/extract-catalog/main.js"
     },
 
     output: {
         filename: "[name].js",
-        path: path.resolve(__dirname, "public/javascripts")
+        path: path.resolve(__dirname, "public/js")
     },
 
     module: {

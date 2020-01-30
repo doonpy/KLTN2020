@@ -567,7 +567,7 @@
         insertCSS: insertCSS
     });
 
-    //always include the default bootstrap style
+    //always controllers the default bootstrap style
     addStyle("bootstrap", {
         html: "<div>\n<span data-notify-text></span>\n</div>",
         classes: {

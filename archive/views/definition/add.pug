@@ -1,7 +1,7 @@
 extends ../header
 
 block content
-    script(src='/javascripts/def-main.js')
+    script(src='/js/def-main.js')
 
     if error
         p.text-danger #{url} - #{error.message}
@@ -24,7 +24,7 @@ block content
                 button#submit-table-data.btn.btn-primary Submit
         .row.main-content
             #left-content.col-7.mr-2
-                img#loading-progress(src="/images/svg/puff.svg" style="position:absolute; background-color: #343a40;")
+                img#loading-progress(src="/img/svg/puff.svg" style="position:absolute; background-color: #343a40;")
                 iframe#live-iframe(src=`/api/get-html/${hostname}/${fileName}`)
             #right-content.col.card
                 #define-data.card-body(style="overflow:auto;")
