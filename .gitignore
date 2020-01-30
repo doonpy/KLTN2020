@@ -80,3 +80,6 @@ yarn.lock
 
 # mongo-data
 mongo-data/
+
+# dist
+dist/
