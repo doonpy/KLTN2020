@@ -79,4 +79,4 @@ package-lock.json
 yarn.lock
 
 # mongo-data
-mongo-data
+mongo-data/
