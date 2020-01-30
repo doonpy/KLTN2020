@@ -72,9 +72,6 @@ data/
 #pm2 ecosystem
 ecosystem.config.js
 
-#package-lock.json
-package-lock.json
-
 # yarn.lock
 yarn.lock
 
