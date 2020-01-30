@@ -1,0 +1,26 @@
+version: '3'
+services:
+  node-server:
+    image: node:12.14.1-alpine3.9
+    container_name: node-server
+    volumes:
+      - ../../dist:/usr/repository/dist
+      - ../../public:/usr/repository/public
+      - ../../package.json:/usr/repository/package.json
+      - ../../.env:/usr/repository/public/.env
+    working_dir: /usr/repository
+    ports:
+      - 3000:3000
+    command: ls -l
+
+  mongo-db:
+    image: mongo
+    container_name: mongo-db
+    environment:
+      - MONGO_INITDB_DATABASE=kltn2020
+      - MONGO_INITDB_ROOT_USERNAME=alice
+      - MONGO_INITDB_ROOT_PASSWORD=alice
+    ports:
+      - '27017-27019:27017-27019'
+    volumes:
+      - ../../mongo-data:/data/db

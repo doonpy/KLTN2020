@@ -77,3 +77,6 @@ package-lock.json
 
 # yarn.lock
 yarn.lock
+
+# mongo-data
+mongo-data
