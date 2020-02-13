@@ -1,69 +1,90 @@
-import express from "express";
-import { Application } from "express";
-import path from "path";
-import chalk from "chalk";
+import express from 'express';
+import { Application } from 'express';
+import path from 'path';
+import MessageLog from './util/message-log';
+import { Constant } from './util/definition/constant';
+import DatabaseConnection from './util/database';
+import { notFoundRoute, errorHandler } from './middleware/error-handler';
 
 class App {
-  public app: Application;
-  public port: any;
+    private app: Application;
+    private readonly serverPort: any;
 
-  constructor(appInit: { port: any; middleWares: any; controllers: any }) {
-    this.app = express();
-    this.port = appInit.port || 3000;
+    constructor(appInit: { port: any; middleWares: any; controllers: any }) {
+        this.app = express();
+        this.serverPort = appInit.port;
 
-    this.bindMiddlewares(appInit.middleWares);
-    this.bindRoutes(appInit.controllers);
-    this.settingAssets();
-    this.settingTemplate();
-  }
+        new DatabaseConnection()
+            .connect()
+            .then(() => {
+                this._settingAssets();
+                this._settingTemplate();
+                this._bindMiddlewares(appInit.middleWares);
+                this._bindRoutes(appInit.controllers);
+            })
+            .catch(error => {
+                new MessageLog(
+                    Constant.MESSAGE_TYPE.ERROR,
+                    error.message
+                ).show();
+            });
+    }
 
-  /**
-   * Bind middlewares
-   * @param middleWares
-   */
-  private bindMiddlewares(middleWares: {
-    forEach: (arg0: (middleWare: any) => void) => void;
-  }) {
-    middleWares.forEach(middleWare => {
-      this.app.use(middleWare);
-    });
-  }
+    /**
+     * Bind middlewares
+     *
+     * @param middleWares
+     */
+    private _bindMiddlewares(middleWares: {
+        forEach: (arg0: (middleWare: any) => void) => void;
+    }): void {
+        middleWares.forEach((middleWare: any): void => {
+            this.app.use(middleWare);
+        });
+    }
 
-  /**
-   * Bind routes
-   * @param routes
-   */
-  private bindRoutes(routes: {
-    forEach: (arg0: (controller: any) => void) => void;
-  }) {
-    routes.forEach(controller => {
-      this.app.use("/", controller.router);
-    });
-  }
+    /**
+     * Bind routes
+     *
+     * @param routes
+     */
+    private _bindRoutes(routes: {
+        forEach: (arg0: (controller: any) => void) => void;
+    }): void {
+        routes.forEach((controller: any): void => {
+            this.app.use('/', controller.router);
+        });
 
-  /**
-   * Setting assets
-   */
-  private settingAssets() {
-    this.app.use(express.static("../public"));
-  }
+        this.app.use(notFoundRoute);
+        this.app.use(errorHandler);
+    }
 
-  /**
-   * Setting template engine
-   */
-  private settingTemplate() {
-    this.app.set("views", path.join(__dirname, "../views"));
-    this.app.set("view engine", "pug");
-  }
+    /**
+     * Setting assets
+     */
+    private _settingAssets(): void {
+        this.app.use(express.static('../public'));
+    }
 
-  /**
-   * Enable listen port
-   */
-  public enableListen() {
-    this.app.listen(this.port, () => {
-      console.log(chalk.blue("[INFO]"), `App listening on the http://localhost:${this.port}`);
-    });
-  }
+    /**
+     * Setting template engine
+     */
+    private _settingTemplate(): void {
+        this.app.set('views', path.join(__dirname, '../views'));
+        this.app.set('view engine', 'pug');
+    }
+
+    /**
+     * Enable listen port
+     */
+    public enableListen(): void {
+        this.app.listen(this.serverPort, (): void => {
+            new MessageLog(
+                Constant.MESSAGE_TYPE.INFO,
+                `App listening on the http://localhost:${this.serverPort}`
+            ).show();
+        });
+    }
 }
 
 export default App;

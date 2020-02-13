@@ -86,7 +86,7 @@ function main(detailUrlsGroup) {
 }
 
 /**
- * Loop update database
+ * Loop update database.ts
  */
 setInterval(() => {
     let rawDataSaveQueueLength = rawDataSaveQueue.length;

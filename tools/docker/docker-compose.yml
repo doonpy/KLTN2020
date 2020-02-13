@@ -10,15 +10,18 @@ services:
       - ../../.env:/usr/repository/.env
       - ../../views:/usr/repository/views
     working_dir: /usr/repository
+    environment:
+      - NODE_ENV=development
     ports:
       - 3000:3000
     command: sh -c "npm install && npm run start"
+    depends_on:
+      - mongo-db
 
   mongo-db:
     image: mongo
     container_name: mongo-db
     environment:
-      - MONGO_INITDB_DATABASE=kltn2020
       - MONGO_INITDB_ROOT_USERNAME=alice
       - MONGO_INITDB_ROOT_PASSWORD=alice
     ports:
