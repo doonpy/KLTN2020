@@ -6,6 +6,8 @@ import Validator from '../validator/validator';
 import StringChecker from '../checker/type/string.checker';
 import StringLengthChecker from '../checker/string-length.checker';
 import DomainChecker from '../checker/domain.checker';
+import IntegerChecker from '../checker/type/integer.checker';
+import IntegerRangeChecker from '../checker/integer-range.checker';
 
 const commonPath: string = '/hosts';
 const specifyIdPath: string = '/hosts/:id';
@@ -28,23 +30,31 @@ class HostController extends ControllerBase {
      * @param next
      */
     protected getAllRoute = (req: Request, res: Response, next: any): void => {
-        const validator = this.createCommonValidator();
+        const validator = new Validator();
 
-        validator.validate(req.query);
-        validator.validate(req.body);
+        validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
+        validator.addParamValidator(
+            this.PARAM_LIMIT,
+            new IntegerRangeChecker(1, 1000)
+        );
 
-        this.initInputs(req);
+        validator.addParamValidator(this.PARAM_OFFSET, new IntegerChecker());
+        validator.addParamValidator(
+            this.PARAM_OFFSET,
+            new IntegerRangeChecker(0, null)
+        );
+
+        validator.validate(this.requestQuery);
 
         this.hostLogic
-            .getAll()
+            .getAll(this.limit, this.offset)
             .then((hosts: Array<object>) => {
-                let handledHosts: Array<object> = this.handleItemsList(hosts);
                 let responseBody: object = {
-                    hosts: handledHosts,
+                    hosts: hosts,
                     hasNext: this.hasNext,
                 };
 
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     responseBody,
                     res
@@ -66,24 +76,23 @@ class HostController extends ControllerBase {
         next: any
     ): void => {
         const validator = new Validator();
-        validator.addParamValidator(this.PARAM_ID, new StringChecker());
+
+        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_ID,
-            new StringLengthChecker(1, null)
+            new IntegerRangeChecker(1, null)
         );
 
-        validator.validate(req.params);
-
-        this.initInputs(req);
+        validator.validate(this.requestParams);
 
         this.hostLogic
-            .getById(req.params.id)
+            .getById(this.requestParams.id)
             .then((host: object) => {
                 let responseBody: object = {
                     host: host,
                 };
 
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     responseBody,
                     res
@@ -101,6 +110,7 @@ class HostController extends ControllerBase {
      */
     protected createRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
+
         validator.addParamValidator(this.PARAM_DOMAIN, new StringChecker());
         validator.addParamValidator(
             this.PARAM_DOMAIN,
@@ -114,14 +124,12 @@ class HostController extends ControllerBase {
             new StringLengthChecker(1, 100)
         );
 
-        validator.validate(req.body);
-
-        this.initInputs(req);
+        validator.validate(this.requestBody);
 
         this.hostLogic
             .create(this.requestBody)
             .then((createdHost: object) => {
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.CREATED,
                     createdHost,
                     res
@@ -139,10 +147,11 @@ class HostController extends ControllerBase {
      */
     protected updateRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
-        validator.addParamValidator(this.PARAM_ID, new StringChecker());
+
+        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_ID,
-            new StringLengthChecker(1, null)
+            new IntegerRangeChecker(1, null)
         );
 
         validator.addParamValidator(this.PARAM_DOMAIN, new StringChecker());
@@ -158,15 +167,13 @@ class HostController extends ControllerBase {
             new StringLengthChecker(1, 100)
         );
 
-        validator.validate(req.body);
-        validator.validate(req.params);
-
-        this.initInputs(req);
+        validator.validate(this.requestParams);
+        validator.validate(this.requestBody);
 
         this.hostLogic
-            .update(req.params.id, this.requestBody)
+            .update(this.requestParams.id, this.requestBody)
             .then((editedHost: object) => {
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     editedHost,
                     res
@@ -184,18 +191,19 @@ class HostController extends ControllerBase {
      */
     protected deleteRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
-        validator.addParamValidator(this.PARAM_ID, new StringChecker());
+
+        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_ID,
-            new StringLengthChecker(1, null)
+            new IntegerRangeChecker(1, null)
         );
 
-        validator.validate(req.params);
+        validator.validate(this.requestParams);
 
         this.hostLogic
-            .delete(req.params.id)
+            .delete(this.requestParams.id)
             .then(() => {
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
                     {},
                     res

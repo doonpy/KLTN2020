@@ -7,6 +7,8 @@ import StringChecker from '../checker/type/string.checker';
 import StringLengthChecker from '../checker/string-length.checker';
 import UrlChecker from '../checker/url.checker';
 import ObjectChecker from '../checker/type/object.checker';
+import IntegerChecker from '../checker/type/integer.checker';
+import IntegerRangeChecker from '../checker/integer-range.checker';
 
 const commonPath: string = '/catalogs';
 const specifyIdPath: string = '/catalogs/:id';
@@ -35,23 +37,17 @@ class CatalogController extends ControllerBase {
     protected getAllRoute = (req: Request, res: Response, next: any): any => {
         const validator = this.createCommonValidator();
 
-        validator.validate(req.query);
-        validator.validate(req.body);
-
-        this.initInputs(req);
+        validator.validate(this.requestQuery);
 
         this.catalogLogic
-            .getAll()
+            .getAll(this.limit, this.offset)
             .then(catalogs => {
-                let handledCatalogs: Array<object> = this.handleItemsList(
-                    catalogs
-                );
                 let responseBody: object = {
-                    catalogs: handledCatalogs,
+                    catalogs: catalogs,
                     hasNext: this.hasNext,
                 };
 
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     responseBody,
                     res
@@ -73,24 +69,23 @@ class CatalogController extends ControllerBase {
         next: any
     ): any => {
         const validator = new Validator();
-        validator.addParamValidator(this.PARAM_ID, new StringChecker());
+
+        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_ID,
-            new StringLengthChecker(24, 24)
+            new IntegerRangeChecker(1, null)
         );
 
-        validator.validate(req.params);
-
-        this.initInputs(req);
+        validator.validate(this.requestParams);
 
         this.catalogLogic
-            .getById(req.params.id)
+            .getById(this.requestParams.id)
             .then(catalog => {
                 let responseBody: object = {
                     catalog: catalog,
                 };
 
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     responseBody,
                     res
@@ -129,18 +124,16 @@ class CatalogController extends ControllerBase {
         validator.addParamValidator(this.PARAM_HOST_ID, new StringChecker());
         validator.addParamValidator(
             this.PARAM_HOST_ID,
-            new StringLengthChecker(24, 24)
+            new StringLengthChecker(1, 1)
         );
 
-        validator.validate(req.body);
-        validator.validate(req.body.locator || {});
-
-        this.initInputs(req);
+        validator.validate(this.requestBody);
+        validator.validate(this.requestBody.locator || {});
 
         this.catalogLogic
-            .create(req.body)
+            .create(this.requestBody)
             .then(createdHost => {
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.CREATED,
                     createdHost,
                     res
@@ -154,14 +147,15 @@ class CatalogController extends ControllerBase {
     /**
      * @param req
      * @param res
+     * @param next
      */
     protected updateRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
-        validator.addParamValidator(this.PARAM_ID, new StringChecker());
+        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_ID,
-            new StringLengthChecker(24, 24)
+            new IntegerRangeChecker(1, null)
         );
 
         validator.addParamValidator(this.PARAM_TITLE, new StringChecker());
@@ -181,22 +175,20 @@ class CatalogController extends ControllerBase {
             new StringChecker()
         );
 
-        validator.addParamValidator(this.PARAM_HOST_ID, new StringChecker());
+        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_HOST_ID,
-            new StringLengthChecker(24, 24)
+            new IntegerRangeChecker(1, null)
         );
 
-        validator.validate(req.params);
-        validator.validate(req.body);
-        validator.validate(req.body.locator || {});
-
-        this.initInputs(req);
+        validator.validate(this.requestParams);
+        validator.validate(this.requestBody);
+        validator.validate(this.requestBody.locator || {});
 
         this.catalogLogic
-            .update(req.params.id, this.requestBody)
+            .update(this.requestParams.id, this.requestBody)
             .then((editedCatalog: object) => {
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     editedCatalog,
                     res
@@ -215,18 +207,18 @@ class CatalogController extends ControllerBase {
     protected deleteRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
-        validator.addParamValidator(this.PARAM_ID, new StringChecker());
+        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
         validator.addParamValidator(
             this.PARAM_ID,
-            new StringLengthChecker(24, 24)
+            new IntegerRangeChecker(1, null)
         );
 
-        validator.validate(req.params);
+        validator.validate(this.requestParams);
 
         this.catalogLogic
-            .delete(req.params.id)
+            .delete(this.requestParams.id)
             .then(() => {
-                this.apiResponse.sendResponse(
+                this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
                     {},
                     res

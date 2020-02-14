@@ -16,4 +16,5 @@ hostSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     incrementBy: 1,
 });
+
 export default mongoose.model('host', hostSchema);

@@ -10,10 +10,12 @@ class HostLogic {
     /**
      * @return Promise<Array<object>>
      */
-    public getAll = (): Promise<Array<object>> => {
+    public getAll = (limit: number, offset: number): Promise<Array<object>> => {
         return new Promise((resolve: any, reject: any): void => {
-            HostModel.find().exec(
-                (error: Error, hosts: Array<Document>): void => {
+            HostModel.find()
+                .skip(offset)
+                .limit(limit)
+                .exec((error: Error, hosts: Array<Document>): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -30,8 +32,7 @@ class HostLogic {
                     });
 
                     resolve(hostList);
-                }
-            );
+                });
         });
     };
 

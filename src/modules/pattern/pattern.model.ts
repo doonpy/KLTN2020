@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import autoIncrement from 'mongoose-auto-increment';
 
 const patternSchema: Schema = new Schema(
     {
@@ -20,5 +21,11 @@ const patternSchema: Schema = new Schema(
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
+
+patternSchema.plugin(autoIncrement.plugin, {
+    model: 'pattern',
+    startAt: 1,
+    incrementBy: 1,
+});
 
 export default mongoose.model('pattern', patternSchema);

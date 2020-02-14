@@ -1,19 +1,21 @@
 import express, { Request, Response } from 'express';
-import ApiResponse from '../../util/api-response';
-import { Constant } from '../../util/definition/constant';
 import Validator from '../validator/validator';
 import IntegerChecker from '../checker/type/integer.checker';
 import IntegerRangeChecker from '../checker/integer-range.checker';
+import { Constant } from '../../util/definition/constant';
 
 abstract class ControllerBase {
     protected commonPath: string = '';
     protected specifyIdPath: string = '';
+
     protected limit: number = 100;
     protected offset: number = 0;
     protected hasNext: boolean = false;
-    protected router: any = express.Router();
-    protected apiResponse: ApiResponse = new ApiResponse();
     protected requestBody: any = {};
+    protected requestParams: any = {};
+    protected requestQuery: any = {};
+
+    protected router: any = express.Router();
 
     protected readonly PARAM_ID: string = 'id';
     protected readonly PARAM_LIMIT: string = 'limit';
@@ -22,11 +24,16 @@ abstract class ControllerBase {
     protected constructor() {}
 
     protected initRoutes(): void {
-        this.router.get(this.commonPath, this.getAllRoute);
-        this.router.get(this.specifyIdPath, this.getWithIdRoute);
-        this.router.post(this.commonPath, this.createRoute);
-        this.router.put(this.specifyIdPath, this.updateRoute);
-        this.router.delete(this.specifyIdPath, this.deleteRoute);
+        this.router
+            .all(this.commonPath, this.initInputs.bind(this))
+            .get(this.commonPath, this.getAllRoute)
+            .post(this.commonPath, this.createRoute);
+
+        this.router
+            .all(this.specifyIdPath, this.initInputs.bind(this))
+            .get(this.specifyIdPath, this.getWithIdRoute)
+            .put(this.specifyIdPath, this.updateRoute)
+            .delete(this.specifyIdPath, this.deleteRoute);
     }
 
     /**
@@ -85,11 +92,11 @@ abstract class ControllerBase {
     ): void;
 
     /**
-     * Initialize default inputs
-     *
      * @param req
+     * @param res
+     * @param next
      */
-    protected initInputs(req: Request): void {
+    private initInputs(req: Request, res: Response, next: any): void {
         let limit: number = Number(req.query.limit);
         let offset: number = Number(req.query.offset);
 
@@ -97,35 +104,22 @@ abstract class ControllerBase {
 
         this.offset = offset || Constant.DEFAULT_VALUE.OFFSET;
 
+        this.requestParams = {};
+        if (Object.keys(req.params).length > 0) {
+            this.requestParams = req.params;
+        }
+
+        this.requestQuery = {};
+        if (Object.keys(req.query).length > 0) {
+            this.requestQuery = req.query;
+        }
+
         this.requestBody = {};
         if (Object.keys(req.body).length > 0) {
             this.requestBody = req.body;
         }
-    }
 
-    /**
-     * @param items
-     *
-     * @return Array<object>
-     */
-    protected handleItemsList(items: Array<object>): Array<object> {
-        let itemsList: Array<object> = [];
-        let totalItem: number = items.length;
-
-        if (this.offset > totalItem) {
-            return itemsList;
-        }
-
-        if (totalItem < this.limit) {
-            return items;
-        }
-
-        items.splice(0, this.offset).length;
-        itemsList = items.splice(0, this.limit);
-
-        this.hasNext = this.offset + itemsList.length < totalItem;
-
-        return itemsList;
+        next();
     }
 
     /**
@@ -148,6 +142,24 @@ abstract class ControllerBase {
 
         return validator;
     };
+
+    /**
+     * @param statusCode
+     * @param body
+     * @param res
+     */
+    protected sendResponse(
+        statusCode: number = Constant.RESPONSE_STATUS_CODE
+            .INTERNAL_SERVER_ERROR,
+        body: object = {},
+        res: Response
+    ): void {
+        if (statusCode === Constant.RESPONSE_STATUS_CODE.NO_CONTENT) {
+            res.status(statusCode).json();
+        } else {
+            res.status(statusCode).json(body);
+        }
+    }
 }
 
 export default ControllerBase;

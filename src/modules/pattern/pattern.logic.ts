@@ -1,21 +1,40 @@
-import PatternModel from "./pattern.model";
-import {Document, Types} from "mongoose";
+import PatternModel from './pattern.model';
+import { Document } from 'mongoose';
+import CustomizeException from '../exception/customize.exception';
+import { Constant } from '../../util/definition/constant';
+import { Cause } from '../../util/definition/error/cause';
+import async from 'async';
+import { PatternErrorMessage } from './error-message';
 
 class PatternLogic {
     /**
-     * Get all pattern
-     *
-     * @return Promise<Document[] | Error>
+     * @return Promise<Array<object>>
      */
-    public getAll = (): Promise<Document[] | Error> => {
-        return new Promise((resolve, reject) => {
-            PatternModel.find({}, {}, (error, patterns) => {
-                if (error) {
-                    reject(error);
-                }
+    public getAll = (limit: number, offset: number): Promise<Array<object>> => {
+        return new Promise((resolve: any, reject: any): void => {
+            PatternModel.find()
+                .skip(offset)
+                .limit(limit)
+                .exec((error: Error, patterns: Array<Document>): void => {
+                    if (error) {
+                        return reject(
+                            new CustomizeException(
+                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                error.message,
+                                Cause.DATABASE
+                            )
+                        );
+                    }
 
-                resolve(patterns);
-            });
+                    let patternList: Array<object> = [];
+                    patterns.forEach((pattern: Document): void => {
+                        patternList.push(
+                            PatternLogic.convertToResponse(pattern)
+                        );
+                    });
+
+                    resolve(patternList);
+                });
         });
     };
 
@@ -39,34 +58,68 @@ class PatternLogic {
     };
 
     /**
-     * Create new pattern
+     * @param requestBody
      *
-     * @param catalogId
-     * @param sourceUrl
-     * @param mainLocator
-     * @param subLocator
-     *
-     * @return Promise<Error | null>
+     * @return Promise<Document>
      */
-    public create = (
-        catalogId: string,
-        sourceUrl: string,
-        mainLocator: object,
-        subLocator: object
-    ): Promise<Error | null> => {
-        return new Promise((resolve, reject) => {
-            new PatternModel({
-                catalogId: catalogId,
-                sourceUrl: sourceUrl,
-                mainLocator: mainLocator,
-                subLocator: subLocator
-            }).save(error => {
-                if (error) {
-                    reject(error);
-                }
+    public create = ({
+        catalogId,
+        sourceUrl,
+        mainLocator,
+        subLocator,
+    }: {
+        catalogId: string;
+        sourceUrl: string;
+        mainLocator: {
+            title: string;
+            price: string;
+            acreage: string;
+            address: string;
+        };
+        subLocator: Array<{ name: string; locator: string }>;
+    }): Promise<Document> => {
+        return new Promise((resolve: any, reject: any): void => {
+            PatternModel.countDocuments({ catalogId: catalogId }).exec(
+                (error: Error, isCatalogExisted: number): void => {
+                    if (error) {
+                        return reject(
+                            new CustomizeException(
+                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                error.message,
+                                Cause.DATABASE
+                            )
+                        );
+                    }
 
-                resolve();
-            });
+                    if (isCatalogExisted) {
+                        return reject(
+                            new CustomizeException(
+                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                                PatternErrorMessage.EXISTS,
+                                Cause.DATA_VALUE.EXISTS,
+                                ['catalog id', catalogId]
+                            )
+                        );
+                    }
+
+                    new PatternModel({
+                        catalogId: catalogId,
+                        sourceUrl: sourceUrl,
+                        mainLocator: mainLocator,
+                        subLocator: subLocator,
+                    }).save((error: Error, createdPattern: Document): void => {
+                        if (error) {
+                            new CustomizeException(
+                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                error.message,
+                                Cause.DATABASE
+                            );
+                        }
+
+                        resolve(PatternLogic.convertToResponse(createdPattern));
+                    });
+                }
+            );
         });
     };
 
@@ -96,9 +149,9 @@ class PatternLogic {
                 url: url,
                 locator: {
                     detailUrl: detailUrlLocator,
-                    pageNumber: pageNumberLocator
+                    pageNumber: pageNumberLocator,
                 },
-                hostId: hostId
+                hostId: hostId,
             };
             PatternModel.findByIdAndUpdate(catalogId, updateObject, error => {
                 if (error) {
@@ -128,6 +181,82 @@ class PatternLogic {
             });
         });
     };
+
+    /**
+     * @param pattern
+     */
+    private static convertToResponse({
+        _id,
+        catalogId,
+        sourceUrl,
+        mainLocator,
+        subLocator,
+        cTime,
+        mTime,
+    }: any): {
+        id: number;
+        catalogId: number;
+        sourceUrl: string;
+        mainLocator: {
+            title: string;
+            price: string;
+            acreage: string;
+            address: string;
+        };
+        subLocator: { name: string; locator: string };
+        createAt: string;
+        updateAt: string;
+    } {
+        let data: {
+            id: number;
+            catalogId: number;
+            sourceUrl: string;
+            mainLocator: {
+                title: string;
+                price: string;
+                acreage: string;
+                address: string;
+            };
+            subLocator: { name: string; locator: string };
+            createAt: string;
+            updateAt: string;
+        } = {
+            id: NaN,
+            catalogId: NaN,
+            sourceUrl: '',
+            mainLocator: { title: '', price: '', acreage: '', address: '' },
+            subLocator: { name: '', locator: '' },
+            createAt: '',
+            updateAt: '',
+        };
+
+        if (_id) {
+            data.id = _id;
+        }
+        if (catalogId) {
+            data.catalogId = catalogId;
+        }
+        if (sourceUrl) {
+            data.sourceUrl = sourceUrl;
+        }
+
+        if (Object.keys(mainLocator).length > 0) {
+            data.mainLocator = mainLocator;
+        }
+
+        if (Object.keys(subLocator).length > 0) {
+            data.subLocator = subLocator;
+        }
+
+        if (cTime) {
+            data.createAt = cTime;
+        }
+        if (mTime) {
+            data.updateAt = mTime;
+        }
+
+        return data;
+    }
 }
 
 export default PatternLogic;

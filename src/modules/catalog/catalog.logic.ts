@@ -12,10 +12,12 @@ class CatalogLogic {
     /**
      * @return Promise<Array<object>>
      */
-    public getAll = (): Promise<Array<object>> => {
+    public getAll = (limit: number, offset: number): Promise<Array<object>> => {
         return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.find().exec(
-                (error: Error, catalogs: Array<Document>): void => {
+            CatalogModel.find()
+                .skip(offset)
+                .limit(limit)
+                .exec((error: Error, catalogs: Array<Document>): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -32,8 +34,7 @@ class CatalogLogic {
                     });
 
                     resolve(catalogList);
-                }
-            );
+                });
         });
     };
 
@@ -259,10 +260,10 @@ class CatalogLogic {
                         );
                     }
 
-                    catalog.title = title;
-                    catalog.url = url;
-                    catalog.locator = locator;
-                    catalog.hostId = hostId;
+                    catalog.title = title || catalog.title;
+                    catalog.url = url || catalog.url;
+                    catalog.locator = locator || catalog.locator;
+                    catalog.hostId = hostId || catalog.hostId;
                     catalog.save(
                         (error: Error, editedCatalog: Document): void => {
                             if (error) {
