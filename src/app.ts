@@ -17,10 +17,10 @@ class App {
         new DatabaseConnection()
             .connect()
             .then(() => {
-                this._settingAssets();
-                this._settingTemplate();
-                this._bindMiddlewares(appInit.middleWares);
-                this._bindRoutes(appInit.controllers);
+                this.settingAssets();
+                this.settingTemplate();
+                this.bindMiddlewares(appInit.middleWares);
+                this.bindRoutes(appInit.controllers);
             })
             .catch(error => {
                 new MessageLog(
@@ -35,7 +35,7 @@ class App {
      *
      * @param middleWares
      */
-    private _bindMiddlewares(middleWares: {
+    private bindMiddlewares(middleWares: {
         forEach: (arg0: (middleWare: any) => void) => void;
     }): void {
         middleWares.forEach((middleWare: any): void => {
@@ -48,7 +48,7 @@ class App {
      *
      * @param routes
      */
-    private _bindRoutes(routes: {
+    private bindRoutes(routes: {
         forEach: (arg0: (controller: any) => void) => void;
     }): void {
         routes.forEach((controller: any): void => {
@@ -62,14 +62,14 @@ class App {
     /**
      * Setting assets
      */
-    private _settingAssets(): void {
+    private settingAssets(): void {
         this.app.use(express.static('../public'));
     }
 
     /**
      * Setting template engine
      */
-    private _settingTemplate(): void {
+    private settingTemplate(): void {
         this.app.set('views', path.join(__dirname, '../views'));
         this.app.set('view engine', 'pug');
     }

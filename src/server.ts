@@ -5,6 +5,7 @@ import * as dotenv from 'dotenv';
 import HostController from './modules/host/host.controller';
 import CatalogController from './modules/catalog/catalog.controller';
 import PatternController from './modules/pattern/pattern.controller';
+import DetailUrlController from './modules/detail-url/detail-url.controller';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const app = new App({
         new HostController(),
         new CatalogController(),
         new PatternController(),
+        new DetailUrlController(),
     ],
     middleWares: [
         bodyParser.json(),

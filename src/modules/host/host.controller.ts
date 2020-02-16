@@ -44,14 +44,16 @@ class HostController extends ControllerBase {
             new IntegerRangeChecker(0, null)
         );
 
+        validator.addParamValidator(this.PARAM_KEYWORD, new StringChecker());
+
         validator.validate(this.requestQuery);
 
         this.hostLogic
-            .getAll(this.limit, this.offset)
-            .then((hosts: Array<object>) => {
+            .getAll(this.keyword, this.limit, this.offset)
+            .then(({ hostList, hasNext }): void => {
                 let responseBody: object = {
-                    hosts: hosts,
-                    hasNext: this.hasNext,
+                    hosts: hostList,
+                    hasNext: hasNext,
                 };
 
                 this.sendResponse(
@@ -87,7 +89,7 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .getById(this.requestParams.id)
-            .then((host: object) => {
+            .then((host: object): void => {
                 let responseBody: object = {
                     host: host,
                 };
@@ -128,7 +130,7 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .create(this.requestBody)
-            .then((createdHost: object) => {
+            .then((createdHost: object): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.CREATED,
                     createdHost,
@@ -172,7 +174,7 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .update(this.requestParams.id, this.requestBody)
-            .then((editedHost: object) => {
+            .then((editedHost: object): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
                     editedHost,
@@ -202,7 +204,7 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .delete(this.requestParams.id)
-            .then(() => {
+            .then((): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
                     {},

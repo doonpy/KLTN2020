@@ -3,18 +3,35 @@ import CatalogModel from './catalog.model';
 import HostModel from '../host/host.model';
 import CustomizeException from '../exception/customize.exception';
 import { Constant } from '../../util/definition/constant';
-import { CatalogErrorMessage } from './error-message';
+import { CatalogErrorMessage } from './catalog.error-message';
 import { Cause } from '../../util/definition/error/cause';
 import async, { Dictionary } from 'async';
-import { HostErrorMessage } from '../host/error-message';
+import HostLogic from '../host/host.logic';
 
 class CatalogLogic {
     /**
-     * @return Promise<Array<object>>
+     * @param keyword
+     * @param limit
+     * @param offset
+     * @param hostId
+     *
+     * @return Promise<{ catalogList: Array<object>; hasNext: boolean }>
      */
-    public getAll = (limit: number, offset: number): Promise<Array<object>> => {
+    public getAll = (
+        keyword: string,
+        limit: number,
+        offset: number,
+        hostId: number
+    ): Promise<{ catalogList: Array<object>; hasNext: boolean }> => {
         return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.find()
+            CatalogModel.find({
+                $or: [
+                    { title: { $regex: keyword, $options: 'i' } },
+                    { url: { $regex: keyword, $options: 'i' } },
+                ],
+                hostId: hostId || { $gt: 0 },
+            })
+                .populate('hostId')
                 .skip(offset)
                 .limit(limit)
                 .exec((error: Error, catalogs: Array<Document>): void => {
@@ -29,11 +46,19 @@ class CatalogLogic {
                     }
 
                     let catalogList: Array<object> = [];
-                    catalogs.forEach((host: Document): void => {
-                        catalogList.push(CatalogLogic.convertToResponse(host));
-                    });
+                    for (
+                        let i: number = 0;
+                        i < catalogs.length && i < limit;
+                        i++
+                    ) {
+                        catalogList.push(
+                            CatalogLogic.convertToResponse(catalogs[i])
+                        );
+                    }
 
-                    resolve(catalogList);
+                    let hasNext: boolean = catalogList.length < catalogs.length;
+
+                    resolve({ catalogList: catalogList, hasNext: hasNext });
                 });
         });
     };
@@ -45,37 +70,39 @@ class CatalogLogic {
      */
     public getById = (id: string): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.findById(id).exec((error, catalog): void => {
-                if (error) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                            error.message,
-                            Cause.DATABASE
-                        )
-                    );
-                }
+            CatalogModel.findById(id)
+                .populate('hostId')
+                .exec((error, catalog): void => {
+                    if (error) {
+                        return reject(
+                            new CustomizeException(
+                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                error.message,
+                                Cause.DATABASE
+                            )
+                        );
+                    }
 
-                if (!catalog) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                            HostErrorMessage.NOT_FOUND,
-                            Cause.DATA_VALUE.NOT_FOUND,
-                            ['id', id]
-                        )
-                    );
-                }
+                    if (!catalog) {
+                        return reject(
+                            new CustomizeException(
+                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                                CatalogErrorMessage.CTL_ERR_3,
+                                Cause.DATA_VALUE.NOT_FOUND,
+                                ['id', id]
+                            )
+                        );
+                    }
 
-                resolve(CatalogLogic.convertToResponse(catalog));
-            });
+                    resolve(CatalogLogic.convertToResponse(catalog));
+                });
         });
     };
 
     /**
      * @param body
      *
-     * @return Promise<Document>
+     * @return Promise<object>
      */
     public create = ({
         title,
@@ -87,26 +114,25 @@ class CatalogLogic {
         url: string;
         locator: { detailUrl: string; pageNumber: string };
         hostId: string;
-    }): Promise<Document> => {
+    }): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
                     catalog: (callback: any): void => {
                         CatalogModel.findOne({ url: url }).exec(callback);
                     },
-                    isHostExisted: (callback: any): void => {
-                        HostModel.countDocuments({ _id: hostId }).exec(
-                            callback
-                        );
+                    host: (callback: any): void => {
+                        HostModel.findById(hostId).exec(callback);
                     },
                 },
                 (
                     error: any,
                     {
                         catalog,
-                        isHostExisted,
+                        host,
                     }: Dictionary<
-                        any | { catalog: Document; isHostExisted: Number }
+                        | any
+                        | { catalog: Document | null; host: Document | null }
                     >
                 ): void => {
                     if (error) {
@@ -123,20 +149,20 @@ class CatalogLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.EXISTS,
+                                CatalogErrorMessage.CTL_ERR_2,
                                 Cause.DATA_VALUE.EXISTS,
                                 ['url', url]
                             )
                         );
                     }
 
-                    if (!isHostExisted) {
+                    if (!host) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.NOT_FOUND,
+                                CatalogErrorMessage.CTL_ERR_3,
                                 Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', hostId]
+                                ['hostId', hostId]
                             )
                         );
                     }
@@ -146,19 +172,27 @@ class CatalogLogic {
                         url: url,
                         locator: locator,
                         hostId: hostId,
-                    }).save((error: Error, createdCatalog: Document): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
+                    }).save(
+                        (
+                            error: Error,
+                            createdCatalog: any | Document
+                        ): void => {
+                            if (error) {
+                                return reject(
+                                    new CustomizeException(
+                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                        error.message,
+                                        Cause.DATABASE
+                                    )
+                                );
+                            }
+
+                            createdCatalog.hostId = host;
+                            resolve(
+                                CatalogLogic.convertToResponse(createdCatalog)
                             );
                         }
-
-                        resolve(CatalogLogic.convertToResponse(createdCatalog));
-                    });
+                    );
                 }
             );
         });
@@ -168,7 +202,7 @@ class CatalogLogic {
      * @param id
      * @param body
      *
-     * @return Promise<Document>
+     * @return Promise<object>
      */
     public update = (
         id: string,
@@ -180,10 +214,10 @@ class CatalogLogic {
         }: {
             title: string;
             url: string;
-            locator: object;
+            locator: { detailUrl: string; pageNumber: string };
             hostId: string;
         }
-    ): Promise<Document> => {
+    ): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
@@ -196,10 +230,12 @@ class CatalogLogic {
                             hostId: hostId,
                         }).exec(callback);
                     },
-                    isHostExisted: (callback: any): void => {
-                        HostModel.countDocuments({ _id: hostId }).exec(
-                            callback
-                        );
+                    host: (callback: any): void => {
+                        if (hostId) {
+                            HostModel.findById(hostId).exec(callback);
+                        } else {
+                            callback();
+                        }
                     },
                 },
                 (
@@ -207,13 +243,13 @@ class CatalogLogic {
                     {
                         catalog,
                         isCatalogExisted,
-                        isHostExisted,
+                        host,
                     }: Dictionary<
                         | any
                         | {
-                              catalog: Document;
+                              catalog: Document | null;
                               isCatalogExisted: Number;
-                              isHostExisted: Number;
+                              host: Document | null;
                           }
                     >
                 ): void => {
@@ -231,7 +267,7 @@ class CatalogLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.NOT_FOUND,
+                                CatalogErrorMessage.CTL_ERR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
@@ -242,30 +278,38 @@ class CatalogLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.EXISTS,
+                                CatalogErrorMessage.CTL_ERR_2,
                                 Cause.DATA_VALUE.EXISTS,
                                 ['url', url]
                             )
                         );
                     }
 
-                    if (!isHostExisted) {
+                    if (hostId && !host) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.NOT_FOUND,
+                                CatalogErrorMessage.CTL_ERR_3,
                                 Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', hostId]
+                                ['hostId', hostId]
                             )
                         );
                     }
 
                     catalog.title = title || catalog.title;
                     catalog.url = url || catalog.url;
-                    catalog.locator = locator || catalog.locator;
+                    if (locator) {
+                        catalog.locator.detailUrl =
+                            locator.detailUrl || catalog.locator.detailUrl;
+                        catalog.locator.pageNumber =
+                            locator.pageNumber || catalog.locator.pageNumber;
+                    }
                     catalog.hostId = hostId || catalog.hostId;
                     catalog.save(
-                        (error: Error, editedCatalog: Document): void => {
+                        async (
+                            error: Error,
+                            editedCatalog: any | Document
+                        ): Promise<void> => {
                             if (error) {
                                 return reject(
                                     new CustomizeException(
@@ -274,6 +318,14 @@ class CatalogLogic {
                                         Cause.DATABASE
                                     )
                                 );
+                            }
+
+                            if (hostId) {
+                                editedCatalog.hostId = host;
+                            } else {
+                                await editedCatalog
+                                    .populate('hostId')
+                                    .execPopulate();
                             }
 
                             resolve(
@@ -309,7 +361,7 @@ class CatalogLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.NOT_FOUND,
+                                CatalogErrorMessage.CTL_ERR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
@@ -336,7 +388,7 @@ class CatalogLogic {
     /**
      * @param catalog
      */
-    private static convertToResponse({
+    public static convertToResponse({
         _id,
         title,
         url,
@@ -345,27 +397,27 @@ class CatalogLogic {
         cTime,
         mTime,
     }: any): {
-        id: string;
+        id: number;
         title: string;
         locator: { detailUrl: string; pageNumber: string };
-        hostId: string;
+        host: object;
         createAt: string;
         updateAt: string;
     } {
         let data: {
-            id: string;
+            id: number;
             title: string;
             url: string;
             locator: { detailUrl: string; pageNumber: string };
-            hostId: string;
+            host: { id: number; name: string; domain: string };
             createAt: string;
             updateAt: string;
         } = {
-            id: '',
+            id: NaN,
             title: '',
             url: '',
             locator: { detailUrl: '', pageNumber: '' },
-            hostId: '',
+            host: { id: NaN, name: '', domain: '' },
             createAt: '',
             updateAt: '',
         };
@@ -382,8 +434,8 @@ class CatalogLogic {
         if (locator) {
             data.locator = locator;
         }
-        if (hostId) {
-            data.hostId = hostId;
+        if (hostId && Object.keys(hostId).length > 0) {
+            data.host = HostLogic.convertToResponse(hostId);
         }
         if (cTime) {
             data.createAt = cTime;

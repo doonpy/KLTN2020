@@ -1,20 +1,32 @@
 import HostModel from './host.model';
 import { Document } from 'mongoose';
 import { Constant } from '../../util/definition/constant';
-import { HostErrorMessage } from './error-message';
+import { HostErrorMessage } from './host.error-message';
 import async, { Dictionary } from 'async';
 import CustomizeException from '../exception/customize.exception';
 import { Cause } from '../../util/definition/error/cause';
 
 class HostLogic {
     /**
-     * @return Promise<Array<object>>
+     * @param keyword
+     * @param limit
+     * @param offset
+     *
+     * @return Promise<{ hostList: Array<object>, hasNext: boolean }>
      */
-    public getAll = (limit: number, offset: number): Promise<Array<object>> => {
+    public getAll = (
+        keyword: string,
+        limit: number,
+        offset: number
+    ): Promise<{ hostList: Array<object>; hasNext: boolean }> => {
         return new Promise((resolve: any, reject: any): void => {
-            HostModel.find()
+            HostModel.find({
+                $or: [
+                    { name: { $regex: keyword, $options: 'i' } },
+                    { domain: { $regex: keyword, $options: 'i' } },
+                ],
+            })
                 .skip(offset)
-                .limit(limit)
                 .exec((error: Error, hosts: Array<Document>): void => {
                     if (error) {
                         return reject(
@@ -27,11 +39,17 @@ class HostLogic {
                     }
 
                     let hostList: Array<object> = [];
-                    hosts.forEach((host: Document): void => {
-                        hostList.push(HostLogic.convertToResponse(host));
-                    });
+                    for (
+                        let i: number = 0;
+                        i < hosts.length && i < limit;
+                        i++
+                    ) {
+                        hostList.push(HostLogic.convertToResponse(hosts[i]));
+                    }
 
-                    resolve(hostList);
+                    let hasNext: boolean = hostList.length < hosts.length;
+
+                    resolve({ hostList: hostList, hasNext: hasNext });
                 });
         });
     };
@@ -59,7 +77,7 @@ class HostLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.NOT_FOUND,
+                                HostErrorMessage.HOST_ERR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
@@ -101,7 +119,7 @@ class HostLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.EXISTS,
+                                HostErrorMessage.HOST_ERR_2,
                                 Cause.DATA_VALUE.EXISTS,
                                 ['domain', domain]
                             )
@@ -172,7 +190,7 @@ class HostLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.NOT_FOUND,
+                                HostErrorMessage.HOST_ERR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
@@ -183,7 +201,7 @@ class HostLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.EXISTS,
+                                HostErrorMessage.HOST_ERR_2,
                                 Cause.DATA_VALUE.EXISTS,
                                 ['domain', domain]
                             )
@@ -233,7 +251,7 @@ class HostLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.NOT_FOUND,
+                                HostErrorMessage.HOST_ERR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
@@ -261,7 +279,7 @@ class HostLogic {
     /**
      * @param host
      */
-    private static convertToResponse({
+    public static convertToResponse({
         _id,
         name,
         domain,

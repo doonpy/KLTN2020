@@ -6,7 +6,7 @@ import { ErrorMessage } from '../../util/definition/error/message';
 
 class UrlChecker extends CheckerBase {
     private VALID_URL: RegExp = new RegExp(
-        /^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.[\d\w\-]+)+\/?(([\d\w\-]+)+\/)+/
+        /^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.[\d\w\-]+)+\/(([\d\w\-]+)+\/?)+/
     );
 
     /**
@@ -24,7 +24,8 @@ class UrlChecker extends CheckerBase {
             throw new CustomizeException(
                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
                 ErrorMessage.PARAM.INVALID_VALUE,
-                Cause.DATA_VALUE.URL
+                Cause.DATA_VALUE.URL,
+                [value]
             );
         }
     }

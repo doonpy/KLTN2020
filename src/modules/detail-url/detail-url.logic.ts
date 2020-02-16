@@ -1,40 +1,33 @@
-import PatternModel from './pattern.model';
-import CatalogModel from '../catalog/catalog.model';
-import DetailUrlModel from '../detail-url/detail-url.model';
+import DetailUrlModel from './detail-url.model';
 import { Document } from 'mongoose';
 import CustomizeException from '../exception/customize.exception';
 import { Constant } from '../../util/definition/constant';
 import { Cause } from '../../util/definition/error/cause';
+import { DetailUrlErrorMessage } from './detail.error-message';
 import async, { Dictionary } from 'async';
-import { PatternErrorMessage } from './pattern.error-message';
-import DetailUrlLogic from '../detail-url/detail-url.logic';
+import CatalogModel from '../catalog/catalog.model';
 import CatalogLogic from '../catalog/catalog.logic';
 
-class PatternLogic {
+class DetailUrlLogic {
     /**
      * @param limit
      * @param offset
      * @param catalogId
      *
-     * @return Promise<{ patternList: Array<object>; hasNext: boolean }>
+     * @return Promise<Array<{ detailUrlList: Array<object>; hasNext: boolean }>>
      */
     public getAll = (
         limit: number,
         offset: number,
         catalogId: number
-    ): Promise<{ patternList: Array<object>; hasNext: boolean }> => {
+    ): Promise<{ detailUrlList: Array<object>; hasNext: boolean }> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.find({ catalogId: catalogId || { $gt: 0 } })
+            DetailUrlModel.find({
+                catalogId: catalogId || { $gt: 0 },
+            })
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                })
                 .skip(offset)
-                .exec((error: Error, patterns: Array<Document>): void => {
+                .exec((error: Error, detailUrls: Array<Document>): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -45,20 +38,21 @@ class PatternLogic {
                         );
                     }
 
-                    let patternList: Array<object> = [];
+                    let detailUrlList: Array<object> = [];
                     for (
                         let i: number = 0;
-                        i < patterns.length && i < limit;
+                        i < detailUrls.length && i < limit;
                         i++
                     ) {
-                        patternList.push(
-                            PatternLogic.convertToResponse(patterns[i])
+                        detailUrlList.push(
+                            DetailUrlLogic.convertToResponse(detailUrls[i])
                         );
                     }
 
-                    let hasNext: boolean = patternList.length < patterns.length;
+                    let hasNext: boolean =
+                        detailUrlList.length < detailUrls.length;
 
-                    resolve({ patternList: patternList, hasNext: hasNext });
+                    resolve({ detailUrlList: detailUrlList, hasNext: hasNext });
                 });
         });
     };
@@ -70,16 +64,9 @@ class PatternLogic {
      */
     public getById = (id: string): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id)
+            DetailUrlModel.findById(id)
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                })
-                .exec((error: Error, pattern: Document | null): void => {
+                .exec((error: Error, detailUrl: Document | null): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -90,18 +77,18 @@ class PatternLogic {
                         );
                     }
 
-                    if (!pattern) {
+                    if (!detailUrl) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
+                                DetailUrlErrorMessage.DU_ERROR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
                         );
                     }
 
-                    resolve(PatternLogic.convertToResponse(pattern));
+                    resolve(DetailUrlLogic.convertToResponse(detailUrl));
                 });
         });
     };
@@ -113,26 +100,21 @@ class PatternLogic {
      */
     public create = ({
         catalogId,
-        sourceUrlId,
-        mainLocator,
-        subLocator,
+        url,
+        isExtracted,
+        requestRetries,
     }: {
-        catalogId: number;
-        sourceUrlId: number;
-        mainLocator: {
-            title: string;
-            price: string;
-            acreage: string;
-            address: string;
-        };
-        subLocator: Array<{ name: string; locator: string }>;
+        catalogId: string;
+        url: string;
+        isExtracted: boolean;
+        requestRetries: number;
     }): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
-                    isPatternExisted: (callback: any): void => {
-                        PatternModel.countDocuments({
-                            catalogId: catalogId,
+                    isDetailUrlExisted: (callback: any): void => {
+                        DetailUrlModel.countDocuments({
+                            url: url,
                         }).exec(callback);
                     },
                     catalog: (callback: any): void => {
@@ -140,27 +122,17 @@ class PatternLogic {
                             .populate('hostId')
                             .exec(callback);
                     },
-                    sourceUrl: (callback: any): void => {
-                        DetailUrlModel.findById(sourceUrlId)
-                            .populate({
-                                path: 'catalogId',
-                                populate: { path: 'hostId' },
-                            })
-                            .exec(callback);
-                    },
                 },
                 (
                     error: Error | undefined,
                     {
-                        isPatternExisted,
+                        isDetailUrlExisted,
                         catalog,
-                        sourceUrl,
                     }: Dictionary<
                         | any
                         | {
-                              isPatternExisted: number;
-                              catalog: Document;
-                              sourceUrl: Document;
+                              isDetailUrlExisted: number;
+                              catalog: Document | null;
                           }
                     >
                 ): void => {
@@ -178,44 +150,31 @@ class PatternLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_3,
+                                DetailUrlErrorMessage.DU_ERROR_3,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['catalogId', catalogId]
                             )
                         );
                     }
 
-                    if (!sourceUrl) {
+                    if (isDetailUrlExisted) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_4,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['sourceUrlId', sourceUrlId]
-                            )
-                        );
-                    }
-
-                    if (isPatternExisted) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_2,
+                                DetailUrlErrorMessage.DU_ERROR_2,
                                 Cause.DATA_VALUE.EXISTS,
-                                ['catalogId', catalogId]
+                                ['url', url]
                             )
                         );
                     }
 
-                    new PatternModel({
+                    new DetailUrlModel({
                         catalogId: catalogId,
-                        sourceUrlId: sourceUrlId,
-                        mainLocator: mainLocator,
-                        subLocator: subLocator,
+                        url: url,
                     }).save(
                         (
                             error: Error,
-                            createdPattern: Document | any
+                            createdDetailUrl: Document | any
                         ): void => {
                             if (error) {
                                 return reject(
@@ -227,10 +186,11 @@ class PatternLogic {
                                 );
                             }
 
-                            createdPattern.catalogId = catalog;
-                            createdPattern.sourceUrlId = sourceUrl;
+                            createdDetailUrl.catalogId = catalog;
                             resolve(
-                                PatternLogic.convertToResponse(createdPattern)
+                                DetailUrlLogic.convertToResponse(
+                                    createdDetailUrl
+                                )
                             );
                         }
                     );
@@ -249,30 +209,25 @@ class PatternLogic {
         id: string,
         {
             catalogId,
-            sourceUrlId,
-            mainLocator,
-            subLocator,
+            url,
+            isExtracted,
+            requestRetries,
         }: {
             catalogId: string;
-            sourceUrlId: number;
-            mainLocator: {
-                title: string;
-                price: string;
-                acreage: string;
-                address: string;
-            };
-            subLocator: Array<{ name: string; locator: string }>;
+            url: string;
+            isExtracted: boolean;
+            requestRetries: number;
         }
     ): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
-                    pattern: (callback: any): void => {
-                        PatternModel.findById(id).exec(callback);
+                    detailUrl: (callback: any): void => {
+                        DetailUrlModel.findById(id).exec(callback);
                     },
-                    isPatternExisted: (callback: any): void => {
-                        PatternModel.countDocuments({
-                            catalogId: catalogId,
+                    isDetailUrlExisted: (callback: any): void => {
+                        DetailUrlModel.countDocuments({
+                            url: url,
                         }).exec(callback);
                     },
                     catalog: (callback: any): void => {
@@ -284,33 +239,19 @@ class PatternLogic {
                             callback();
                         }
                     },
-                    sourceUrl: (callback: any): void => {
-                        if (sourceUrlId) {
-                            DetailUrlModel.findById(sourceUrlId)
-                                .populate({
-                                    path: 'catalogId',
-                                    populate: { path: 'hostId' },
-                                })
-                                .exec(callback);
-                        } else {
-                            callback();
-                        }
-                    },
                 },
                 (
                     error: Error | undefined,
                     {
-                        pattern,
-                        isPatternExisted,
+                        detailUrl,
+                        isDetailUrlExisted,
                         catalog,
-                        sourceUrl,
                     }: Dictionary<
                         | any
                         | {
-                              pattern: Document | null;
+                              detailUrl: Document | null;
                               isPatternExisted: number;
                               catalog: Document | null;
-                              sourceUrl: Document | null;
                           }
                     >
                 ): void => {
@@ -324,11 +265,11 @@ class PatternLogic {
                         );
                     }
 
-                    if (!pattern) {
+                    if (!detailUrl) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
+                                DetailUrlErrorMessage.DU_ERROR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
@@ -339,43 +280,38 @@ class PatternLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_3,
+                                DetailUrlErrorMessage.DU_ERROR_3,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['catalogId', catalogId]
                             )
                         );
                     }
 
-                    if (!sourceUrl && sourceUrlId) {
+                    if (isDetailUrlExisted && url !== detailUrl.url) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_4,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['sourceUrlId', sourceUrlId]
-                            )
-                        );
-                    }
-
-                    if (isPatternExisted && catalogId !== catalog.catalogId) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_2,
+                                DetailUrlErrorMessage.DU_ERROR_2,
                                 Cause.DATA_VALUE.EXISTS,
-                                ['catalogId', catalogId]
+                                ['url', url]
                             )
                         );
                     }
 
-                    pattern.catalogId = catalogId || pattern.catalogId;
-                    pattern.sourceUrlId = sourceUrlId || pattern.sourceUrlId;
-                    pattern.mainLocator = mainLocator || pattern.mainLocator;
-                    pattern.subLocator = subLocator || pattern.subLocator;
-                    pattern.save(
+                    detailUrl.catalogId = catalogId || detailUrl.catalogId;
+                    detailUrl.url = url || detailUrl.url;
+                    detailUrl.isExtracted =
+                        isExtracted !== detailUrl.isExtracted
+                            ? isExtracted
+                            : detailUrl.isExtracted;
+                    detailUrl.requestRetries =
+                        requestRetries !== detailUrl.requestRetries
+                            ? requestRetries
+                            : detailUrl.requestRetries;
+                    detailUrl.save(
                         async (
                             error: Error,
-                            editedPattern: Document | any
+                            editedDetailUrl: Document | any
                         ): Promise<void> => {
                             if (error) {
                                 new CustomizeException(
@@ -386,32 +322,19 @@ class PatternLogic {
                             }
 
                             if (catalogId) {
-                                editedPattern.catalogId = catalog;
+                                editedDetailUrl.catalogId = catalog;
                             } else {
-                                await editedPattern
+                                await editedDetailUrl
                                     .populate({
                                         path: 'catalogId',
                                         populate: { path: 'hostId' },
                                     })
                                     .execPopulate();
                             }
-
-                            if (sourceUrlId) {
-                                editedPattern.sourceUrlId = sourceUrl;
-                            } else {
-                                await editedPattern
-                                    .populate({
-                                        path: 'sourceUrlId',
-                                        populate: {
-                                            path: 'catalogId',
-                                            populate: { path: 'hostId' },
-                                        },
-                                    })
-                                    .execPopulate();
-                            }
-
                             resolve(
-                                PatternLogic.convertToResponse(editedPattern)
+                                DetailUrlLogic.convertToResponse(
+                                    editedDetailUrl
+                                )
                             );
                         }
                     );
@@ -427,7 +350,7 @@ class PatternLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id).exec(
+            DetailUrlModel.findById(id).exec(
                 (error: Error, pattern: Document | null): void => {
                     if (error) {
                         return reject(
@@ -443,26 +366,29 @@ class PatternLogic {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
+                                DetailUrlErrorMessage.DU_ERROR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
                         );
                     }
 
-                    PatternModel.findByIdAndDelete(id, (error: Error): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
+                    DetailUrlModel.findByIdAndDelete(
+                        id,
+                        (error: Error): void => {
+                            if (error) {
+                                return reject(
+                                    new CustomizeException(
+                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                        error.message,
+                                        Cause.DATABASE
+                                    )
+                                );
+                            }
 
-                        resolve();
-                    });
+                            resolve();
+                        }
+                    );
                 }
             );
         });
@@ -472,47 +398,37 @@ class PatternLogic {
      * @param pattern
      */
 
-    private static convertToResponse({
+    public static convertToResponse({
         _id,
         catalogId,
-        sourceUrlId,
-        mainLocator,
-        subLocator,
+        url,
+        isExtracted,
+        requestRetries,
         cTime,
         mTime,
     }: any): {
         id: number;
         catalog: object;
-        sourceUrl: object;
-        mainLocator: {
-            title: string;
-            price: string;
-            acreage: string;
-            address: string;
-        };
-        subLocator: { name: string; locator: string };
+        url: string;
+        isExtracted: boolean;
+        requestRetries: number;
         createAt: string;
         updateAt: string;
     } {
         let data: {
             id: number;
             catalog: object;
-            sourceUrl: object;
-            mainLocator: {
-                title: string;
-                price: string;
-                acreage: string;
-                address: string;
-            };
-            subLocator: { name: string; locator: string };
+            url: string;
+            isExtracted: boolean;
+            requestRetries: number;
             createAt: string;
             updateAt: string;
         } = {
             id: NaN,
             catalog: {},
-            sourceUrl: {},
-            mainLocator: { title: '', price: '', acreage: '', address: '' },
-            subLocator: { name: '', locator: '' },
+            url: '',
+            isExtracted: false,
+            requestRetries: 0,
             createAt: '',
             updateAt: '',
         };
@@ -523,16 +439,16 @@ class PatternLogic {
         if (catalogId && Object.keys(catalogId).length > 0) {
             data.catalog = CatalogLogic.convertToResponse(catalogId);
         }
-        if (sourceUrlId && Object.keys(sourceUrlId).length > 0) {
-            data.sourceUrl = DetailUrlLogic.convertToResponse(sourceUrlId);
+        if (url) {
+            data.url = url;
         }
 
-        if (Object.keys(mainLocator).length > 0) {
-            data.mainLocator = mainLocator;
+        if (isExtracted) {
+            data.isExtracted = isExtracted;
         }
 
-        if (Object.keys(subLocator).length > 0) {
-            data.subLocator = subLocator;
+        if (requestRetries) {
+            data.requestRetries = requestRetries;
         }
 
         if (cTime) {
@@ -546,4 +462,4 @@ class PatternLogic {
     }
 }
 
-export default PatternLogic;
+export default DetailUrlLogic;

@@ -3,8 +3,8 @@ import autoIncrement from 'mongoose-auto-increment';
 
 const patternSchema: Schema = new Schema(
     {
-        catalogId: { type: Schema.Types.ObjectId, ref: 'catalog' },
-        sourceUrl: { type: Schema.Types.ObjectId, ref: 'detail_url' },
+        catalogId: { type: Schema.Types.Number, ref: 'catalog' },
+        sourceUrlId: { type: Schema.Types.Number, ref: 'detail_url' },
         mainLocator: {
             title: { type: Schema.Types.String },
             price: { type: Schema.Types.String },

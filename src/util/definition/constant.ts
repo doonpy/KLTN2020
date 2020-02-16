@@ -24,5 +24,6 @@ export const Constant = {
     DEFAULT_VALUE: {
         LIMIT: 100,
         OFFSET: 0,
+        KEYWORD: '',
     },
 };

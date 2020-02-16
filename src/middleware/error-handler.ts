@@ -87,9 +87,9 @@ const convertToString = (inputs: Array<{ [key: string]: string }>): string => {
             let value: any = input[key];
 
             if (typeof value === 'object') {
-                inputString.push(`${key} => {${convertToString([value])}}`);
+                inputString.push(`'${key}' => {${convertToString([value])}}`);
             } else {
-                inputString.push(`${key} => ${value}`);
+                inputString.push(`'${key}' => '${value}'`);
             }
         });
     });

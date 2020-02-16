@@ -10,6 +10,7 @@ abstract class ControllerBase {
 
     protected limit: number = 100;
     protected offset: number = 0;
+    protected keyword: string = '';
     protected hasNext: boolean = false;
     protected requestBody: any = {};
     protected requestParams: any = {};
@@ -20,20 +21,21 @@ abstract class ControllerBase {
     protected readonly PARAM_ID: string = 'id';
     protected readonly PARAM_LIMIT: string = 'limit';
     protected readonly PARAM_OFFSET: string = 'offset';
+    protected readonly PARAM_KEYWORD: string = 'keyword';
 
     protected constructor() {}
 
     protected initRoutes(): void {
         this.router
             .all(this.commonPath, this.initInputs.bind(this))
-            .get(this.commonPath, this.getAllRoute)
-            .post(this.commonPath, this.createRoute);
+            .get(this.commonPath, this.getAllRoute.bind(this))
+            .post(this.commonPath, this.createRoute.bind(this));
 
         this.router
             .all(this.specifyIdPath, this.initInputs.bind(this))
-            .get(this.specifyIdPath, this.getWithIdRoute)
-            .put(this.specifyIdPath, this.updateRoute)
-            .delete(this.specifyIdPath, this.deleteRoute);
+            .get(this.specifyIdPath, this.getWithIdRoute.bind(this))
+            .put(this.specifyIdPath, this.updateRoute.bind(this))
+            .delete(this.specifyIdPath, this.deleteRoute.bind(this));
     }
 
     /**
@@ -101,8 +103,10 @@ abstract class ControllerBase {
         let offset: number = Number(req.query.offset);
 
         this.limit = limit || Constant.DEFAULT_VALUE.LIMIT;
-
         this.offset = offset || Constant.DEFAULT_VALUE.OFFSET;
+        this.keyword = req.query.keyword
+            ? req.query.keyword.trim()
+            : Constant.DEFAULT_VALUE.KEYWORD;
 
         this.requestParams = {};
         if (Object.keys(req.params).length > 0) {
@@ -121,27 +125,6 @@ abstract class ControllerBase {
 
         next();
     }
-
-    /**
-     * @return Validator
-     */
-    protected createCommonValidator = (): Validator => {
-        const validator = new Validator();
-
-        validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_LIMIT,
-            new IntegerRangeChecker(1, 1000)
-        );
-
-        validator.addParamValidator(this.PARAM_OFFSET, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_OFFSET,
-            new IntegerRangeChecker(0, null)
-        );
-
-        return validator;
-    };
 
     /**
      * @param statusCode

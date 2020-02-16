@@ -1,26 +1,24 @@
-import { Request, Response } from 'express';
 import ControllerBase from '../base/controller.base';
-import CatalogLogic from './catalog.logic';
-import { Constant } from '../../util/definition/constant';
+import { Request, Response } from 'express';
 import Validator from '../validator/validator';
-import StringChecker from '../checker/type/string.checker';
-import StringLengthChecker from '../checker/string-length.checker';
-import UrlChecker from '../checker/url.checker';
-import ObjectChecker from '../checker/type/object.checker';
 import IntegerChecker from '../checker/type/integer.checker';
 import IntegerRangeChecker from '../checker/integer-range.checker';
+import StringChecker from '../checker/type/string.checker';
+import { Constant } from '../../util/definition/constant';
+import StringLengthChecker from '../checker/string-length.checker';
+import DetailUrlLogic from './detail-url.logic';
+import UrlChecker from '../checker/url.checker';
+import BooleanChecker from '../checker/type/boolean.checker';
 
-const commonPath: string = '/catalogs';
-const specifyIdPath: string = '/catalogs/:id';
+const commonPath: string = '/detail-urls';
+const specifyIdPath: string = '/detail-urls/:id';
 
-class CatalogController extends ControllerBase {
-    private catalogLogic: CatalogLogic = new CatalogLogic();
-    private readonly PARAM_TITLE: string = 'title';
+class DetailUrlController extends ControllerBase {
+    private detailUrlLogic: DetailUrlLogic = new DetailUrlLogic();
+    private readonly PARAM_CATALOG_ID: string = 'catalogId';
     private readonly PARAM_URL: string = 'url';
-    private readonly PARAM_LOCATOR: string = 'locator';
-    private readonly PARAM_DETAIL_URL: string = 'detailUrl';
-    private readonly PARAM_PAGE_NUMBER: string = 'pageNumber';
-    private readonly PARAM_HOST_ID: string = 'hostId';
+    private readonly PARAM_IS_EXTRACTED: string = 'isExtracted';
+    private readonly PARAM_REQUEST_RETRIES: string = 'requestRetries';
 
     constructor() {
         super();
@@ -34,7 +32,7 @@ class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute = (req: Request, res: Response, next: any): any => {
+    protected getAllRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
@@ -49,26 +47,26 @@ class CatalogController extends ControllerBase {
             new IntegerRangeChecker(0, null)
         );
 
-        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
         validator.addParamValidator(
-            this.PARAM_HOST_ID,
+            this.PARAM_CATALOG_ID,
+            new IntegerChecker()
+        );
+        validator.addParamValidator(
+            this.PARAM_CATALOG_ID,
             new IntegerRangeChecker(1, null)
         );
 
-        validator.addParamValidator(this.PARAM_KEYWORD, new StringChecker());
-
         validator.validate(this.requestQuery);
 
-        this.catalogLogic
+        this.detailUrlLogic
             .getAll(
-                this.keyword,
                 this.limit,
                 this.offset,
-                this.requestQuery.hostId
+                this.requestQuery[this.PARAM_CATALOG_ID]
             )
-            .then(({ catalogList, hasNext }): void => {
+            .then(({ detailUrlList, hasNext }): void => {
                 let responseBody: object = {
-                    catalogs: catalogList,
+                    detailUrls: detailUrlList,
                     hasNext: hasNext,
                 };
 
@@ -92,7 +90,7 @@ class CatalogController extends ControllerBase {
         req: Request,
         res: Response,
         next: any
-    ): any => {
+    ): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
@@ -103,11 +101,11 @@ class CatalogController extends ControllerBase {
 
         validator.validate(this.requestParams);
 
-        this.catalogLogic
+        this.detailUrlLogic
             .getById(this.requestParams.id)
-            .then((catalog: object): void => {
+            .then((detailUrl: object): void => {
                 let responseBody: object = {
-                    catalog: catalog,
+                    host: detailUrl,
                 };
 
                 this.sendResponse(
@@ -126,41 +124,33 @@ class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute = (req: Request, res: Response, next: any): any => {
+    protected createRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
-        validator.addParamValidator(this.PARAM_TITLE, new StringChecker());
         validator.addParamValidator(
-            this.PARAM_TITLE,
-            new StringLengthChecker(1, 100)
+            this.PARAM_CATALOG_ID,
+            new IntegerChecker()
         );
-
-        validator.addParamValidator(this.PARAM_URL, new StringChecker());
-        validator.addParamValidator(this.PARAM_URL, new UrlChecker());
-
-        validator.addParamValidator(this.PARAM_LOCATOR, new ObjectChecker());
-
-        validator.addParamValidator(this.PARAM_DETAIL_URL, new StringChecker());
         validator.addParamValidator(
-            this.PARAM_PAGE_NUMBER,
-            new StringChecker()
-        );
-
-        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_HOST_ID,
+            this.PARAM_CATALOG_ID,
             new IntegerRangeChecker(1, null)
         );
 
-        validator.validate(this.requestBody);
-        validator.validate(this.requestBody.locator || {});
+        validator.addParamValidator(this.PARAM_URL, new StringChecker());
+        validator.addParamValidator(
+            this.PARAM_URL,
+            new StringLengthChecker(1, 100)
+        );
+        validator.addParamValidator(this.PARAM_URL, new UrlChecker());
 
-        this.catalogLogic
+        validator.validate(this.requestBody);
+
+        this.detailUrlLogic
             .create(this.requestBody)
-            .then((createdHost: object): void => {
+            .then((createdDetailUrl: object): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.CREATED,
-                    createdHost,
+                    createdDetailUrl,
                     res
                 );
             })
@@ -174,7 +164,7 @@ class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute = (req: Request, res: Response, next: any): any => {
+    protected updateRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
@@ -183,39 +173,45 @@ class CatalogController extends ControllerBase {
             new IntegerRangeChecker(1, null)
         );
 
-        validator.addParamValidator(this.PARAM_TITLE, new StringChecker());
         validator.addParamValidator(
-            this.PARAM_TITLE,
-            new StringLengthChecker(1, 100)
+            this.PARAM_CATALOG_ID,
+            new IntegerChecker()
+        );
+        validator.addParamValidator(
+            this.PARAM_CATALOG_ID,
+            new IntegerRangeChecker(1, null)
         );
 
         validator.addParamValidator(this.PARAM_URL, new StringChecker());
+        validator.addParamValidator(
+            this.PARAM_URL,
+            new StringLengthChecker(1, 100)
+        );
         validator.addParamValidator(this.PARAM_URL, new UrlChecker());
 
-        validator.addParamValidator(this.PARAM_LOCATOR, new ObjectChecker());
-
-        validator.addParamValidator(this.PARAM_DETAIL_URL, new StringChecker());
         validator.addParamValidator(
-            this.PARAM_PAGE_NUMBER,
-            new StringChecker()
+            this.PARAM_IS_EXTRACTED,
+            new BooleanChecker()
         );
 
-        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
         validator.addParamValidator(
-            this.PARAM_HOST_ID,
-            new IntegerRangeChecker(1, null)
+            this.PARAM_REQUEST_RETRIES,
+            new IntegerChecker()
+        );
+        validator.addParamValidator(
+            this.PARAM_REQUEST_RETRIES,
+            new IntegerRangeChecker(0, null)
         );
 
         validator.validate(this.requestParams);
         validator.validate(this.requestBody);
-        validator.validate(this.requestBody.locator || {});
 
-        this.catalogLogic
-            .update(this.requestParams.id, this.requestBody)
-            .then((editedCatalog: object): void => {
+        this.detailUrlLogic
+            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .then((editedDetailUrl: object): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
-                    editedCatalog,
+                    editedDetailUrl,
                     res
                 );
             })
@@ -229,7 +225,7 @@ class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute = (req: Request, res: Response, next: any): any => {
+    protected deleteRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
@@ -240,8 +236,8 @@ class CatalogController extends ControllerBase {
 
         validator.validate(this.requestParams);
 
-        this.catalogLogic
-            .delete(this.requestParams.id)
+        this.detailUrlLogic
+            .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
@@ -255,4 +251,4 @@ class CatalogController extends ControllerBase {
     };
 }
 
-export default CatalogController;
+export default DetailUrlController;

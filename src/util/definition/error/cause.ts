@@ -1,8 +1,10 @@
 export const Cause = {
     DATA_TYPE: {
         INTEGER: 'Data type of %s must be integer.',
+        DECIMAL: 'Data type of %s must be decimal.',
         OBJECT: 'Data type of %s must be object.',
         STRING: 'Data type of %s must be string.',
+        BOOLEAN: 'Data type of %s must be boolean.',
     },
     DATA_VALUE: {
         DOMAIN: '%s is invalid domain.',
