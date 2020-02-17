@@ -102,7 +102,7 @@ class DetailUrlController extends ControllerBase {
         validator.validate(this.requestParams);
 
         this.detailUrlLogic
-            .getById(this.requestParams.id)
+            .getById(this.requestParams[this.PARAM_ID])
             .then((detailUrl: object): void => {
                 let responseBody: object = {
                     host: detailUrl,

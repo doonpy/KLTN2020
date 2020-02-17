@@ -1,40 +1,37 @@
-import PatternModel from './pattern.model';
-import CatalogModel from '../catalog/catalog.model';
-import DetailUrlModel from '../detail-url/detail-url.model';
+import RawDataModel from './raw-data.model';
 import { Document } from 'mongoose';
 import CustomizeException from '../exception/customize.exception';
 import { Constant } from '../../util/definition/constant';
 import { Cause } from '../../util/definition/error/cause';
 import async, { Dictionary } from 'async';
-import { PatternErrorMessage } from './pattern.error-message';
+import DetailUrlModel from '../detail-url/detail-url.model';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
-import CatalogLogic from '../catalog/catalog.logic';
+import { RawDataErrorMessage } from './raw-data.error-message';
 
-class PatternLogic {
+class RawDataLogic {
     /**
      * @param limit
      * @param offset
-     * @param catalogId
+     * @param detailUrlId
      *
-     * @return Promise<{ patternList: Array<object>; hasNext: boolean }>
+     * @return Promise<{ rawDataList: Array<object>; hasNext: boolean }>
      */
     public getAll = (
         limit: number,
         offset: number,
-        catalogId: number
-    ): Promise<{ patternList: Array<object>; hasNext: boolean }> => {
+        detailUrlId: number
+    ): Promise<{ rawDataList: Array<object>; hasNext: boolean }> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.find({ catalogId: catalogId || { $gt: 0 } })
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
+            RawDataModel.find({ detailUrlId: detailUrlId || { $gt: 0 } })
                 .populate({
-                    path: 'sourceUrlId',
+                    path: 'detailUrlId',
                     populate: {
                         path: 'catalogId',
                         populate: { path: 'hostId' },
                     },
                 })
                 .skip(offset)
-                .exec((error: Error, patterns: Array<Document>): void => {
+                .exec((error: Error, rawDataset: Array<Document>): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -45,20 +42,21 @@ class PatternLogic {
                         );
                     }
 
-                    let patternList: Array<object> = [];
+                    let rawDataList: Array<object> = [];
                     for (
                         let i: number = 0;
-                        i < patterns.length && i < limit;
+                        i < rawDataset.length && i < limit;
                         i++
                     ) {
-                        patternList.push(
-                            PatternLogic.convertToResponse(patterns[i])
+                        rawDataList.push(
+                            DetailUrlLogic.convertToResponse(rawDataset[i])
                         );
                     }
 
-                    let hasNext: boolean = patternList.length < patterns.length;
+                    let hasNext: boolean =
+                        rawDataList.length < rawDataset.length;
 
-                    resolve({ patternList: patternList, hasNext: hasNext });
+                    resolve({ rawDataList: rawDataList, hasNext: hasNext });
                 });
         });
     };
@@ -70,16 +68,15 @@ class PatternLogic {
      */
     public getById = (id: string): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id)
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
+            RawDataModel.findById(id)
                 .populate({
-                    path: 'sourceUrlId',
+                    path: 'detailUrlId',
                     populate: {
                         path: 'catalogId',
                         populate: { path: 'hostId' },
                     },
                 })
-                .exec((error: Error, pattern: Document | null): void => {
+                .exec((error: Error, rawData: Document | null): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -90,18 +87,18 @@ class PatternLogic {
                         );
                     }
 
-                    if (!pattern) {
+                    if (!rawData) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
+                                RawDataErrorMessage.RD_ERROR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
                         );
                     }
 
-                    resolve(PatternLogic.convertToResponse(pattern));
+                    resolve(RawDataLogic.convertToResponse(rawData));
                 });
         });
     };
@@ -112,36 +109,35 @@ class PatternLogic {
      * @return Promise<object>
      */
     public create = ({
-        catalogId,
-        sourceUrlId,
-        mainLocator,
-        subLocator,
+        detailUrlId,
+        title,
+        price,
+        acreage,
+        address,
+        others = [],
     }: {
-        catalogId: number;
-        sourceUrlId: number;
-        mainLocator: {
-            title: string;
-            price: string;
-            acreage: string;
-            address: string;
-        };
-        subLocator: Array<{ name: string; locator: string }>;
+        detailUrlId: number;
+        title: string;
+        price: number;
+        acreage: string;
+        address: string;
+        others:
+            | Array<{
+                  name: string;
+                  value: string;
+              }>
+            | Array<null>;
     }): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
-                    isPatternExisted: (callback: any): void => {
-                        PatternModel.countDocuments({
-                            catalogId: catalogId,
+                    isRawDataExisted: (callback: any): void => {
+                        RawDataModel.countDocuments({
+                            detailUrlId: detailUrlId,
                         }).exec(callback);
                     },
-                    catalog: (callback: any): void => {
-                        CatalogModel.findById(catalogId)
-                            .populate('hostId')
-                            .exec(callback);
-                    },
-                    sourceUrl: (callback: any): void => {
-                        DetailUrlModel.findById(sourceUrlId)
+                    detailUrl: (callback: any): void => {
+                        DetailUrlModel.findById(detailUrlId)
                             .populate({
                                 path: 'catalogId',
                                 populate: { path: 'hostId' },
@@ -152,15 +148,13 @@ class PatternLogic {
                 (
                     error: Error | undefined,
                     {
-                        isPatternExisted,
-                        catalog,
-                        sourceUrl,
+                        isRawDataExisted,
+                        detailUrl,
                     }: Dictionary<
                         | any
                         | {
-                              isPatternExisted: number;
-                              catalog: Document;
-                              sourceUrl: Document;
+                              isRawDataExisted: number;
+                              detailUrl: Document;
                           }
                     >
                 ): void => {
@@ -174,48 +168,39 @@ class PatternLogic {
                         );
                     }
 
-                    if (!catalog) {
+                    if (isRawDataExisted) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_3,
+                                RawDataErrorMessage.RD_ERROR_2,
                                 Cause.DATA_VALUE.NOT_FOUND,
-                                ['catalogId', catalogId]
+                                ['detailUrlId', detailUrlId]
                             )
                         );
                     }
 
-                    if (!sourceUrl) {
+                    if (!detailUrl) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_4,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['sourceUrlId', sourceUrlId]
-                            )
-                        );
-                    }
-
-                    if (isPatternExisted) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_2,
+                                RawDataErrorMessage.RD_ERROR_3,
                                 Cause.DATA_VALUE.EXISTS,
-                                ['catalogId', catalogId]
+                                ['detailUrlId', detailUrlId]
                             )
                         );
                     }
 
-                    new PatternModel({
-                        catalogId: catalogId,
-                        sourceUrlId: sourceUrlId,
-                        mainLocator: mainLocator,
-                        subLocator: subLocator,
+                    new RawDataModel({
+                        detailUrlId: detailUrlId,
+                        title: title,
+                        price: price,
+                        acreage: acreage,
+                        address: address,
+                        others: others,
                     }).save(
                         (
                             error: Error,
-                            createdPattern: Document | any
+                            createdRawData: Document | any
                         ): void => {
                             if (error) {
                                 return reject(
@@ -227,10 +212,9 @@ class PatternLogic {
                                 );
                             }
 
-                            createdPattern.catalogId = catalog;
-                            createdPattern.sourceUrlId = sourceUrl;
+                            createdRawData.detailUrlId = detailUrl;
                             resolve(
-                                PatternLogic.convertToResponse(createdPattern)
+                                RawDataLogic.convertToResponse(createdRawData)
                             );
                         }
                     );
@@ -248,45 +232,40 @@ class PatternLogic {
     public update = (
         id: string,
         {
-            catalogId,
-            sourceUrlId,
-            mainLocator,
-            subLocator,
+            detailUrlId,
+            title,
+            price,
+            acreage,
+            address,
+            others = [],
         }: {
-            catalogId: string;
-            sourceUrlId: number;
-            mainLocator: {
-                title: string;
-                price: string;
-                acreage: string;
-                address: string;
-            };
-            subLocator: Array<{ name: string; locator: string }>;
+            detailUrlId: number;
+            title: string;
+            price: number;
+            acreage: string;
+            address: string;
+            others:
+                | Array<{
+                      name: string;
+                      value: string;
+                  }>
+                | Array<any>;
         }
     ): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
-                    pattern: (callback: any): void => {
-                        PatternModel.findById(id).exec(callback);
+                    rawData: (callback: any): void => {
+                        RawDataModel.findById(id).exec(callback);
                     },
-                    isPatternExisted: (callback: any): void => {
-                        PatternModel.countDocuments({
-                            catalogId: catalogId,
+                    isRawDataExisted: (callback: any): void => {
+                        RawDataModel.countDocuments({
+                            detailUrlId: detailUrlId,
                         }).exec(callback);
                     },
-                    catalog: (callback: any): void => {
-                        if (catalogId) {
-                            CatalogModel.findById(catalogId)
-                                .populate('hostId')
-                                .exec(callback);
-                        } else {
-                            callback();
-                        }
-                    },
-                    sourceUrl: (callback: any): void => {
-                        if (sourceUrlId) {
-                            DetailUrlModel.findById(sourceUrlId)
+                    detailUrl: (callback: any): void => {
+                        if (detailUrlId) {
+                            DetailUrlModel.findById(detailUrlId)
                                 .populate({
                                     path: 'catalogId',
                                     populate: { path: 'hostId' },
@@ -300,17 +279,15 @@ class PatternLogic {
                 (
                     error: Error | undefined,
                     {
-                        pattern,
-                        isPatternExisted,
-                        catalog,
-                        sourceUrl,
+                        rawData,
+                        isRawDataExisted,
+                        detailUrl,
                     }: Dictionary<
                         | any
                         | {
-                              pattern: Document | null;
-                              isPatternExisted: number;
-                              catalog: Document | null;
-                              sourceUrl: Document | null;
+                              rawData: Document | null;
+                              isRawDataExisted: number;
+                              detailUrl: Document | null;
                           }
                     >
                 ): void => {
@@ -324,88 +301,70 @@ class PatternLogic {
                         );
                     }
 
-                    if (!pattern) {
+                    if (!rawData) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
+                                RawDataErrorMessage.RD_ERROR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
                         );
                     }
 
-                    if (!catalog && catalogId) {
+                    if (!detailUrl && detailUrlId) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_3,
+                                RawDataErrorMessage.RD_ERROR_3,
                                 Cause.DATA_VALUE.NOT_FOUND,
-                                ['catalogId', catalogId]
+                                ['detailUrlId', detailUrlId]
                             )
                         );
                     }
 
-                    if (!sourceUrl && sourceUrlId) {
+                    if (
+                        isRawDataExisted &&
+                        detailUrlId !== rawData.detailUrlId
+                    ) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_4,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['sourceUrlId', sourceUrlId]
-                            )
-                        );
-                    }
-
-                    if (isPatternExisted && catalogId !== catalog.catalogId) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_2,
+                                RawDataErrorMessage.RD_ERROR_2,
                                 Cause.DATA_VALUE.EXISTS,
-                                ['catalogId', catalogId]
+                                ['detailUrlId', detailUrlId]
                             )
                         );
                     }
 
-                    pattern.catalogId = catalogId || pattern.catalogId;
-                    pattern.sourceUrlId = sourceUrlId || pattern.sourceUrlId;
-                    if (mainLocator) {
-                        pattern.mainLocator.title =
-                            mainLocator.title || pattern.mainLocator.title;
-                        pattern.mainLocator.price =
-                            mainLocator.price || pattern.mainLocator.price;
-                        pattern.mainLocator.acreage =
-                            mainLocator.acreage || pattern.mainLocator.acreage;
-                        pattern.mainLocator.address =
-                            mainLocator.address || pattern.mainLocator.address;
-                    }
-                    if (subLocator) {
-                        subLocator.forEach(
-                            (subLocatorItem: {
-                                name: string;
-                                locator: string;
-                            }): void => {
-                                let subLocatorSimilarIndex = pattern.subLocator.findIndex(
-                                    (s: {
+                    rawData.detailUrlId = detailUrlId || rawData.detailUrlId;
+                    rawData.title = title || rawData.title;
+                    rawData.price = price || rawData.price;
+                    rawData.acreage = acreage || rawData.acreage;
+                    rawData.address = address || rawData.address;
+                    if (others) {
+                        others.forEach(
+                            (
+                                other: { name: string; value: string } | any
+                            ): void => {
+                                let otherSimilarIndex = rawData.others.findIndex(
+                                    (o: {
                                         name: string;
-                                        locator: string;
+                                        value: string;
                                     }): boolean => {
-                                        return s.name === subLocatorItem.name;
+                                        return o.name === other.name;
                                     }
                                 );
-                                if (subLocatorSimilarIndex >= 0) {
-                                    pattern.subLocator[
-                                        subLocatorSimilarIndex
-                                    ] = subLocatorItem;
+                                if (otherSimilarIndex >= 0) {
+                                    rawData.others[otherSimilarIndex] = other;
                                 }
                             }
                         );
                     }
-                    pattern.save(
+                    rawData.save(
                         async (
                             error: Error,
-                            editedPattern: Document | any
+                            editedRawData: Document | any
                         ): Promise<void> => {
                             if (error) {
                                 new CustomizeException(
@@ -415,23 +374,12 @@ class PatternLogic {
                                 );
                             }
 
-                            if (catalogId) {
-                                editedPattern.catalogId = catalog;
+                            if (detailUrlId) {
+                                editedRawData.detailUrlId = detailUrl;
                             } else {
-                                await editedPattern
+                                await editedRawData
                                     .populate({
-                                        path: 'catalogId',
-                                        populate: { path: 'hostId' },
-                                    })
-                                    .execPopulate();
-                            }
-
-                            if (sourceUrlId) {
-                                editedPattern.sourceUrlId = sourceUrl;
-                            } else {
-                                await editedPattern
-                                    .populate({
-                                        path: 'sourceUrlId',
+                                        path: 'detailUrlId',
                                         populate: {
                                             path: 'catalogId',
                                             populate: { path: 'hostId' },
@@ -441,7 +389,7 @@ class PatternLogic {
                             }
 
                             resolve(
-                                PatternLogic.convertToResponse(editedPattern)
+                                DetailUrlLogic.convertToResponse(editedRawData)
                             );
                         }
                     );
@@ -457,8 +405,8 @@ class PatternLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id).exec(
-                (error: Error, pattern: Document | null): void => {
+            RawDataModel.findById(id).exec(
+                (error: Error, rawData: Document | null): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -469,18 +417,18 @@ class PatternLogic {
                         );
                     }
 
-                    if (!pattern) {
+                    if (!rawData) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
+                                RawDataErrorMessage.RD_ERROR_1,
                                 Cause.DATA_VALUE.NOT_FOUND,
                                 ['id', id]
                             )
                         );
                     }
 
-                    PatternModel.findByIdAndDelete(id, (error: Error): void => {
+                    RawDataModel.findByIdAndDelete(id, (error: Error): void => {
                         if (error) {
                             return reject(
                                 new CustomizeException(
@@ -499,50 +447,48 @@ class PatternLogic {
     };
 
     /**
-     * @param pattern
+     * @param rawData
      */
 
     private static convertToResponse({
         _id,
-        catalogId,
-        sourceUrlId,
-        mainLocator,
-        subLocator,
+        detailUrlId,
+        title,
+        price,
+        acreage,
+        address,
+        others,
         cTime,
         mTime,
     }: any): {
         id: number;
-        catalog: object;
-        sourceUrl: object;
-        mainLocator: {
-            title: string;
-            price: string;
-            acreage: string;
-            address: string;
-        };
-        subLocator: { name: string; locator: string };
+        detailUrl: object;
+        title: string;
+        price: number;
+        acreage: string;
+        address: string;
+        others: Array<{ name: string; value: string }> | Array<any>;
         createAt: string;
         updateAt: string;
     } {
         let data: {
             id: number;
-            catalog: object;
-            sourceUrl: object;
-            mainLocator: {
-                title: string;
-                price: string;
-                acreage: string;
-                address: string;
-            };
-            subLocator: { name: string; locator: string };
+            detailUrl: object;
+            title: string;
+            price: number;
+            acreage: string;
+            address: string;
+            others: Array<{ name: string; value: string }> | Array<any>;
             createAt: string;
             updateAt: string;
         } = {
             id: NaN,
-            catalog: {},
-            sourceUrl: {},
-            mainLocator: { title: '', price: '', acreage: '', address: '' },
-            subLocator: { name: '', locator: '' },
+            detailUrl: {},
+            title: '',
+            price: NaN,
+            acreage: '',
+            address: '',
+            others: [],
             createAt: '',
             updateAt: '',
         };
@@ -550,19 +496,29 @@ class PatternLogic {
         if (_id) {
             data.id = _id;
         }
-        if (catalogId && Object.keys(catalogId).length > 0) {
-            data.catalog = CatalogLogic.convertToResponse(catalogId);
-        }
-        if (sourceUrlId && Object.keys(sourceUrlId).length > 0) {
-            data.sourceUrl = DetailUrlLogic.convertToResponse(sourceUrlId);
+
+        if (detailUrlId && Object.keys(detailUrlId).length > 0) {
+            data.detailUrl = DetailUrlLogic.convertToResponse(detailUrlId);
         }
 
-        if (Object.keys(mainLocator).length > 0) {
-            data.mainLocator = mainLocator;
+        if (title) {
+            data.title = title;
         }
 
-        if (Object.keys(subLocator).length > 0) {
-            data.subLocator = subLocator;
+        if (price) {
+            data.title = title;
+        }
+
+        if (acreage) {
+            data.title = acreage;
+        }
+
+        if (address) {
+            data.title = address;
+        }
+
+        if (others.length > 0) {
+            data.others = others;
         }
 
         if (cTime) {
@@ -576,4 +532,4 @@ class PatternLogic {
     }
 }
 
-export default PatternLogic;
+export default RawDataLogic;

@@ -88,7 +88,7 @@ class HostController extends ControllerBase {
         validator.validate(this.requestParams);
 
         this.hostLogic
-            .getById(this.requestParams.id)
+            .getById(this.requestParams[this.PARAM_ID])
             .then((host: object): void => {
                 let responseBody: object = {
                     host: host,
@@ -173,7 +173,7 @@ class HostController extends ControllerBase {
         validator.validate(this.requestBody);
 
         this.hostLogic
-            .update(this.requestParams.id, this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedHost: object): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
@@ -203,7 +203,7 @@ class HostController extends ControllerBase {
         validator.validate(this.requestParams);
 
         this.hostLogic
-            .delete(this.requestParams.id)
+            .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.NO_CONTENT,

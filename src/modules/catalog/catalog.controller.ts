@@ -64,7 +64,7 @@ class CatalogController extends ControllerBase {
                 this.keyword,
                 this.limit,
                 this.offset,
-                this.requestQuery.hostId
+                this.requestQuery[this.PARAM_HOST_ID]
             )
             .then(({ catalogList, hasNext }): void => {
                 let responseBody: object = {
@@ -104,7 +104,7 @@ class CatalogController extends ControllerBase {
         validator.validate(this.requestParams);
 
         this.catalogLogic
-            .getById(this.requestParams.id)
+            .getById(this.requestParams[this.PARAM_ID])
             .then((catalog: object): void => {
                 let responseBody: object = {
                     catalog: catalog,
@@ -211,7 +211,7 @@ class CatalogController extends ControllerBase {
         validator.validate(this.requestBody.locator || {});
 
         this.catalogLogic
-            .update(this.requestParams.id, this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedCatalog: object): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.OK,
@@ -241,7 +241,7 @@ class CatalogController extends ControllerBase {
         validator.validate(this.requestParams);
 
         this.catalogLogic
-            .delete(this.requestParams.id)
+            .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
                 this.sendResponse(
                     Constant.RESPONSE_STATUS_CODE.NO_CONTENT,

@@ -5,6 +5,7 @@ export const Cause = {
         OBJECT: 'Data type of %s must be object.',
         STRING: 'Data type of %s must be string.',
         BOOLEAN: 'Data type of %s must be boolean.',
+        ARRAY: 'Data type of %s must be array.',
     },
     DATA_VALUE: {
         DOMAIN: '%s is invalid domain.',
