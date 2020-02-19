@@ -5,9 +5,7 @@ import { Cause } from '../../util/definition/error/cause';
 import { ErrorMessage } from '../../util/definition/error/message';
 
 class UrlChecker extends CheckerBase {
-    private VALID_URL: RegExp = new RegExp(
-        /^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.[\d\w\-]+)+\/(([\d\w\-]+)+\/?)+/
-    );
+    private VALID_URL: RegExp = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.[\d\w\-]+)+\/(([\d\w\-]+)+\/?)+/);
 
     /**
      * @param paramName

@@ -1,7 +1,4 @@
 import express, { Request, Response } from 'express';
-import Validator from '../validator/validator';
-import IntegerChecker from '../checker/type/integer.checker';
-import IntegerRangeChecker from '../checker/integer-range.checker';
 import { Constant } from '../../util/definition/constant';
 
 abstract class ControllerBase {
@@ -43,55 +40,35 @@ abstract class ControllerBase {
      * @param res
      * @param next
      */
-    protected abstract getAllRoute(
-        req: Request,
-        res: Response,
-        next: any
-    ): void;
+    protected abstract getAllRoute(req: Request, res: Response, next: any): void;
 
     /**
      * @param req
      * @param res
      * @param next
      */
-    protected abstract getWithIdRoute(
-        req: Request,
-        res: Response,
-        next: any
-    ): void;
+    protected abstract getWithIdRoute(req: Request, res: Response, next: any): void;
 
     /**
      * @param req
      * @param res
      * @param next
      */
-    protected abstract createRoute(
-        req: Request,
-        res: Response,
-        next: any
-    ): void;
+    protected abstract createRoute(req: Request, res: Response, next: any): void;
 
     /**
      * @param req
      * @param res
      * @param next
      */
-    protected abstract updateRoute(
-        req: Request,
-        res: Response,
-        next: any
-    ): void;
+    protected abstract updateRoute(req: Request, res: Response, next: any): void;
 
     /**
      * @param req
      * @param res
      * @param next
      */
-    protected abstract deleteRoute(
-        req: Request,
-        res: Response,
-        next: any
-    ): void;
+    protected abstract deleteRoute(req: Request, res: Response, next: any): void;
 
     /**
      * @param req
@@ -104,9 +81,7 @@ abstract class ControllerBase {
 
         this.limit = limit || Constant.DEFAULT_VALUE.LIMIT;
         this.offset = offset || Constant.DEFAULT_VALUE.OFFSET;
-        this.keyword = req.query.keyword
-            ? req.query.keyword.trim()
-            : Constant.DEFAULT_VALUE.KEYWORD;
+        this.keyword = req.query.keyword ? req.query.keyword.trim() : Constant.DEFAULT_VALUE.KEYWORD;
 
         this.requestParams = {};
         if (Object.keys(req.params).length > 0) {
@@ -132,8 +107,7 @@ abstract class ControllerBase {
      * @param res
      */
     protected sendResponse(
-        statusCode: number = Constant.RESPONSE_STATUS_CODE
-            .INTERNAL_SERVER_ERROR,
+        statusCode: number = Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
         body: object = {},
         res: Response
     ): void {

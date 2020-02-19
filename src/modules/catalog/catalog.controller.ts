@@ -38,45 +38,27 @@ class CatalogController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_LIMIT,
-            new IntegerRangeChecker(1, 1000)
-        );
+        validator.addParamValidator(this.PARAM_LIMIT, new IntegerRangeChecker(1, 1000));
 
         validator.addParamValidator(this.PARAM_OFFSET, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_OFFSET,
-            new IntegerRangeChecker(0, null)
-        );
+        validator.addParamValidator(this.PARAM_OFFSET, new IntegerRangeChecker(0, null));
 
         validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_HOST_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerRangeChecker(1, null));
 
         validator.addParamValidator(this.PARAM_KEYWORD, new StringChecker());
 
         validator.validate(this.requestQuery);
 
         this.catalogLogic
-            .getAll(
-                this.keyword,
-                this.limit,
-                this.offset,
-                this.requestQuery[this.PARAM_HOST_ID]
-            )
+            .getAll(this.keyword, this.limit, this.offset, this.requestQuery[this.PARAM_HOST_ID])
             .then(({ catalogList, hasNext }): void => {
                 let responseBody: object = {
                     catalogs: catalogList,
                     hasNext: hasNext,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -88,18 +70,11 @@ class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (
-        req: Request,
-        res: Response,
-        next: any
-    ): any => {
+    protected getWithIdRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
@@ -110,11 +85,7 @@ class CatalogController extends ControllerBase {
                     catalog: catalog,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -130,10 +101,7 @@ class CatalogController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_TITLE, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_TITLE,
-            new StringLengthChecker(1, 100)
-        );
+        validator.addParamValidator(this.PARAM_TITLE, new StringLengthChecker(1, 100));
 
         validator.addParamValidator(this.PARAM_URL, new StringChecker());
         validator.addParamValidator(this.PARAM_URL, new UrlChecker());
@@ -141,16 +109,10 @@ class CatalogController extends ControllerBase {
         validator.addParamValidator(this.PARAM_LOCATOR, new ObjectChecker());
 
         validator.addParamValidator(this.PARAM_DETAIL_URL, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_PAGE_NUMBER,
-            new StringChecker()
-        );
+        validator.addParamValidator(this.PARAM_PAGE_NUMBER, new StringChecker());
 
         validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_HOST_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestBody);
         validator.validate(this.requestBody.locator || {});
@@ -158,11 +120,7 @@ class CatalogController extends ControllerBase {
         this.catalogLogic
             .create(this.requestBody)
             .then((createdHost: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.CREATED,
-                    createdHost,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdHost, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -178,16 +136,10 @@ class CatalogController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.addParamValidator(this.PARAM_TITLE, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_TITLE,
-            new StringLengthChecker(1, 100)
-        );
+        validator.addParamValidator(this.PARAM_TITLE, new StringLengthChecker(1, 100));
 
         validator.addParamValidator(this.PARAM_URL, new StringChecker());
         validator.addParamValidator(this.PARAM_URL, new UrlChecker());
@@ -195,16 +147,10 @@ class CatalogController extends ControllerBase {
         validator.addParamValidator(this.PARAM_LOCATOR, new ObjectChecker());
 
         validator.addParamValidator(this.PARAM_DETAIL_URL, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_PAGE_NUMBER,
-            new StringChecker()
-        );
+        validator.addParamValidator(this.PARAM_PAGE_NUMBER, new StringChecker());
 
         validator.addParamValidator(this.PARAM_HOST_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_HOST_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_HOST_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
         validator.validate(this.requestBody);
@@ -213,11 +159,7 @@ class CatalogController extends ControllerBase {
         this.catalogLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedCatalog: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    editedCatalog,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedCatalog, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -233,21 +175,14 @@ class CatalogController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
         this.catalogLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
-                    {},
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

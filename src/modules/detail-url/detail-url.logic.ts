@@ -39,18 +39,11 @@ class DetailUrlLogic {
                     }
 
                     let detailUrlList: Array<object> = [];
-                    for (
-                        let i: number = 0;
-                        i < detailUrls.length && i < limit;
-                        i++
-                    ) {
-                        detailUrlList.push(
-                            DetailUrlLogic.convertToResponse(detailUrls[i])
-                        );
+                    for (let i: number = 0; i < detailUrls.length && i < limit; i++) {
+                        detailUrlList.push(DetailUrlLogic.convertToResponse(detailUrls[i]));
                     }
 
-                    let hasNext: boolean =
-                        detailUrlList.length < detailUrls.length;
+                    let hasNext: boolean = detailUrlList.length < detailUrls.length;
 
                     resolve({ detailUrlList: detailUrlList, hasNext: hasNext });
                 });
@@ -171,29 +164,20 @@ class DetailUrlLogic {
                     new DetailUrlModel({
                         catalogId: catalogId,
                         url: url,
-                    }).save(
-                        (
-                            error: Error,
-                            createdDetailUrl: Document | any
-                        ): void => {
-                            if (error) {
-                                return reject(
-                                    new CustomizeException(
-                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                        error.message,
-                                        Cause.DATABASE
-                                    )
-                                );
-                            }
-
-                            createdDetailUrl.catalogId = catalog;
-                            resolve(
-                                DetailUrlLogic.convertToResponse(
-                                    createdDetailUrl
+                    }).save((error: Error, createdDetailUrl: Document | any): void => {
+                        if (error) {
+                            return reject(
+                                new CustomizeException(
+                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                    error.message,
+                                    Cause.DATABASE
                                 )
                             );
                         }
-                    );
+
+                        createdDetailUrl.catalogId = catalog;
+                        resolve(DetailUrlLogic.convertToResponse(createdDetailUrl));
+                    });
                 }
             );
         });
@@ -300,19 +284,11 @@ class DetailUrlLogic {
 
                     detailUrl.catalogId = catalogId || detailUrl.catalogId;
                     detailUrl.url = url || detailUrl.url;
-                    detailUrl.isExtracted =
-                        isExtracted !== detailUrl.isExtracted
-                            ? isExtracted
-                            : detailUrl.isExtracted;
+                    detailUrl.isExtracted = isExtracted !== detailUrl.isExtracted ? isExtracted : detailUrl.isExtracted;
                     detailUrl.requestRetries =
-                        requestRetries !== detailUrl.requestRetries
-                            ? requestRetries
-                            : detailUrl.requestRetries;
+                        requestRetries !== detailUrl.requestRetries ? requestRetries : detailUrl.requestRetries;
                     detailUrl.save(
-                        async (
-                            error: Error,
-                            editedDetailUrl: Document | any
-                        ): Promise<void> => {
+                        async (error: Error, editedDetailUrl: Document | any): Promise<void> => {
                             if (error) {
                                 new CustomizeException(
                                     Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
@@ -331,11 +307,7 @@ class DetailUrlLogic {
                                     })
                                     .execPopulate();
                             }
-                            resolve(
-                                DetailUrlLogic.convertToResponse(
-                                    editedDetailUrl
-                                )
-                            );
+                            resolve(DetailUrlLogic.convertToResponse(editedDetailUrl));
                         }
                     );
                 }
@@ -350,8 +322,29 @@ class DetailUrlLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            DetailUrlModel.findById(id).exec(
-                (error: Error, pattern: Document | null): void => {
+            DetailUrlModel.findById(id).exec((error: Error, pattern: Document | null): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
+                }
+
+                if (!pattern) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            DetailUrlErrorMessage.DU_ERROR_1,
+                            Cause.DATA_VALUE.NOT_FOUND,
+                            ['id', id]
+                        )
+                    );
+                }
+
+                DetailUrlModel.findByIdAndDelete(id, (error: Error): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -362,35 +355,9 @@ class DetailUrlLogic {
                         );
                     }
 
-                    if (!pattern) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    DetailUrlModel.findByIdAndDelete(
-                        id,
-                        (error: Error): void => {
-                            if (error) {
-                                return reject(
-                                    new CustomizeException(
-                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                        error.message,
-                                        Cause.DATABASE
-                                    )
-                                );
-                            }
-
-                            resolve();
-                        }
-                    );
-                }
-            );
+                    resolve();
+                });
+            });
         });
     };
 

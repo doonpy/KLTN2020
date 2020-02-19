@@ -25,10 +25,7 @@ class CatalogLogic {
     ): Promise<{ catalogList: Array<object>; hasNext: boolean }> => {
         return new Promise((resolve: any, reject: any): void => {
             CatalogModel.find({
-                $or: [
-                    { title: { $regex: keyword, $options: 'i' } },
-                    { url: { $regex: keyword, $options: 'i' } },
-                ],
+                $or: [{ title: { $regex: keyword, $options: 'i' } }, { url: { $regex: keyword, $options: 'i' } }],
                 hostId: hostId || { $gt: 0 },
             })
                 .populate('hostId')
@@ -46,14 +43,8 @@ class CatalogLogic {
                     }
 
                     let catalogList: Array<object> = [];
-                    for (
-                        let i: number = 0;
-                        i < catalogs.length && i < limit;
-                        i++
-                    ) {
-                        catalogList.push(
-                            CatalogLogic.convertToResponse(catalogs[i])
-                        );
+                    for (let i: number = 0; i < catalogs.length && i < limit; i++) {
+                        catalogList.push(CatalogLogic.convertToResponse(catalogs[i]));
                     }
 
                     let hasNext: boolean = catalogList.length < catalogs.length;
@@ -68,7 +59,7 @@ class CatalogLogic {
      *
      * @return Promise<object>
      */
-    public getById = (id: string): Promise<object> => {
+    public getById = (id: string | number): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             CatalogModel.findById(id)
                 .populate('hostId')
@@ -127,13 +118,7 @@ class CatalogLogic {
                 },
                 (
                     error: any,
-                    {
-                        catalog,
-                        host,
-                    }: Dictionary<
-                        | any
-                        | { catalog: Document | null; host: Document | null }
-                    >
+                    { catalog, host }: Dictionary<any | { catalog: Document | null; host: Document | null }>
                 ): void => {
                     if (error) {
                         return reject(
@@ -172,27 +157,20 @@ class CatalogLogic {
                         url: url,
                         locator: locator,
                         hostId: hostId,
-                    }).save(
-                        (
-                            error: Error,
-                            createdCatalog: any | Document
-                        ): void => {
-                            if (error) {
-                                return reject(
-                                    new CustomizeException(
-                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                        error.message,
-                                        Cause.DATABASE
-                                    )
-                                );
-                            }
-
-                            createdCatalog.hostId = host;
-                            resolve(
-                                CatalogLogic.convertToResponse(createdCatalog)
+                    }).save((error: Error, createdCatalog: any | Document): void => {
+                        if (error) {
+                            return reject(
+                                new CustomizeException(
+                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                    error.message,
+                                    Cause.DATABASE
+                                )
                             );
                         }
-                    );
+
+                        createdCatalog.hostId = host;
+                        resolve(CatalogLogic.convertToResponse(createdCatalog));
+                    });
                 }
             );
         });
@@ -299,17 +277,12 @@ class CatalogLogic {
                     catalog.title = title || catalog.title;
                     catalog.url = url || catalog.url;
                     if (locator) {
-                        catalog.locator.detailUrl =
-                            locator.detailUrl || catalog.locator.detailUrl;
-                        catalog.locator.pageNumber =
-                            locator.pageNumber || catalog.locator.pageNumber;
+                        catalog.locator.detailUrl = locator.detailUrl || catalog.locator.detailUrl;
+                        catalog.locator.pageNumber = locator.pageNumber || catalog.locator.pageNumber;
                     }
                     catalog.hostId = hostId || catalog.hostId;
                     catalog.save(
-                        async (
-                            error: Error,
-                            editedCatalog: any | Document
-                        ): Promise<void> => {
+                        async (error: Error, editedCatalog: any | Document): Promise<void> => {
                             if (error) {
                                 return reject(
                                     new CustomizeException(
@@ -323,14 +296,10 @@ class CatalogLogic {
                             if (hostId) {
                                 editedCatalog.hostId = host;
                             } else {
-                                await editedCatalog
-                                    .populate('hostId')
-                                    .execPopulate();
+                                await editedCatalog.populate('hostId').execPopulate();
                             }
 
-                            resolve(
-                                CatalogLogic.convertToResponse(editedCatalog)
-                            );
+                            resolve(CatalogLogic.convertToResponse(editedCatalog));
                         }
                     );
                 }
@@ -345,43 +314,38 @@ class CatalogLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.findById(id).exec(
-                (error: Error, catalog: Document | null): void => {
+            CatalogModel.findById(id).exec((error: Error, catalog: Document | null): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
+                }
+
+                if (!catalog) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            CatalogErrorMessage.CTL_ERR_1,
+                            Cause.DATA_VALUE.NOT_FOUND,
+                            ['id', id]
+                        )
+                    );
+                }
+
+                CatalogModel.findByIdAndDelete(id, (error: Error): void => {
                     if (error) {
                         return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
+                            new CustomizeException(Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR, error.message)
                         );
                     }
 
-                    if (!catalog) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    CatalogModel.findByIdAndDelete(id, (error: Error): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message
-                                )
-                            );
-                        }
-
-                        resolve();
-                    });
-                }
-            );
+                    resolve();
+                });
+            });
         });
     };
 

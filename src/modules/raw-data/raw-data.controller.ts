@@ -1,5 +1,4 @@
 import ControllerBase from '../base/controller.base';
-import PatternLogic from '../pattern/pattern.logic';
 import { Request, Response } from 'express';
 import Validator from '../validator/validator';
 import IntegerChecker from '../checker/type/integer.checker';
@@ -8,18 +7,33 @@ import ObjectChecker from '../checker/type/object.checker';
 import StringChecker from '../checker/type/string.checker';
 import StringLengthChecker from '../checker/string-length.checker';
 import { Constant } from '../../util/definition/constant';
+import DecimalChecker from '../checker/type/decimal.checker';
+import DecimalRangeChecker from '../checker/decimal-range.checker';
+import MeasureUnitChecker from '../checker/measure-unit.checker';
+import RawDataLogic from './raw-data.logic';
+import { RawDataConstant } from './raw-data.constant';
 
 const commonPath: string = '/raw-dataset';
 const specifyIdPath: string = '/raw-dataset/:id';
 
 class RawDataController extends ControllerBase {
-    private patternLogic: PatternLogic = new PatternLogic();
+    private rawDataLogic: RawDataLogic = new RawDataLogic();
     private readonly PARAM_DETAIL_URL_ID: string = 'detailUrlId';
+    private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
+    private readonly PARAM_PROPERTY_TYPE: string = 'propertyType';
     private readonly PARAM_TITLE: string = 'title';
     private readonly PARAM_PRICE: string = 'price';
+    private readonly PARAM_PRICE_CURRENCY: string = 'currency';
     private readonly PARAM_ACREAGE: string = 'acreage';
+    private readonly PARAM_ACREAGE_MEASURE_UNIT: string = 'measureUnit';
     private readonly PARAM_ADDRESS: string = 'address';
+    private readonly PARAM_ADDRESS_CITY: string = 'city';
+    private readonly PARAM_ADDRESS_DISTRICT: string = 'district';
+    private readonly PARAM_ADDRESS_WARD: string = 'ward';
+    private readonly PARAM_ADDRESS_STREET: string = 'street';
     private readonly PARAM_OTHERS: string = 'others';
+    private readonly PARAM_OTHERS_NAME: string = 'name';
+    private readonly PARAM_VALUE: string = 'value';
 
     constructor() {
         super();
@@ -34,72 +48,80 @@ class RawDataController extends ControllerBase {
      * @param next
      */
     protected createRoute(req: Request, res: Response, next: any): void {
-        const validator = new Validator();
+        const bodyValidator = new Validator();
+        const priceValidator = new Validator();
+        const acreageValidator = new Validator();
+        const addressValidator = new Validator();
+        const othersValidator = new Validator();
 
-        validator.addParamValidator(
-            this.PARAM_DETAIL_URL_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_DETAIL_URL_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        // Validate request body
+        bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new IntegerChecker());
+        bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new IntegerRangeChecker(1, null));
 
-        validator.addParamValidator(this.PARAM_TITLE, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_TITLE,
-            new StringLengthChecker(1, null)
-        );
-
-        validator.addParamValidator(this.PARAM_PRICE, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_PRICE,
-            new StringLengthChecker(1, null)
+        bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new IntegerChecker());
+        bodyValidator.addParamValidator(
+            this.PARAM_TRANSACTION_TYPE,
+            new IntegerRangeChecker(0, Object.keys(RawDataConstant.TYPE_OF_TRANSACTION).length - 1)
         );
 
-        validator.addParamValidator(
-            this.PARAM_ACREAGE_LOCATOR,
-            new StringChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_ACREAGE_LOCATOR,
-            new StringLengthChecker(1, null)
+        bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new IntegerChecker());
+        bodyValidator.addParamValidator(
+            this.PARAM_PROPERTY_TYPE,
+            new IntegerRangeChecker(0, Object.keys(RawDataConstant.TYPE_OF_PROPERTY).length - 1)
         );
 
-        validator.addParamValidator(
-            this.PARAM_ADDRESS_LOCATOR,
-            new StringChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_ADDRESS_LOCATOR,
-            new StringLengthChecker(1, null)
-        );
+        bodyValidator.addParamValidator(this.PARAM_TITLE, new StringChecker());
+        bodyValidator.addParamValidator(this.PARAM_TITLE, new StringLengthChecker(1, null));
 
-        validator.addParamValidator(
-            this.PARAM_SUB_LOCATOR,
-            new ObjectChecker()
-        );
+        bodyValidator.addParamValidator(this.PARAM_PRICE, new ObjectChecker());
 
-        validator.addParamValidator(
-            this.PARAM_LOCATOR_SUB_LOCATOR,
-            new StringChecker()
-        );
+        bodyValidator.addParamValidator(this.PARAM_ACREAGE, new ObjectChecker());
 
-        validator.addParamValidator(
-            this.PARAM_NAME_SUB_LOCATOR,
-            new StringChecker()
-        );
+        bodyValidator.addParamValidator(this.PARAM_ADDRESS, new ObjectChecker());
 
-        validator.validate(this.requestBody);
+        bodyValidator.addParamValidator(this.PARAM_OTHERS, new ObjectChecker());
 
-        this.patternLogic
+        // Validate price object
+        priceValidator.addParamValidator(this.PARAM_PRICE_CURRENCY, new StringChecker());
+
+        priceValidator.addParamValidator(this.PARAM_VALUE, new DecimalChecker());
+        priceValidator.addParamValidator(this.PARAM_VALUE, new DecimalRangeChecker(0, null));
+
+        // Validate acreage object
+        acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new StringChecker());
+        acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new MeasureUnitChecker('m²'));
+
+        acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalChecker());
+        acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalRangeChecker(0, null));
+
+        // Validate address object
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_CITY, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_DISTRICT, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_WARD, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_STREET, new StringChecker());
+
+        // Validate others object
+        othersValidator.addParamValidator(this.PARAM_OTHERS_NAME, new StringChecker());
+
+        othersValidator.addParamValidator(this.PARAM_VALUE, new StringChecker());
+
+        bodyValidator.validate(this.requestBody);
+        priceValidator.validate(this.requestBody[this.PARAM_PRICE]);
+        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE]);
+        addressValidator.validate(this.requestBody[this.PARAM_ADDRESS]);
+        othersValidator.validate(this.requestBody[this.PARAM_OTHERS]);
+
+        if (this.requestBody[this.PARAM_ACREAGE].measureUnit) {
+            encodeURI(this.requestBody[this.PARAM_ACREAGE].measureUnit);
+        }
+
+        this.rawDataLogic
             .create(this.requestBody)
-            .then((createdHost: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.CREATED,
-                    createdHost,
-                    res
-                );
+            .then((createdRawData: object): void => {
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdRawData, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -115,21 +137,14 @@ class RawDataController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
-        this.patternLogic
-            .delete(this.requestParams.id)
+        this.rawDataLogic
+            .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
-                    {},
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -145,43 +160,23 @@ class RawDataController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_LIMIT,
-            new IntegerRangeChecker(1, 1000)
-        );
+        validator.addParamValidator(this.PARAM_LIMIT, new IntegerRangeChecker(1, 1000));
 
         validator.addParamValidator(this.PARAM_OFFSET, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_OFFSET,
-            new IntegerRangeChecker(0, null)
-        );
+        validator.addParamValidator(this.PARAM_OFFSET, new IntegerRangeChecker(0, null));
 
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_DETAIL_URL_ID, new IntegerChecker());
+        validator.addParamValidator(this.PARAM_DETAIL_URL_ID, new IntegerRangeChecker(1, null));
 
-        this.patternLogic
-            .getAll(
-                this.limit,
-                this.offset,
-                this.requestQuery[this.PARAM_CATALOG_ID]
-            )
-            .then(({ patternList, hasNext }): void => {
+        this.rawDataLogic
+            .getAll(this.limit, this.offset, this.requestQuery[this.PARAM_DETAIL_URL_ID])
+            .then(({ rawDataList: rawDataList, hasNext }): void => {
                 let responseBody: object = {
-                    patterns: patternList,
+                    rawDataset: rawDataList,
                     hasNext: hasNext,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -197,25 +192,18 @@ class RawDataController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
-        this.patternLogic
+        this.rawDataLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((pattern: object): void => {
+            .then((rawData: object): void => {
                 let responseBody: object = {
-                    catalog: pattern,
+                    rawData: rawData,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -228,99 +216,83 @@ class RawDataController extends ControllerBase {
      * @param next
      */
     protected updateRoute(req: Request, res: Response, next: any): void {
-        const validator = new Validator();
+        const bodyValidator = new Validator();
+        const priceValidator = new Validator();
+        const acreageValidator = new Validator();
+        const addressValidator = new Validator();
+        const othersValidator = new Validator();
 
-        validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        // Validate request body
+        bodyValidator.addParamValidator(this.PARAM_ID, new IntegerChecker());
+        bodyValidator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new IntegerChecker());
+        bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new IntegerRangeChecker(1, null));
 
-        validator.addParamValidator(
-            this.PARAM_DETAIL_URL_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_DETAIL_URL_ID,
-            new IntegerRangeChecker(1, null)
+        bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new IntegerChecker());
+        bodyValidator.addParamValidator(
+            this.PARAM_TRANSACTION_TYPE,
+            new IntegerRangeChecker(0, Object.keys(RawDataConstant.TYPE_OF_TRANSACTION).length - 1)
         );
 
-        validator.addParamValidator(
-            this.PARAM_MAIN_LOCATOR,
-            new ObjectChecker()
+        bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new IntegerChecker());
+        bodyValidator.addParamValidator(
+            this.PARAM_PROPERTY_TYPE,
+            new IntegerRangeChecker(0, Object.keys(RawDataConstant.TYPE_OF_PROPERTY).length - 1)
         );
 
-        validator.addParamValidator(
-            this.PARAM_TITLE_LOCATOR,
-            new StringChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_TITLE_LOCATOR,
-            new StringLengthChecker(1, null)
-        );
+        bodyValidator.addParamValidator(this.PARAM_TITLE, new StringChecker());
+        bodyValidator.addParamValidator(this.PARAM_TITLE, new StringLengthChecker(1, null));
 
-        validator.addParamValidator(
-            this.PARAM_PRICE_LOCATOR,
-            new StringChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_PRICE_LOCATOR,
-            new StringLengthChecker(1, null)
-        );
+        bodyValidator.addParamValidator(this.PARAM_PRICE, new ObjectChecker());
 
-        validator.addParamValidator(
-            this.PARAM_ACREAGE_LOCATOR,
-            new StringChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_ACREAGE_LOCATOR,
-            new StringLengthChecker(1, null)
-        );
+        bodyValidator.addParamValidator(this.PARAM_ACREAGE, new ObjectChecker());
 
-        validator.addParamValidator(
-            this.PARAM_ADDRESS_LOCATOR,
-            new StringChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_ADDRESS_LOCATOR,
-            new StringLengthChecker(1, null)
-        );
+        bodyValidator.addParamValidator(this.PARAM_ADDRESS, new ObjectChecker());
 
-        validator.addParamValidator(
-            this.PARAM_SUB_LOCATOR,
-            new ObjectChecker()
-        );
+        bodyValidator.addParamValidator(this.PARAM_OTHERS, new ObjectChecker());
 
-        validator.addParamValidator(
-            this.PARAM_LOCATOR_SUB_LOCATOR,
-            new StringChecker()
-        );
+        // Validate price object
+        priceValidator.addParamValidator(this.PARAM_PRICE_CURRENCY, new StringChecker());
 
-        validator.addParamValidator(
-            this.PARAM_NAME_SUB_LOCATOR,
-            new StringChecker()
-        );
+        priceValidator.addParamValidator(this.PARAM_VALUE, new DecimalChecker());
+        priceValidator.addParamValidator(this.PARAM_VALUE, new DecimalRangeChecker(0, null));
 
-        validator.validate(this.requestParams);
-        validator.validate(this.requestBody);
+        // Validate acreage object
+        acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new StringChecker());
+        acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new MeasureUnitChecker('m²'));
 
-        this.patternLogic
+        acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalChecker());
+        acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalRangeChecker(0, null));
+
+        // Validate address object
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_CITY, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_DISTRICT, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_WARD, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_STREET, new StringChecker());
+
+        // Validate others object
+        othersValidator.addParamValidator(this.PARAM_OTHERS_NAME, new StringChecker());
+
+        othersValidator.addParamValidator(this.PARAM_VALUE, new StringChecker());
+
+        bodyValidator.validate(this.requestBody);
+        priceValidator.validate(this.requestBody[this.PARAM_PRICE]);
+        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE]);
+        addressValidator.validate(this.requestBody[this.PARAM_ADDRESS]);
+        othersValidator.validate(this.requestBody[this.PARAM_OTHERS]);
+
+        if (this.requestBody[this.PARAM_ACREAGE].measureUnit) {
+            encodeURI(this.requestBody[this.PARAM_ACREAGE].measureUnit);
+        }
+
+        this.rawDataLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedPattern: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    editedPattern,
-                    res
-                );
+            .then((editedRawData: object): void => {
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedRawData, res);
             })
             .catch((error: Error): void => {
                 next(error);

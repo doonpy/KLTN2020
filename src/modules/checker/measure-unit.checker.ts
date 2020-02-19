@@ -4,8 +4,13 @@ import { Constant } from '../../util/definition/constant';
 import { Cause } from '../../util/definition/error/cause';
 import { ErrorMessage } from '../../util/definition/error/message';
 
-class DomainChecker extends CheckerBase {
-    private VALID_DOMAIN: RegExp = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.[\d\w\-]+)+\/?/);
+class MeasureUnitChecker extends CheckerBase {
+    private measureUnit: string;
+
+    constructor(measureUnit: string) {
+        super();
+        this.measureUnit = encodeURI(measureUnit);
+    }
 
     /**
      * @param paramName
@@ -18,15 +23,15 @@ class DomainChecker extends CheckerBase {
             return;
         }
 
-        if (!this.VALID_DOMAIN.test(value)) {
+        if (this.measureUnit !== encodeURI(value)) {
             throw new CustomizeException(
                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
                 ErrorMessage.PARAM.INVALID_VALUE,
-                Cause.DATA_VALUE.DOMAIN,
-                [value]
+                Cause.DATA_VALUE.MEASURE_UNIT,
+                [value, decodeURI(this.measureUnit)]
             );
         }
     }
 }
 
-export default DomainChecker;
+export default MeasureUnitChecker;

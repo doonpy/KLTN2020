@@ -15,11 +15,7 @@ class ApiResponse {
      * @param resource
      * @param res
      */
-    public sendResponse(
-        statusCode: number,
-        resource: any,
-        res: Response
-    ): void {
+    public sendResponse(statusCode: number, resource: any, res: Response): void {
         this.statusCode = statusCode;
         this.body = resource;
 

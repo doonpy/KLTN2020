@@ -26,4 +26,5 @@ export const Constant = {
         OFFSET: 0,
         KEYWORD: '',
     },
+    LANGUAGE: 0, // 0: Vietnamese, 1: English
 };

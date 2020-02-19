@@ -1,10 +1,9 @@
-import express from 'express';
-import { Application } from 'express';
+import express, { Application } from 'express';
 import path from 'path';
 import MessageLog from './util/message-log';
 import { Constant } from './util/definition/constant';
-import DatabaseConnection from './util/database';
-import { notFoundRoute, errorHandler } from './middleware/error-handler';
+import DatabaseConnection from './modules/database/database';
+import { errorHandler, notFoundRoute } from './middleware/error-handler';
 
 class App {
     private app: Application;
@@ -23,10 +22,7 @@ class App {
                 this.bindRoutes(appInit.controllers);
             })
             .catch(error => {
-                new MessageLog(
-                    Constant.MESSAGE_TYPE.ERROR,
-                    error.message
-                ).show();
+                new MessageLog(Constant.MESSAGE_TYPE.ERROR, error.message).show();
             });
     }
 
@@ -35,9 +31,7 @@ class App {
      *
      * @param middleWares
      */
-    private bindMiddlewares(middleWares: {
-        forEach: (arg0: (middleWare: any) => void) => void;
-    }): void {
+    private bindMiddlewares(middleWares: { forEach: (arg0: (middleWare: any) => void) => void }): void {
         middleWares.forEach((middleWare: any): void => {
             this.app.use(middleWare);
         });
@@ -48,9 +42,7 @@ class App {
      *
      * @param routes
      */
-    private bindRoutes(routes: {
-        forEach: (arg0: (controller: any) => void) => void;
-    }): void {
+    private bindRoutes(routes: { forEach: (arg0: (controller: any) => void) => void }): void {
         routes.forEach((controller: any): void => {
             this.app.use('/', controller.router);
         });

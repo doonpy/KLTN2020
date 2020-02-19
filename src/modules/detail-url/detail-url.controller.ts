@@ -36,45 +36,25 @@ class DetailUrlController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_LIMIT,
-            new IntegerRangeChecker(1, 1000)
-        );
+        validator.addParamValidator(this.PARAM_LIMIT, new IntegerRangeChecker(1, 1000));
 
         validator.addParamValidator(this.PARAM_OFFSET, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_OFFSET,
-            new IntegerRangeChecker(0, null)
-        );
+        validator.addParamValidator(this.PARAM_OFFSET, new IntegerRangeChecker(0, null));
 
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_CATALOG_ID, new IntegerChecker());
+        validator.addParamValidator(this.PARAM_CATALOG_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestQuery);
 
         this.detailUrlLogic
-            .getAll(
-                this.limit,
-                this.offset,
-                this.requestQuery[this.PARAM_CATALOG_ID]
-            )
+            .getAll(this.limit, this.offset, this.requestQuery[this.PARAM_CATALOG_ID])
             .then(({ detailUrlList, hasNext }): void => {
                 let responseBody: object = {
                     detailUrls: detailUrlList,
                     hasNext: hasNext,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -86,18 +66,11 @@ class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (
-        req: Request,
-        res: Response,
-        next: any
-    ): void => {
+    protected getWithIdRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
@@ -108,11 +81,7 @@ class DetailUrlController extends ControllerBase {
                     host: detailUrl,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -127,20 +96,11 @@ class DetailUrlController extends ControllerBase {
     protected createRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_CATALOG_ID, new IntegerChecker());
+        validator.addParamValidator(this.PARAM_CATALOG_ID, new IntegerRangeChecker(1, null));
 
         validator.addParamValidator(this.PARAM_URL, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_URL,
-            new StringLengthChecker(1, 100)
-        );
+        validator.addParamValidator(this.PARAM_URL, new StringLengthChecker(1, 100));
         validator.addParamValidator(this.PARAM_URL, new UrlChecker());
 
         validator.validate(this.requestBody);
@@ -148,11 +108,7 @@ class DetailUrlController extends ControllerBase {
         this.detailUrlLogic
             .create(this.requestBody)
             .then((createdDetailUrl: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.CREATED,
-                    createdDetailUrl,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdDetailUrl, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -168,40 +124,19 @@ class DetailUrlController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_CATALOG_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_CATALOG_ID, new IntegerChecker());
+        validator.addParamValidator(this.PARAM_CATALOG_ID, new IntegerRangeChecker(1, null));
 
         validator.addParamValidator(this.PARAM_URL, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_URL,
-            new StringLengthChecker(1, 100)
-        );
+        validator.addParamValidator(this.PARAM_URL, new StringLengthChecker(1, 100));
         validator.addParamValidator(this.PARAM_URL, new UrlChecker());
 
-        validator.addParamValidator(
-            this.PARAM_IS_EXTRACTED,
-            new BooleanChecker()
-        );
+        validator.addParamValidator(this.PARAM_IS_EXTRACTED, new BooleanChecker());
 
-        validator.addParamValidator(
-            this.PARAM_REQUEST_RETRIES,
-            new IntegerChecker()
-        );
-        validator.addParamValidator(
-            this.PARAM_REQUEST_RETRIES,
-            new IntegerRangeChecker(0, null)
-        );
+        validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new IntegerChecker());
+        validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new IntegerRangeChecker(0, null));
 
         validator.validate(this.requestParams);
         validator.validate(this.requestBody);
@@ -209,11 +144,7 @@ class DetailUrlController extends ControllerBase {
         this.detailUrlLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedDetailUrl: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    editedDetailUrl,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedDetailUrl, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -229,21 +160,14 @@ class DetailUrlController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
         this.detailUrlLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
-                    {},
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

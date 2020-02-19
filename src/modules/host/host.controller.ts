@@ -33,16 +33,10 @@ class HostController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_LIMIT,
-            new IntegerRangeChecker(1, 1000)
-        );
+        validator.addParamValidator(this.PARAM_LIMIT, new IntegerRangeChecker(1, 1000));
 
         validator.addParamValidator(this.PARAM_OFFSET, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_OFFSET,
-            new IntegerRangeChecker(0, null)
-        );
+        validator.addParamValidator(this.PARAM_OFFSET, new IntegerRangeChecker(0, null));
 
         validator.addParamValidator(this.PARAM_KEYWORD, new StringChecker());
 
@@ -56,11 +50,7 @@ class HostController extends ControllerBase {
                     hasNext: hasNext,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -72,18 +62,11 @@ class HostController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (
-        req: Request,
-        res: Response,
-        next: any
-    ): void => {
+    protected getWithIdRoute = (req: Request, res: Response, next: any): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
@@ -94,11 +77,7 @@ class HostController extends ControllerBase {
                     host: host,
                 };
 
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    responseBody,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -114,28 +93,18 @@ class HostController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_DOMAIN, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_DOMAIN,
-            new StringLengthChecker(10, 100)
-        );
+        validator.addParamValidator(this.PARAM_DOMAIN, new StringLengthChecker(10, 100));
         validator.addParamValidator(this.PARAM_DOMAIN, new DomainChecker());
 
         validator.addParamValidator(this.PARAM_NAME, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_NAME,
-            new StringLengthChecker(1, 100)
-        );
+        validator.addParamValidator(this.PARAM_NAME, new StringLengthChecker(1, 100));
 
         validator.validate(this.requestBody);
 
         this.hostLogic
             .create(this.requestBody)
             .then((createdHost: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.CREATED,
-                    createdHost,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdHost, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -151,23 +120,14 @@ class HostController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.addParamValidator(this.PARAM_DOMAIN, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_DOMAIN,
-            new StringLengthChecker(10, 100)
-        );
+        validator.addParamValidator(this.PARAM_DOMAIN, new StringLengthChecker(10, 100));
         validator.addParamValidator(this.PARAM_DOMAIN, new DomainChecker());
 
         validator.addParamValidator(this.PARAM_NAME, new StringChecker());
-        validator.addParamValidator(
-            this.PARAM_NAME,
-            new StringLengthChecker(1, 100)
-        );
+        validator.addParamValidator(this.PARAM_NAME, new StringLengthChecker(1, 100));
 
         validator.validate(this.requestParams);
         validator.validate(this.requestBody);
@@ -175,11 +135,7 @@ class HostController extends ControllerBase {
         this.hostLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedHost: object): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.OK,
-                    editedHost,
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedHost, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -195,21 +151,14 @@ class HostController extends ControllerBase {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new IntegerChecker());
-        validator.addParamValidator(
-            this.PARAM_ID,
-            new IntegerRangeChecker(1, null)
-        );
+        validator.addParamValidator(this.PARAM_ID, new IntegerRangeChecker(1, null));
 
         validator.validate(this.requestParams);
 
         this.hostLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(
-                    Constant.RESPONSE_STATUS_CODE.NO_CONTENT,
-                    {},
-                    res
-                );
+                this.sendResponse(Constant.RESPONSE_STATUS_CODE.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

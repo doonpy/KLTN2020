@@ -7,6 +7,7 @@ import async, { Dictionary } from 'async';
 import DetailUrlModel from '../detail-url/detail-url.model';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 import { RawDataErrorMessage } from './raw-data.error-message';
+import { RawDataConstant } from './raw-data.constant';
 
 class RawDataLogic {
     /**
@@ -43,18 +44,11 @@ class RawDataLogic {
                     }
 
                     let rawDataList: Array<object> = [];
-                    for (
-                        let i: number = 0;
-                        i < rawDataset.length && i < limit;
-                        i++
-                    ) {
-                        rawDataList.push(
-                            DetailUrlLogic.convertToResponse(rawDataset[i])
-                        );
+                    for (let i: number = 0; i < rawDataset.length && i < limit; i++) {
+                        rawDataList.push(RawDataLogic.convertToResponse(rawDataset[i]));
                     }
 
-                    let hasNext: boolean =
-                        rawDataList.length < rawDataset.length;
+                    let hasNext: boolean = rawDataList.length < rawDataset.length;
 
                     resolve({ rawDataList: rawDataList, hasNext: hasNext });
                 });
@@ -110,6 +104,8 @@ class RawDataLogic {
      */
     public create = ({
         detailUrlId,
+        transactionType,
+        propertyType,
         title,
         price,
         acreage,
@@ -117,10 +113,23 @@ class RawDataLogic {
         others = [],
     }: {
         detailUrlId: number;
+        transactionType: number;
+        propertyType: number;
         title: string;
-        price: number;
-        acreage: string;
-        address: string;
+        price: {
+            value: number;
+            currency: string;
+        };
+        acreage: {
+            value: number;
+            measureUnit: string;
+        };
+        address: {
+            city: string;
+            district: string;
+            ward: string;
+            street: string;
+        };
         others:
             | Array<{
                   name: string;
@@ -136,25 +145,22 @@ class RawDataLogic {
                             detailUrlId: detailUrlId,
                         }).exec(callback);
                     },
-                    detailUrl: (callback: any): void => {
-                        DetailUrlModel.findById(detailUrlId)
-                            .populate({
-                                path: 'catalogId',
-                                populate: { path: 'hostId' },
-                            })
-                            .exec(callback);
+                    isDetailUrlExisted: (callback: any): void => {
+                        DetailUrlModel.countDocuments({
+                            _id: detailUrlId,
+                        }).exec(callback);
                     },
                 },
                 (
                     error: Error | undefined,
                     {
                         isRawDataExisted,
-                        detailUrl,
+                        isDetailUrlExisted,
                     }: Dictionary<
                         | any
                         | {
                               isRawDataExisted: number;
-                              detailUrl: Document;
+                              isDetailUrlExisted: number;
                           }
                     >
                 ): void => {
@@ -173,18 +179,18 @@ class RawDataLogic {
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
                                 RawDataErrorMessage.RD_ERROR_2,
-                                Cause.DATA_VALUE.NOT_FOUND,
+                                Cause.DATA_VALUE.EXISTS,
                                 ['detailUrlId', detailUrlId]
                             )
                         );
                     }
 
-                    if (!detailUrl) {
+                    if (!isDetailUrlExisted) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
                                 RawDataErrorMessage.RD_ERROR_3,
-                                Cause.DATA_VALUE.EXISTS,
+                                Cause.DATA_VALUE.NOT_FOUND,
                                 ['detailUrlId', detailUrlId]
                             )
                         );
@@ -192,16 +198,15 @@ class RawDataLogic {
 
                     new RawDataModel({
                         detailUrlId: detailUrlId,
+                        transactionType: transactionType,
+                        propertyType: propertyType,
                         title: title,
                         price: price,
                         acreage: acreage,
                         address: address,
                         others: others,
                     }).save(
-                        (
-                            error: Error,
-                            createdRawData: Document | any
-                        ): void => {
+                        async (error: Error, createdRawData: Document | any): Promise<void> => {
                             if (error) {
                                 return reject(
                                     new CustomizeException(
@@ -212,10 +217,17 @@ class RawDataLogic {
                                 );
                             }
 
-                            createdRawData.detailUrlId = detailUrl;
-                            resolve(
-                                RawDataLogic.convertToResponse(createdRawData)
-                            );
+                            await createdRawData
+                                .populate({
+                                    path: 'detailUrlId',
+                                    populate: {
+                                        path: 'catalogId',
+                                        populate: { path: 'hostId' },
+                                    },
+                                })
+                                .execPopulate();
+
+                            resolve(RawDataLogic.convertToResponse(createdRawData));
                         }
                     );
                 }
@@ -233,6 +245,8 @@ class RawDataLogic {
         id: string,
         {
             detailUrlId,
+            transactionType,
+            propertyType,
             title,
             price,
             acreage,
@@ -240,16 +254,29 @@ class RawDataLogic {
             others = [],
         }: {
             detailUrlId: number;
+            transactionType: number;
+            propertyType: number;
             title: string;
-            price: number;
-            acreage: string;
-            address: string;
+            price: {
+                value: number;
+                currency: string;
+            };
+            acreage: {
+                value: number;
+                measureUnit: string;
+            };
+            address: {
+                city: string;
+                district: string;
+                ward: string;
+                street: string;
+            };
             others:
                 | Array<{
                       name: string;
                       value: string;
                   }>
-                | Array<any>;
+                | Array<null>;
         }
     ): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
@@ -263,17 +290,10 @@ class RawDataLogic {
                             detailUrlId: detailUrlId,
                         }).exec(callback);
                     },
-                    detailUrl: (callback: any): void => {
-                        if (detailUrlId) {
-                            DetailUrlModel.findById(detailUrlId)
-                                .populate({
-                                    path: 'catalogId',
-                                    populate: { path: 'hostId' },
-                                })
-                                .exec(callback);
-                        } else {
-                            callback();
-                        }
+                    isDetailUrlExisted: (callback: any): void => {
+                        DetailUrlModel.countDocuments({
+                            _id: detailUrlId,
+                        }).exec(callback);
                     },
                 },
                 (
@@ -281,13 +301,13 @@ class RawDataLogic {
                     {
                         rawData,
                         isRawDataExisted,
-                        detailUrl,
+                        isDetailUrlExisted,
                     }: Dictionary<
                         | any
                         | {
                               rawData: Document | null;
                               isRawDataExisted: number;
-                              detailUrl: Document | null;
+                              isDetailUrlExisted: number;
                           }
                     >
                 ): void => {
@@ -312,7 +332,7 @@ class RawDataLogic {
                         );
                     }
 
-                    if (!detailUrl && detailUrlId) {
+                    if (!isDetailUrlExisted) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
@@ -323,10 +343,7 @@ class RawDataLogic {
                         );
                     }
 
-                    if (
-                        isRawDataExisted &&
-                        detailUrlId !== rawData.detailUrlId
-                    ) {
+                    if (isRawDataExisted && detailUrlId === rawData.detailUrlId) {
                         return reject(
                             new CustomizeException(
                                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
@@ -338,34 +355,43 @@ class RawDataLogic {
                     }
 
                     rawData.detailUrlId = detailUrlId || rawData.detailUrlId;
+                    rawData.transactionType =
+                        typeof transactionType !== 'undefined' ? transactionType : rawData.transactionType;
+                    rawData.propertyType = typeof propertyType !== 'undefined' ? propertyType : rawData.propertyType;
                     rawData.title = title || rawData.title;
-                    rawData.price = price || rawData.price;
-                    rawData.acreage = acreage || rawData.acreage;
-                    rawData.address = address || rawData.address;
-                    if (others) {
-                        others.forEach(
-                            (
-                                other: { name: string; value: string } | any
-                            ): void => {
-                                let otherSimilarIndex = rawData.others.findIndex(
-                                    (o: {
-                                        name: string;
-                                        value: string;
-                                    }): boolean => {
-                                        return o.name === other.name;
-                                    }
-                                );
-                                if (otherSimilarIndex >= 0) {
-                                    rawData.others[otherSimilarIndex] = other;
-                                }
-                            }
-                        );
+
+                    if (price && Object.keys(price).length > 0) {
+                        rawData.price.value = price.value || rawData.price.value;
+                        rawData.price.currency = price.currency || rawData.price.currency;
                     }
+
+                    if (acreage && Object.keys(acreage).length > 0) {
+                        rawData.acreage.value = acreage.value || rawData.acreage.value;
+                        rawData.acreage.measureUnit = acreage.measureUnit || rawData.acreage.measureUnit;
+                    }
+
+                    if (address && Object.keys(address).length > 0) {
+                        rawData.address.city = address.city || rawData.address.city;
+                        rawData.address.district = address.district || rawData.address.district;
+                        rawData.address.ward = address.ward || rawData.address.ward;
+                        rawData.address.street = address.street || rawData.address.street;
+                    }
+
+                    if (others && others.length > 0) {
+                        others.forEach((other: { name: string; value: string } | any): void => {
+                            let otherSimilarIndex = rawData.others.findIndex(
+                                (o: { name: string; value: string }): boolean => {
+                                    return o.name === other.name;
+                                }
+                            );
+                            if (otherSimilarIndex >= 0) {
+                                rawData.others[otherSimilarIndex] = other;
+                            }
+                        });
+                    }
+
                     rawData.save(
-                        async (
-                            error: Error,
-                            editedRawData: Document | any
-                        ): Promise<void> => {
+                        async (error: Error, editedRawData: Document | any): Promise<void> => {
                             if (error) {
                                 new CustomizeException(
                                     Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
@@ -374,23 +400,17 @@ class RawDataLogic {
                                 );
                             }
 
-                            if (detailUrlId) {
-                                editedRawData.detailUrlId = detailUrl;
-                            } else {
-                                await editedRawData
-                                    .populate({
-                                        path: 'detailUrlId',
-                                        populate: {
-                                            path: 'catalogId',
-                                            populate: { path: 'hostId' },
-                                        },
-                                    })
-                                    .execPopulate();
-                            }
+                            await editedRawData
+                                .populate({
+                                    path: 'detailUrlId',
+                                    populate: {
+                                        path: 'catalogId',
+                                        populate: { path: 'hostId' },
+                                    },
+                                })
+                                .execPopulate();
 
-                            resolve(
-                                DetailUrlLogic.convertToResponse(editedRawData)
-                            );
+                            resolve(RawDataLogic.convertToResponse(editedRawData));
                         }
                     );
                 }
@@ -405,8 +425,29 @@ class RawDataLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            RawDataModel.findById(id).exec(
-                (error: Error, rawData: Document | null): void => {
+            RawDataModel.findById(id).exec((error: Error, rawData: Document | null): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
+                }
+
+                if (!rawData) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            RawDataErrorMessage.RD_ERROR_1,
+                            Cause.DATA_VALUE.NOT_FOUND,
+                            ['id', id]
+                        )
+                    );
+                }
+
+                RawDataModel.findByIdAndDelete(id, (error: Error): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -417,32 +458,9 @@ class RawDataLogic {
                         );
                     }
 
-                    if (!rawData) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                RawDataErrorMessage.RD_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    RawDataModel.findByIdAndDelete(id, (error: Error): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        resolve();
-                    });
-                }
-            );
+                    resolve();
+                });
+            });
         });
     };
 
@@ -452,6 +470,8 @@ class RawDataLogic {
 
     private static convertToResponse({
         _id,
+        transactionType,
+        propertyType,
         detailUrlId,
         title,
         price,
@@ -462,32 +482,38 @@ class RawDataLogic {
         mTime,
     }: any): {
         id: number;
+        transactionType: string;
+        propertyType: string;
         detailUrl: object;
         title: string;
-        price: number;
-        acreage: string;
-        address: string;
+        price: { value: number; currency: string } | object;
+        acreage: { value: number; measureUnit: string } | object;
+        address: { city: string; district: string; ward: string; street: string } | object;
         others: Array<{ name: string; value: string }> | Array<any>;
         createAt: string;
         updateAt: string;
     } {
         let data: {
             id: number;
+            transactionType: string;
+            propertyType: string;
             detailUrl: object;
             title: string;
-            price: number;
-            acreage: string;
-            address: string;
+            price: { value: number; currency: string } | object;
+            acreage: { value: number; measureUnit: string } | object;
+            address: { city: string; district: string; ward: string; street: string } | object;
             others: Array<{ name: string; value: string }> | Array<any>;
             createAt: string;
             updateAt: string;
         } = {
             id: NaN,
+            transactionType: '',
+            propertyType: '',
             detailUrl: {},
             title: '',
-            price: NaN,
-            acreage: '',
-            address: '',
+            price: {},
+            acreage: {},
+            address: {},
             others: [],
             createAt: '',
             updateAt: '',
@@ -495,6 +521,15 @@ class RawDataLogic {
 
         if (_id) {
             data.id = _id;
+        }
+
+        if (typeof transactionType !== 'undefined') {
+            data.transactionType =
+                RawDataConstant.DEFINITION.TYPE_OF_TRANSACTION[transactionType][Constant.LANGUAGE] || '';
+        }
+
+        if (typeof propertyType !== 'undefined') {
+            data.propertyType = RawDataConstant.DEFINITION.TYPE_OF_PROPERTY[propertyType][Constant.LANGUAGE] || '';
         }
 
         if (detailUrlId && Object.keys(detailUrlId).length > 0) {
@@ -505,16 +540,19 @@ class RawDataLogic {
             data.title = title;
         }
 
-        if (price) {
-            data.title = title;
+        if (Object.keys(price).length > 0) {
+            data.price = price;
         }
 
-        if (acreage) {
-            data.title = acreage;
+        if (Object.keys(acreage).length > 0) {
+            if (acreage.measureUnit) {
+                acreage.measureUnit = decodeURI(acreage.measureUnit);
+            }
+            data.acreage = acreage;
         }
 
-        if (address) {
-            data.title = address;
+        if (Object.keys(address).length > 0) {
+            data.address = address;
         }
 
         if (others.length > 0) {

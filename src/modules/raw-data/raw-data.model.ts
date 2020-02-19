@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import { RawDataConstant } from './raw-data.constant';
 
 const rawDataSchema = new Schema(
     {
@@ -7,29 +8,50 @@ const rawDataSchema = new Schema(
             type: Schema.Types.Number,
             ref: 'detail_url',
         },
-        title: { type: Schema.Types.String, default: '' },
+        transactionType: {
+            type: Schema.Types.Number,
+            enum: [RawDataConstant.TYPE_OF_TRANSACTION.SALE, RawDataConstant.TYPE_OF_TRANSACTION.RENT],
+        },
+        propertyType: {
+            type: Schema.Types.Number,
+            enum: [
+                RawDataConstant.TYPE_OF_PROPERTY.APARTMENT,
+                RawDataConstant.TYPE_OF_PROPERTY.OFFICE,
+                RawDataConstant.TYPE_OF_PROPERTY.OTHER,
+                RawDataConstant.TYPE_OF_PROPERTY.ROOM,
+                RawDataConstant.TYPE_OF_PROPERTY.SHOP,
+                RawDataConstant.TYPE_OF_PROPERTY.FARM,
+                RawDataConstant.TYPE_OF_PROPERTY.INDIVIDUAL_HOUSE,
+                RawDataConstant.TYPE_OF_PROPERTY.LAND,
+                RawDataConstant.TYPE_OF_PROPERTY.PROJECT_LAND,
+                RawDataConstant.TYPE_OF_PROPERTY.RESORT,
+                RawDataConstant.TYPE_OF_PROPERTY.TOWNHOUSE,
+                RawDataConstant.TYPE_OF_PROPERTY.VILLA,
+                RawDataConstant.TYPE_OF_PROPERTY.WAREHOUSE,
+            ],
+        },
+        title: { type: Schema.Types.String },
         price: {
-            value: { type: Schema.Types.Number, default: 0 },
-            currency: { type: Schema.Types.String, default: '' },
+            value: { type: Schema.Types.Number },
+            currency: { type: Schema.Types.String, default: 'VND' },
         },
         acreage: {
-            value: { type: Schema.Types.Number, default: 0 },
+            value: { type: Schema.Types.Number },
             measureUnit: { type: Schema.Types.String, default: 'm%B2' }, //decode unicode m²
         },
         address: {
-            city: { type: Schema.Types.String, default: '' },
-            district: { type: Schema.Types.String, default: '' },
-            ward: { type: Schema.Types.String, default: '' },
-            street: { type: Schema.Types.String, default: '' },
+            city: { type: Schema.Types.String },
+            district: { type: Schema.Types.String },
+            ward: { type: Schema.Types.String },
+            street: { type: Schema.Types.String },
         },
         others: [
             {
-                name: { type: Schema.Types.String, default: '' },
-                value: { type: Schema.Types.String, default: '' },
+                name: { type: Schema.Types.String },
+                value: { type: Schema.Types.String },
                 _id: false,
             },
         ],
-        type: { type: Schema.Types.Number, enum: [] },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );

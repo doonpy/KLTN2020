@@ -12,10 +12,7 @@ class IntegerChecker extends TypeCheckerBase {
      * @param value
      */
     public checkType(paramName: string, value: any): void {
-        if (
-            !NUMERIC_CHARACTER_PATTERN.test(value) ||
-            !Number.isInteger(Number(value))
-        ) {
+        if (!NUMERIC_CHARACTER_PATTERN.test(value) || !Number.isInteger(Number(value))) {
             throw new CustomizeException(
                 Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
                 ErrorMessage.PARAM.INVALID_TYPE,

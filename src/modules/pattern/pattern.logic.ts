@@ -46,14 +46,8 @@ class PatternLogic {
                     }
 
                     let patternList: Array<object> = [];
-                    for (
-                        let i: number = 0;
-                        i < patterns.length && i < limit;
-                        i++
-                    ) {
-                        patternList.push(
-                            PatternLogic.convertToResponse(patterns[i])
-                        );
+                    for (let i: number = 0; i < patterns.length && i < limit; i++) {
+                        patternList.push(PatternLogic.convertToResponse(patterns[i]));
                     }
 
                     let hasNext: boolean = patternList.length < patterns.length;
@@ -212,28 +206,21 @@ class PatternLogic {
                         sourceUrlId: sourceUrlId,
                         mainLocator: mainLocator,
                         subLocator: subLocator,
-                    }).save(
-                        (
-                            error: Error,
-                            createdPattern: Document | any
-                        ): void => {
-                            if (error) {
-                                return reject(
-                                    new CustomizeException(
-                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                        error.message,
-                                        Cause.DATABASE
-                                    )
-                                );
-                            }
-
-                            createdPattern.catalogId = catalog;
-                            createdPattern.sourceUrlId = sourceUrl;
-                            resolve(
-                                PatternLogic.convertToResponse(createdPattern)
+                    }).save((error: Error, createdPattern: Document | any): void => {
+                        if (error) {
+                            return reject(
+                                new CustomizeException(
+                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                                    error.message,
+                                    Cause.DATABASE
+                                )
                             );
                         }
-                    );
+
+                        createdPattern.catalogId = catalog;
+                        createdPattern.sourceUrlId = sourceUrl;
+                        resolve(PatternLogic.convertToResponse(createdPattern));
+                    });
                 }
             );
         });
@@ -371,42 +358,25 @@ class PatternLogic {
                     pattern.catalogId = catalogId || pattern.catalogId;
                     pattern.sourceUrlId = sourceUrlId || pattern.sourceUrlId;
                     if (mainLocator) {
-                        pattern.mainLocator.title =
-                            mainLocator.title || pattern.mainLocator.title;
-                        pattern.mainLocator.price =
-                            mainLocator.price || pattern.mainLocator.price;
-                        pattern.mainLocator.acreage =
-                            mainLocator.acreage || pattern.mainLocator.acreage;
-                        pattern.mainLocator.address =
-                            mainLocator.address || pattern.mainLocator.address;
+                        pattern.mainLocator.title = mainLocator.title || pattern.mainLocator.title;
+                        pattern.mainLocator.price = mainLocator.price || pattern.mainLocator.price;
+                        pattern.mainLocator.acreage = mainLocator.acreage || pattern.mainLocator.acreage;
+                        pattern.mainLocator.address = mainLocator.address || pattern.mainLocator.address;
                     }
                     if (subLocator) {
-                        subLocator.forEach(
-                            (subLocatorItem: {
-                                name: string;
-                                locator: string;
-                            }): void => {
-                                let subLocatorSimilarIndex = pattern.subLocator.findIndex(
-                                    (s: {
-                                        name: string;
-                                        locator: string;
-                                    }): boolean => {
-                                        return s.name === subLocatorItem.name;
-                                    }
-                                );
-                                if (subLocatorSimilarIndex >= 0) {
-                                    pattern.subLocator[
-                                        subLocatorSimilarIndex
-                                    ] = subLocatorItem;
+                        subLocator.forEach((subLocatorItem: { name: string; locator: string }): void => {
+                            let subLocatorSimilarIndex = pattern.subLocator.findIndex(
+                                (s: { name: string; locator: string }): boolean => {
+                                    return s.name === subLocatorItem.name;
                                 }
+                            );
+                            if (subLocatorSimilarIndex >= 0) {
+                                pattern.subLocator[subLocatorSimilarIndex] = subLocatorItem;
                             }
-                        );
+                        });
                     }
                     pattern.save(
-                        async (
-                            error: Error,
-                            editedPattern: Document | any
-                        ): Promise<void> => {
+                        async (error: Error, editedPattern: Document | any): Promise<void> => {
                             if (error) {
                                 new CustomizeException(
                                     Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
@@ -440,9 +410,7 @@ class PatternLogic {
                                     .execPopulate();
                             }
 
-                            resolve(
-                                PatternLogic.convertToResponse(editedPattern)
-                            );
+                            resolve(PatternLogic.convertToResponse(editedPattern));
                         }
                     );
                 }
@@ -457,8 +425,29 @@ class PatternLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id).exec(
-                (error: Error, pattern: Document | null): void => {
+            PatternModel.findById(id).exec((error: Error, pattern: Document | null): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
+                }
+
+                if (!pattern) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            PatternErrorMessage.PTN_ERROR_1,
+                            Cause.DATA_VALUE.NOT_FOUND,
+                            ['id', id]
+                        )
+                    );
+                }
+
+                PatternModel.findByIdAndDelete(id, (error: Error): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -469,32 +458,9 @@ class PatternLogic {
                         );
                     }
 
-                    if (!pattern) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    PatternModel.findByIdAndDelete(id, (error: Error): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        resolve();
-                    });
-                }
-            );
+                    resolve();
+                });
+            });
         });
     };
 

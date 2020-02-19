@@ -4,7 +4,7 @@ import { Constant } from '../../util/definition/constant';
 import { Cause } from '../../util/definition/error/cause';
 import { ErrorMessage } from '../../util/definition/error/message';
 
-class IntegerRangeChecker extends CheckerBase {
+class DecimalRangeChecker extends CheckerBase {
     private minRange: number;
     private maxRange: number;
 
@@ -68,4 +68,4 @@ class IntegerRangeChecker extends CheckerBase {
     }
 }
 
-export default IntegerRangeChecker;
+export default DecimalRangeChecker;

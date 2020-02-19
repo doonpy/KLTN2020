@@ -21,10 +21,7 @@ class HostLogic {
     ): Promise<{ hostList: Array<object>; hasNext: boolean }> => {
         return new Promise((resolve: any, reject: any): void => {
             HostModel.find({
-                $or: [
-                    { name: { $regex: keyword, $options: 'i' } },
-                    { domain: { $regex: keyword, $options: 'i' } },
-                ],
+                $or: [{ name: { $regex: keyword, $options: 'i' } }, { domain: { $regex: keyword, $options: 'i' } }],
             })
                 .skip(offset)
                 .exec((error: Error, hosts: Array<Document>): void => {
@@ -39,11 +36,7 @@ class HostLogic {
                     }
 
                     let hostList: Array<object> = [];
-                    for (
-                        let i: number = 0;
-                        i < hosts.length && i < limit;
-                        i++
-                    ) {
+                    for (let i: number = 0; i < hosts.length && i < limit; i++) {
                         hostList.push(HostLogic.convertToResponse(hosts[i]));
                     }
 
@@ -61,32 +54,30 @@ class HostLogic {
      */
     public getById = (id: string): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
-            HostModel.findById(id).exec(
-                (error: Error, host: Document): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
-
-                    if (!host) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.HOST_ERR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    resolve(HostLogic.convertToResponse(host));
+            HostModel.findById(id).exec((error: Error, host: Document): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
                 }
-            );
+
+                if (!host) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            HostErrorMessage.HOST_ERR_1,
+                            Cause.DATA_VALUE.NOT_FOUND,
+                            ['id', id]
+                        )
+                    );
+                }
+
+                resolve(HostLogic.convertToResponse(host));
+            });
         });
     };
 
@@ -95,16 +86,34 @@ class HostLogic {
      *
      * @return Promise<object>
      */
-    public create = ({
-        name,
-        domain,
-    }: {
-        name: string;
-        domain: string;
-    }): Promise<object> => {
+    public create = ({ name, domain }: { name: string; domain: string }): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
-            HostModel.findOne({ domain: domain }).exec(
-                (error: Error, host: Document | null): void => {
+            HostModel.findOne({ domain: domain }).exec((error: Error, host: Document | null): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
+                }
+
+                if (host) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            HostErrorMessage.HOST_ERR_2,
+                            Cause.DATA_VALUE.EXISTS,
+                            ['domain', domain]
+                        )
+                    );
+                }
+
+                new HostModel({
+                    name: name,
+                    domain: domain,
+                }).save((error: Error, createdHost: Document): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -115,35 +124,9 @@ class HostLogic {
                         );
                     }
 
-                    if (host) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.HOST_ERR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['domain', domain]
-                            )
-                        );
-                    }
-
-                    new HostModel({
-                        name: name,
-                        domain: domain,
-                    }).save((error: Error, createdHost: Document): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        resolve(HostLogic.convertToResponse(createdHost));
-                    });
-                }
-            );
+                    resolve(HostLogic.convertToResponse(createdHost));
+                });
+            });
         });
     };
 
@@ -153,10 +136,7 @@ class HostLogic {
      *
      * @return Promise<object>
      */
-    public update = (
-        id: string,
-        { name, domain }: { name: string; domain: string }
-    ): Promise<object> => {
+    public update = (id: string, { name, domain }: { name: string; domain: string }): Promise<object> => {
         return new Promise((resolve: any, reject: any): void => {
             async.parallel(
                 {
@@ -164,18 +144,10 @@ class HostLogic {
                         HostModel.findById(id).exec(callback);
                     },
                     isExisted: (callback: any): void => {
-                        HostModel.countDocuments({ domain: domain }).exec(
-                            callback
-                        );
+                        HostModel.countDocuments({ domain: domain }).exec(callback);
                     },
                 },
-                (
-                    error: any,
-                    {
-                        host,
-                        isExisted,
-                    }: Dictionary<any | { host: Document; isExisted: Number }>
-                ): void => {
+                (error: any, { host, isExisted }: Dictionary<any | { host: Document; isExisted: Number }>): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -235,8 +207,29 @@ class HostLogic {
      */
     public delete = (id: string): Promise<null> => {
         return new Promise((resolve: any, reject: any): void => {
-            HostModel.findById(id).exec(
-                (error: Error, host: Document | null): void => {
+            HostModel.findById(id).exec((error: Error, host: Document | null): void => {
+                if (error) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                            error.message,
+                            Cause.DATABASE
+                        )
+                    );
+                }
+
+                if (!host) {
+                    return reject(
+                        new CustomizeException(
+                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                            HostErrorMessage.HOST_ERR_1,
+                            Cause.DATA_VALUE.NOT_FOUND,
+                            ['id', id]
+                        )
+                    );
+                }
+
+                HostModel.findByIdAndDelete(id, (error: Error): void => {
                     if (error) {
                         return reject(
                             new CustomizeException(
@@ -247,32 +240,9 @@ class HostLogic {
                         );
                     }
 
-                    if (!host) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                HostErrorMessage.HOST_ERR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    HostModel.findByIdAndDelete(id, (error: Error): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        resolve();
-                    });
-                }
-            );
+                    resolve();
+                });
+            });
         });
     };
 
