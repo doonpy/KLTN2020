@@ -77,3 +77,6 @@ mongo-data/
 
 # dist
 dist/*
+
+# log
+log/
