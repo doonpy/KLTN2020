@@ -9,6 +9,8 @@ import StringLengthChecker from '../checker/string-length.checker';
 import DetailUrlLogic from './detail-url.logic';
 import UrlChecker from '../checker/url.checker';
 import BooleanChecker from '../checker/type/boolean.checker';
+import HostLogic from '../host/host.logic';
+import DetailUrlModelInterface from './detail-url.model.interface';
 
 const commonPath: string = '/detail-urls';
 const specifyIdPath: string = '/detail-urls/:id';
@@ -47,8 +49,14 @@ class DetailUrlController extends ControllerBase {
         validator.validate(this.requestQuery);
 
         this.detailUrlLogic
-            .getAll(this.limit, this.offset, this.requestQuery[this.PARAM_CATALOG_ID])
-            .then(({ detailUrlList, hasNext }): void => {
+            .getAll(this.requestQuery[this.PARAM_CATALOG_ID], this.limit, this.offset)
+            .then(({ detailUrls, hasNext }): void => {
+                let detailUrlList: Array<object> = detailUrls.map(
+                    (detailUrl: DetailUrlModelInterface): object => {
+                        return DetailUrlLogic.convertToResponse(detailUrl);
+                    }
+                );
+
                 let responseBody: object = {
                     detailUrls: detailUrlList,
                     hasNext: hasNext,
@@ -76,9 +84,9 @@ class DetailUrlController extends ControllerBase {
 
         this.detailUrlLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((detailUrl: object): void => {
+            .then((detailUrl: DetailUrlModelInterface | null): void => {
                 let responseBody: object = {
-                    host: detailUrl,
+                    detailUrl: DetailUrlLogic.convertToResponse(detailUrl),
                 };
 
                 this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
@@ -107,8 +115,12 @@ class DetailUrlController extends ControllerBase {
 
         this.detailUrlLogic
             .create(this.requestBody)
-            .then((createdDetailUrl: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdDetailUrl, res);
+            .then((createdDetailUrl: DetailUrlModelInterface): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.CREATED,
+                    DetailUrlLogic.convertToResponse(createdDetailUrl),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -143,8 +155,12 @@ class DetailUrlController extends ControllerBase {
 
         this.detailUrlLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedDetailUrl: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedDetailUrl, res);
+            .then((editedDetailUrl: DetailUrlModelInterface | undefined): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.OK,
+                    DetailUrlLogic.convertToResponse(editedDetailUrl),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);

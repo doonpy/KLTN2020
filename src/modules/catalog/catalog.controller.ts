@@ -9,6 +9,7 @@ import UrlChecker from '../checker/url.checker';
 import ObjectChecker from '../checker/type/object.checker';
 import IntegerChecker from '../checker/type/integer.checker';
 import IntegerRangeChecker from '../checker/integer-range.checker';
+import CatalogModelInterface from './catalog.model.interface';
 
 const commonPath: string = '/catalogs';
 const specifyIdPath: string = '/catalogs/:id';
@@ -51,8 +52,14 @@ class CatalogController extends ControllerBase {
         validator.validate(this.requestQuery);
 
         this.catalogLogic
-            .getAll(this.keyword, this.limit, this.offset, this.requestQuery[this.PARAM_HOST_ID])
-            .then(({ catalogList, hasNext }): void => {
+            .getAll(this.requestQuery[this.PARAM_HOST_ID], this.keyword, this.limit, this.offset)
+            .then(({ catalogs, hasNext }): void => {
+                let catalogList: Array<object> = catalogs.map(
+                    (catalog: CatalogModelInterface): object => {
+                        return CatalogLogic.convertToResponse(catalog);
+                    }
+                );
+
                 let responseBody: object = {
                     catalogs: catalogList,
                     hasNext: hasNext,
@@ -80,9 +87,9 @@ class CatalogController extends ControllerBase {
 
         this.catalogLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((catalog: object): void => {
+            .then((catalog: CatalogModelInterface | null): void => {
                 let responseBody: object = {
-                    catalog: catalog,
+                    catalog: CatalogLogic.convertToResponse(catalog),
                 };
 
                 this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
@@ -119,8 +126,12 @@ class CatalogController extends ControllerBase {
 
         this.catalogLogic
             .create(this.requestBody)
-            .then((createdHost: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdHost, res);
+            .then((createdHost: CatalogModelInterface): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.CREATED,
+                    CatalogLogic.convertToResponse(createdHost),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -158,8 +169,12 @@ class CatalogController extends ControllerBase {
 
         this.catalogLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedCatalog: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedCatalog, res);
+            .then((editedCatalog: CatalogModelInterface | undefined): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.OK,
+                    CatalogLogic.convertToResponse(editedCatalog),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);

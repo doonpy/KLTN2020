@@ -4,6 +4,8 @@ import MessageLog from './util/message-log';
 import { Constant } from './util/definition/constant';
 import DatabaseConnection from './modules/database/database';
 import { errorHandler, notFoundRoute } from './middleware/error-handler';
+import DetailUrlScrape from './worker/scrape/detail-url/detail-url.scrape';
+import RawDataScrape from './worker/scrape/raw-data/raw-data.scrape';
 
 class App {
     private app: Application;
@@ -15,11 +17,14 @@ class App {
 
         new DatabaseConnection()
             .connect()
-            .then(() => {
+            .then(async () => {
                 this.settingAssets();
                 this.settingTemplate();
                 this.bindMiddlewares(appInit.middleWares);
                 this.bindRoutes(appInit.controllers);
+
+                // await new DetailUrlScrape(2).start();
+                // await new RawDataScrape(2).start();
             })
             .catch(error => {
                 new MessageLog(Constant.MESSAGE_TYPE.ERROR, error.message).show();
@@ -31,7 +36,9 @@ class App {
      *
      * @param middleWares
      */
-    private bindMiddlewares(middleWares: { forEach: (arg0: (middleWare: any) => void) => void }): void {
+    private bindMiddlewares(middleWares: {
+        forEach: (arg0: (middleWare: any) => void) => void;
+    }): void {
         middleWares.forEach((middleWare: any): void => {
             this.app.use(middleWare);
         });
@@ -56,14 +63,15 @@ class App {
      */
     private settingAssets(): void {
         this.app.use(express.static('../public'));
+        this.app.use(express.static(path.join(__dirname, '../log')));
     }
 
     /**
      * Setting template engine
      */
     private settingTemplate(): void {
-        this.app.set('views', path.join(__dirname, '../views'));
-        this.app.set('view engine', 'pug');
+        // this.app.set('views', path.join(__dirname, '../views'));
+        // this.app.set('view engine', 'pug');
     }
 
     /**

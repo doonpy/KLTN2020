@@ -1,13 +1,8 @@
 import sendRequest from './util/send-request';
+import DetailUrlScrape from './worker/scrape/detail-url/detail-url.scrape';
+import DatabaseConnection from './modules/database/database';
 
-export const runBackgroundJobs = (): void => {
-    sendRequest('https://g2asdaf2oogle.com/')
-        .then((body: string): void => {
-            console.log(body);
-        })
-        .catch((error: Error): void => {
-            console.log(error);
-        });
+const runBackgroundJobs = (): void => {
+    new DetailUrlScrape(2).start();
 };
-
 runBackgroundJobs();

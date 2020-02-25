@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import HostModelInterface from './host.model.interface';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -17,4 +18,4 @@ hostSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-export default mongoose.model('host', hostSchema);
+export default mongoose.model<HostModelInterface>('host', hostSchema);

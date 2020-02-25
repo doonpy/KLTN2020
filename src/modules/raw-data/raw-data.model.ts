@@ -1,6 +1,9 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { RawDataConstant } from './raw-data.constant';
+import RawDataModelInterface from './raw-data.model.interface';
+
+autoIncrement.initialize(mongoose.connection);
 
 const rawDataSchema = new Schema(
     {
@@ -10,7 +13,10 @@ const rawDataSchema = new Schema(
         },
         transactionType: {
             type: Schema.Types.Number,
-            enum: [RawDataConstant.TYPE_OF_TRANSACTION.SALE, RawDataConstant.TYPE_OF_TRANSACTION.RENT],
+            enum: [
+                RawDataConstant.TYPE_OF_TRANSACTION.SALE,
+                RawDataConstant.TYPE_OF_TRANSACTION.RENT,
+            ],
         },
         propertyType: {
             type: Schema.Types.Number,
@@ -33,17 +39,18 @@ const rawDataSchema = new Schema(
         title: { type: Schema.Types.String },
         price: {
             value: { type: Schema.Types.Number },
-            currency: { type: Schema.Types.String, default: 'VND' },
+            currency: { type: Schema.Types.String },
         },
         acreage: {
             value: { type: Schema.Types.Number },
-            measureUnit: { type: Schema.Types.String, default: 'm%B2' }, //decode unicode m²
+            measureUnit: { type: Schema.Types.String },
         },
         address: {
             city: { type: Schema.Types.String },
             district: { type: Schema.Types.String },
             ward: { type: Schema.Types.String },
             street: { type: Schema.Types.String },
+            project: { type: Schema.Types.String },
         },
         others: [
             {
@@ -62,4 +69,4 @@ rawDataSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-export default mongoose.model('raw_data', rawDataSchema);
+export default mongoose.model<RawDataModelInterface>('raw_data', rawDataSchema);

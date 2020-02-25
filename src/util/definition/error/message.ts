@@ -6,4 +6,7 @@ export const ErrorMessage = {
     ROUTES: {
         NOT_FOUND: 'The specified URI path is not found.',
     },
+    LOG: {
+        DATA_NULL: 'File name or content is null.',
+    },
 };

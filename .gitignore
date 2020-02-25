@@ -79,4 +79,4 @@ mongo-data/
 dist/*
 
 # log
-log/
+log/*

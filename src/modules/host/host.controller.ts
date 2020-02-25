@@ -8,6 +8,7 @@ import StringLengthChecker from '../checker/string-length.checker';
 import DomainChecker from '../checker/domain.checker';
 import IntegerChecker from '../checker/type/integer.checker';
 import IntegerRangeChecker from '../checker/integer-range.checker';
+import HostModelInterface from './host.model.interface';
 
 const commonPath: string = '/hosts';
 const specifyIdPath: string = '/hosts/:id';
@@ -44,7 +45,11 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .getAll(this.keyword, this.limit, this.offset)
-            .then(({ hostList, hasNext }): void => {
+            .then(({ hosts, hasNext }): void => {
+                let hostList: Array<object> = hosts.map((host: HostModelInterface): object => {
+                    return HostLogic.convertToResponse(host);
+                });
+
                 let responseBody: object = {
                     hosts: hostList,
                     hasNext: hasNext,
@@ -72,9 +77,9 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((host: object): void => {
+            .then((host: HostModelInterface | null): void => {
                 let responseBody: object = {
-                    host: host,
+                    host: HostLogic.convertToResponse(host),
                 };
 
                 this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
@@ -103,8 +108,12 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .create(this.requestBody)
-            .then((createdHost: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdHost, res);
+            .then((createdHost: HostModelInterface): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.CREATED,
+                    HostLogic.convertToResponse(createdHost),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -134,8 +143,12 @@ class HostController extends ControllerBase {
 
         this.hostLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedHost: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedHost, res);
+            .then((editedHost: HostModelInterface | undefined): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.OK,
+                    HostLogic.convertToResponse(editedHost),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);

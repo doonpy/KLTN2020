@@ -1,14 +1,13 @@
 import PatternModel from './pattern.model';
-import CatalogModel from '../catalog/catalog.model';
-import DetailUrlModel from '../detail-url/detail-url.model';
-import { Document } from 'mongoose';
 import CustomizeException from '../exception/customize.exception';
 import { Constant } from '../../util/definition/constant';
 import { Cause } from '../../util/definition/error/cause';
-import async, { Dictionary } from 'async';
 import { PatternErrorMessage } from './pattern.error-message';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 import CatalogLogic from '../catalog/catalog.logic';
+import CatalogModelInterface from '../catalog/catalog.model.interface';
+import PatternModelInterface from './pattern.model.interface';
+import { DocumentQuery, Query } from 'mongoose';
 
 class PatternLogic {
     /**
@@ -16,15 +15,20 @@ class PatternLogic {
      * @param offset
      * @param catalogId
      *
-     * @return Promise<{ patternList: Array<object>; hasNext: boolean }>
+     * @return Promise<{ patterns: Array<PatternModelInterface>; hasNext: boolean }>
      */
-    public getAll = (
+    public async getAll(
         limit: number,
         offset: number,
         catalogId: number
-    ): Promise<{ patternList: Array<object>; hasNext: boolean }> => {
-        return new Promise((resolve: any, reject: any): void => {
-            PatternModel.find({ catalogId: catalogId || { $gt: 0 } })
+    ): Promise<{ patterns: Array<PatternModelInterface>; hasNext: boolean }> {
+        try {
+            let conditions: object = { catalogId: catalogId || { $gt: 0 } };
+            let patternQuery: DocumentQuery<
+                Array<PatternModelInterface>,
+                PatternModelInterface,
+                object
+            > = PatternModel.find(conditions)
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
                 .populate({
                     path: 'sourceUrlId',
@@ -32,39 +36,41 @@ class PatternLogic {
                         path: 'catalogId',
                         populate: { path: 'hostId' },
                     },
-                })
-                .skip(offset)
-                .exec((error: Error, patterns: Array<Document>): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
-
-                    let patternList: Array<object> = [];
-                    for (let i: number = 0; i < patterns.length && i < limit; i++) {
-                        patternList.push(PatternLogic.convertToResponse(patterns[i]));
-                    }
-
-                    let hasNext: boolean = patternList.length < patterns.length;
-
-                    resolve({ patternList: patternList, hasNext: hasNext });
                 });
-        });
-    };
+            let remainPatternQuery: Query<number> = PatternModel.countDocuments(conditions);
+
+            if (offset) {
+                patternQuery.skip(offset);
+                remainPatternQuery.skip(offset);
+            }
+
+            if (limit) {
+                patternQuery.limit(limit);
+            }
+
+            let patterns: Array<PatternModelInterface> = await patternQuery.exec();
+            let remainPattern: number = await remainPatternQuery.exec();
+
+            return { patterns: patterns, hasNext: patterns.length < remainPattern };
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
     /**
      * @param id
      *
-     * @return Promise<object>
+     * @return Promise<PatternModelInterface>
      */
-    public getById = (id: string): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id)
+    public async getById(id: string | number): Promise<PatternModelInterface | null> {
+        try {
+            await PatternLogic.checkPatternExistedWithId(id);
+
+            return await PatternModel.findById(id)
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
                 .populate({
                     path: 'sourceUrlId',
@@ -73,402 +79,209 @@ class PatternLogic {
                         populate: { path: 'hostId' },
                     },
                 })
-                .exec((error: Error, pattern: Document | null): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
-
-                    if (!pattern) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    resolve(PatternLogic.convertToResponse(pattern));
-                });
-        });
-    };
+                .exec();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
     /**
      * @param requestBody
      *
-     * @return Promise<object>
+     * @return Promise<PatternModelInterface>
      */
-    public create = ({
+    public async create({
         catalogId,
         sourceUrlId,
         mainLocator,
         subLocator,
-    }: {
-        catalogId: number;
-        sourceUrlId: number;
-        mainLocator: {
-            title: string;
-            price: string;
-            acreage: string;
-            address: string;
-        };
-        subLocator: Array<{ name: string; locator: string }>;
-    }): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            async.parallel(
-                {
-                    isPatternExisted: (callback: any): void => {
-                        PatternModel.countDocuments({
-                            catalogId: catalogId,
-                        }).exec(callback);
+    }: PatternModelInterface): Promise<PatternModelInterface> {
+        try {
+            await CatalogLogic.checkCatalogExistedWithId(catalogId);
+            await DetailUrlLogic.checkDetailUrlExistedWithId(sourceUrlId);
+            await PatternLogic.checkPatternExistedWithCatalogId(catalogId);
+            await DetailUrlLogic.isDetailUrlBelongCatalog(sourceUrlId, catalogId);
+
+            return await (
+                await new PatternModel({
+                    catalogId: catalogId,
+                    sourceUrlId: sourceUrlId,
+                    mainLocator: mainLocator,
+                    subLocator: subLocator,
+                }).save()
+            )
+                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
+                .populate({
+                    path: 'sourceUrlId',
+                    populate: {
+                        path: 'catalogId',
+                        populate: { path: 'hostId' },
                     },
-                    catalog: (callback: any): void => {
-                        CatalogModel.findById(catalogId)
-                            .populate('hostId')
-                            .exec(callback);
-                    },
-                    sourceUrl: (callback: any): void => {
-                        DetailUrlModel.findById(sourceUrlId)
-                            .populate({
-                                path: 'catalogId',
-                                populate: { path: 'hostId' },
-                            })
-                            .exec(callback);
-                    },
-                },
-                (
-                    error: Error | undefined,
-                    {
-                        isPatternExisted,
-                        catalog,
-                        sourceUrl,
-                    }: Dictionary<
-                        | any
-                        | {
-                              isPatternExisted: number;
-                              catalog: Document;
-                              sourceUrl: Document;
-                          }
-                    >
-                ): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
-
-                    if (!catalog) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['catalogId', catalogId]
-                            )
-                        );
-                    }
-
-                    if (!sourceUrl) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_4,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['sourceUrlId', sourceUrlId]
-                            )
-                        );
-                    }
-
-                    if (isPatternExisted) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['catalogId', catalogId]
-                            )
-                        );
-                    }
-
-                    new PatternModel({
-                        catalogId: catalogId,
-                        sourceUrlId: sourceUrlId,
-                        mainLocator: mainLocator,
-                        subLocator: subLocator,
-                    }).save((error: Error, createdPattern: Document | any): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        createdPattern.catalogId = catalog;
-                        createdPattern.sourceUrlId = sourceUrl;
-                        resolve(PatternLogic.convertToResponse(createdPattern));
-                    });
-                }
+                })
+                .execPopulate();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
             );
-        });
-    };
+        }
+    }
 
     /**
      * @param id
      * @param requestBody
      *
-     * @return Promise<>
+     * @return Promise<PatternModelInterface>
      */
-    public update = (
-        id: string,
-        {
-            catalogId,
-            sourceUrlId,
-            mainLocator,
-            subLocator,
-        }: {
-            catalogId: string;
-            sourceUrlId: number;
-            mainLocator: {
-                title: string;
-                price: string;
-                acreage: string;
-                address: string;
-            };
-            subLocator: Array<{ name: string; locator: string }>;
-        }
-    ): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            async.parallel(
-                {
-                    pattern: (callback: any): void => {
-                        PatternModel.findById(id).exec(callback);
-                    },
-                    isPatternExisted: (callback: any): void => {
-                        PatternModel.countDocuments({
-                            catalogId: catalogId,
-                        }).exec(callback);
-                    },
-                    catalog: (callback: any): void => {
-                        if (catalogId) {
-                            CatalogModel.findById(catalogId)
-                                .populate('hostId')
-                                .exec(callback);
-                        } else {
-                            callback();
-                        }
-                    },
-                    sourceUrl: (callback: any): void => {
-                        if (sourceUrlId) {
-                            DetailUrlModel.findById(sourceUrlId)
-                                .populate({
-                                    path: 'catalogId',
-                                    populate: { path: 'hostId' },
-                                })
-                                .exec(callback);
-                        } else {
-                            callback();
-                        }
-                    },
-                },
-                (
-                    error: Error | undefined,
-                    {
-                        pattern,
-                        isPatternExisted,
-                        catalog,
-                        sourceUrl,
-                    }: Dictionary<
-                        | any
-                        | {
-                              pattern: Document | null;
-                              isPatternExisted: number;
-                              catalog: Document | null;
-                              sourceUrl: Document | null;
-                          }
-                    >
-                ): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    public async update(
+        id: string | number,
+        { catalogId, sourceUrlId, mainLocator, subLocator }: PatternModelInterface
+    ): Promise<PatternModelInterface | undefined> {
+        try {
+            await PatternLogic.checkPatternExistedWithId(id);
+            await DetailUrlLogic.isDetailUrlBelongCatalog(sourceUrlId, catalogId);
 
+            let pattern: PatternModelInterface | null = await PatternModel.findById(id).exec();
+            if (!pattern) {
+                return;
+            }
+            if (pattern.catalogId !== catalogId) {
+                await PatternLogic.checkPatternExistedWithCatalogId(catalogId);
+                await CatalogLogic.checkCatalogExistedWithId(catalogId);
+            }
+
+            if (pattern.sourceUrlId !== sourceUrlId) {
+                await DetailUrlLogic.checkDetailUrlExistedWithId(sourceUrlId);
+            }
+
+            pattern.catalogId = catalogId || pattern.catalogId;
+            pattern.sourceUrlId = sourceUrlId || pattern.sourceUrlId;
+            if (mainLocator) {
+                pattern.mainLocator.propertyType =
+                    mainLocator.propertyType || pattern.mainLocator.propertyType;
+                pattern.mainLocator.title = mainLocator.title || pattern.mainLocator.title;
+                pattern.mainLocator.price = mainLocator.price || pattern.mainLocator.price;
+                pattern.mainLocator.acreage = mainLocator.acreage || pattern.mainLocator.acreage;
+                pattern.mainLocator.address = mainLocator.address || pattern.mainLocator.address;
+            }
+            if (subLocator.length > 0) {
+                subLocator.forEach((subLocatorItem: { name: string; locator: string }): void => {
                     if (!pattern) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
+                        return;
                     }
-
-                    if (!catalog && catalogId) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['catalogId', catalogId]
-                            )
-                        );
-                    }
-
-                    if (!sourceUrl && sourceUrlId) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_4,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['sourceUrlId', sourceUrlId]
-                            )
-                        );
-                    }
-
-                    if (isPatternExisted && catalogId !== catalog.catalogId) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                PatternErrorMessage.PTN_ERROR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['catalogId', catalogId]
-                            )
-                        );
-                    }
-
-                    pattern.catalogId = catalogId || pattern.catalogId;
-                    pattern.sourceUrlId = sourceUrlId || pattern.sourceUrlId;
-                    if (mainLocator) {
-                        pattern.mainLocator.title = mainLocator.title || pattern.mainLocator.title;
-                        pattern.mainLocator.price = mainLocator.price || pattern.mainLocator.price;
-                        pattern.mainLocator.acreage = mainLocator.acreage || pattern.mainLocator.acreage;
-                        pattern.mainLocator.address = mainLocator.address || pattern.mainLocator.address;
-                    }
-                    if (subLocator) {
-                        subLocator.forEach((subLocatorItem: { name: string; locator: string }): void => {
-                            let subLocatorSimilarIndex = pattern.subLocator.findIndex(
-                                (s: { name: string; locator: string }): boolean => {
-                                    return s.name === subLocatorItem.name;
-                                }
-                            );
-                            if (subLocatorSimilarIndex >= 0) {
-                                pattern.subLocator[subLocatorSimilarIndex] = subLocatorItem;
-                            }
-                        });
-                    }
-                    pattern.save(
-                        async (error: Error, editedPattern: Document | any): Promise<void> => {
-                            if (error) {
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                );
-                            }
-
-                            if (catalogId) {
-                                editedPattern.catalogId = catalog;
-                            } else {
-                                await editedPattern
-                                    .populate({
-                                        path: 'catalogId',
-                                        populate: { path: 'hostId' },
-                                    })
-                                    .execPopulate();
-                            }
-
-                            if (sourceUrlId) {
-                                editedPattern.sourceUrlId = sourceUrl;
-                            } else {
-                                await editedPattern
-                                    .populate({
-                                        path: 'sourceUrlId',
-                                        populate: {
-                                            path: 'catalogId',
-                                            populate: { path: 'hostId' },
-                                        },
-                                    })
-                                    .execPopulate();
-                            }
-
-                            resolve(PatternLogic.convertToResponse(editedPattern));
+                    let subLocatorSimilarIndex = pattern.subLocator.findIndex(
+                        (s: { name: string; locator: string }): boolean => {
+                            return s.name === subLocatorItem.name;
                         }
                     );
-                }
+                    if (subLocatorSimilarIndex >= 0) {
+                        pattern.subLocator[subLocatorSimilarIndex] = subLocatorItem;
+                    }
+                });
+            }
+
+            return await (await pattern.save())
+                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
+                .populate({
+                    path: 'sourceUrlId',
+                    populate: {
+                        path: 'catalogId',
+                        populate: { path: 'hostId' },
+                    },
+                })
+                .execPopulate();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
             );
-        });
-    };
+        }
+    }
 
     /**
      * @param id
      *
      * @return Promise<null>
      */
-    public delete = (id: string): Promise<null> => {
-        return new Promise((resolve: any, reject: any): void => {
-            PatternModel.findById(id).exec((error: Error, pattern: Document | null): void => {
-                if (error) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                            error.message,
-                            Cause.DATABASE
-                        )
-                    );
-                }
+    public async delete(id: string | number): Promise<null> {
+        try {
+            await PatternLogic.checkPatternExistedWithId(id);
+            await PatternModel.findByIdAndDelete(id).exec();
 
-                if (!pattern) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                            PatternErrorMessage.PTN_ERROR_1,
-                            Cause.DATA_VALUE.NOT_FOUND,
-                            ['id', id]
-                        )
-                    );
-                }
+            return null;
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
-                PatternModel.findByIdAndDelete(id, (error: Error): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    /**
+     * @param catalogId
+     *
+     * @return Promise<PatternModelInterface | null>
+     */
+    public async getByCatalogId(catalogId: number | string): Promise<PatternModelInterface | null> {
+        try {
+            return await PatternModel.findOne({ catalogId: catalogId })
+                .populate({
+                    path: 'sourceUrlId',
+                    populate: {
+                        path: 'catalogId',
+                        populate: { path: 'hostId' },
+                    },
+                })
+                .exec();
+        } catch (error) {
+            throw error;
+        }
+    }
 
-                    resolve();
-                });
-            });
-        });
-    };
+    /**
+     * @param catalogId
+     */
+    public static async checkPatternExistedWithCatalogId(
+        catalogId: CatalogModelInterface | number | string
+    ): Promise<void> {
+        if (typeof catalogId === 'object') {
+            catalogId = catalogId._id;
+        }
+        if ((await PatternModel.countDocuments({ catalogId: catalogId }).exec()) > 0) {
+            new CustomizeException(
+                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                PatternErrorMessage.PTN_ERROR_2,
+                Cause.DATA_VALUE.EXISTS,
+                ['catalogId', catalogId]
+            ).raise();
+        }
+    }
+
+    /**
+     * @param id
+     */
+    public static async checkPatternExistedWithId(id: number | string): Promise<void> {
+        if ((await PatternModel.countDocuments({ _id: id }).exec()) > 0) {
+            new CustomizeException(
+                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                PatternErrorMessage.PTN_ERROR_1,
+                Cause.DATA_VALUE.NOT_FOUND,
+                ['id', id]
+            ).raise();
+        }
+    }
 
     /**
      * @param pattern
      */
-
-    private static convertToResponse({
+    public static convertToResponse({
         _id,
         catalogId,
         sourceUrlId,
@@ -516,9 +329,11 @@ class PatternLogic {
         if (_id) {
             data.id = _id;
         }
+
         if (catalogId && Object.keys(catalogId).length > 0) {
             data.catalog = CatalogLogic.convertToResponse(catalogId);
         }
+
         if (sourceUrlId && Object.keys(sourceUrlId).length > 0) {
             data.sourceUrl = DetailUrlLogic.convertToResponse(sourceUrlId);
         }
@@ -534,6 +349,7 @@ class PatternLogic {
         if (cTime) {
             data.createAt = cTime;
         }
+
         if (mTime) {
             data.updateAt = mTime;
         }

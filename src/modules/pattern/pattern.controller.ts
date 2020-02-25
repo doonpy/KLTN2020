@@ -8,6 +8,8 @@ import IntegerChecker from '../checker/type/integer.checker';
 import IntegerRangeChecker from '../checker/integer-range.checker';
 import ObjectChecker from '../checker/type/object.checker';
 import StringLengthChecker from '../checker/string-length.checker';
+import DetailUrlLogic from '../detail-url/detail-url.logic';
+import PatternModelInterface from './pattern.model.interface';
 
 const commonPath: string = '/patterns';
 const specifyIdPath: string = '/patterns/:id';
@@ -22,6 +24,7 @@ class PatternController extends ControllerBase {
     private readonly PARAM_PRICE_LOCATOR: string = 'price';
     private readonly PARAM_ACREAGE_LOCATOR: string = 'acreage';
     private readonly PARAM_ADDRESS_LOCATOR: string = 'address';
+    private readonly PARAM_PROPERTY_TYPE_LOCATOR: string = 'propertyType';
     private readonly PARAM_NAME_SUB_LOCATOR: string = 'name';
     private readonly PARAM_LOCATOR_SUB_LOCATOR: string = 'locator';
 
@@ -60,6 +63,12 @@ class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_ADDRESS_LOCATOR, new StringChecker());
         validator.addParamValidator(this.PARAM_ADDRESS_LOCATOR, new StringLengthChecker(1, null));
 
+        validator.addParamValidator(this.PARAM_PROPERTY_TYPE_LOCATOR, new StringChecker());
+        validator.addParamValidator(
+            this.PARAM_PROPERTY_TYPE_LOCATOR,
+            new StringLengthChecker(1, null)
+        );
+
         validator.addParamValidator(this.PARAM_SUB_LOCATOR, new ObjectChecker());
 
         validator.addParamValidator(this.PARAM_LOCATOR_SUB_LOCATOR, new StringChecker());
@@ -70,8 +79,12 @@ class PatternController extends ControllerBase {
 
         this.patternLogic
             .create(this.requestBody)
-            .then((createdPattern: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdPattern, res);
+            .then((createdPattern: PatternModelInterface): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.CREATED,
+                    PatternLogic.convertToResponse(createdPattern),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -120,7 +133,13 @@ class PatternController extends ControllerBase {
 
         this.patternLogic
             .getAll(this.limit, this.offset, this.requestQuery[this.PARAM_CATALOG_ID])
-            .then(({ patternList, hasNext }): void => {
+            .then(({ patterns, hasNext }): void => {
+                let patternList: Array<object> = patterns.map(
+                    (pattern: PatternModelInterface): object => {
+                        return PatternLogic.convertToResponse(pattern);
+                    }
+                );
+
                 let responseBody: object = {
                     patterns: patternList,
                     hasNext: hasNext,
@@ -148,9 +167,9 @@ class PatternController extends ControllerBase {
 
         this.patternLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((pattern: object): void => {
+            .then((pattern: PatternModelInterface | null): void => {
                 let responseBody: object = {
-                    pattern: pattern,
+                    pattern: PatternLogic.convertToResponse(pattern),
                 };
 
                 this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
@@ -191,6 +210,12 @@ class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_ADDRESS_LOCATOR, new StringChecker());
         validator.addParamValidator(this.PARAM_ADDRESS_LOCATOR, new StringLengthChecker(1, null));
 
+        validator.addParamValidator(this.PARAM_PROPERTY_TYPE_LOCATOR, new StringChecker());
+        validator.addParamValidator(
+            this.PARAM_PROPERTY_TYPE_LOCATOR,
+            new StringLengthChecker(1, null)
+        );
+
         validator.addParamValidator(this.PARAM_SUB_LOCATOR, new ObjectChecker());
 
         validator.addParamValidator(this.PARAM_LOCATOR_SUB_LOCATOR, new StringChecker());
@@ -202,8 +227,12 @@ class PatternController extends ControllerBase {
 
         this.patternLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedPattern: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedPattern, res);
+            .then((editedPattern: PatternModelInterface | undefined): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.OK,
+                    PatternLogic.convertToResponse(editedPattern),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);

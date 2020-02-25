@@ -1,12 +1,12 @@
-import { Document } from 'mongoose';
 import CatalogModel from './catalog.model';
-import HostModel from '../host/host.model';
 import CustomizeException from '../exception/customize.exception';
 import { Constant } from '../../util/definition/constant';
 import { CatalogErrorMessage } from './catalog.error-message';
 import { Cause } from '../../util/definition/error/cause';
-import async, { Dictionary } from 'async';
 import HostLogic from '../host/host.logic';
+import CatalogModelInterface from './catalog.model.interface';
+import HostModelInterface from '../host/host.model.interface';
+import { DocumentQuery, Query } from 'mongoose';
 
 class CatalogLogic {
     /**
@@ -15,166 +15,105 @@ class CatalogLogic {
      * @param offset
      * @param hostId
      *
-     * @return Promise<{ catalogList: Array<object>; hasNext: boolean }>
+     * @return Promise<{ catalogs: Array<CatalogModelInterface>; hasNext: boolean }>
      */
-    public getAll = (
+    public async getAll(
+        hostId: number,
         keyword: string,
         limit: number,
-        offset: number,
-        hostId: number
-    ): Promise<{ catalogList: Array<object>; hasNext: boolean }> => {
-        return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.find({
-                $or: [{ title: { $regex: keyword, $options: 'i' } }, { url: { $regex: keyword, $options: 'i' } }],
-                hostId: hostId || { $gt: 0 },
-            })
-                .populate('hostId')
-                .skip(offset)
-                .limit(limit)
-                .exec((error: Error, catalogs: Array<Document>): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+        offset: number
+    ): Promise<{ catalogs: Array<CatalogModelInterface>; hasNext: boolean }> {
+        try {
+            let conditions: object = {
+                $or: [
+                    { title: { $regex: keyword, $options: 'i' } },
+                    { url: { $regex: keyword, $options: 'i' } },
+                ],
+                hostId: hostId || { $gt: 0 }, // get all without host id
+            };
+            let catalogQuery: DocumentQuery<
+                Array<CatalogModelInterface>,
+                CatalogModelInterface,
+                object
+            > = CatalogModel.find(conditions).populate('hostId');
+            let remainCatalogQuery: Query<number> = CatalogModel.countDocuments(conditions);
 
-                    let catalogList: Array<object> = [];
-                    for (let i: number = 0; i < catalogs.length && i < limit; i++) {
-                        catalogList.push(CatalogLogic.convertToResponse(catalogs[i]));
-                    }
+            if (offset) {
+                catalogQuery.skip(offset);
+                remainCatalogQuery.skip(offset);
+            }
 
-                    let hasNext: boolean = catalogList.length < catalogs.length;
+            if (limit) {
+                catalogQuery.limit(limit);
+            }
 
-                    resolve({ catalogList: catalogList, hasNext: hasNext });
-                });
-        });
-    };
+            let catalogs: Array<CatalogModelInterface> = await catalogQuery.exec();
+            let remainCatalog: number = await remainCatalogQuery.exec();
+
+            return { catalogs: catalogs, hasNext: catalogs.length < remainCatalog };
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
     /**
      * @param id
      *
      * @return Promise<object>
      */
-    public getById = (id: string | number): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.findById(id)
+    public async getById(id: string | number): Promise<CatalogModelInterface | null> {
+        try {
+            await CatalogLogic.checkCatalogExistedWithId(id);
+
+            return await CatalogModel.findById(id)
                 .populate('hostId')
-                .exec((error, catalog): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
-
-                    if (!catalog) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    resolve(CatalogLogic.convertToResponse(catalog));
-                });
-        });
-    };
+                .exec();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
     /**
      * @param body
      *
      * @return Promise<object>
      */
-    public create = ({
+    public async create({
         title,
         url,
         locator,
         hostId,
-    }: {
-        title: string;
-        url: string;
-        locator: { detailUrl: string; pageNumber: string };
-        hostId: string;
-    }): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            async.parallel(
-                {
-                    catalog: (callback: any): void => {
-                        CatalogModel.findOne({ url: url }).exec(callback);
-                    },
-                    host: (callback: any): void => {
-                        HostModel.findById(hostId).exec(callback);
-                    },
-                },
-                (
-                    error: any,
-                    { catalog, host }: Dictionary<any | { catalog: Document | null; host: Document | null }>
-                ): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    }: CatalogModelInterface): Promise<CatalogModelInterface> {
+        try {
+            await CatalogLogic.checkCatalogExistedWithUrl(url, hostId);
+            await HostLogic.checkHostExistedWithId(hostId);
 
-                    if (catalog) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['url', url]
-                            )
-                        );
-                    }
-
-                    if (!host) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['hostId', hostId]
-                            )
-                        );
-                    }
-
-                    new CatalogModel({
-                        title: title,
-                        url: url,
-                        locator: locator,
-                        hostId: hostId,
-                    }).save((error: Error, createdCatalog: any | Document): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        createdCatalog.hostId = host;
-                        resolve(CatalogLogic.convertToResponse(createdCatalog));
-                    });
-                }
+            return await (
+                await new CatalogModel({
+                    title: title,
+                    url: url,
+                    locator: locator,
+                    hostId: hostId,
+                }).save()
+            )
+                .populate('hostId')
+                .execPopulate();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
             );
-        });
-    };
+        }
+    }
 
     /**
      * @param id
@@ -182,171 +121,102 @@ class CatalogLogic {
      *
      * @return Promise<object>
      */
-    public update = (
-        id: string,
-        {
-            title,
-            url,
-            locator,
-            hostId,
-        }: {
-            title: string;
-            url: string;
-            locator: { detailUrl: string; pageNumber: string };
-            hostId: string;
-        }
-    ): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            async.parallel(
-                {
-                    catalog: (callback: any): void => {
-                        CatalogModel.findById(id).exec(callback);
-                    },
-                    isCatalogExisted: (callback: any): void => {
-                        CatalogModel.countDocuments({
-                            url: url,
-                            hostId: hostId,
-                        }).exec(callback);
-                    },
-                    host: (callback: any): void => {
-                        if (hostId) {
-                            HostModel.findById(hostId).exec(callback);
-                        } else {
-                            callback();
-                        }
-                    },
-                },
-                (
-                    error: any,
-                    {
-                        catalog,
-                        isCatalogExisted,
-                        host,
-                    }: Dictionary<
-                        | any
-                        | {
-                              catalog: Document | null;
-                              isCatalogExisted: Number;
-                              host: Document | null;
-                          }
-                    >
-                ): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    public async update(
+        id: string | number,
+        { title, url, locator, hostId }: CatalogModelInterface
+    ): Promise<CatalogModelInterface | undefined> {
+        try {
+            await CatalogLogic.checkCatalogExistedWithId(id);
+            await HostLogic.checkHostExistedWithId(hostId);
 
-                    if (!catalog) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
+            let catalog: CatalogModelInterface | null = await CatalogModel.findById(id).exec();
+            if (!catalog) {
+                return;
+            }
 
-                    if (isCatalogExisted) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['url', url]
-                            )
-                        );
-                    }
+            if (catalog.url !== url) {
+                await CatalogLogic.checkCatalogExistedWithUrl(url, hostId);
+            }
 
-                    if (hostId && !host) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                CatalogErrorMessage.CTL_ERR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['hostId', hostId]
-                            )
-                        );
-                    }
+            catalog.title = title || catalog.title;
+            catalog.url = url || catalog.url;
+            if (locator && Object.keys(locator).length > 0) {
+                catalog.locator.detailUrl = locator.detailUrl || catalog.locator.detailUrl;
+                catalog.locator.pageNumber = locator.pageNumber || catalog.locator.pageNumber;
+            }
+            catalog.hostId = hostId || catalog.hostId;
 
-                    catalog.title = title || catalog.title;
-                    catalog.url = url || catalog.url;
-                    if (locator) {
-                        catalog.locator.detailUrl = locator.detailUrl || catalog.locator.detailUrl;
-                        catalog.locator.pageNumber = locator.pageNumber || catalog.locator.pageNumber;
-                    }
-                    catalog.hostId = hostId || catalog.hostId;
-                    catalog.save(
-                        async (error: Error, editedCatalog: any | Document): Promise<void> => {
-                            if (error) {
-                                return reject(
-                                    new CustomizeException(
-                                        Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                        error.message,
-                                        Cause.DATABASE
-                                    )
-                                );
-                            }
-
-                            if (hostId) {
-                                editedCatalog.hostId = host;
-                            } else {
-                                await editedCatalog.populate('hostId').execPopulate();
-                            }
-
-                            resolve(CatalogLogic.convertToResponse(editedCatalog));
-                        }
-                    );
-                }
+            return await (await catalog.save()).populate('hostId').execPopulate();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
             );
-        });
-    };
+        }
+    }
 
     /**
      * @param id
      *
      * @return Promise<null>
      */
-    public delete = (id: string): Promise<null> => {
-        return new Promise((resolve: any, reject: any): void => {
-            CatalogModel.findById(id).exec((error: Error, catalog: Document | null): void => {
-                if (error) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                            error.message,
-                            Cause.DATABASE
-                        )
-                    );
-                }
+    public async delete(id: string): Promise<null> {
+        try {
+            await CatalogLogic.checkCatalogExistedWithId(id);
+            await CatalogModel.findByIdAndDelete(id).exec();
 
-                if (!catalog) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                            CatalogErrorMessage.CTL_ERR_1,
-                            Cause.DATA_VALUE.NOT_FOUND,
-                            ['id', id]
-                        )
-                    );
-                }
+            return null;
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
-                CatalogModel.findByIdAndDelete(id, (error: Error): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR, error.message)
-                        );
-                    }
+    /**
+     * @param url
+     * @param hostId
+     */
+    public static checkCatalogExistedWithUrl = async (
+        url: string,
+        hostId?: HostModelInterface | number
+    ): Promise<void> => {
+        if (typeof hostId === 'object') {
+            hostId = hostId._id;
+        }
+        if (
+            (await CatalogModel.countDocuments({ url: url, hostId: hostId || { $gt: 0 } }).exec()) >
+            0
+        ) {
+            new CustomizeException(
+                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                CatalogErrorMessage.CTL_ERR_2,
+                Cause.DATA_VALUE.EXISTS,
+                ['url', url]
+            ).raise();
+        }
+    };
 
-                    resolve();
-                });
-            });
-        });
+    /**
+     * @param id
+     */
+    public static checkCatalogExistedWithId = async (
+        id: string | number | CatalogModelInterface
+    ): Promise<void> => {
+        if (typeof id === 'object') {
+            id = id._id;
+        }
+        if ((await CatalogModel.countDocuments({ _id: id }).exec()) === 0) {
+            new CustomizeException(
+                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                CatalogErrorMessage.CTL_ERR_1,
+                Cause.DATA_VALUE.NOT_FOUND,
+                ['id', id]
+            ).raise();
+        }
     };
 
     /**
@@ -389,21 +259,27 @@ class CatalogLogic {
         if (_id) {
             data.id = _id;
         }
+
         if (title) {
             data.title = title;
         }
+
         if (url) {
             data.url = url;
         }
+
         if (locator) {
             data.locator = locator;
         }
+
         if (hostId && Object.keys(hostId).length > 0) {
             data.host = HostLogic.convertToResponse(hostId);
         }
+
         if (cTime) {
             data.createAt = cTime;
         }
+
         if (mTime) {
             data.updateAt = mTime;
         }

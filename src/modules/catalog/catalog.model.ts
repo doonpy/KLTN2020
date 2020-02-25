@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import CatalogModelInterface from './catalog.model.interface';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -25,4 +26,4 @@ CatalogSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-export default mongoose.model('catalog', CatalogSchema);
+export default mongoose.model<CatalogModelInterface>('catalog', CatalogSchema);

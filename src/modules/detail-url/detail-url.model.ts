@@ -1,12 +1,15 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import DetailUrlModelInterface from './detail-url.model.interface';
+
+autoIncrement.initialize(mongoose.connection);
 
 const detailUrlSchema: Schema = new Schema(
     {
         catalogId: { type: Schema.Types.Number, ref: 'catalog' },
         url: { type: Schema.Types.String },
-        isExtracted: { type: Schema.Types.Boolean, default: false },
-        requestRetries: { type: Schema.Types.Number, default: 0, min: 0 },
+        isExtracted: { type: Schema.Types.Boolean },
+        requestRetries: { type: Schema.Types.Number },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
@@ -17,4 +20,4 @@ detailUrlSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-export default mongoose.model('detail_url', detailUrlSchema);
+export default mongoose.model<DetailUrlModelInterface>('detail_url', detailUrlSchema);

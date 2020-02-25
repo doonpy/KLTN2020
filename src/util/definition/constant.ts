@@ -27,4 +27,7 @@ export const Constant = {
         KEYWORD: '',
     },
     LANGUAGE: 0, // 0: Vietnamese, 1: English
+    REQUEST: {
+        TIMEOUT: 5000, //ms
+    },
 };

@@ -1,21 +1,18 @@
 import requestPromise from 'request-promise';
-import cheerio from 'cheerio';
+import { Constant } from './definition/constant';
 
 const options: object = {
     headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
     },
-    timeout: 1000,
-    transform: (body: string): CheerioStatic => {
-        return cheerio.load(body);
-    },
+    timeout: Constant.REQUEST.TIMEOUT,
 };
 
 const sendRequest = (url: string): Promise<any> => {
     return new Promise((resolve: any, reject: any): void => {
         requestPromise(url, options)
-            .then(($: CheerioStatic): void => {
-                resolve($.root().html());
+            .then((htmlString: string): void => {
+                resolve(htmlString);
             })
             .catch((error: Error): void => {
                 reject(error);

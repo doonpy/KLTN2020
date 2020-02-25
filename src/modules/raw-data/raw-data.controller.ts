@@ -12,6 +12,7 @@ import DecimalRangeChecker from '../checker/decimal-range.checker';
 import MeasureUnitChecker from '../checker/measure-unit.checker';
 import RawDataLogic from './raw-data.logic';
 import { RawDataConstant } from './raw-data.constant';
+import RawDataModelInterface from './raw-data.model.interface';
 
 const commonPath: string = '/raw-dataset';
 const specifyIdPath: string = '/raw-dataset/:id';
@@ -31,6 +32,7 @@ class RawDataController extends ControllerBase {
     private readonly PARAM_ADDRESS_DISTRICT: string = 'district';
     private readonly PARAM_ADDRESS_WARD: string = 'ward';
     private readonly PARAM_ADDRESS_STREET: string = 'street';
+    private readonly PARAM_ADDRESS_PROJECT: string = 'project';
     private readonly PARAM_OTHERS: string = 'others';
     private readonly PARAM_OTHERS_NAME: string = 'name';
     private readonly PARAM_VALUE: string = 'value';
@@ -89,7 +91,10 @@ class RawDataController extends ControllerBase {
 
         // Validate acreage object
         acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new StringChecker());
-        acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new MeasureUnitChecker('m²'));
+        acreageValidator.addParamValidator(
+            this.PARAM_ACREAGE_MEASURE_UNIT,
+            new MeasureUnitChecker('m²')
+        );
 
         acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalChecker());
         acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalRangeChecker(0, null));
@@ -102,6 +107,8 @@ class RawDataController extends ControllerBase {
         addressValidator.addParamValidator(this.PARAM_ADDRESS_WARD, new StringChecker());
 
         addressValidator.addParamValidator(this.PARAM_ADDRESS_STREET, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_PROJECT, new StringChecker());
 
         // Validate others object
         othersValidator.addParamValidator(this.PARAM_OTHERS_NAME, new StringChecker());
@@ -120,8 +127,12 @@ class RawDataController extends ControllerBase {
 
         this.rawDataLogic
             .create(this.requestBody)
-            .then((createdRawData: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.CREATED, createdRawData, res);
+            .then((createdRawData: RawDataModelInterface): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.CREATED,
+                    RawDataLogic.convertToResponse(createdRawData),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -170,7 +181,13 @@ class RawDataController extends ControllerBase {
 
         this.rawDataLogic
             .getAll(this.limit, this.offset, this.requestQuery[this.PARAM_DETAIL_URL_ID])
-            .then(({ rawDataList: rawDataList, hasNext }): void => {
+            .then(({ rawDataset, hasNext }): void => {
+                let rawDataList: Array<object> = rawDataset.map(
+                    (rawDataItem: RawDataModelInterface): object => {
+                        return RawDataLogic.convertToResponse(rawDataItem);
+                    }
+                );
+
                 let responseBody: object = {
                     rawDataset: rawDataList,
                     hasNext: hasNext,
@@ -198,9 +215,9 @@ class RawDataController extends ControllerBase {
 
         this.rawDataLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((rawData: object): void => {
+            .then((rawData: RawDataModelInterface | null): void => {
                 let responseBody: object = {
-                    rawData: rawData,
+                    rawData: RawDataLogic.convertToResponse(rawData),
                 };
 
                 this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, responseBody, res);
@@ -260,7 +277,10 @@ class RawDataController extends ControllerBase {
 
         // Validate acreage object
         acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new StringChecker());
-        acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new MeasureUnitChecker('m²'));
+        acreageValidator.addParamValidator(
+            this.PARAM_ACREAGE_MEASURE_UNIT,
+            new MeasureUnitChecker('m²')
+        );
 
         acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalChecker());
         acreageValidator.addParamValidator(this.PARAM_VALUE, new DecimalRangeChecker(0, null));
@@ -273,6 +293,8 @@ class RawDataController extends ControllerBase {
         addressValidator.addParamValidator(this.PARAM_ADDRESS_WARD, new StringChecker());
 
         addressValidator.addParamValidator(this.PARAM_ADDRESS_STREET, new StringChecker());
+
+        addressValidator.addParamValidator(this.PARAM_ADDRESS_PROJECT, new StringChecker());
 
         // Validate others object
         othersValidator.addParamValidator(this.PARAM_OTHERS_NAME, new StringChecker());
@@ -291,8 +313,12 @@ class RawDataController extends ControllerBase {
 
         this.rawDataLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedRawData: object): void => {
-                this.sendResponse(Constant.RESPONSE_STATUS_CODE.OK, editedRawData, res);
+            .then((editedRawData: RawDataModelInterface | undefined): void => {
+                this.sendResponse(
+                    Constant.RESPONSE_STATUS_CODE.OK,
+                    RawDataLogic.convertToResponse(editedRawData),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);

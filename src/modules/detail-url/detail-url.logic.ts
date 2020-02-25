@@ -1,12 +1,12 @@
 import DetailUrlModel from './detail-url.model';
-import { Document } from 'mongoose';
 import CustomizeException from '../exception/customize.exception';
 import { Constant } from '../../util/definition/constant';
 import { Cause } from '../../util/definition/error/cause';
 import { DetailUrlErrorMessage } from './detail.error-message';
-import async, { Dictionary } from 'async';
-import CatalogModel from '../catalog/catalog.model';
 import CatalogLogic from '../catalog/catalog.logic';
+import CatalogModelInterface from '../catalog/catalog.model.interface';
+import DetailUrlModelInterface from './detail-url.model.interface';
+import { DocumentQuery, Query } from 'mongoose';
 
 class DetailUrlLogic {
     /**
@@ -14,357 +14,258 @@ class DetailUrlLogic {
      * @param offset
      * @param catalogId
      *
-     * @return Promise<Array<{ detailUrlList: Array<object>; hasNext: boolean }>>
+     * @return Promise<{ catalogs: Array<DetailUrlModelInterface>; hasNext: boolean }>
      */
-    public getAll = (
-        limit: number,
-        offset: number,
-        catalogId: number
-    ): Promise<{ detailUrlList: Array<object>; hasNext: boolean }> => {
-        return new Promise((resolve: any, reject: any): void => {
-            DetailUrlModel.find({
+    public async getAll(
+        catalogId: number,
+        limit: number = Constant.DEFAULT_VALUE.LIMIT,
+        offset: number = Constant.DEFAULT_VALUE.OFFSET
+    ): Promise<{ detailUrls: Array<DetailUrlModelInterface>; hasNext: boolean }> {
+        try {
+            let conditions: object = {
                 catalogId: catalogId || { $gt: 0 },
-            })
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .skip(offset)
-                .exec((error: Error, detailUrls: Array<Document>): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+            };
+            let detailUrlQuery: DocumentQuery<
+                Array<DetailUrlModelInterface>,
+                DetailUrlModelInterface,
+                object
+            > = DetailUrlModel.find(conditions).populate({
+                path: 'catalogId',
+                populate: { path: 'hostId' },
+            });
+            let remainDetailUrlQuery: Query<number> = DetailUrlModel.countDocuments(conditions);
 
-                    let detailUrlList: Array<object> = [];
-                    for (let i: number = 0; i < detailUrls.length && i < limit; i++) {
-                        detailUrlList.push(DetailUrlLogic.convertToResponse(detailUrls[i]));
-                    }
+            if (offset) {
+                detailUrlQuery.skip(offset);
+                remainDetailUrlQuery.skip(offset);
+            }
 
-                    let hasNext: boolean = detailUrlList.length < detailUrls.length;
+            if (limit) {
+                detailUrlQuery.limit(limit);
+            }
 
-                    resolve({ detailUrlList: detailUrlList, hasNext: hasNext });
-                });
-        });
-    };
+            let detailUrls: Array<DetailUrlModelInterface> = await detailUrlQuery.exec();
+            let remainDetailUrl: number = await remainDetailUrlQuery.exec();
+
+            return {
+                detailUrls: detailUrls,
+                hasNext: detailUrls.length < remainDetailUrl,
+            };
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
     /**
      * @param id
      *
-     * @return Promise<object>
+     * @return Promise<DetailUrlModelInterface>
      */
-    public getById = (id: string): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            DetailUrlModel.findById(id)
+    public async getById(id: string | number): Promise<DetailUrlModelInterface | null> {
+        try {
+            await DetailUrlLogic.checkDetailUrlExistedWithId(id);
+
+            return await DetailUrlModel.findById(id)
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .exec((error: Error, detailUrl: Document | null): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
-
-                    if (!detailUrl) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
-
-                    resolve(DetailUrlLogic.convertToResponse(detailUrl));
-                });
-        });
-    };
+                .exec();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
     /**
      * @param requestBody
      *
-     * @return Promise<object>
+     * @return Promise<DetailUrlModelInterface>
      */
-    public create = ({
+    public async create({
         catalogId,
         url,
         isExtracted,
         requestRetries,
-    }: {
-        catalogId: string;
-        url: string;
-        isExtracted: boolean;
-        requestRetries: number;
-    }): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            async.parallel(
-                {
-                    isDetailUrlExisted: (callback: any): void => {
-                        DetailUrlModel.countDocuments({
-                            url: url,
-                        }).exec(callback);
-                    },
-                    catalog: (callback: any): void => {
-                        CatalogModel.findById(catalogId)
-                            .populate('hostId')
-                            .exec(callback);
-                    },
-                },
-                (
-                    error: Error | undefined,
-                    {
-                        isDetailUrlExisted,
-                        catalog,
-                    }: Dictionary<
-                        | any
-                        | {
-                              isDetailUrlExisted: number;
-                              catalog: Document | null;
-                          }
-                    >
-                ): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    }: DetailUrlModelInterface): Promise<DetailUrlModelInterface> {
+        try {
+            await CatalogLogic.checkCatalogExistedWithId(catalogId);
+            await DetailUrlLogic.checkDetailUrlExistedWithUrl(url, catalogId);
 
-                    if (!catalog) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['catalogId', catalogId]
-                            )
-                        );
-                    }
-
-                    if (isDetailUrlExisted) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['url', url]
-                            )
-                        );
-                    }
-
-                    new DetailUrlModel({
-                        catalogId: catalogId,
-                        url: url,
-                    }).save((error: Error, createdDetailUrl: Document | any): void => {
-                        if (error) {
-                            return reject(
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                )
-                            );
-                        }
-
-                        createdDetailUrl.catalogId = catalog;
-                        resolve(DetailUrlLogic.convertToResponse(createdDetailUrl));
-                    });
-                }
+            return await (
+                await new DetailUrlModel({
+                    catalogId: catalogId,
+                    url: url,
+                    isExtracted: isExtracted || false,
+                    requestRetries: requestRetries || 0,
+                }).save()
+            )
+                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
+                .execPopulate();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
             );
-        });
-    };
+        }
+    }
 
     /**
      * @param id
      * @param requestBody
      *
-     * @return Promise<>
+     * @return Promise<DetailUrlModelInterface>
      */
-    public update = (
-        id: string,
-        {
-            catalogId,
-            url,
-            isExtracted,
-            requestRetries,
-        }: {
-            catalogId: string;
-            url: string;
-            isExtracted: boolean;
-            requestRetries: number;
-        }
-    ): Promise<object> => {
-        return new Promise((resolve: any, reject: any): void => {
-            async.parallel(
-                {
-                    detailUrl: (callback: any): void => {
-                        DetailUrlModel.findById(id).exec(callback);
-                    },
-                    isDetailUrlExisted: (callback: any): void => {
-                        DetailUrlModel.countDocuments({
-                            url: url,
-                        }).exec(callback);
-                    },
-                    catalog: (callback: any): void => {
-                        if (catalogId) {
-                            CatalogModel.findById(catalogId)
-                                .populate('hostId')
-                                .exec(callback);
-                        } else {
-                            callback();
-                        }
-                    },
-                },
-                (
-                    error: Error | undefined,
-                    {
-                        detailUrl,
-                        isDetailUrlExisted,
-                        catalog,
-                    }: Dictionary<
-                        | any
-                        | {
-                              detailUrl: Document | null;
-                              isPatternExisted: number;
-                              catalog: Document | null;
-                          }
-                    >
-                ): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    public async update(
+        id: string | number,
+        { catalogId, url, isExtracted, requestRetries }: DetailUrlModelInterface
+    ): Promise<DetailUrlModelInterface | undefined> {
+        try {
+            await DetailUrlLogic.checkDetailUrlExistedWithId(id);
+            await CatalogLogic.checkCatalogExistedWithId(catalogId);
 
-                    if (!detailUrl) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_1,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['id', id]
-                            )
-                        );
-                    }
+            let detailUrl: DetailUrlModelInterface | null = await DetailUrlModel.findById(
+                id
+            ).exec();
+            if (!detailUrl) {
+                return;
+            }
 
-                    if (!catalog && catalogId) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_3,
-                                Cause.DATA_VALUE.NOT_FOUND,
-                                ['catalogId', catalogId]
-                            )
-                        );
-                    }
+            if (detailUrl.url !== url) {
+                await DetailUrlLogic.checkDetailUrlExistedWithUrl(url, catalogId);
+            }
 
-                    if (isDetailUrlExisted && url !== detailUrl.url) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                                DetailUrlErrorMessage.DU_ERROR_2,
-                                Cause.DATA_VALUE.EXISTS,
-                                ['url', url]
-                            )
-                        );
-                    }
+            detailUrl.catalogId = catalogId || detailUrl.catalogId;
+            detailUrl.url = url || detailUrl.url;
+            detailUrl.isExtracted =
+                isExtracted !== detailUrl.isExtracted ? isExtracted : detailUrl.isExtracted;
+            detailUrl.requestRetries =
+                requestRetries !== detailUrl.requestRetries
+                    ? requestRetries
+                    : detailUrl.requestRetries;
 
-                    detailUrl.catalogId = catalogId || detailUrl.catalogId;
-                    detailUrl.url = url || detailUrl.url;
-                    detailUrl.isExtracted = isExtracted !== detailUrl.isExtracted ? isExtracted : detailUrl.isExtracted;
-                    detailUrl.requestRetries =
-                        requestRetries !== detailUrl.requestRetries ? requestRetries : detailUrl.requestRetries;
-                    detailUrl.save(
-                        async (error: Error, editedDetailUrl: Document | any): Promise<void> => {
-                            if (error) {
-                                new CustomizeException(
-                                    Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                    error.message,
-                                    Cause.DATABASE
-                                );
-                            }
-
-                            if (catalogId) {
-                                editedDetailUrl.catalogId = catalog;
-                            } else {
-                                await editedDetailUrl
-                                    .populate({
-                                        path: 'catalogId',
-                                        populate: { path: 'hostId' },
-                                    })
-                                    .execPopulate();
-                            }
-                            resolve(DetailUrlLogic.convertToResponse(editedDetailUrl));
-                        }
-                    );
-                }
+            return await (await detailUrl.save())
+                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
+                .execPopulate();
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
             );
-        });
-    };
+        }
+    }
 
     /**
      * @param id
      *
      * @return Promise<null>
      */
-    public delete = (id: string): Promise<null> => {
-        return new Promise((resolve: any, reject: any): void => {
-            DetailUrlModel.findById(id).exec((error: Error, pattern: Document | null): void => {
-                if (error) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                            error.message,
-                            Cause.DATABASE
-                        )
-                    );
-                }
+    public async delete(id: string | number): Promise<null> {
+        try {
+            await DetailUrlLogic.checkDetailUrlExistedWithId(id);
+            await DetailUrlModel.findByIdAndDelete(id).exec();
 
-                if (!pattern) {
-                    return reject(
-                        new CustomizeException(
-                            Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
-                            DetailUrlErrorMessage.DU_ERROR_1,
-                            Cause.DATA_VALUE.NOT_FOUND,
-                            ['id', id]
-                        )
-                    );
-                }
+            return null;
+        } catch (error) {
+            throw new CustomizeException(
+                error.statusCode || Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Cause.DATABASE
+            );
+        }
+    }
 
-                DetailUrlModel.findByIdAndDelete(id, (error: Error): void => {
-                    if (error) {
-                        return reject(
-                            new CustomizeException(
-                                Constant.RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR,
-                                error.message,
-                                Cause.DATABASE
-                            )
-                        );
-                    }
+    /**
+     * @param url
+     * @param catalogId
+     */
+    public static async checkDetailUrlExistedWithUrl(
+        url: string,
+        catalogId: CatalogModelInterface | number
+    ): Promise<void> {
+        if (typeof catalogId === 'object') {
+            catalogId = catalogId._id;
+        }
+        if (
+            (await DetailUrlModel.countDocuments({
+                url: url,
+                catalogId: catalogId || { $gt: 0 },
+            }).exec()) > 0
+        ) {
+            new CustomizeException(
+                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                DetailUrlErrorMessage.DU_ERROR_2,
+                Cause.DATA_VALUE.EXISTS,
+                ['url', url]
+            ).raise();
+        }
+    }
 
-                    resolve();
-                });
-            });
-        });
-    };
+    /**
+     * @param id
+     */
+    public static async checkDetailUrlExistedWithId(
+        id: number | string | DetailUrlModelInterface
+    ): Promise<void> {
+        if (typeof id === 'object') {
+            id = id._id;
+        }
+        if ((await DetailUrlModel.countDocuments({ id: id }).exec()) === 0) {
+            new CustomizeException(
+                Constant.RESPONSE_STATUS_CODE.BAD_REQUEST,
+                DetailUrlErrorMessage.DU_ERROR_1,
+                Cause.DATA_VALUE.NOT_FOUND,
+                ['id', id]
+            ).raise();
+        }
+    }
+
+    /**
+     * @param id
+     * @param catalogId
+     */
+    public static async isDetailUrlBelongCatalog(
+        id: number | string | DetailUrlModelInterface,
+        catalogId: number | string | CatalogModelInterface
+    ): Promise<boolean> {
+        if (typeof id === 'object') {
+            id = id._id;
+        }
+        if (typeof catalogId === 'object') {
+            catalogId = catalogId._id;
+        }
+        return (await DetailUrlModel.countDocuments({ _id: id, catalogId: catalogId }).exec()) > 0;
+    }
+
+    /**
+     * @param conditions
+     *
+     * @return Promise<Array<DetailUrlModelInterface>>
+     */
+    public async getAllWithConditions(
+        conditions: object = {}
+    ): Promise<Array<DetailUrlModelInterface>> {
+        try {
+            return await DetailUrlModel.find(conditions)
+                .populate({
+                    path: 'catalogId',
+                    populate: { path: 'hostId' },
+                })
+                .exec();
+        } catch (error) {
+            throw error;
+        }
+    }
 
     /**
      * @param pattern
      */
-
     public static convertToResponse({
         _id,
         catalogId,
@@ -403,9 +304,11 @@ class DetailUrlLogic {
         if (_id) {
             data.id = _id;
         }
+
         if (catalogId && Object.keys(catalogId).length > 0) {
             data.catalog = CatalogLogic.convertToResponse(catalogId);
         }
+
         if (url) {
             data.url = url;
         }
@@ -421,6 +324,7 @@ class DetailUrlLogic {
         if (cTime) {
             data.createAt = cTime;
         }
+
         if (mTime) {
             data.updateAt = mTime;
         }
