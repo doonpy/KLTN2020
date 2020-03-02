@@ -76,7 +76,7 @@ yarn.lock
 mongo-data/
 
 # dist
-dist/*
+dist/
 
 # log
-log/*
+public/
