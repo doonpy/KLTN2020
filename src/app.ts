@@ -1,13 +1,11 @@
 import express, { Application } from 'express';
 import path from 'path';
-import MessageLog from './util/message-log';
-import { Constant } from './util/definition/constant';
-import DatabaseConnection from './modules/database/database';
-import { errorHandler, notFoundRoute } from './middleware/error-handler';
-import DetailUrlScrape from './worker/scrape/detail-url/detail-url.scrape';
-import RawDataScrape from './worker/scrape/raw-data/raw-data.scrape';
+import ConsoleLog from './util/console/console.log';
+import { Database } from './services/database/database.index';
+import { ConsoleConstant } from './util/console/console.constant';
+import { errorHandler, notFoundRoute } from './middleware/error-handler/error-handler';
 
-class App {
+export default class App {
     private app: Application;
     private readonly serverPort: any;
 
@@ -15,24 +13,21 @@ class App {
         this.app = express();
         this.serverPort = appInit.port;
 
-        new DatabaseConnection()
+        new Database.MongoDb()
             .connect()
-            .then(async () => {
+            .then((): void => {
                 this.settingAssets();
-                this.settingTemplate();
                 this.bindMiddlewares(appInit.middleWares);
                 this.bindRoutes(appInit.controllers);
-
-                // await new DetailUrlScrape(2).start();
-                // await new RawDataScrape(2).start();
             })
-            .catch(error => {
-                new MessageLog(Constant.MESSAGE_TYPE.ERROR, error.message).show();
+
+            .catch((error: Error): void => {
+                new ConsoleLog(ConsoleConstant.Type.ERROR, error.message).show();
             });
     }
 
     /**
-     * Bind middlewares
+     * Bind middleware
      *
      * @param middleWares
      */
@@ -62,16 +57,7 @@ class App {
      * Setting assets
      */
     private settingAssets(): void {
-        this.app.use(express.static('../public'));
-        this.app.use(express.static(path.join(__dirname, '../log')));
-    }
-
-    /**
-     * Setting template engine
-     */
-    private settingTemplate(): void {
-        // this.app.set('views', path.join(__dirname, '../views'));
-        // this.app.set('view engine', 'pug');
+        this.app.use(express.static(path.join(__dirname, '../public')));
     }
 
     /**
@@ -79,12 +65,10 @@ class App {
      */
     public enableListen(): void {
         this.app.listen(this.serverPort, (): void => {
-            new MessageLog(
-                Constant.MESSAGE_TYPE.INFO,
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
                 `App listening on the http://localhost:${this.serverPort}`
             ).show();
         });
     }
 }
-
-export default App;

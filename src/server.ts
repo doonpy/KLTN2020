@@ -1,23 +1,23 @@
 import App from './app';
 import * as bodyParser from 'body-parser';
-import requestLogger from './middleware/request-logger';
 import * as dotenv from 'dotenv';
-import HostController from './modules/host/host.controller';
-import CatalogController from './modules/catalog/catalog.controller';
-import PatternController from './modules/pattern/pattern.controller';
-import DetailUrlController from './modules/detail-url/detail-url.controller';
-import RawDataController from './modules/raw-data/raw-data.controller';
+import { RawData } from './services/raw-data/raw-data.index';
+import { Host } from './services/host/host.index';
+import { Catalog } from './services/catalog/catalog.index';
+import { Pattern } from './services/pattern/pattern.index';
+import { DetailUrl } from './services/detail-url/detail-url.index';
+import { requestLogger } from './middleware/request-logger/request-logger';
 
 dotenv.config();
 
 const app = new App({
     port: process.env.SERVER_PORT,
     controllers: [
-        new HostController(),
-        new CatalogController(),
-        new PatternController(),
-        new DetailUrlController(),
-        new RawDataController(),
+        new Host.Controller(),
+        new Catalog.Controller(),
+        new Pattern.Controller(),
+        new DetailUrl.Controller(),
+        new RawData.Controller(),
     ],
     middleWares: [bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
 });
