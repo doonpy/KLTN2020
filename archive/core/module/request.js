@@ -1,4 +1,4 @@
-const request = require("request");
+const request = require("archive/core/module/request");
 const DEFAULT_OPTION = {
     MAX_TIMEOUT: 1000 * 15
 };

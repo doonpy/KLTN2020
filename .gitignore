@@ -54,9 +54,6 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
-
 # next.js build output
 .next
 
@@ -67,19 +64,28 @@ temp/
 data/
 
 #.idea
-.idea/
-
-# public js
-public/javascripts
-
-# test.js
-test.js
+../.idea/
 
 #pm2 ecosystem
 ecosystem.config.js
 
-#package-lock.json
-package-lock.json
-
 # yarn.lock
 yarn.lock
+
+# mongo-data
+mongo-data/
+
+# dist
+dist/
+
+# log
+public/
+
+# SSL Cert
+*.pem
+
+# app folder
+app/
+
+# nginx
+nginx/
