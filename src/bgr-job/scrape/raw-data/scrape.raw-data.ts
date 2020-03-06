@@ -278,7 +278,7 @@ export default class ScrapeRawData extends ScrapeBase {
     protected finishAction(): void {
         let isDone: boolean = false;
         while (!isDone) {
-            if (this.saveQueue.getRemainTask() !== 0) {
+            if (this.saveQueue.getRemainTask() === 0) {
                 isDone = true;
             }
             this.saveQueue.stop();
