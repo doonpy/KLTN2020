@@ -38,17 +38,29 @@ export default class DateTime extends Date {
      *
      * @return boolean
      */
-    public static isExactTime(expectTime: Date): boolean {
+    public static isExactTime(expectTime: Date, isUtcTime: boolean = false): boolean {
         let currentTime: Date = new Date();
 
-        if (expectTime.getHours() !== currentTime.getHours()) {
-            return false;
-        }
+        if (!isUtcTime) {
+            if (expectTime.getHours() !== currentTime.getHours()) {
+                return false;
+            }
 
-        if (expectTime.getMinutes() !== currentTime.getMinutes()) {
-            return false;
-        }
+            if (expectTime.getMinutes() !== currentTime.getMinutes()) {
+                return false;
+            }
 
-        return expectTime.getSeconds() === currentTime.getSeconds();
+            return expectTime.getSeconds() === currentTime.getSeconds();
+        } else {
+            if (expectTime.getUTCHours() !== currentTime.getUTCHours()) {
+                return false;
+            }
+
+            if (expectTime.getUTCMinutes() !== currentTime.getUTCMinutes()) {
+                return false;
+            }
+
+            return expectTime.getUTCSeconds() === currentTime.getUTCSeconds();
+        }
     }
 }

@@ -24,7 +24,7 @@ const script = (): void => {
         expectTime.setHours(SCHEDULE_TIME_HOUR);
         expectTime.setMinutes(SCHEDULE_TIME_MINUTE);
         expectTime.setSeconds(SCHEDULE_TIME_SECOND);
-        if (!DateTime.isExactTime(expectTime)) {
+        if (!DateTime.isExactTime(expectTime, true)) {
             return;
         }
 
