@@ -80,3 +80,12 @@ dist/
 
 # log
 public/
+
+# SSL Cert
+*.pem
+
+# app folder
+app/
+
+# nginx
+nginx/
