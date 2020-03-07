@@ -68,7 +68,7 @@ const script = async (): Promise<void> => {
 
         for (const jobQueue of jobQueueList) {
             if (!jobQueue.isRunning) {
-                jobQueue.start();
+                await jobQueue.start();
             }
         }
     }, 1000);
@@ -77,6 +77,13 @@ const script = async (): Promise<void> => {
 new Database.MongoDb().connect().then(
     async (): Promise<void> => {
         new ChatBotTelegram();
-        await script();
+        try {
+            await script();
+        } catch (error) {
+            ChatBotTelegram.sendMessage(
+                `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\n→ Message: <code>${error.message}</code>`
+            );
+            throw error;
+        }
     }
 );

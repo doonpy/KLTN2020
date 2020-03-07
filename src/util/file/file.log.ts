@@ -1,4 +1,3 @@
-import fs from 'fs';
 import FileBase from './file.base';
 
 export default class FileLog extends FileBase {
@@ -58,7 +57,7 @@ export default class FileLog extends FileBase {
      */
     public exportFile(): void {
         try {
-            this.createFile(this.PUBLIC_FOLDER_PATH + '/' + this.getFullPath(), this.content, {
+            this.createFile(this.getFullPath(), this.content, {
                 encoding: 'utf-8',
             });
         } catch (error) {
@@ -73,7 +72,7 @@ export default class FileLog extends FileBase {
         let content: string = `Error!\nName: ${error.name}\nMessage: ${error.message}\n Stack: ${error.stack}`;
 
         try {
-            this.createFile(this.PUBLIC_FOLDER_PATH + '/' + this.getFullPath(true), content, {
+            this.createFile(this.getFullPath(true), content, {
                 encoding: 'utf-8',
             });
         } catch (error) {

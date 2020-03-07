@@ -46,7 +46,7 @@ export default class App {
      */
     private bindRoutes(routes: { forEach: (arg0: (controller: any) => void) => void }): void {
         routes.forEach((controller: any): void => {
-            this.app.use('/', controller.router);
+            this.app.use('/api/v1', controller.router);
         });
 
         this.app.use(notFoundRoute);

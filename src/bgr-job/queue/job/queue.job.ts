@@ -5,7 +5,7 @@ import { QueueJobConstant } from './queue.job.constant';
 
 export default class QueueJob extends QueueBase {
     protected MAX_TASK_EXECUTE: number = 1;
-    private index: number;
+    private readonly index: number;
     public isRunning: boolean = false;
 
     constructor(index: number = -1, delayTime: number | undefined = undefined) {
