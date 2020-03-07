@@ -194,13 +194,7 @@ export default class RawDataLogic extends LogicBase {
                 rawData.acreage.measureUnit = acreage.measureUnit || rawData.acreage.measureUnit;
             }
 
-            if (address && Object.keys(address).length > 0) {
-                rawData.address.city = address.city || rawData.address.city;
-                rawData.address.district = address.district || rawData.address.district;
-                rawData.address.ward = address.ward || rawData.address.ward;
-                rawData.address.street = address.street || rawData.address.street;
-                rawData.address.other = address.other || rawData.address.other;
-            }
+            rawData.address = address || rawData.address;
 
             if (others && others.length > 0) {
                 others.forEach((other: { name: string; value: string } | any): void => {
@@ -363,9 +357,7 @@ export default class RawDataLogic extends LogicBase {
         title: string;
         price: { value: string; currency: string } | object;
         acreage: { value: string; measureUnit: string } | object;
-        address:
-            | { city: string; district: string; ward: string; street: string; other: string }
-            | object;
+        address: string;
         others: Array<{ name: string; value: string }> | Array<any>;
         createAt: string;
         updateAt: string;
@@ -379,9 +371,7 @@ export default class RawDataLogic extends LogicBase {
             title: string;
             price: { value: string; currency: string } | object;
             acreage: { value: string; measureUnit: string } | object;
-            address:
-                | { city: string; district: string; ward: string; street: string; other: string }
-                | object;
+            address: string;
             others: Array<{ name: string; value: string }> | Array<any>;
             createAt: string;
             updateAt: string;
@@ -394,7 +384,7 @@ export default class RawDataLogic extends LogicBase {
             title: '',
             price: {},
             acreage: {},
-            address: {},
+            address: '',
             others: [],
             createAt: '',
             updateAt: '',
@@ -443,7 +433,7 @@ export default class RawDataLogic extends LogicBase {
             data.acreage = acreage;
         }
 
-        if (Object.keys(address).length > 0) {
+        if (address) {
             data.address = address;
         }
 

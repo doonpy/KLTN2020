@@ -16,13 +16,7 @@ export default interface RawDataModelInterface extends mongoose.Document {
         value: string;
         measureUnit: string;
     };
-    address: {
-        city: string;
-        district: string;
-        ward: string;
-        street: string;
-        other: string;
-    };
+    address: string;
     others: [
         {
             name: string;
