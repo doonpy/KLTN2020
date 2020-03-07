@@ -1,5 +1,4 @@
 import ScrapeBase from '../scrape.base';
-import Timeout = NodeJS.Timeout;
 import PatternModelInterface from '../../../services/pattern/pattern.model.interface';
 import PatternLogic from '../../../services/pattern/pattern.logic';
 import RawDataModelInterface from '../../../services/raw-data/raw-data.model.interface';
@@ -221,36 +220,6 @@ export default class ScrapeRawData extends ScrapeBase {
                 ).shift() || '',
         };
 
-        let addressElement: Array<string> = addressData.split(/\s?\,\s?/);
-        let address: {
-            city: string;
-            district: string;
-            ward: string;
-            street: string;
-            other: string;
-        } = {
-            city:
-                addressElement.length === Object.keys(ScrapeRawDataConstant.ADDRESS_INDEX).length
-                    ? addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.CITY]
-                    : addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.CITY - 1],
-            district:
-                addressElement.length === Object.keys(ScrapeRawDataConstant.ADDRESS_INDEX).length
-                    ? addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.DISTRICT]
-                    : addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.DISTRICT - 1],
-            ward:
-                addressElement.length === Object.keys(ScrapeRawDataConstant.ADDRESS_INDEX).length
-                    ? addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.WARD]
-                    : addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.WARD - 1],
-            street:
-                addressElement.length === Object.keys(ScrapeRawDataConstant.ADDRESS_INDEX).length
-                    ? addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.STREET]
-                    : addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.STREET - 1],
-            other:
-                addressElement.length === Object.keys(ScrapeRawDataConstant.ADDRESS_INDEX).length
-                    ? addressElement[ScrapeRawDataConstant.ADDRESS_INDEX.PROJECT]
-                    : '',
-        };
-
         let transactionType: number = ScrapeRawDataConstant.TRANSACTION_PATTERN.test(
             this.catalog.title
         )
@@ -267,7 +236,7 @@ export default class ScrapeRawData extends ScrapeBase {
             title: titleData,
             price: price,
             acreage: acreage,
-            address: address,
+            address: addressData,
             others: othersData,
         });
     }

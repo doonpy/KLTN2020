@@ -72,6 +72,7 @@ export default class QueueSave extends QueueBase {
             } catch (error) {
                 this.writeErrorLog(error, JSON.stringify(saveItem));
             }
+            this.countNumber++;
         }
     }
 }

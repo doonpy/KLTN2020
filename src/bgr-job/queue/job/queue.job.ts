@@ -5,13 +5,15 @@ import { QueueSaveConstant } from '../save/queue.save.constant';
 
 export default class QueueJob extends QueueBase {
     protected MAX_TASK_EXECUTE: number = 1;
+    private index: number;
     public isRunning: boolean = false;
 
-    constructor(delayTime: number | undefined = undefined) {
+    constructor(index: number = -1, delayTime: number | undefined = undefined) {
         super();
         this.delayTime = delayTime || this.QUEUE_DELAY_DEFAULT;
+        this.index = index;
         this.logFile.initLogFolder('job-queue');
-        this.logFile.createFileName('jq_');
+        this.logFile.createFileName(`jq-${this.index}_`);
     }
 
     /**
@@ -20,6 +22,7 @@ export default class QueueJob extends QueueBase {
      */
     public pushElement(elements: Function): void {
         this.add(elements);
+        this.writeLog(`Add element.`);
     }
 
     /**
@@ -39,17 +42,15 @@ export default class QueueJob extends QueueBase {
             }
             elementCounter++;
             try {
-                this.writeLog(`Func: ${element.name} - Queue pending: ${this.queue.length}`);
+                this.writeLog(`Execute element - Queue pending: ${this.queue.length}`);
                 await element();
             } catch (error) {
-                this.writeErrorLog(
-                    error,
-                    `Func: ${element.name} - Queue pending: ${this.queue.length}`
-                );
+                this.writeErrorLog(error, `Execute element - Queue pending: ${this.queue.length}`);
             }
             elementCounter--;
         }
 
+        this.exportLog();
         this.isRunning = false;
     }
 
@@ -58,6 +59,10 @@ export default class QueueJob extends QueueBase {
      */
     public exportLog(): void {
         this.footerLogContent = [
+            {
+                name: 'Thread index',
+                value: this.index,
+            },
             {
                 name: 'Job amount',
                 value: this.countNumber,
