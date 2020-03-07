@@ -1,7 +1,7 @@
 import QueueBase from '../queue.base';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
 import StringHandler from '../../../util/string-handler/string-handler';
-import { QueueSaveConstant } from '../save/queue.save.constant';
+import { QueueJobConstant } from './queue.job.constant';
 
 export default class QueueJob extends QueueBase {
     protected MAX_TASK_EXECUTE: number = 1;
@@ -78,7 +78,7 @@ export default class QueueJob extends QueueBase {
         this.logFile.createFileName('jq_');
         this.logFile.resetLog();
         ChatBotTelegram.sendMessage(
-            StringHandler.replaceString(QueueSaveConstant.EXPORT_DAILY_LOG, [this.logFile.getUrl()])
+            StringHandler.replaceString(QueueJobConstant.EXPORT_DAILY_LOG, [this.logFile.getUrl()])
         );
         this.countNumber = 1;
     }

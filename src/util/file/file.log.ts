@@ -111,6 +111,8 @@ export default class FileLog extends FileBase {
      */
     private getFullPath(isError: boolean = false): string {
         return (
+            this.PUBLIC_FOLDER_PATH +
+            '/' +
             this.LOG_ROOT_FOLDER +
             '/' +
             (isError ? this.ERROR_LOG_ROOT_FOLDER : this.folderPath) +
