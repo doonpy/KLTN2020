@@ -92,8 +92,8 @@ export default class DetailUrlLogic extends LogicBase {
     public async create({
         catalogId,
         url,
-        isExtracted,
-        requestRetries,
+        isExtracted = false,
+        requestRetries = 0,
     }: DetailUrlModelInterface): Promise<DetailUrlModelInterface> {
         try {
             await Catalog.Logic.checkCatalogExistedWithId(catalogId);
@@ -272,19 +272,27 @@ export default class DetailUrlLogic extends LogicBase {
 
     /**
      * @param conditions
+     * @param isPopulate
      *
      * @return Promise<Array<DetailUrlModelInterface>>
      */
     public async getAllWithConditions(
-        conditions: object = {}
+        conditions: object = {},
+        isPopulate: boolean = false
     ): Promise<Array<DetailUrlModelInterface>> {
         try {
-            return await DetailUrlModel.find(conditions)
-                .populate({
+            let query: DocumentQuery<
+                Array<DetailUrlModelInterface>,
+                DetailUrlModelInterface
+            > = DetailUrlModel.find(conditions);
+            if (isPopulate) {
+                query.populate({
                     path: 'catalogId',
                     populate: { path: 'hostId' },
-                })
-                .exec();
+                });
+            }
+
+            return await DetailUrlModel.find(conditions).exec();
         } catch (error) {
             throw error;
         }

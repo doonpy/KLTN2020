@@ -31,7 +31,11 @@ const initJobQueueList = (): Array<BgrQueue.Job> => {
 const displayConsole = (jobQueueList: Array<BgrQueue.Job>): void => {
     console.clear();
     let infoTable: Array<object> = jobQueueList.map((jobQueue, index): any => {
-        return { threadIndex: index, remainTasks: jobQueue.getRemainTask() };
+        return {
+            threadIndex: index,
+            remainTasks: jobQueue.getRemainElements(),
+            status: jobQueue.isRunning,
+        };
     });
     new ConsoleLog(ConsoleConstant.Type.INFO, `Background job process...`).show();
     new ConsoleTable(infoTable).show();
@@ -61,14 +65,12 @@ const script = async (): Promise<void> => {
         for (const catalogId of catalogIdList) {
             let scrapeDetailUrlJob: BgrScrape.DetailUrl = new BgrScrape.DetailUrl(catalogId);
             let threadIndex: number = catalogId % THREAD_AMOUNT;
-            jobQueueList[threadIndex].pushElement(
-                scrapeDetailUrlJob.start.bind(scrapeDetailUrlJob)
-            );
+            jobQueueList[threadIndex].pushElement(scrapeDetailUrlJob);
         }
 
         for (const jobQueue of jobQueueList) {
             if (!jobQueue.isRunning) {
-                await jobQueue.start();
+                jobQueue.start();
             }
         }
     }, 1000);

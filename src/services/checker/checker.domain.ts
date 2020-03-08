@@ -5,7 +5,7 @@ import { CheckerFailedResponse } from './checker.failed-response';
 
 export default class CheckerDomain extends CheckerBase {
     private VALID_DOMAIN: RegExp = new RegExp(
-        /^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.[\d\w\-]+)+\/?/
+        /^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.([\d\w\-]+))+$/
     );
 
     /**

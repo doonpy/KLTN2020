@@ -1,8 +1,6 @@
 import ScrapeBase from '../scrape.base';
 import PatternModelInterface from '../../../services/pattern/pattern.model.interface';
 import PatternLogic from '../../../services/pattern/pattern.logic';
-import RawDataModelInterface from '../../../services/raw-data/raw-data.model.interface';
-import RawDataModel from '../../../services/raw-data/raw-data.model';
 import RawDataLogic from '../../../services/raw-data/raw-data.logic';
 import DateTime from '../../../util/datetime/datetime';
 import StringHandler from '../../../util/string-handler/string-handler';
@@ -13,31 +11,27 @@ import {
 import { RawData } from '../../../services/raw-data/raw-data.index';
 import { Catalog } from '../../../services/catalog/catalog.index';
 import { DetailUrl } from '../../../services/detail-url/detail-url.index';
-import { BgrQueue } from '../../queue/queue.index';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
-import delay from 'delay';
+import Timeout = NodeJS.Timeout;
+import { ScrapeConstant } from '../scrape.constant';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly catalogId: number = 0;
     private readonly catalogLogic: Catalog.Logic = new Catalog.Logic();
     private readonly detailUrlLogic: DetailUrl.Logic = new DetailUrl.Logic();
+    private readonly rawDataLogic: RawData.Logic = new RawData.Logic();
     private readonly patternLogic: PatternLogic = new PatternLogic();
     private catalog: Catalog.DocumentInterface | any;
     private detailUrls: Array<DetailUrl.DocumentInterface> = [];
     private pattern: PatternModelInterface | any;
-    private saveQueue: BgrQueue.Save;
+    private saveAmount: number = 0;
 
     private readonly NOT_EXTRACTED: boolean = false;
     private readonly EXTRACTED: boolean = true;
     private readonly MAX_REQUEST_RETRIES: number = 3;
-    private SAVE_QUEUE_DELAY: number = parseInt(
-        process.env.SCRAPE_RAW_DATA_SAVE_QUEUE_DELAY || '500'
-    ); // ms
-    private SAVE_AMOUNT: number = parseInt(process.env.SCRAPE_RAW_DATA_SAVE_QUEUE_AMOUNT || '1000'); // ms
 
     constructor(catalogId: number) {
         super();
-        this.saveQueue = new BgrQueue.Save(this.SAVE_QUEUE_DELAY, this.SAVE_AMOUNT);
         this.catalogId = catalogId;
         this.logInstance.initLogFolder('raw-data-scrape');
         this.logInstance.createFileName('cid-' + catalogId + '_');
@@ -49,6 +43,7 @@ export default class ScrapeRawData extends ScrapeBase {
     public async start(): Promise<void> {
         try {
             this.startTime = process.hrtime();
+            this.isRunning = true;
 
             await Catalog.Logic.checkCatalogExistedWithId(this.catalogId);
             await PatternLogic.checkPatternExistedWithCatalogId(this.catalogId);
@@ -75,8 +70,9 @@ export default class ScrapeRawData extends ScrapeBase {
                 return;
             }
 
-            await this.scrapeAction();
+            this.scrapeAction();
         } catch (error) {
+            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
             this.addSummaryErrorLog(
                 ScrapeRawDataConstantChatBotMessage.ERROR,
                 error,
@@ -88,43 +84,50 @@ export default class ScrapeRawData extends ScrapeBase {
     /**
      * Scrape action
      */
-    private async scrapeAction(): Promise<void> {
+    private scrapeAction(): void {
         let requestLimiter: number = 0;
 
-        while (this.detailUrls.length !== 0) {
-            if (requestLimiter > this.MAX_REQUEST) {
-                continue;
+        let loop: Timeout = setInterval(async (): Promise<void> => {
+            if (this.detailUrls.length === 0 && requestLimiter === 0) {
+                clearInterval(loop);
+                this.finishAction();
             }
 
-            let currentUrlObject: any | undefined = this.detailUrls.shift();
-            if (!currentUrlObject || currentUrlObject.requestRetries > this.MAX_REQUEST_RETRIES) {
-                continue;
+            if (requestLimiter > this.MAX_REQUEST) {
+                return;
+            }
+
+            let currentDetailUrlDocument:
+                | DetailUrl.DocumentInterface
+                | undefined = this.detailUrls.shift();
+            if (!currentDetailUrlDocument) {
+                return;
             }
             requestLimiter++;
 
             let $: CheerioStatic | undefined = await this.getBody(
                 this.catalog.hostId.domain,
-                currentUrlObject.url
+                currentDetailUrlDocument.url
             );
 
             if (!$) {
-                this.handleFailedRequest(currentUrlObject);
+                await this.handleFailedRequest(currentDetailUrlDocument);
             } else {
-                await this.handleSuccessRequest($, currentUrlObject);
+                this.handleSuccessRequest($, currentDetailUrlDocument);
             }
 
             requestLimiter--;
-            await delay(this.REQUEST_DELAY);
-        }
-
-        this.finishAction();
+        }, this.REQUEST_DELAY);
     }
 
     /**
      * @param $
-     * @param currentUrlObject
+     * @param currentDetailUrlDocument
      */
-    protected async handleSuccessRequest($: CheerioStatic, currentUrlObject: any): Promise<void> {
+    protected async handleSuccessRequest(
+        $: CheerioStatic,
+        currentDetailUrlDocument: DetailUrl.DocumentInterface
+    ): Promise<void> {
         let propertyTypeData: string =
             this.extractData($, this.pattern.mainLocator.propertyType).shift() || '';
         let postDateData: string =
@@ -135,10 +138,10 @@ export default class ScrapeRawData extends ScrapeBase {
             this.extractData($, this.pattern.mainLocator.acreage).shift() || '';
         let addressData: string =
             this.extractData($, this.pattern.mainLocator.address).shift() || '';
-        let othersData: Array<object> = [];
+        let othersData: Array<{ name: string; value: string }> = [];
 
         for (let i: number = 0; i < this.pattern.subLocator.length; i++) {
-            let data: object = {
+            let data: { name: string; value: string } = {
                 name: this.pattern.subLocator[i].name,
                 value: this.extractData($, this.pattern.subLocator[i].locator).shift() || '',
             };
@@ -146,8 +149,8 @@ export default class ScrapeRawData extends ScrapeBase {
             othersData.push(data);
         }
 
-        let rawData: RawDataModelInterface = this.handleScrapedData(
-            currentUrlObject._id,
+        let rawData: RawData.DocumentInterface = this.handleScrapedData(
+            currentDetailUrlDocument._id,
             propertyTypeData,
             postDateData,
             titleData,
@@ -156,19 +159,64 @@ export default class ScrapeRawData extends ScrapeBase {
             addressData,
             othersData
         );
-        currentUrlObject.isExtracted = this.EXTRACTED;
-        await this.saveQueue.pushElement([rawData, currentUrlObject]);
+        currentDetailUrlDocument.isExtracted = this.EXTRACTED;
+
+        try {
+            this.writeLog(
+                ScrapeConstant.LOG_ACTION.UPDATE,
+                `Update document: ${JSON.stringify(
+                    await this.detailUrlLogic.update(
+                        currentDetailUrlDocument._id,
+                        currentDetailUrlDocument
+                    )
+                )}`
+            );
+        } catch (error) {
+            this.writeErrorLog(
+                error,
+                ScrapeConstant.LOG_ACTION.UPDATE,
+                JSON.stringify(currentDetailUrlDocument)
+            );
+        }
+
+        try {
+            this.writeLog(
+                ScrapeConstant.LOG_ACTION.CREATE,
+                `${JSON.stringify(await this.rawDataLogic.create(rawData))}`
+            );
+            this.saveAmount++;
+        } catch (error) {
+            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, JSON.stringify(rawData));
+        }
     }
 
     /**
-     * @param currentUrlObject
+     * @param currentDetailUrlDocument
      */
-    protected handleFailedRequest(currentUrlObject: any): void {
-        currentUrlObject.requestRetries++;
-        if (currentUrlObject.requestRetries < this.MAX_REQUEST_RETRIES) {
-            this.detailUrls.push(currentUrlObject);
+    protected async handleFailedRequest(
+        currentDetailUrlDocument: DetailUrl.DocumentInterface
+    ): Promise<void> {
+        currentDetailUrlDocument.requestRetries++;
+        if (currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES) {
+            this.detailUrls.push(currentDetailUrlDocument);
         } else {
-            this.saveQueue.pushElement(currentUrlObject);
+            try {
+                this.writeLog(
+                    ScrapeConstant.LOG_ACTION.UPDATE,
+                    `Update document: ${JSON.stringify(
+                        await this.detailUrlLogic.update(
+                            currentDetailUrlDocument._id,
+                            currentDetailUrlDocument
+                        )
+                    )}`
+                );
+            } catch (error) {
+                this.writeErrorLog(
+                    error,
+                    ScrapeConstant.LOG_ACTION.UPDATE,
+                    JSON.stringify(currentDetailUrlDocument)
+                );
+            }
         }
     }
 
@@ -192,17 +240,15 @@ export default class ScrapeRawData extends ScrapeBase {
         priceData: string,
         acreageData: string,
         addressData: string,
-        othersData: Array<object>
-    ): RawDataModelInterface {
+        othersData: Array<{ name: string; value: string }>
+    ): RawData.DocumentInterface {
         let postDate: Date = DateTime.convertStringToDate(
             postDateData,
             this.pattern.mainLocator.postDate.format,
             this.pattern.mainLocator.postDate.delimiter
         );
         if (postDate.toString() === 'Invalid Date') {
-            console.log(detailUrlId);
-
-            throw new Error('stop here');
+            postDate = new Date(0, 0, 0, 0, 0, 0, 0);
         }
         let price: { value: string; currency: string } = {
             value: (priceData.match(ScrapeRawDataConstant.PRICE_VALUE_PATTERN) || []).shift() || '',
@@ -228,37 +274,31 @@ export default class ScrapeRawData extends ScrapeBase {
 
         let propertyType: number = RawDataLogic.getPropertyTypeIndex(propertyTypeData);
 
-        return new RawDataModel({
-            detailUrlId: detailUrlId,
-            transactionType: transactionType,
-            propertyType: propertyType,
-            postDate: postDate,
-            title: titleData,
-            price: price,
-            acreage: acreage,
-            address: addressData,
-            others: othersData,
-        });
+        return this.rawDataLogic.createDocument(
+            detailUrlId,
+            transactionType,
+            propertyType,
+            postDate.toISOString(),
+            titleData,
+            price,
+            acreage,
+            addressData,
+            othersData
+        );
     }
 
     /**
      * Finish action
      */
     protected finishAction(): void {
-        let isDone: boolean = false;
-        while (!isDone) {
-            if (this.saveQueue.getRemainTask() === 0) {
-                isDone = true;
-            }
-            this.saveQueue.stop();
-            this.exportLog(this.catalog);
-            ChatBotTelegram.sendMessage(
-                StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.FINISH, [
-                    this.catalog.title,
-                    this.catalog.id,
-                    this.logInstance.getUrl(),
-                ])
-            );
-        }
+        this.exportLog(this.catalog, [{ name: 'Save amount', value: this.saveAmount }]);
+        ChatBotTelegram.sendMessage(
+            StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.FINISH, [
+                this.catalog.title,
+                this.catalog.id,
+                this.logInstance.getUrl(),
+            ])
+        );
+        this.isRunning = false;
     }
 }

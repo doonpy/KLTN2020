@@ -89,9 +89,10 @@ export default class FileLog extends FileBase {
             this.PREFIX +
             customizeFileName +
             currentDate.getUTCHours() +
+            '-' +
             currentDate.getUTCMinutes() +
-            currentDate.getUTCSeconds() +
-            currentDate.getUTCMilliseconds();
+            '-' +
+            currentDate.getUTCSeconds();
     }
 
     /**

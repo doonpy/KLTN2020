@@ -332,6 +332,52 @@ export default class RawDataLogic extends LogicBase {
     }
 
     /**
+     * Create raw data document
+     *
+     * @param detailUrlId
+     * @param transactionType
+     * @param propertyType
+     * @param postDate
+     * @param title
+     * @param price
+     * @param acreage
+     * @param address
+     * @param others
+     */
+    public createDocument(
+        detailUrlId: string | number,
+        transactionType: number,
+        propertyType: number,
+        postDate: string,
+        title: string,
+        price: {
+            value: string;
+            currency: string;
+        },
+        acreage: {
+            value: string;
+            measureUnit: string;
+        },
+        address: string,
+        others: Array<{
+            name: string;
+            value: string;
+        }>
+    ): RawDataModelInterface {
+        return new RawDataModel({
+            detailUrlId: detailUrlId,
+            transactionType: transactionType,
+            propertyType: propertyType,
+            postDate: postDate,
+            title: title,
+            price: price,
+            acreage: acreage,
+            address: address,
+            others: others,
+        });
+    }
+
+    /**
      * @param rawData
      */
 

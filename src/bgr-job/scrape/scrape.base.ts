@@ -7,14 +7,17 @@ import Request from '../../util/request/request';
 import { ScrapeConstant } from './scrape.constant';
 import { Common } from '../../common/common.index';
 import { File } from '../../util/file/file.index';
+import DateTime from '../../util/datetime/datetime';
+import _ from 'lodash';
 
 export default abstract class ScrapeBase {
     protected readonly logInstance: File.Log = new File.Log();
     protected failedRequestCounter: number = 0;
     protected successRequestCounter: number = 0;
-    protected requestCounter: number = 1;
+    protected countNumber: number = 0;
     protected startTime: [number, number] | undefined;
     protected requestLimiter: number = 0;
+    protected isRunning: boolean = false;
 
     protected readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_MAX_REQUEST || '10');
     protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100');
@@ -37,18 +40,18 @@ export default abstract class ScrapeBase {
                 response.request.uri.href !== url
             ) {
                 let statusCode: number = response.statusCode === 200 ? 404 : response.statusCode;
-                this.logInstance.addLine(
-                    `${this.requestCounter} >> ${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+                this.writeLog(
+                    ScrapeConstant.LOG_ACTION.REQUEST,
+                    `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
                 );
                 this.failedRequestCounter++;
-                this.requestCounter++;
                 return;
             }
 
-            this.logInstance.addLine(
-                `${this.requestCounter} >> ${response.statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+            this.writeLog(
+                ScrapeConstant.LOG_ACTION.REQUEST,
+                `${response.statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
             );
-            this.requestCounter++;
 
             this.successRequestCounter++;
             return cherrio.load(response.body);
@@ -137,13 +140,20 @@ export default abstract class ScrapeBase {
 
     /**
      * @param catalog
+     * @param customizeFooter
      */
-    protected exportLog(catalog: CatalogModelInterface): void {
+    protected exportLog(
+        catalog: CatalogModelInterface,
+        customizeFooter: Array<{ name: string; value: string | number }> = []
+    ): void {
         let endTime: [number, number] = process.hrtime(this.startTime);
         let footerLogContent: Array<{ name: string; value: number | string }> = [
             {
                 name: 'Execution time',
-                value: StringHandler.replaceString(`%is %ims`, [endTime[0], endTime[1] / 1000000]),
+                value: StringHandler.replaceString(
+                    `${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`,
+                    [endTime[1] / 1000000]
+                ),
             },
             {
                 name: 'Catalog ID',
@@ -162,8 +172,43 @@ export default abstract class ScrapeBase {
                 value: this.failedRequestCounter,
             },
         ];
+        footerLogContent = _.merge(footerLogContent, customizeFooter);
 
         this.logInstance.initFooter(footerLogContent);
         this.logInstance.exportFile();
+    }
+
+    /**
+     * Check is task running
+     */
+    public isTaskRunning(): boolean {
+        return this.isRunning;
+    }
+
+    /**
+     * Write save success log
+     *
+     * @param action
+     * @param content
+     */
+    protected writeLog(action: string, content: string): void {
+        this.logInstance.addLine(
+            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ${action}: ${content}`
+        );
+    }
+
+    /**
+     * Write save error log
+     *
+     * @param error
+     * @param action
+     * @param content
+     */
+    protected writeErrorLog(error: Error, action: string, content: string): void {
+        this.logInstance.addLine(
+            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${
+                error.message
+            } | ${action}: ${content}`
+        );
     }
 }

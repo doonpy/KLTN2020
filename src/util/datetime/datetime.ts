@@ -63,4 +63,24 @@ export default class DateTime extends Date {
             return expectTime.getUTCSeconds() === currentTime.getUTCSeconds();
         }
     }
+
+    /**
+     * Convert seconds to time
+     *
+     * @param totalSeconds
+     *
+     * @return string
+     */
+    public static convertTotalSecondsToTime(totalSeconds: number): string {
+        let days: number = Math.floor(totalSeconds / 86400);
+        totalSeconds %= 86400;
+        let hours: number = Math.floor(totalSeconds / 3600);
+        totalSeconds %= 3600;
+        let minutes: number = Math.floor(totalSeconds / 60);
+        let seconds: number = totalSeconds % 60;
+
+        return `${days} days ${hours < 9 ? `0${hours}` : hours}:${
+            minutes < 9 ? `0${minutes}` : minutes
+        }:${seconds < 9 ? `0${seconds}` : seconds}`;
+    }
 }
