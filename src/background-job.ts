@@ -8,6 +8,7 @@ import DateTime from './util/datetime/datetime';
 import ConsoleLog from './util/console/console.log';
 import { ConsoleConstant } from './util/console/console.constant';
 import ConsoleTable from './util/console/console.table';
+import chalk from 'chalk';
 dotenv.config();
 
 const SCHEDULE_TIME_HOUR: number = parseInt(process.env.SCHEDULE_TIME_HOUR || '0'); // hour
@@ -34,7 +35,7 @@ const displayConsole = (jobQueueList: Array<BgrQueue.Job>): void => {
         return {
             threadIndex: index,
             remainTasks: jobQueue.getRemainElements(),
-            status: jobQueue.isRunning,
+            status: jobQueue.isRunning ? chalk.green('Running') : chalk.red('Stop'),
         };
     });
     new ConsoleLog(ConsoleConstant.Type.INFO, `Background job process...`).show();

@@ -3,6 +3,7 @@ import StringHandler from '../../util/string-handler/string-handler';
 import { QueueSaveConstant } from './save/queue.save.constant';
 import ChatBotTelegram from '../../services/chatbot/chatBotTelegram';
 import DateTime from '../../util/datetime/datetime';
+import _ from 'lodash';
 
 export default abstract class QueueBase {
     protected delayTime: number | undefined;
@@ -37,13 +38,33 @@ export default abstract class QueueBase {
     /**
      * Stop loop
      */
-    public stop(): void {
+    public stop(customizeFooter: Array<{ name: string; value: string | number }> = []): void {
         if (!this.loop) {
             return;
         }
         clearInterval(this.loop);
+        let endTime: [number, number] = process.hrtime(this.startTime);
+        this.logFile.initFooter(
+            _.merge(
+                [
+                    {
+                        name: 'Execution time',
+                        value: StringHandler.replaceString(
+                            `${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`,
+                            [endTime[1] / 1000000]
+                        ),
+                    },
+                    {
+                        name: 'Summary',
+                        value: this.countNumber,
+                    },
+                ],
+                customizeFooter
+            )
+        );
+        this.logFile.exportFile();
+        this.logFile.resetLog();
         this.isRunning = false;
-        this.stopAction();
     }
 
     /**
@@ -68,33 +89,6 @@ export default abstract class QueueBase {
             `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${
                 error.message
             } | ${content}`
-        );
-    }
-
-    /**
-     * Reset log file
-     */
-    protected stopAction(): void {
-        let endTime: [number, number] = process.hrtime(this.startTime);
-        this.logFile.initFooter([
-            {
-                name: 'Execution time',
-                value: StringHandler.replaceString(
-                    `${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`,
-                    [endTime[1] / 1000000]
-                ),
-            },
-            {
-                name: 'Summary',
-                value: this.countNumber,
-            },
-        ]);
-        this.logFile.exportFile();
-        this.logFile.resetLog();
-        ChatBotTelegram.sendMessage(
-            StringHandler.replaceString(QueueSaveConstant.EXPORT_SUCCESS_LOG, [
-                this.logFile.getUrl(),
-            ])
         );
     }
 

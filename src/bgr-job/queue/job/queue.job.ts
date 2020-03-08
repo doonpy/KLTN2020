@@ -1,4 +1,7 @@
 import QueueBase from '../queue.base';
+import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
+import StringHandler from '../../../util/string-handler/string-handler';
+import { QueueJobConstant } from './queue.job.constant';
 
 export default class QueueJob extends QueueBase {
     private readonly index: number;
@@ -32,9 +35,15 @@ export default class QueueJob extends QueueBase {
             }
 
             if (this.queue.length === 0) {
-                this.stop();
+                this.stop([{ name: 'Thread ID', value: this.index }]);
                 this.logFile.initLogFolder('job-queue');
                 this.logFile.createFileName('jq_');
+                ChatBotTelegram.sendMessage(
+                    StringHandler.replaceString(QueueJobConstant.EXPORT_SUCCESS_LOG, [
+                        this.index,
+                        this.logFile.getUrl(),
+                    ])
+                );
                 return;
             }
 

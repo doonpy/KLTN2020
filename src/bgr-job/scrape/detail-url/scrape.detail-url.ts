@@ -133,6 +133,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 this.catalogId,
                 detailUrl
             );
+            this.existedDetailUrls.push(detailUrl);
             try {
                 this.writeLog(
                     ScrapeConstant.LOG_ACTION.CREATE,
