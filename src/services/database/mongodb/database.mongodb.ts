@@ -5,32 +5,43 @@ import { DatabaseFailedResponseRootCause } from '../database.failed-response';
 import { Common } from '../../../common/common.index';
 
 export default class DatabaseMongodb {
-    private _dbHost: any = process.env.DB_HOST;
-    private _dbPort: any = process.env.DB_PORT;
-    private _dbName: any = process.env.DB_NAME;
-    private _username: any = process.env.DB_USERNAME;
-    private _password: any = process.env.DB_PASS;
+    private readonly dbHost: string = process.env.DB_HOST || '';
+    private readonly dbPort: string = process.env.DB_PORT || '';
+    private readonly dbName: string = process.env.DB_NAME || '';
+    private readonly username: string = process.env.DB_USERNAME || '';
+    private readonly password: string = process.env.DB_PASS || '';
+    private readonly authSource: string = process.env.DB_AUTH_SOURCE || '';
 
-    constructor() {}
+    constructor() {
+        if (process.env.NODE_ENV === 'development') {
+            this.dbHost = process.env.DB_HOST_DEV || '';
+        }
+    }
 
     /**
      * Open connection to database
      */
     public async connect(): Promise<void> {
-        const connString: string = `mongodb://${this._username}:${this._password}@${this._dbHost}:${this._dbPort}/${this._dbName}?authSource=admin`;
+        const connString: string = `mongodb://${this.dbHost}:${this.dbPort}`;
         try {
             await mongoose.connect(connString, {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
                 useFindAndModify: false,
                 useCreateIndex: true,
+                auth: {
+                    user: this.username,
+                    password: this.password,
+                },
+                authSource: this.authSource,
+                dbName: this.dbName,
             });
         } catch (error) {
-            new Exception.Api(
+            new Exception.Customize(
                 Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 DatabaseFailedResponseRootCause.DB_RC_1
-            );
+            ).raise();
         }
     }
 

@@ -67,7 +67,7 @@ export default class App {
         this.app.listen(this.serverPort, (): void => {
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
-                `App listening on the http://localhost:${this.serverPort}`
+                `App listening on the ${process.env.SERVER_PROTOCOL}${process.env.SERVER_URI}:${this.serverPort}`
             ).show();
         });
     }

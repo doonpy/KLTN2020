@@ -20,7 +20,7 @@ export default class CheckerUrl extends CheckerBase {
         }
 
         if (!this.VALID_URL.test(value)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.URL,

@@ -12,7 +12,7 @@ export default class CheckerTypeDecimal extends CheckerTypeBase {
      */
     public checkType(paramName: string, value: any): void {
         if (!DECIMAL_NUMERIC_CHARACTER_PATTERN.test(value.toString())) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerTypeFailedResponse.Message.INVALID_TYPE,
                 CheckerTypeFailedResponse.RootCause.DECIMAL,

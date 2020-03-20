@@ -11,6 +11,7 @@ const specifyIdPath: string = '/catalogs/:id';
 
 export default class CatalogController extends ControllerBase {
     private catalogLogic: CatalogLogic = new CatalogLogic();
+    private readonly PARAM_PATTERN_ID: string = 'patternId';
     private readonly PARAM_TITLE: string = 'title';
     private readonly PARAM_URL: string = 'url';
     private readonly PARAM_LOCATOR: string = 'locator';
@@ -119,6 +120,9 @@ export default class CatalogController extends ControllerBase {
         validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
         validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
 
+        validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
+        validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
+
         validator.validate(this.requestBody);
         validator.validate(this.requestBody.locator || {});
 
@@ -160,6 +164,9 @@ export default class CatalogController extends ControllerBase {
 
         validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
         validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
+
+        validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
+        validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
 
         validator.validate(this.requestParams);
         validator.validate(this.requestBody);

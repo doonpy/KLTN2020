@@ -32,6 +32,8 @@
     "@types/node": "^13.7.4",
     "@types/node-telegram-bot-api": "^0.40.2",
     "@types/request-promise": "^4.1.45",
+    "@types/socket.io": "^2.1.4",
+    "@types/uuid": "^7.0.0",
     "body-parser": "^1.19.0",
     "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
@@ -50,7 +52,9 @@
     "pug": "^2.0.4",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
-    "typescript": "^3.7.5"
+    "socket.io": "^2.3.0",
+    "typescript": "^3.7.5",
+    "uuid": "^7.0.2"
   },
   "devDependencies": {
     "prettier": "1.19.1",

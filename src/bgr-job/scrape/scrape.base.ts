@@ -9,6 +9,7 @@ import { Common } from '../../common/common.index';
 import { File } from '../../util/file/file.index';
 import DateTime from '../../util/datetime/datetime';
 import _ from 'lodash';
+import { Exception } from '../../services/exception/exception.index';
 
 export default abstract class ScrapeBase {
     protected readonly logInstance: File.Log = new File.Log();
@@ -18,6 +19,7 @@ export default abstract class ScrapeBase {
     protected startTime: [number, number] | undefined;
     protected requestLimiter: number = 0;
     protected isRunning: boolean = false;
+    protected currentUrl: string | undefined;
 
     protected readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_MAX_REQUEST || '10');
     protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100');
@@ -204,11 +206,22 @@ export default abstract class ScrapeBase {
      * @param action
      * @param content
      */
-    protected writeErrorLog(error: Error, action: string, content: string): void {
+    protected writeErrorLog(
+        error: Error | Exception.Customize,
+        action: string,
+        content: string
+    ): void {
         this.logInstance.addLine(
             `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${
                 error.message
             } | ${action}: ${content}`
         );
+    }
+
+    /**
+     * Get current URL
+     */
+    public getCurrentUrl(): string | undefined {
+        return this.currentUrl;
     }
 }

@@ -10,6 +10,8 @@ import {
 } from './catalog.error-response';
 import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
+import { Pattern } from '../pattern/pattern.index';
+import CatalogApiInterface from './catalog.api.interface';
 
 export default class CatalogLogic extends LogicBase {
     /**
@@ -38,7 +40,15 @@ export default class CatalogLogic extends LogicBase {
                 Array<CatalogModelInterface>,
                 CatalogModelInterface,
                 object
-            > = CatalogModel.find(conditions).populate('hostId');
+            > = CatalogModel.find(conditions)
+                .populate('hostId')
+                .populate({
+                    path: 'patternId',
+                    populate: {
+                        path: 'sourceId',
+                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                    },
+                });
             let remainCatalogQuery: Query<number> = CatalogModel.countDocuments(conditions);
 
             if (offset) {
@@ -55,7 +65,7 @@ export default class CatalogLogic extends LogicBase {
 
             return { catalogs: catalogs, hasNext: catalogs.length < remainCatalog };
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -74,9 +84,16 @@ export default class CatalogLogic extends LogicBase {
 
             return await CatalogModel.findById(id)
                 .populate('hostId')
+                .populate({
+                    path: 'patternId',
+                    populate: {
+                        path: 'sourceId',
+                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                    },
+                })
                 .exec();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -94,10 +111,14 @@ export default class CatalogLogic extends LogicBase {
         url,
         locator,
         hostId,
+        patternId,
     }: CatalogModelInterface): Promise<CatalogModelInterface> {
         try {
             await CatalogLogic.checkCatalogExistedWithUrl(url, hostId, true);
             await Host.Logic.checkHostExistedWithId(hostId);
+            if (patternId) {
+                await Pattern.Logic.checkPatternExistedWithId(patternId);
+            }
 
             return await (
                 await new CatalogModel({
@@ -105,12 +126,20 @@ export default class CatalogLogic extends LogicBase {
                     url: url,
                     locator: locator,
                     hostId: hostId,
+                    patternId: patternId || 0,
                 }).save()
             )
                 .populate('hostId')
+                .populate({
+                    path: 'patternId',
+                    populate: {
+                        path: 'sourceId',
+                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                    },
+                })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -126,11 +155,14 @@ export default class CatalogLogic extends LogicBase {
      */
     public async update(
         id: string | number,
-        { title, url, locator, hostId }: CatalogModelInterface
+        { title, url, locator, hostId, patternId }: CatalogModelInterface
     ): Promise<CatalogModelInterface | undefined> {
         try {
             await CatalogLogic.checkCatalogExistedWithId(id);
             await Host.Logic.checkHostExistedWithId(hostId);
+            if (patternId) {
+                await Pattern.Logic.checkPatternExistedWithId(patternId);
+            }
 
             let catalog: CatalogModelInterface | null = await CatalogModel.findById(id).exec();
             if (!catalog) {
@@ -148,10 +180,20 @@ export default class CatalogLogic extends LogicBase {
                 catalog.locator.pageNumber = locator.pageNumber || catalog.locator.pageNumber;
             }
             catalog.hostId = hostId || catalog.hostId;
+            catalog.patternId = patternId || catalog.patternId;
 
-            return await (await catalog.save()).populate('hostId').execPopulate();
+            return await (await catalog.save())
+                .populate('hostId')
+                .populate({
+                    path: 'patternId',
+                    populate: {
+                        path: 'sourceId',
+                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                    },
+                })
+                .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -171,7 +213,7 @@ export default class CatalogLogic extends LogicBase {
 
             return null;
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -198,7 +240,7 @@ export default class CatalogLogic extends LogicBase {
         }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_1,
                 CatalogErrorResponseRootCause.CTL_RC_1,
@@ -207,7 +249,7 @@ export default class CatalogLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_2,
                 CatalogErrorResponseRootCause.CTL_RC_2,
@@ -230,7 +272,7 @@ export default class CatalogLogic extends LogicBase {
         let result: number = await CatalogModel.countDocuments({ _id: id }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_1,
                 CatalogErrorResponseRootCause.CTL_RC_1,
@@ -239,7 +281,7 @@ export default class CatalogLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_2,
                 CatalogErrorResponseRootCause.CTL_RC_2,
@@ -257,32 +299,19 @@ export default class CatalogLogic extends LogicBase {
         url,
         locator,
         hostId,
+        patternId,
         cTime,
         mTime,
-    }: CatalogModelInterface): {
-        id: number;
-        title: string;
-        locator: { detailUrl: string; pageNumber: string };
-        host: object;
-        createAt: string;
-        updateAt: string;
-    } {
-        let data: {
-            id: number;
-            title: string;
-            url: string;
-            locator: { detailUrl: string; pageNumber: string };
-            host: { id: number; name: string; domain: string };
-            createAt: string;
-            updateAt: string;
-        } = {
-            id: NaN,
-            title: '',
-            url: '',
-            locator: { detailUrl: '', pageNumber: '' },
-            host: { id: NaN, name: '', domain: '' },
-            createAt: '',
-            updateAt: '',
+    }: CatalogModelInterface): CatalogApiInterface {
+        let data: CatalogApiInterface = {
+            id: null,
+            title: null,
+            url: null,
+            locator: null,
+            host: null,
+            pattern: null,
+            createAt: null,
+            updateAt: null,
         };
 
         if (_id) {
@@ -303,6 +332,10 @@ export default class CatalogLogic extends LogicBase {
 
         if (hostId && Object.keys(hostId).length > 0) {
             data.host = Host.Logic.convertToResponse(<Host.DocumentInterface>hostId);
+        }
+
+        if (patternId && Object.keys(patternId).length > 0) {
+            data.pattern = Pattern.Logic.convertToResponse(<Pattern.DocumentInterface>patternId);
         }
 
         if (cTime) {

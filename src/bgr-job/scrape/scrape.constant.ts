@@ -9,4 +9,8 @@ export const ScrapeConstant = {
         REQUEST: 'REQUEST',
         FETCH_DATA: 'FETCH DATA',
     },
+    STATUS: {
+        FAILED: 'FAILED',
+        SUCCESS: 'SUCCESS',
+    },
 };

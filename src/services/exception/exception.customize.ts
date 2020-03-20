@@ -1,6 +1,6 @@
 import StringHandler from '../../util/string-handler/string-handler';
 
-export default class ExceptionApi extends Error {
+export default class ExceptionCustomize extends Error {
     public readonly statusCode: number;
     public readonly cause: string;
 

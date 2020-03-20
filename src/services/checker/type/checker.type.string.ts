@@ -10,7 +10,7 @@ export default class CheckerTypeString extends CheckerTypeBase {
      */
     public checkType(paramName: string, value: any): void {
         if (typeof value !== 'string') {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerTypeFailedResponse.Message.INVALID_TYPE,
                 CheckerTypeFailedResponse.RootCause.STRING,

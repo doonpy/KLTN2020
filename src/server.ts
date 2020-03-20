@@ -12,7 +12,7 @@ import { requestLogger } from './middleware/request-logger/request-logger';
 dotenv.config();
 
 const app = new App({
-    port: process.env.SERVER_PORT,
+    port: parseInt(process.env.SERVER_PORT || '3000'),
     controllers: [
         new Host.Controller(),
         new Catalog.Controller(),

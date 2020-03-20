@@ -5,6 +5,7 @@ import { QueueJobConstant } from './queue.job.constant';
 
 export default class QueueJob extends QueueBase {
     private readonly index: number;
+    private currentTask: any | undefined;
 
     constructor(index: number = -1, delayTime: number | undefined = undefined) {
         super();
@@ -16,10 +17,10 @@ export default class QueueJob extends QueueBase {
 
     /**
      *
-     * @param elements
+     * @param task
      */
-    public pushElement(elements: any): void {
-        this.add(elements);
+    public pushElement(task: any): void {
+        this.add(task);
     }
 
     /**
@@ -27,17 +28,18 @@ export default class QueueJob extends QueueBase {
      */
     public start(): void {
         this.isRunning = true;
-        let currentElement: any | undefined = undefined;
         this.startTime = process.hrtime();
         this.loop = setInterval(async (): Promise<void> => {
-            if (currentElement && currentElement.isTaskRunning()) {
+            if (this.currentTask && this.currentTask.isTaskRunning()) {
                 return;
             }
 
             if (this.queue.length === 0) {
                 this.stop([{ name: 'Thread ID', value: this.index }]);
-                this.logFile.initLogFolder('job-queue');
-                this.logFile.createFileName('jq_');
+                if (this.isRunning) {
+                    this.logFile.initLogFolder('job-queue');
+                    this.logFile.createFileName(`jq-${this.index}_`);
+                }
                 ChatBotTelegram.sendMessage(
                     StringHandler.replaceString(QueueJobConstant.EXPORT_SUCCESS_LOG, [
                         this.index,
@@ -47,17 +49,24 @@ export default class QueueJob extends QueueBase {
                 return;
             }
 
-            currentElement = this.queue.shift();
-            if (!currentElement) {
+            this.currentTask = this.queue.shift();
+            if (!this.currentTask) {
                 return;
             }
 
             try {
                 this.writeLog(`Execute element - Queue pending: ${this.queue.length}`);
-                await currentElement.start();
+                await this.currentTask.start();
             } catch (error) {
                 this.writeErrorLog(error, `Execute element - Queue pending: ${this.queue.length}`);
             }
         }, this.QUEUE_DELAY_DEFAULT);
+    }
+
+    /**
+     * Get current task
+     */
+    public getCurrentTask(): any | undefined {
+        return this.currentTask;
     }
 }

@@ -12,7 +12,7 @@ export default class FileLog extends FileBase {
     private readonly PREFIX: string = 'log_';
     private readonly FULL_HOST_URI: string | any = `${process.env.SERVER_PROTOCOL ||
         'http://'}${process.env.SERVER_URI || '127.0.0.1'}${
-        process.env.SERVER_PORT ? `:${process.env.SERVER_PORT}` : ':3000'
+        process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'
     }`;
 
     constructor() {

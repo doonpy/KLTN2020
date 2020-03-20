@@ -10,6 +10,7 @@ import {
     DetailUrlErrorResponseRootCause,
 } from './detail-url.error-response';
 import { Common } from '../../common/common.index';
+import DetailUrlApiInterface from './detail-url.api.interface';
 
 export default class DetailUrlLogic extends LogicBase {
     /**
@@ -55,7 +56,7 @@ export default class DetailUrlLogic extends LogicBase {
                 hasNext: detailUrls.length < remainDetailUrl,
             };
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -76,7 +77,7 @@ export default class DetailUrlLogic extends LogicBase {
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
                 .exec();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -110,7 +111,7 @@ export default class DetailUrlLogic extends LogicBase {
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -156,7 +157,7 @@ export default class DetailUrlLogic extends LogicBase {
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -176,7 +177,7 @@ export default class DetailUrlLogic extends LogicBase {
 
             return null;
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -203,7 +204,7 @@ export default class DetailUrlLogic extends LogicBase {
         }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_1,
                 DetailUrlErrorResponseRootCause.DU_RC_1,
@@ -212,7 +213,7 @@ export default class DetailUrlLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_2,
                 DetailUrlErrorResponseRootCause.DU_RC_2,
@@ -235,7 +236,7 @@ export default class DetailUrlLogic extends LogicBase {
         let result: number = await DetailUrlModel.countDocuments({ _id: id }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_1,
                 DetailUrlErrorResponseRootCause.DU_RC_1,
@@ -244,7 +245,7 @@ export default class DetailUrlLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_2,
                 DetailUrlErrorResponseRootCause.DU_RC_2,
@@ -322,31 +323,15 @@ export default class DetailUrlLogic extends LogicBase {
         requestRetries,
         cTime,
         mTime,
-    }: DetailUrlModelInterface): {
-        id: number;
-        catalog: object;
-        url: string;
-        isExtracted: boolean;
-        requestRetries: number;
-        createAt: string;
-        updateAt: string;
-    } {
-        let data: {
-            id: number;
-            catalog: object;
-            url: string;
-            isExtracted: boolean;
-            requestRetries: number;
-            createAt: string;
-            updateAt: string;
-        } = {
-            id: NaN,
-            catalog: {},
-            url: '',
-            isExtracted: false,
-            requestRetries: 0,
-            createAt: '',
-            updateAt: '',
+    }: DetailUrlModelInterface): DetailUrlApiInterface {
+        let data: DetailUrlApiInterface = {
+            id: null,
+            catalog: null,
+            url: null,
+            isExtracted: null,
+            requestRetries: null,
+            createAt: null,
+            updateAt: null,
         };
 
         if (_id) {
@@ -361,7 +346,7 @@ export default class DetailUrlLogic extends LogicBase {
             data.url = url;
         }
 
-        if (isExtracted) {
+        if (isExtracted !== null || isExtracted !== undefined) {
             data.isExtracted = isExtracted;
         }
 

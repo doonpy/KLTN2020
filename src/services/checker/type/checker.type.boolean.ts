@@ -10,7 +10,7 @@ export default class CheckerTypeBoolean extends CheckerTypeBase {
      */
     public checkType(paramName: string, value: any): void {
         if (value !== 'true' && value !== 'false') {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerTypeFailedResponse.Message.INVALID_TYPE,
                 CheckerTypeFailedResponse.RootCause.BOOLEAN,

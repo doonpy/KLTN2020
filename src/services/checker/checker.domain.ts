@@ -20,7 +20,7 @@ export default class CheckerDomain extends CheckerBase {
         }
 
         if (!this.VALID_DOMAIN.test(value)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.DOMAIN,

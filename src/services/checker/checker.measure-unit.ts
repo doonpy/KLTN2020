@@ -23,7 +23,7 @@ export default class CheckerMeasureUnit extends CheckerBase {
         }
 
         if (this.measureUnit !== encodeURI(value)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.MEASURE_UNIT,

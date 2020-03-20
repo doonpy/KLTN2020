@@ -11,6 +11,7 @@ import {
 import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { DetailUrl } from '../detail-url/detail-url.index';
+import RawDataApiInterface from './raw-data.api.interface';
 
 export default class RawDataLogic extends LogicBase {
     /**
@@ -57,7 +58,7 @@ export default class RawDataLogic extends LogicBase {
                 hasNext: rawDataset.length < remainRawDataset,
             };
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -84,7 +85,7 @@ export default class RawDataLogic extends LogicBase {
                 })
                 .exec();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -134,7 +135,7 @@ export default class RawDataLogic extends LogicBase {
                 })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -223,7 +224,7 @@ export default class RawDataLogic extends LogicBase {
                 })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -243,7 +244,7 @@ export default class RawDataLogic extends LogicBase {
 
             return null;
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -281,7 +282,7 @@ export default class RawDataLogic extends LogicBase {
         let result: number = await RawDataModel.countDocuments({ _id: id }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_1,
                 RawDataErrorResponseRootCause.RD_RC_1,
@@ -290,7 +291,7 @@ export default class RawDataLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_2,
                 RawDataErrorResponseRootCause.RD_RC_2,
@@ -313,7 +314,7 @@ export default class RawDataLogic extends LogicBase {
         let result: number = await RawDataModel.countDocuments({ detailUrlId: detailUrlId }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_1,
                 RawDataErrorResponseRootCause.RD_RC_1,
@@ -322,7 +323,7 @@ export default class RawDataLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_2,
                 RawDataErrorResponseRootCause.RD_RC_2,
@@ -394,46 +395,20 @@ export default class RawDataLogic extends LogicBase {
         others,
         cTime,
         mTime,
-    }: RawDataModelInterface): {
-        id: number;
-        transactionType: string;
-        propertyType: string;
-        detailUrl: object;
-        postDate: string;
-        title: string;
-        price: { value: string; currency: string } | object;
-        acreage: { value: string; measureUnit: string } | object;
-        address: string;
-        others: Array<{ name: string; value: string }> | Array<any>;
-        createAt: string;
-        updateAt: string;
-    } {
-        let data: {
-            id: number;
-            transactionType: string;
-            propertyType: string;
-            detailUrl: object;
-            postDate: string;
-            title: string;
-            price: { value: string; currency: string } | object;
-            acreage: { value: string; measureUnit: string } | object;
-            address: string;
-            others: Array<{ name: string; value: string }> | Array<any>;
-            createAt: string;
-            updateAt: string;
-        } = {
-            id: NaN,
-            transactionType: '',
-            propertyType: '',
-            detailUrl: {},
-            postDate: '',
-            title: '',
-            price: {},
-            acreage: {},
-            address: '',
-            others: [],
-            createAt: '',
-            updateAt: '',
+    }: RawDataModelInterface): RawDataApiInterface {
+        let data: RawDataApiInterface = {
+            id: null,
+            transactionType: null,
+            propertyType: null,
+            detailUrl: null,
+            postDate: null,
+            title: null,
+            price: null,
+            acreage: null,
+            address: null,
+            others: null,
+            createAt: null,
+            updateAt: null,
         };
 
         if (_id) {

@@ -27,7 +27,7 @@ export default class CheckerIntegerRange extends CheckerBase {
         value = Number(value);
 
         if (!this.checkMinRange(value)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_SMALLER,
@@ -36,7 +36,7 @@ export default class CheckerIntegerRange extends CheckerBase {
         }
 
         if (!this.checkMaxRange(value)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_LARGER,

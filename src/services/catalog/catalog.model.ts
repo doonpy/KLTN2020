@@ -16,6 +16,10 @@ const CatalogSchema: Schema = new Schema(
             type: Schema.Types.Number,
             ref: 'host',
         },
+        patternId: {
+            type: Schema.Types.Number,
+            ref: 'pattern',
+        },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );

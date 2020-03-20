@@ -1,7 +1,5 @@
 import PatternModel from './pattern.model';
 import { Exception } from '../exception/exception.index';
-import { Catalog } from '../catalog/catalog.index';
-import { DetailUrl } from '../detail-url/detail-url.index';
 import PatternModelInterface from './pattern.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
@@ -11,36 +9,26 @@ import {
     PatternErrorResponseRootCause,
 } from './pattern.error-response';
 import { Common } from '../../common/common.index';
+import PatternApiInterface from './pattern.api.interface';
 
 export default class PatternLogic extends LogicBase {
     /**
      * @param limit
      * @param offset
-     * @param catalogId
      *
      * @return Promise<{ patterns: Array<PatternModelInterface>; hasNext: boolean }>
      */
     public async getAll(
         limit: number,
-        offset: number,
-        catalogId: number
+        offset: number
     ): Promise<{ patterns: Array<PatternModelInterface>; hasNext: boolean }> {
         try {
-            let conditions: object = { catalogId: catalogId || { $gt: 0 } };
             let patternQuery: DocumentQuery<
                 Array<PatternModelInterface>,
                 PatternModelInterface,
                 object
-            > = PatternModel.find(conditions)
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                });
-            let remainPatternQuery: Query<number> = PatternModel.countDocuments(conditions);
+            > = PatternModel.find();
+            let remainPatternQuery: Query<number> = PatternModel.countDocuments();
 
             if (offset) {
                 patternQuery.skip(offset);
@@ -56,7 +44,7 @@ export default class PatternLogic extends LogicBase {
 
             return { patterns: patterns, hasNext: patterns.length < remainPattern };
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -73,18 +61,9 @@ export default class PatternLogic extends LogicBase {
         try {
             await PatternLogic.checkPatternExistedWithId(id);
 
-            return await PatternModel.findById(id)
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                })
-                .exec();
+            return await PatternModel.findById(id).exec();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -98,36 +77,18 @@ export default class PatternLogic extends LogicBase {
      * @return Promise<PatternModelInterface>
      */
     public async create({
-        catalogId,
-        sourceUrlId,
+        sourceUrl,
         mainLocator,
         subLocator,
     }: PatternModelInterface): Promise<PatternModelInterface> {
         try {
-            await Catalog.Logic.checkCatalogExistedWithId(catalogId);
-            await DetailUrl.Logic.checkDetailUrlExistedWithId(sourceUrlId);
-            await PatternLogic.checkPatternExistedWithCatalogId(catalogId, true);
-            await DetailUrl.Logic.isDetailUrlBelongCatalog(sourceUrlId, catalogId);
-
-            return await (
-                await new PatternModel({
-                    catalogId: catalogId,
-                    sourceUrlId: sourceUrlId,
-                    mainLocator: mainLocator,
-                    subLocator: subLocator,
-                }).save()
-            )
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                })
-                .execPopulate();
+            return await new PatternModel({
+                sourceUrl: sourceUrl,
+                mainLocator: mainLocator,
+                subLocator: subLocator,
+            }).save();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -143,27 +104,17 @@ export default class PatternLogic extends LogicBase {
      */
     public async update(
         id: string | number,
-        { catalogId, sourceUrlId, mainLocator, subLocator }: PatternModelInterface
+        { sourceUrl, mainLocator, subLocator }: PatternModelInterface
     ): Promise<PatternModelInterface | undefined> {
         try {
             await PatternLogic.checkPatternExistedWithId(id);
-            await DetailUrl.Logic.isDetailUrlBelongCatalog(sourceUrlId, catalogId);
 
             let pattern: PatternModelInterface | null = await PatternModel.findById(id).exec();
             if (!pattern) {
                 return;
             }
-            if (pattern.catalogId !== catalogId) {
-                await PatternLogic.checkPatternExistedWithCatalogId(catalogId);
-                await Catalog.Logic.checkCatalogExistedWithId(catalogId);
-            }
 
-            if (pattern.sourceUrlId !== sourceUrlId) {
-                await DetailUrl.Logic.checkDetailUrlExistedWithId(sourceUrlId);
-            }
-
-            pattern.catalogId = catalogId || pattern.catalogId;
-            pattern.sourceUrlId = sourceUrlId || pattern.sourceUrlId;
+            pattern.sourceUrl = sourceUrl || pattern.sourceUrl;
             if (mainLocator) {
                 pattern.mainLocator.propertyType =
                     mainLocator.propertyType || pattern.mainLocator.propertyType;
@@ -196,18 +147,9 @@ export default class PatternLogic extends LogicBase {
                 });
             }
 
-            return await (await pattern.save())
-                .populate({ path: 'catalogId', populate: { path: 'hostId' } })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                })
-                .execPopulate();
+            return await pattern.save();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -227,83 +169,37 @@ export default class PatternLogic extends LogicBase {
 
             return null;
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
         }
     }
-
-    /**
-     * @param catalogId
-     *
-     * @return Promise<PatternModelInterface | null>
-     */
-    public async getByCatalogId(catalogId: number | string): Promise<PatternModelInterface | null> {
-        try {
-            return await PatternModel.findOne({ catalogId: catalogId })
-                .populate({
-                    path: 'sourceUrlId',
-                    populate: {
-                        path: 'catalogId',
-                        populate: { path: 'hostId' },
-                    },
-                })
-                .exec();
-        } catch (error) {
-            throw new Exception.Api(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
-                error.message,
-                error.cause || Database.FailedResponse.RootCause.DB_RC_2
-            );
-        }
-    }
-
-    /**
-     * @param catalogId
-     * @param isNot
-     */
-    public static async checkPatternExistedWithCatalogId(
-        catalogId: Catalog.DocumentInterface | number | string,
-        isNot: boolean = false
-    ): Promise<void> {
-        if (typeof catalogId === 'object') {
-            catalogId = catalogId._id;
-        }
-        let result: number = await PatternModel.countDocuments({ catalogId: catalogId }).exec();
-
-        if (!isNot && result === 0) {
-            throw new Exception.Api(
-                Common.ResponseStatusCode.BAD_REQUEST,
-                PatternErrorResponseMessage.PTN_MSG_1,
-                PatternErrorResponseRootCause.PTN_RC_1,
-                ['catalogId', catalogId]
-            );
-        }
-
-        if (isNot && result > 0) {
-            throw new Exception.Api(
-                Common.ResponseStatusCode.BAD_REQUEST,
-                PatternErrorResponseMessage.PTN_MSG_2,
-                PatternErrorResponseRootCause.PTN_RC_2,
-                ['catalogId', catalogId]
-            );
-        }
-    }
-
     /**
      * @param id
      * @param isNot
      */
     public static async checkPatternExistedWithId(
-        id: number | string,
+        id: number | string | PatternModelInterface,
         isNot: boolean = false
     ): Promise<void> {
+        if (!id) {
+            throw new Exception.Customize(
+                Common.ResponseStatusCode.BAD_REQUEST,
+                PatternErrorResponseMessage.PTN_MSG_1,
+                PatternErrorResponseRootCause.PTN_RC_1,
+                ['id', id]
+            );
+        }
+
+        if (typeof id === 'object') {
+            id = id._id;
+        }
         let result: number = await PatternModel.countDocuments({ _id: id }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 PatternErrorResponseMessage.PTN_MSG_1,
                 PatternErrorResponseRootCause.PTN_RC_1,
@@ -312,7 +208,7 @@ export default class PatternLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 PatternErrorResponseMessage.PTN_MSG_2,
                 PatternErrorResponseRootCause.PTN_RC_2,
@@ -326,80 +222,27 @@ export default class PatternLogic extends LogicBase {
      */
     public static convertToResponse({
         _id,
-        catalogId,
-        sourceUrlId,
+        sourceUrl,
         mainLocator,
         subLocator,
         cTime,
         mTime,
-    }: PatternModelInterface): {
-        id: number;
-        catalog: object;
-        sourceUrl: object;
-        mainLocator: {
-            propertyType: string;
-            title: string;
-            price: string;
-            acreage: string;
-            address: string;
-            postDate: {
-                locator: string;
-                format: string;
-                delimiter: string;
-            };
-        };
-        subLocator: Array<{ name: string; locator: string }> | Array<null>;
-        createAt: string;
-        updateAt: string;
-    } {
-        let data: {
-            id: number;
-            catalog: object;
-            sourceUrl: object;
-            mainLocator: {
-                propertyType: string;
-                title: string;
-                price: string;
-                acreage: string;
-                address: string;
-                postDate: { locator: string; format: string; delimiter: string };
-            };
-            subLocator: Array<{ name: string; locator: string }> | Array<null>;
-            createAt: string;
-            updateAt: string;
-        } = {
-            id: NaN,
-            catalog: {},
-            sourceUrl: {},
-            mainLocator: {
-                propertyType: '',
-                title: '',
-                price: '',
-                acreage: '',
-                address: '',
-                postDate: {
-                    locator: '',
-                    format: '',
-                    delimiter: '',
-                },
-            },
-            subLocator: [],
-            createAt: '',
-            updateAt: '',
+    }: PatternModelInterface): PatternApiInterface {
+        let data: PatternApiInterface = {
+            id: null,
+            sourceUrl: null,
+            mainLocator: null,
+            subLocator: null,
+            createAt: null,
+            updateAt: null,
         };
 
         if (_id) {
             data.id = _id;
         }
 
-        if (catalogId && Object.keys(catalogId).length > 0) {
-            data.catalog = Catalog.Logic.convertToResponse(<Catalog.DocumentInterface>catalogId);
-        }
-
-        if (sourceUrlId && Object.keys(sourceUrlId).length > 0) {
-            data.sourceUrl = DetailUrl.Logic.convertToResponse(
-                <DetailUrl.DocumentInterface>sourceUrlId
-            );
+        if (sourceUrl) {
+            data.sourceUrl = sourceUrl;
         }
 
         if (Object.keys(mainLocator).length > 0) {

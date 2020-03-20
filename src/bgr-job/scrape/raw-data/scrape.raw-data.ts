@@ -14,6 +14,7 @@ import { DetailUrl } from '../../../services/detail-url/detail-url.index';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
 import Timeout = NodeJS.Timeout;
 import { ScrapeConstant } from '../scrape.constant';
+import { Pattern } from '../../../services/pattern/pattern.index';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly catalogId: number = 0;
@@ -21,6 +22,7 @@ export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrl.Logic = new DetailUrl.Logic();
     private readonly rawDataLogic: RawData.Logic = new RawData.Logic();
     private readonly patternLogic: PatternLogic = new PatternLogic();
+    private extractedDetailUrl: Array<string> = [];
     private catalog: Catalog.DocumentInterface | any;
     private detailUrls: Array<DetailUrl.DocumentInterface> = [];
     private pattern: PatternModelInterface | any;
@@ -46,10 +48,10 @@ export default class ScrapeRawData extends ScrapeBase {
             this.isRunning = true;
 
             await Catalog.Logic.checkCatalogExistedWithId(this.catalogId);
-            await PatternLogic.checkPatternExistedWithCatalogId(this.catalogId);
-
             this.catalog = await this.catalogLogic.getById(this.catalogId);
-            this.pattern = await this.patternLogic.getByCatalogId(this.catalogId);
+
+            await Pattern.Logic.checkPatternExistedWithId(this.catalog.patternId);
+            this.pattern = await this.patternLogic.getById(this.catalog.patternId);
 
             ChatBotTelegram.sendMessage(
                 StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.START, [
@@ -78,6 +80,7 @@ export default class ScrapeRawData extends ScrapeBase {
                 error,
                 this.catalogId
             );
+            this.isRunning = false;
         }
     }
 
@@ -85,15 +88,13 @@ export default class ScrapeRawData extends ScrapeBase {
      * Scrape action
      */
     private scrapeAction(): void {
-        let requestLimiter: number = 0;
-
         let loop: Timeout = setInterval(async (): Promise<void> => {
-            if (this.detailUrls.length === 0 && requestLimiter === 0) {
+            if (this.detailUrls.length === 0 && this.requestLimiter === 0) {
                 clearInterval(loop);
                 this.finishAction();
             }
 
-            if (requestLimiter > this.MAX_REQUEST) {
+            if (this.requestLimiter > this.MAX_REQUEST) {
                 return;
             }
 
@@ -103,8 +104,10 @@ export default class ScrapeRawData extends ScrapeBase {
             if (!currentDetailUrlDocument) {
                 return;
             }
-            requestLimiter++;
+            this.currentUrl = currentDetailUrlDocument.url;
+            this.extractedDetailUrl.push(currentDetailUrlDocument.url);
 
+            this.requestLimiter++;
             let $: CheerioStatic | undefined = await this.getBody(
                 this.catalog.hostId.domain,
                 currentDetailUrlDocument.url
@@ -115,8 +118,7 @@ export default class ScrapeRawData extends ScrapeBase {
             } else {
                 this.handleSuccessRequest($, currentDetailUrlDocument);
             }
-
-            requestLimiter--;
+            this.requestLimiter--;
         }, this.REQUEST_DELAY);
     }
 
@@ -162,15 +164,12 @@ export default class ScrapeRawData extends ScrapeBase {
         currentDetailUrlDocument.isExtracted = this.EXTRACTED;
 
         try {
-            this.writeLog(
-                ScrapeConstant.LOG_ACTION.UPDATE,
-                `Update document: ${JSON.stringify(
-                    await this.detailUrlLogic.update(
-                        currentDetailUrlDocument._id,
-                        currentDetailUrlDocument
-                    )
-                )}`
+            await this.detailUrlLogic.update(
+                currentDetailUrlDocument._id,
+                currentDetailUrlDocument
             );
+
+            this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `ID: ${currentDetailUrlDocument._id}`);
         } catch (error) {
             this.writeErrorLog(
                 error,
@@ -180,13 +179,15 @@ export default class ScrapeRawData extends ScrapeBase {
         }
 
         try {
+            let createdDoc: RawData.DocumentInterface = await this.rawDataLogic.create(rawData);
+
             this.writeLog(
                 ScrapeConstant.LOG_ACTION.CREATE,
-                `${JSON.stringify(await this.rawDataLogic.create(rawData))}`
+                `ID: ${createdDoc ? createdDoc._id : 'N/A'}`
             );
             this.saveAmount++;
         } catch (error) {
-            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, JSON.stringify(rawData));
+            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `ID: ${rawData._id}`);
         }
     }
 
@@ -201,20 +202,19 @@ export default class ScrapeRawData extends ScrapeBase {
             this.detailUrls.push(currentDetailUrlDocument);
         } else {
             try {
+                await this.detailUrlLogic.update(
+                    currentDetailUrlDocument._id,
+                    currentDetailUrlDocument
+                );
                 this.writeLog(
                     ScrapeConstant.LOG_ACTION.UPDATE,
-                    `Update document: ${JSON.stringify(
-                        await this.detailUrlLogic.update(
-                            currentDetailUrlDocument._id,
-                            currentDetailUrlDocument
-                        )
-                    )}`
+                    `ID: ${currentDetailUrlDocument._id}`
                 );
             } catch (error) {
                 this.writeErrorLog(
                     error,
                     ScrapeConstant.LOG_ACTION.UPDATE,
-                    JSON.stringify(currentDetailUrlDocument)
+                    `ID: ${currentDetailUrlDocument._id}`
                 );
             }
         }
@@ -300,5 +300,12 @@ export default class ScrapeRawData extends ScrapeBase {
             ])
         );
         this.isRunning = false;
+    }
+
+    /**
+     * Get extracted detail URL
+     */
+    public getExtractedDetailUrl(): Array<string> {
+        return this.extractedDetailUrl;
     }
 }
