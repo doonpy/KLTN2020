@@ -79,7 +79,7 @@ mongo-data/
 dist/
 
 # log
-public/
+./public
 
 # SSL Cert
 *.pem

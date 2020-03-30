@@ -4,10 +4,7 @@ import PatternLogic from '../../../services/pattern/pattern.logic';
 import RawDataLogic from '../../../services/raw-data/raw-data.logic';
 import DateTime from '../../../util/datetime/datetime';
 import StringHandler from '../../../util/string-handler/string-handler';
-import {
-    ScrapeRawDataConstant,
-    ScrapeRawDataConstantChatBotMessage,
-} from './scrape.raw-data.constant';
+import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
 import { RawData } from '../../../services/raw-data/raw-data.index';
 import { Catalog } from '../../../services/catalog/catalog.index';
 import { DetailUrl } from '../../../services/detail-url/detail-url.index';
@@ -75,12 +72,8 @@ export default class ScrapeRawData extends ScrapeBase {
             this.scrapeAction();
         } catch (error) {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
-            this.addSummaryErrorLog(
-                ScrapeRawDataConstantChatBotMessage.ERROR,
-                error,
-                this.catalogId
-            );
-            this.isRunning = false;
+            this.addSummaryErrorLog(ScrapeRawDataConstantChatBotMessage.ERROR, error, this.catalogId);
+            this.finishAction();
         }
     }
 
@@ -98,14 +91,14 @@ export default class ScrapeRawData extends ScrapeBase {
                 return;
             }
 
-            let currentDetailUrlDocument:
-                | DetailUrl.DocumentInterface
-                | undefined = this.detailUrls.shift();
+            let currentDetailUrlDocument: DetailUrl.DocumentInterface | undefined = this.detailUrls.shift();
             if (!currentDetailUrlDocument) {
                 return;
             }
             this.currentUrl = currentDetailUrlDocument.url;
             this.extractedDetailUrl.push(currentDetailUrlDocument.url);
+
+            console.log(this.currentUrl);
 
             this.requestLimiter++;
             let $: CheerioStatic | undefined = await this.getBody(
@@ -130,16 +123,12 @@ export default class ScrapeRawData extends ScrapeBase {
         $: CheerioStatic,
         currentDetailUrlDocument: DetailUrl.DocumentInterface
     ): Promise<void> {
-        let propertyTypeData: string =
-            this.extractData($, this.pattern.mainLocator.propertyType).shift() || '';
-        let postDateData: string =
-            this.extractData($, this.pattern.mainLocator.postDate.locator).shift() || '';
+        let propertyTypeData: string = this.extractData($, this.pattern.mainLocator.propertyType).shift() || '';
+        let postDateData: string = this.extractData($, this.pattern.mainLocator.postDate.locator).shift() || '';
         let titleData: string = this.extractData($, this.pattern.mainLocator.title).shift() || '';
         let priceData: string = this.extractData($, this.pattern.mainLocator.price).shift() || '';
-        let acreageData: string =
-            this.extractData($, this.pattern.mainLocator.acreage).shift() || '';
-        let addressData: string =
-            this.extractData($, this.pattern.mainLocator.address).shift() || '';
+        let acreageData: string = this.extractData($, this.pattern.mainLocator.acreage).shift() || '';
+        let addressData: string = this.extractData($, this.pattern.mainLocator.address).shift() || '';
         let othersData: Array<{ name: string; value: string }> = [];
 
         for (let i: number = 0; i < this.pattern.subLocator.length; i++) {
@@ -164,27 +153,17 @@ export default class ScrapeRawData extends ScrapeBase {
         currentDetailUrlDocument.isExtracted = this.EXTRACTED;
 
         try {
-            await this.detailUrlLogic.update(
-                currentDetailUrlDocument._id,
-                currentDetailUrlDocument
-            );
+            await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
 
             this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `ID: ${currentDetailUrlDocument._id}`);
         } catch (error) {
-            this.writeErrorLog(
-                error,
-                ScrapeConstant.LOG_ACTION.UPDATE,
-                JSON.stringify(currentDetailUrlDocument)
-            );
+            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.UPDATE, JSON.stringify(currentDetailUrlDocument));
         }
 
         try {
             let createdDoc: RawData.DocumentInterface = await this.rawDataLogic.create(rawData);
 
-            this.writeLog(
-                ScrapeConstant.LOG_ACTION.CREATE,
-                `ID: ${createdDoc ? createdDoc._id : 'N/A'}`
-            );
+            this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
             this.saveAmount++;
         } catch (error) {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `ID: ${rawData._id}`);
@@ -194,28 +173,16 @@ export default class ScrapeRawData extends ScrapeBase {
     /**
      * @param currentDetailUrlDocument
      */
-    protected async handleFailedRequest(
-        currentDetailUrlDocument: DetailUrl.DocumentInterface
-    ): Promise<void> {
+    protected async handleFailedRequest(currentDetailUrlDocument: DetailUrl.DocumentInterface): Promise<void> {
         currentDetailUrlDocument.requestRetries++;
         if (currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES) {
             this.detailUrls.push(currentDetailUrlDocument);
         } else {
             try {
-                await this.detailUrlLogic.update(
-                    currentDetailUrlDocument._id,
-                    currentDetailUrlDocument
-                );
-                this.writeLog(
-                    ScrapeConstant.LOG_ACTION.UPDATE,
-                    `ID: ${currentDetailUrlDocument._id}`
-                );
+                await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
+                this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `ID: ${currentDetailUrlDocument._id}`);
             } catch (error) {
-                this.writeErrorLog(
-                    error,
-                    ScrapeConstant.LOG_ACTION.UPDATE,
-                    `ID: ${currentDetailUrlDocument._id}`
-                );
+                this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.UPDATE, `ID: ${currentDetailUrlDocument._id}`);
             }
         }
     }
@@ -252,23 +219,15 @@ export default class ScrapeRawData extends ScrapeBase {
         }
         let price: { value: string; currency: string } = {
             value: (priceData.match(ScrapeRawDataConstant.PRICE_VALUE_PATTERN) || []).shift() || '',
-            currency:
-                (priceData.match(ScrapeRawDataConstant.PRICE_CURRENCY_PATTERN) || []).shift() || '',
+            currency: (priceData.match(ScrapeRawDataConstant.PRICE_CURRENCY_PATTERN) || []).shift() || '',
         };
 
         let acreage: { value: string; measureUnit: string } = {
-            value:
-                (acreageData.match(ScrapeRawDataConstant.ACREAGE_VALUE_PATTERN) || []).shift() ||
-                '',
-            measureUnit:
-                (
-                    acreageData.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []
-                ).shift() || '',
+            value: (acreageData.match(ScrapeRawDataConstant.ACREAGE_VALUE_PATTERN) || []).shift() || '',
+            measureUnit: (acreageData.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []).shift() || '',
         };
 
-        let transactionType: number = ScrapeRawDataConstant.TRANSACTION_PATTERN.test(
-            this.catalog.title
-        )
+        let transactionType: number = ScrapeRawDataConstant.TRANSACTION_PATTERN.test(this.catalog.title)
             ? RawData.Constant.TYPE_OF_TRANSACTION.RENT
             : RawData.Constant.TYPE_OF_TRANSACTION.SALE;
 
@@ -290,7 +249,7 @@ export default class ScrapeRawData extends ScrapeBase {
     /**
      * Finish action
      */
-    protected finishAction(): void {
+    public finishAction(): void {
         this.exportLog(this.catalog, [{ name: 'Save amount', value: this.saveAmount }]);
         ChatBotTelegram.sendMessage(
             StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.FINISH, [

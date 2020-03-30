@@ -35,6 +35,7 @@ export default class DateTime extends Date {
 
     /**
      * @param expectTime
+     * @param isUtcTime
      *
      * @return boolean
      */

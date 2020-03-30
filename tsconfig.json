@@ -3,8 +3,9 @@
     "target": "ESNext",
     "module": "commonjs",
     "lib": [
-      "es5",
-      "dom"
+      "esnext",
+      "dom",
+      "dom.iterable"
     ],
     "allowJs": false,
     "sourceMap": true,
@@ -17,5 +18,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "./bgr-job/monitor/*"
+  ]
 }

@@ -22,6 +22,9 @@ COPY ./tools/docker/node-server/command.sh command.sh
 
 COPY ./tools/docker/bgr-job/command.sh bgr-job-command.sh
 
+COPY ./tools/docker/monitor-server/command.sh monitor-server-command.sh
+
+
 RUN chmod +x command.sh
 
 RUN chmod +x bgr-job-command.sh

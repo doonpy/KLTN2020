@@ -36,15 +36,14 @@ export default abstract class ScrapeBase {
         let url: string = path.includes(domain) ? path : domain + path;
         try {
             let response: Response = await new Request(url).send();
+            let statusCode: number = response.statusCode;
 
-            if (
-                response.statusCode !== Common.ResponseStatusCode.OK ||
-                response.request.uri.href !== url
-            ) {
-                let statusCode: number = response.statusCode === 200 ? 404 : response.statusCode;
+            if (response.statusCode !== Common.ResponseStatusCode.OK || response.request.uri.href !== url) {
                 this.writeLog(
                     ScrapeConstant.LOG_ACTION.REQUEST,
-                    `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+                    `${statusCode === 200 ? 404 : response.statusCode} (${response.elapsedTime}ms): '${
+                        response.request.path
+                    }'`
                 );
                 this.failedRequestCounter++;
                 return;
@@ -52,7 +51,7 @@ export default abstract class ScrapeBase {
 
             this.writeLog(
                 ScrapeConstant.LOG_ACTION.REQUEST,
-                `${response.statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+                `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
             );
 
             this.successRequestCounter++;
@@ -69,11 +68,7 @@ export default abstract class ScrapeBase {
      *
      * @return dataArray
      */
-    protected extractData(
-        $: CheerioStatic,
-        locator: string,
-        attribute: string = ''
-    ): Array<string> {
+    protected extractData($: CheerioStatic, locator: string, attribute: string = ''): Array<string> {
         let elementsSelected = $(locator);
 
         if (elementsSelected.length === 0) {
@@ -116,10 +111,8 @@ export default abstract class ScrapeBase {
 
     /**
      * Finish action abstract method.
-     *
-     * @param successRequestCounter
      */
-    protected abstract finishAction(successRequestCounter: number): void;
+    protected abstract finishAction(): void;
 
     /**
      * @param message
@@ -132,11 +125,7 @@ export default abstract class ScrapeBase {
         this.logInstance.addLine(`- CATALOG ID: ${catalogId}`);
         this.logInstance.exportFile();
         ChatBotTelegram.sendMessage(
-            StringHandler.replaceString(message, [
-                catalogId,
-                error.message,
-                this.logInstance.getUrl(),
-            ])
+            StringHandler.replaceString(message, [catalogId, error.message, this.logInstance.getUrl()])
         );
     }
 
@@ -152,10 +141,9 @@ export default abstract class ScrapeBase {
         let footerLogContent: Array<{ name: string; value: number | string }> = [
             {
                 name: 'Execution time',
-                value: StringHandler.replaceString(
-                    `${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`,
-                    [endTime[1] / 1000000]
-                ),
+                value: StringHandler.replaceString(`${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`, [
+                    endTime[1] / 1000000,
+                ]),
             },
             {
                 name: 'Catalog ID',
@@ -194,9 +182,7 @@ export default abstract class ScrapeBase {
      * @param content
      */
     protected writeLog(action: string, content: string): void {
-        this.logInstance.addLine(
-            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ${action}: ${content}`
-        );
+        this.logInstance.addLine(`[${new Date().toLocaleString()}] - ${++this.countNumber} >> ${action}: ${content}`);
     }
 
     /**
@@ -206,15 +192,9 @@ export default abstract class ScrapeBase {
      * @param action
      * @param content
      */
-    protected writeErrorLog(
-        error: Error | Exception.Customize,
-        action: string,
-        content: string
-    ): void {
+    protected writeErrorLog(error: Error | Exception.Customize, action: string, content: string): void {
         this.logInstance.addLine(
-            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${
-                error.message
-            } | ${action}: ${content}`
+            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`
         );
     }
 

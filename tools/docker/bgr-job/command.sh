@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm run bgr-start
+npm run bgr-prod

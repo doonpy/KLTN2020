@@ -4,10 +4,7 @@ import ScrapeBase from '../scrape.base';
 import CatalogModelInterface from '../../../services/catalog/catalog.model.interface';
 import _ from 'lodash';
 import StringHandler from '../../../util/string-handler/string-handler';
-import {
-    ScrapeDetailUrlConstantChatBotMessage,
-    ScrapeDetailUrlConstantPhase,
-} from './scrape.detail-url.constant';
+import { ScrapeDetailUrlConstantChatBotMessage, ScrapeDetailUrlConstantPhase } from './scrape.detail-url.constant';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
 import { BgrScrape } from '../scrape.index';
 import Timeout = NodeJS.Timeout;
@@ -56,11 +53,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             let queryConditions: object = {
                 catalogId: this.catalogId,
             };
-            this.existedDetailUrls = (
-                await this.detailUrlLogic.getAllWithConditions(queryConditions)
-            ).map((existedDetailUrl): string => {
-                return existedDetailUrl.url;
-            });
+            this.existedDetailUrls = (await this.detailUrlLogic.getAllWithConditions(queryConditions)).map(
+                (existedDetailUrl): string => {
+                    return existedDetailUrl.url;
+                }
+            );
             this.phase = StringHandler.replaceString(ScrapeDetailUrlConstantPhase.DETAIL_URL, [
                 this.catalog.title,
                 this.catalogId,
@@ -68,11 +65,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.scrapeAction();
         } catch (error) {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
-            this.addSummaryErrorLog(
-                ScrapeDetailUrlConstantChatBotMessage.ERROR,
-                error,
-                this.catalogId
-            );
+            this.addSummaryErrorLog(ScrapeDetailUrlConstantChatBotMessage.ERROR, error, this.catalogId);
             this.isRunning = false;
         }
     }
@@ -98,19 +91,20 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 return;
             }
 
+            console.log(this.currentUrl);
+
             this.requestLimiter++;
-            let $: CheerioStatic | undefined = await this.getBody(
-                this.catalog.hostId.domain,
-                this.currentUrl
-            );
+            let $: CheerioStatic | undefined = await this.getBody(this.catalog.hostId.domain, this.currentUrl);
             this.scrapedPageNumber.push(this.currentUrl);
             this.scrapedPageNumber = _.uniq(this.scrapedPageNumber);
 
             if (!$) {
+                this.requestLimiter--;
                 return;
             }
 
             await this.handleSuccessRequest($);
+            this.requestLimiter--;
         }, this.REQUEST_DELAY);
     }
 
@@ -133,19 +127,10 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 detailUrl
             );
             try {
-                let createdDoc: DetailUrl.DocumentInterface = await this.detailUrlLogic.create(
-                    detailUrlDoc
-                );
-                this.writeLog(
-                    ScrapeConstant.LOG_ACTION.CREATE,
-                    `ID: ${createdDoc ? createdDoc._id : 'N/A'}`
-                );
+                let createdDoc: DetailUrl.DocumentInterface = await this.detailUrlLogic.create(detailUrlDoc);
+                this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
             } catch (error) {
-                this.writeErrorLog(
-                    error,
-                    ScrapeConstant.LOG_ACTION.CREATE,
-                    `ID: ${detailUrlDoc._id}`
-                );
+                this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `ID: ${detailUrlDoc._id}`);
             }
         }
 
@@ -158,7 +143,6 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         newPageNumberUrls = this.urlSanitizeAndFilter(newPageNumberUrls, this.scrapedPageNumber);
 
         this.pageNumberQueue = _.uniq(_.concat(this.pageNumberQueue, newPageNumberUrls));
-        this.requestLimiter--;
     }
 
     /**
@@ -194,19 +178,14 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      *
      * @return Array<string>
      */
-    private urlSanitizeAndFilter(
-        sourceUrls: Array<string>,
-        filterArray: Array<string>
-    ): Array<string> {
+    private urlSanitizeAndFilter(sourceUrls: Array<string>, filterArray: Array<string>): Array<string> {
         sourceUrls = _.uniq(
             sourceUrls.map((url): string => {
                 return UrlHandler.sanitizeUrl(url);
             })
         );
 
-        return sourceUrls.filter(
-            (url: string): boolean => url !== '' && filterArray.indexOf(url) < 0
-        );
+        return sourceUrls.filter((url: string): boolean => url !== '' && filterArray.indexOf(url) < 0);
     }
 
     /**
