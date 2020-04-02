@@ -1,80 +1,68 @@
 import QueueBase from '../queue.base';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
 import StringHandler from '../../../util/string-handler/string-handler';
-import { QueueSaveConstant } from '../save/queue.save.constant';
+import { QueueJobConstant } from './queue.job.constant';
 
 export default class QueueJob extends QueueBase {
-    protected MAX_TASK_EXECUTE: number = 1;
-    public isRunning: boolean = false;
+    private readonly index: number;
+    private currentTask: any | undefined;
 
-    constructor(delayTime: number | undefined = undefined) {
+    constructor(index: number = -1, delayTime: number | undefined = undefined) {
         super();
         this.delayTime = delayTime || this.QUEUE_DELAY_DEFAULT;
+        this.index = index;
         this.logFile.initLogFolder('job-queue');
-        this.logFile.createFileName('jq_');
+        this.logFile.createFileName(`jq-${this.index}_`);
     }
 
     /**
      *
-     * @param elements
+     * @param task
      */
-    public pushElement(elements: Function): void {
-        this.add(elements);
+    public pushElement(task: any): void {
+        this.add(task);
     }
 
     /**
      * Start queue
      */
-    public async start(): Promise<void> {
+    public start(): void {
         this.isRunning = true;
-        let elementCounter: number = 0;
-        while (this.queue.length !== 0) {
-            if (elementCounter > this.MAX_TASK_EXECUTE) {
-                continue;
-            }
-
-            let element: Function | undefined = this.queue.shift();
-            if (!element) {
+        this.startTime = process.hrtime();
+        this.loop = setInterval(async (): Promise<void> => {
+            if (this.currentTask && this.currentTask.isTaskRunning()) {
                 return;
             }
-            elementCounter++;
-            try {
-                this.writeLog(`Func: ${element.name} - Queue pending: ${this.queue.length}`);
-                await element();
-            } catch (error) {
-                this.writeErrorLog(
-                    error,
-                    `Func: ${element.name} - Queue pending: ${this.queue.length}`
-                );
-            }
-            elementCounter--;
-        }
 
-        this.isRunning = false;
+            if (this.queue.length === 0) {
+                this.stop([{ name: 'Thread ID', value: this.index }]);
+                ChatBotTelegram.sendMessage(
+                    StringHandler.replaceString(QueueJobConstant.EXPORT_SUCCESS_LOG, [
+                        this.index,
+                        this.logFile.getUrl(),
+                    ])
+                );
+                return;
+            }
+
+            this.currentTask = this.queue.shift();
+            if (!this.currentTask) {
+                return;
+            }
+
+            try {
+                this.writeLog(`Execute element - Queue pending: ${this.queue.length}`);
+                await this.currentTask.start();
+            } catch (error) {
+                this.writeErrorLog(error, `Execute element - Queue pending: ${this.queue.length}`);
+            }
+        }, this.QUEUE_DELAY_DEFAULT);
     }
 
     /**
-     * Export log
+     * Get current task
      */
-    public exportLog(): void {
-        this.footerLogContent = [
-            {
-                name: 'Job amount',
-                value: this.countNumber,
-            },
-            {
-                name: 'Job remain:',
-                value: this.queue.length,
-            },
-        ];
-        this.logFile.initFooter(this.footerLogContent);
-        this.logFile.exportFile();
-        this.logFile.initLogFolder('job-queue');
-        this.logFile.createFileName('jq_');
-        this.logFile.resetLog();
-        ChatBotTelegram.sendMessage(
-            StringHandler.replaceString(QueueSaveConstant.EXPORT_DAILY_LOG, [this.logFile.getUrl()])
-        );
-        this.countNumber = 1;
+    public getCurrentTask(): any | undefined {
+        return this.currentTask;
     }
 }

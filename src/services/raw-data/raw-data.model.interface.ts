@@ -1,9 +1,9 @@
 import * as mongoose from 'mongoose';
-import DetailUrlModelInterface from '../detail-url/detail-url.model.interface';
+import { DetailUrl } from '../detail-url/detail-url.index';
 
 export default interface RawDataModelInterface extends mongoose.Document {
     _id: number;
-    detailUrlId: DetailUrlModelInterface | number;
+    detailUrlId: DetailUrl.DocumentInterface | number;
     transactionType: number;
     propertyType: number;
     postDate: string;
@@ -16,13 +16,7 @@ export default interface RawDataModelInterface extends mongoose.Document {
         value: string;
         measureUnit: string;
     };
-    address: {
-        city: string;
-        district: string;
-        ward: string;
-        street: string;
-        other: string;
-    };
+    address: string;
     others: [
         {
             name: string;

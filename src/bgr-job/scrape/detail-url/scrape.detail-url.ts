@@ -2,35 +2,31 @@ import { DetailUrl } from '../../../services/detail-url/detail-url.index';
 import { Catalog } from '../../../services/catalog/catalog.index';
 import ScrapeBase from '../scrape.base';
 import CatalogModelInterface from '../../../services/catalog/catalog.model.interface';
-import DetailUrlModelInterface from '../../../services/detail-url/detail-url.model.interface';
 import _ from 'lodash';
 import StringHandler from '../../../util/string-handler/string-handler';
-import { BgrQueue } from '../../queue/queue.index';
 import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
 import { BgrScrape } from '../scrape.index';
-import delay from 'delay';
+import UrlHandler from '../../../util/url-handler/url-handler';
+import { ScrapeConstant } from '../scrape.constant';
+import Timeout = NodeJS.Timeout;
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private readonly catalogId: number;
     private detailUrlLogic: DetailUrl.Logic = new DetailUrl.Logic();
     private catalogLogic: Catalog.Logic = new Catalog.Logic();
     private catalog: CatalogModelInterface | any;
-    private existedDetailUrls: Array<DetailUrlModelInterface> | undefined;
-    private saveQueue: BgrQueue.Save;
-    private SAVE_QUEUE_DELAY: number = parseInt(
-        process.env.SCRAPE_DETAIL_URL_SAVE_QUEUE_DELAY || '500'
-    ); // ms
-    private SAVE_AMOUNT: number = parseInt(
-        process.env.SCRAPE_DETAIL_URL_SAVE_QUEUE_AMOUNT || '1000'
-    ); // ms
+    private scrapeRawData: BgrScrape.RawData;
+    private pageNumberQueue: Array<string> = [];
+    private scrapedPageNumber: Array<string> = [];
+    private existedDetailUrls: Array<string> = [];
 
     private readonly ATTRIBUTE_TO_GET_DATA: string = 'href';
 
     constructor(catalogId: number) {
         super();
-        this.saveQueue = new BgrQueue.Save(this.SAVE_QUEUE_DELAY, this.SAVE_AMOUNT);
         this.catalogId = catalogId;
+        this.scrapeRawData = new BgrScrape.RawData(catalogId);
         this.logInstance.initLogFolder('detail-url-scrape');
         this.logInstance.createFileName('cid-' + catalogId + '_');
     }
@@ -41,6 +37,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     public async start(): Promise<void> {
         try {
             this.startTime = process.hrtime();
+            this.isRunning = true;
 
             await Catalog.Logic.checkCatalogExistedWithId(this.catalogId);
             this.catalog = await this.catalogLogic.getById(this.catalogId);
@@ -55,135 +52,122 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             let queryConditions: object = {
                 catalogId: this.catalogId,
             };
-            this.existedDetailUrls = await this.detailUrlLogic.getAllWithConditions(
-                queryConditions
+            this.existedDetailUrls = (await this.detailUrlLogic.getAllWithConditions(queryConditions)).map(
+                (existedDetailUrl): string => existedDetailUrl.url
             );
 
-            await this.scrapeAction();
+            this.scrapeAction();
         } catch (error) {
-            this.addSummaryErrorLog(
-                ScrapeDetailUrlConstantChatBotMessage.ERROR,
-                error,
-                this.catalogId
-            );
+            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
+            this.addSummaryErrorLog(ScrapeDetailUrlConstantChatBotMessage.ERROR, error, this.catalogId);
+            this.isRunning = false;
         }
     }
 
     /**
      * Scrape action.
      */
-    private async scrapeAction(): Promise<void> {
-        let pageNumberQueue: Array<string> = [this.catalog.url];
-        let pageNumberScraped: Array<string> = [];
+    private scrapeAction(): void {
+        this.pageNumberQueue = [this.catalog.url];
 
-        while (pageNumberQueue.length !== 0) {
+        let loop: Timeout = setInterval(async (): Promise<void> => {
+            if (this.pageNumberQueue.length === 0 && this.requestLimiter === 0) {
+                clearInterval(loop);
+                this.finishAction();
+            }
+
             if (this.requestLimiter > this.MAX_REQUEST) {
-                continue;
+                return;
             }
 
-            let currentUrl: string | undefined = pageNumberQueue.shift() || undefined;
+            let currentUrl: string | undefined = this.pageNumberQueue.shift();
             if (!currentUrl) {
-                continue;
+                return;
             }
-            this.requestLimiter++;
 
-            let $: CheerioStatic | undefined = await this.getBody(
-                this.catalog.hostId.domain,
-                currentUrl
-            );
+            this.requestLimiter++;
+            let $: CheerioStatic | undefined = await this.getBody(this.catalog.hostId.domain, currentUrl);
+            this.scrapedPageNumber.push(currentUrl);
+            this.scrapedPageNumber = _.uniq(this.scrapedPageNumber);
 
             if (!$) {
-                continue;
+                this.requestLimiter--;
+                return;
             }
 
-            pageNumberQueue = await this.handleSuccessRequest(
-                $,
-                currentUrl,
-                pageNumberScraped,
-                pageNumberQueue
-            );
-
+            await this.handleSuccessRequest($);
             this.requestLimiter--;
-            await delay(this.REQUEST_DELAY);
-        }
-
-        this.finishAction();
-        await new BgrScrape.RawData(this.catalogId).start();
+        }, this.REQUEST_DELAY);
     }
 
     /**
      * @param $
-     * @param currentUrl
-     * @param pageNumberScraped
-     * @param pageNumberQueue
      */
-    private async handleSuccessRequest(
-        $: CheerioStatic,
-        currentUrl: string,
-        pageNumberScraped: Array<string>,
-        pageNumberQueue: Array<string>
-    ): Promise<Array<string>> {
-        let pageNumberUrls: Array<string> = this.extractData(
-            $,
-            this.catalog.locator.pageNumber,
-            this.ATTRIBUTE_TO_GET_DATA
-        );
-        let urlList: Array<string> = this.extractData(
+    private async handleSuccessRequest($: CheerioStatic): Promise<void> {
+        let newDetailUrlList: Array<string> = this.extractData(
             $,
             this.catalog.locator.detailUrl,
             this.ATTRIBUTE_TO_GET_DATA
         );
 
-        let detailUrlDocumentList: Array<DetailUrlModelInterface> = [];
-        urlList.forEach((url): void => {
-            if (this.isDetailUrlExisted(this.existedDetailUrls, url)) {
-                return;
+        newDetailUrlList = this.urlSanitizeAndFilter(newDetailUrlList, this.existedDetailUrls);
+        this.existedDetailUrls = _.uniq(_.concat(this.existedDetailUrls, newDetailUrlList));
+
+        for (const detailUrl of newDetailUrlList) {
+            let detailUrlDoc: DetailUrl.DocumentInterface = this.detailUrlLogic.createDocument(
+                this.catalogId,
+                detailUrl
+            );
+            try {
+                let createdDoc: DetailUrl.DocumentInterface = await this.detailUrlLogic.create(detailUrlDoc);
+                this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
+            } catch (error) {
+                this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `ID: ${detailUrlDoc._id}`);
             }
-
-            detailUrlDocumentList.push(this.detailUrlLogic.createDocument(this.catalogId, url));
-        });
-        this.saveQueue.pushElement(detailUrlDocumentList);
-
-        pageNumberScraped.push(currentUrl);
-        return _.union(pageNumberQueue, _.difference(pageNumberUrls, pageNumberScraped));
-    }
-
-    /**
-     * @param detailUrls
-     * @param url
-     *
-     * @return boolean
-     */
-    private isDetailUrlExisted(
-        detailUrls: Array<DetailUrlModelInterface> | undefined,
-        url: string
-    ): boolean {
-        if (!detailUrls) {
-            return false;
         }
-        let index: number = detailUrls.findIndex((item): boolean => item.url === url);
 
-        return index >= 0;
+        let newPageNumberUrls: Array<string> = this.extractData(
+            $,
+            this.catalog.locator.pageNumber,
+            this.ATTRIBUTE_TO_GET_DATA
+        );
+
+        newPageNumberUrls = this.urlSanitizeAndFilter(newPageNumberUrls, this.scrapedPageNumber);
+
+        this.pageNumberQueue = _.uniq(_.concat(this.pageNumberQueue, newPageNumberUrls));
     }
 
     /**
      * Finish scrape action.
      */
-    protected finishAction(): void {
-        let isDone: boolean = false;
-        while (!isDone) {
-            if (this.saveQueue.getRemainTask() !== 0) {
-                isDone = true;
-            }
-            this.saveQueue.stop();
-            this.exportLog(this.catalog);
-            ChatBotTelegram.sendMessage(
-                StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [
-                    this.catalog.title,
-                    this.catalog.id,
-                    this.logInstance.getUrl(),
-                ])
-            );
-        }
+    protected async finishAction(): Promise<void> {
+        this.exportLog(this.catalog);
+        ChatBotTelegram.sendMessage(
+            StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [
+                this.catalog.title,
+                this.catalog.id,
+                this.logInstance.getUrl(),
+            ])
+        );
+        this.isRunning = false;
+    }
+
+    /**
+     * @param sourceUrls
+     * @param filterArray
+     *
+     * @return Array<string>
+     */
+    private urlSanitizeAndFilter(sourceUrls: Array<string>, filterArray: Array<string>): Array<string> {
+        sourceUrls = _.uniq(sourceUrls.map((url): string => UrlHandler.sanitizeUrl(url)));
+
+        return sourceUrls.filter((url: string): boolean => url !== '' && filterArray.indexOf(url) < 0);
+    }
+
+    /**
+     * Get page number scraped
+     */
+    public getTargetList(): Array<string> {
+        return this.scrapedPageNumber;
     }
 }

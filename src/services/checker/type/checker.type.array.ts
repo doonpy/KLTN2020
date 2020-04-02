@@ -10,7 +10,7 @@ export default class CheckerTypeArray extends CheckerTypeBase {
      */
     public checkType(paramName: string, value: any): void {
         if (!Array.isArray(value)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerTypeFailedResponse.Message.INVALID_TYPE,
                 CheckerTypeFailedResponse.RootCause.ARRAY,

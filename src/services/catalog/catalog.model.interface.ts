@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
-import HostModelInterface from '../host/host.model.interface';
+import { Host } from '../host/host.index';
+import { Pattern } from '../pattern/pattern.index';
 
 export default interface CatalogModelInterface extends mongoose.Document {
     _id: number;
@@ -9,7 +10,8 @@ export default interface CatalogModelInterface extends mongoose.Document {
         detailUrl: string;
         pageNumber: string;
     };
-    hostId: HostModelInterface | number;
+    hostId: Host.DocumentInterface | number;
+    patternId: Pattern.DocumentInterface | number;
     cTime: string;
     mTime: string;
 }

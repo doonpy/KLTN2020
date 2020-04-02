@@ -8,6 +8,7 @@ import LogicBase from '../logic.base';
 import { Database } from '../database/database.index';
 import { HostErrorResponseMessage, HostErrorResponseRootCause } from './host.error-response';
 import { Common } from '../../common/common.index';
+import HostApiInterface from './host.api.interface';
 
 export default class HostLogic extends LogicBase {
     /**
@@ -49,7 +50,7 @@ export default class HostLogic extends LogicBase {
 
             return { hosts: hosts, hasNext: hosts.length < remainHost };
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -68,7 +69,7 @@ export default class HostLogic extends LogicBase {
 
             return await HostModel.findById(id).exec();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -90,7 +91,7 @@ export default class HostLogic extends LogicBase {
                 domain: domain,
             }).save();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -126,7 +127,7 @@ export default class HostLogic extends LogicBase {
 
             return await host.save();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -146,7 +147,7 @@ export default class HostLogic extends LogicBase {
 
             return null;
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -164,7 +165,7 @@ export default class HostLogic extends LogicBase {
         let result: number = await HostModel.countDocuments({ domain: domain }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_1,
                 HostErrorResponseRootCause.HO_RC_1,
@@ -173,7 +174,7 @@ export default class HostLogic extends LogicBase {
         }
 
         if (!isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_2,
                 HostErrorResponseRootCause.HO_RC_2,
@@ -196,7 +197,7 @@ export default class HostLogic extends LogicBase {
         let result: number = await HostModel.countDocuments({ _id: id }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_1,
                 HostErrorResponseRootCause.HO_RC_1,
@@ -205,7 +206,7 @@ export default class HostLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_2,
                 HostErrorResponseRootCause.HO_RC_2,
@@ -223,20 +224,14 @@ export default class HostLogic extends LogicBase {
         domain,
         cTime,
         mTime,
-    }: HostModelInterface): {
-        id: number;
-        name: string;
-        domain: string;
-        createAt: string;
-        updateAt: string;
-    } {
-        let data: {
-            id: number;
-            name: string;
-            domain: string;
-            createAt: string;
-            updateAt: string;
-        } = { id: NaN, name: '', domain: '', createAt: '', updateAt: '' };
+    }: HostModelInterface): HostApiInterface {
+        let data: HostApiInterface = {
+            id: null,
+            name: null,
+            domain: null,
+            createAt: null,
+            updateAt: null,
+        };
 
         if (_id) {
             data.id = _id;

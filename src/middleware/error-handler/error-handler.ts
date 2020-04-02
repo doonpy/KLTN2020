@@ -14,7 +14,7 @@ export const notFoundRoute = (req: Request, res: Response, next: any): void => {
     const Common = require('../../common/common.index').Common;
 
     next(
-        new Exception.Api(
+        new Exception.Customize(
             Common.ResponseStatusCode.NOT_FOUND,
             ErrorHandlerConstant.PATH_NOT_FOUND,
             '%s does not exits.',
@@ -32,7 +32,7 @@ export const notFoundRoute = (req: Request, res: Response, next: any): void => {
  * @param next
  */
 export const errorHandler = (
-    { statusCode, message, cause, stack }: Exception.Api,
+    { statusCode, message, cause, stack }: Exception.Customize,
     req: Request,
     res: Response,
     next: any

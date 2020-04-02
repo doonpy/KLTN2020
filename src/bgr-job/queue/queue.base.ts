@@ -2,18 +2,19 @@ import { File } from '../../util/file/file.index';
 import StringHandler from '../../util/string-handler/string-handler';
 import { QueueSaveConstant } from './save/queue.save.constant';
 import ChatBotTelegram from '../../services/chatbot/chatBotTelegram';
+import DateTime from '../../util/datetime/datetime';
+import _ from 'lodash';
 
 export default abstract class QueueBase {
     protected delayTime: number | undefined;
     protected loop: NodeJS.Timeout | undefined;
     protected logFile: File.Log = new File.Log();
-    protected countNumber: number = 1;
+    protected countNumber: number = 0;
     protected queue: Array<any> = [];
-    protected footerLogContent: Array<{ name: string; value: any }> = [];
+    protected isRunning: boolean = false;
+    protected startTime: [number, number] | undefined;
 
-    protected readonly QUEUE_DELAY_DEFAULT: number = parseInt(
-        process.env.QUEUE_DELAY_DEFAULT || '100'
-    ); // ms
+    protected readonly QUEUE_DELAY_DEFAULT: number = parseInt(process.env.QUEUE_DELAY_DEFAULT || '100'); // ms
 
     protected constructor() {}
 
@@ -24,13 +25,7 @@ export default abstract class QueueBase {
      */
     protected add(task: any): void {
         this.queue.push(task);
-    }
-
-    /**
-     * @return Array<any> queue
-     */
-    public getQueue(): Array<any> {
-        return this.queue;
+        this.writeLog(`Add element - Queue remain: ${this.queue.length}`);
     }
 
     /**
@@ -41,12 +36,32 @@ export default abstract class QueueBase {
     /**
      * Stop loop
      */
-    public stop(): void {
+    public stop(customizeFooter: Array<{ name: string; value: string | number }> = []): void {
         if (!this.loop) {
             return;
         }
         clearInterval(this.loop);
-        this.stopAction();
+        let endTime: [number, number] = process.hrtime(this.startTime);
+        this.logFile.initFooter(
+            _.merge(
+                [
+                    {
+                        name: 'Execution time',
+                        value: StringHandler.replaceString(`${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`, [
+                            endTime[1] / 1000000,
+                        ]),
+                    },
+                    {
+                        name: 'Summary',
+                        value: this.countNumber,
+                    },
+                ],
+                customizeFooter
+            )
+        );
+        this.logFile.exportFile();
+        this.logFile.resetLog();
+        this.isRunning = false;
     }
 
     /**
@@ -55,9 +70,7 @@ export default abstract class QueueBase {
      * @param content
      */
     protected writeLog(content: string): void {
-        this.logFile.addLine(
-            `[${new Date().toLocaleString()}] - ${this.countNumber++} >> ${content}`
-        );
+        this.logFile.addLine(`[${new Date().toLocaleString()}] - ${++this.countNumber} >> ${content}`);
     }
 
     /**
@@ -68,27 +81,21 @@ export default abstract class QueueBase {
      */
     protected writeErrorLog(error: Error, content: string): void {
         this.logFile.addLine(
-            `[${new Date().toLocaleString()}] - ${this.countNumber++} >> ERR: ${
-                error.message
-            } | ${content}`
-        );
-    }
-
-    /**
-     * Reset log file
-     */
-    protected stopAction(): void {
-        this.logFile.initFooter(this.footerLogContent);
-        this.logFile.exportFile();
-        ChatBotTelegram.sendMessage(
-            StringHandler.replaceString(QueueSaveConstant.EXPORT_DAILY_LOG, [this.logFile.getUrl()])
+            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${content}`
         );
     }
 
     /**
      * Get number of remain task
      */
-    public getRemainTask(): number {
+    public getRemainElements(): number {
         return this.queue.length;
+    }
+
+    /**
+     * Check is running
+     */
+    public checkIsRunning(): boolean {
+        return this.isRunning;
     }
 }

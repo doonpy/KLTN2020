@@ -5,18 +5,16 @@ export default class QueueSave extends QueueBase {
     private readonly saveAmount: number;
     private SAVE_AMOUNT_DEFAULT: number = parseInt(process.env.SAVE_QUEUE_AMOUNT_DEFAULT || '500');
 
-    constructor(delayTime: number | undefined = undefined, saveAmount: number | undefined) {
+    constructor(
+        jobName: string,
+        delayTime: number | undefined = undefined,
+        saveAmount: number | undefined
+    ) {
         super();
         this.saveAmount = saveAmount || this.SAVE_AMOUNT_DEFAULT;
         this.delayTime = delayTime || this.QUEUE_DELAY_DEFAULT;
-        this.logFile.initLogFolder('save-queue');
+        this.logFile.initLogFolder(`save-queue/${jobName}`);
         this.logFile.createFileName('sq_');
-        this.footerLogContent = [
-            {
-                name: 'Save amount',
-                value: this.countNumber,
-            },
-        ];
         this.start();
     }
 
@@ -32,6 +30,7 @@ export default class QueueSave extends QueueBase {
      * Start queue
      */
     protected start(): void {
+        this.isRunning = true;
         this.loop = setInterval(async (): Promise<void> => {
             let element:
                 | { fn: Function; vars: Document | Array<Document> }

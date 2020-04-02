@@ -16,7 +16,7 @@ export default class ConsoleLog {
      * @return
      */
     public show(): void {
-        let message = chalk.green(`[${new Date().toLocaleString()}]`);
+        let message = chalk.green(`[${new Date().toUTCString()}]`);
 
         switch (this._msgType) {
             case ConsoleConstant.Type.INFO:

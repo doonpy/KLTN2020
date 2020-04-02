@@ -46,13 +46,7 @@ const rawDataSchema = new Schema(
             value: { type: Schema.Types.String },
             measureUnit: { type: Schema.Types.String },
         },
-        address: {
-            city: { type: Schema.Types.String },
-            district: { type: Schema.Types.String },
-            ward: { type: Schema.Types.String },
-            street: { type: Schema.Types.String },
-            other: { type: Schema.Types.String },
-        },
+        address: { type: Schema.Types.String },
         others: [
             {
                 name: { type: Schema.Types.String },

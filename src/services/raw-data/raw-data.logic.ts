@@ -11,6 +11,7 @@ import {
 import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { DetailUrl } from '../detail-url/detail-url.index';
+import RawDataApiInterface from './raw-data.api.interface';
 
 export default class RawDataLogic extends LogicBase {
     /**
@@ -57,7 +58,7 @@ export default class RawDataLogic extends LogicBase {
                 hasNext: rawDataset.length < remainRawDataset,
             };
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -84,7 +85,7 @@ export default class RawDataLogic extends LogicBase {
                 })
                 .exec();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -134,7 +135,7 @@ export default class RawDataLogic extends LogicBase {
                 })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -194,13 +195,7 @@ export default class RawDataLogic extends LogicBase {
                 rawData.acreage.measureUnit = acreage.measureUnit || rawData.acreage.measureUnit;
             }
 
-            if (address && Object.keys(address).length > 0) {
-                rawData.address.city = address.city || rawData.address.city;
-                rawData.address.district = address.district || rawData.address.district;
-                rawData.address.ward = address.ward || rawData.address.ward;
-                rawData.address.street = address.street || rawData.address.street;
-                rawData.address.other = address.other || rawData.address.other;
-            }
+            rawData.address = address || rawData.address;
 
             if (others && others.length > 0) {
                 others.forEach((other: { name: string; value: string } | any): void => {
@@ -229,7 +224,7 @@ export default class RawDataLogic extends LogicBase {
                 })
                 .execPopulate();
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -249,7 +244,7 @@ export default class RawDataLogic extends LogicBase {
 
             return null;
         } catch (error) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
@@ -287,7 +282,7 @@ export default class RawDataLogic extends LogicBase {
         let result: number = await RawDataModel.countDocuments({ _id: id }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_1,
                 RawDataErrorResponseRootCause.RD_RC_1,
@@ -296,7 +291,7 @@ export default class RawDataLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_2,
                 RawDataErrorResponseRootCause.RD_RC_2,
@@ -319,7 +314,7 @@ export default class RawDataLogic extends LogicBase {
         let result: number = await RawDataModel.countDocuments({ detailUrlId: detailUrlId }).exec();
 
         if (!isNot && result === 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_1,
                 RawDataErrorResponseRootCause.RD_RC_1,
@@ -328,13 +323,59 @@ export default class RawDataLogic extends LogicBase {
         }
 
         if (isNot && result > 0) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_2,
                 RawDataErrorResponseRootCause.RD_RC_2,
                 ['detailUrlId', detailUrlId]
             );
         }
+    }
+
+    /**
+     * Create raw data document
+     *
+     * @param detailUrlId
+     * @param transactionType
+     * @param propertyType
+     * @param postDate
+     * @param title
+     * @param price
+     * @param acreage
+     * @param address
+     * @param others
+     */
+    public createDocument(
+        detailUrlId: string | number,
+        transactionType: number,
+        propertyType: number,
+        postDate: string,
+        title: string,
+        price: {
+            value: string;
+            currency: string;
+        },
+        acreage: {
+            value: string;
+            measureUnit: string;
+        },
+        address: string,
+        others: Array<{
+            name: string;
+            value: string;
+        }>
+    ): RawDataModelInterface {
+        return new RawDataModel({
+            detailUrlId: detailUrlId,
+            transactionType: transactionType,
+            propertyType: propertyType,
+            postDate: postDate,
+            title: title,
+            price: price,
+            acreage: acreage,
+            address: address,
+            others: others,
+        });
     }
 
     /**
@@ -354,50 +395,20 @@ export default class RawDataLogic extends LogicBase {
         others,
         cTime,
         mTime,
-    }: RawDataModelInterface): {
-        id: number;
-        transactionType: string;
-        propertyType: string;
-        detailUrl: object;
-        postDate: string;
-        title: string;
-        price: { value: string; currency: string } | object;
-        acreage: { value: string; measureUnit: string } | object;
-        address:
-            | { city: string; district: string; ward: string; street: string; other: string }
-            | object;
-        others: Array<{ name: string; value: string }> | Array<any>;
-        createAt: string;
-        updateAt: string;
-    } {
-        let data: {
-            id: number;
-            transactionType: string;
-            propertyType: string;
-            detailUrl: object;
-            postDate: string;
-            title: string;
-            price: { value: string; currency: string } | object;
-            acreage: { value: string; measureUnit: string } | object;
-            address:
-                | { city: string; district: string; ward: string; street: string; other: string }
-                | object;
-            others: Array<{ name: string; value: string }> | Array<any>;
-            createAt: string;
-            updateAt: string;
-        } = {
-            id: NaN,
-            transactionType: '',
-            propertyType: '',
-            detailUrl: {},
-            postDate: '',
-            title: '',
-            price: {},
-            acreage: {},
-            address: {},
-            others: [],
-            createAt: '',
-            updateAt: '',
+    }: RawDataModelInterface): RawDataApiInterface {
+        let data: RawDataApiInterface = {
+            id: null,
+            transactionType: null,
+            propertyType: null,
+            detailUrl: null,
+            postDate: null,
+            title: null,
+            price: null,
+            acreage: null,
+            address: null,
+            others: null,
+            createAt: null,
+            updateAt: null,
         };
 
         if (_id) {
@@ -443,7 +454,7 @@ export default class RawDataLogic extends LogicBase {
             data.acreage = acreage;
         }
 
-        if (Object.keys(address).length > 0) {
+        if (address) {
             data.address = address;
         }
 

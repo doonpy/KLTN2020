@@ -4,8 +4,7 @@ import PatternModelInterface from './pattern.model.interface';
 
 const patternSchema: Schema = new Schema(
     {
-        catalogId: { type: Schema.Types.Number, ref: 'catalog' },
-        sourceUrlId: { type: Schema.Types.Number, ref: 'detail_url' },
+        sourceUrl: { type: Schema.Types.String },
         mainLocator: {
             propertyType: { type: Schema.Types.String },
             title: { type: Schema.Types.String },

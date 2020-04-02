@@ -12,7 +12,7 @@ export default class CheckerTypeInteger extends CheckerTypeBase {
      */
     public checkType(paramName: string, value: any): void {
         if (!NUMERIC_CHARACTER_PATTERN.test(value) || !Number.isInteger(Number(value))) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerTypeFailedResponse.Message.INVALID_TYPE,
                 CheckerTypeFailedResponse.RootCause.INTEGER,

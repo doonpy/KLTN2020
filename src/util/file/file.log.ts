@@ -1,4 +1,3 @@
-import fs from 'fs';
 import FileBase from './file.base';
 
 export default class FileLog extends FileBase {
@@ -13,14 +12,14 @@ export default class FileLog extends FileBase {
     private readonly PREFIX: string = 'log_';
     private readonly FULL_HOST_URI: string | any = `${process.env.SERVER_PROTOCOL ||
         'http://'}${process.env.SERVER_URI || '127.0.0.1'}${
-        process.env.SERVER_PORT ? `:${process.env.SERVER_PORT}` : ':3000'
+        process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'
     }`;
 
     constructor() {
         super();
         let currentDate: Date = new Date();
-        this.dateFolder = `${currentDate.getFullYear()}-${currentDate.getMonth() +
-            1}-${currentDate.getDate()}`;
+        this.dateFolder = `${currentDate.getUTCFullYear()}-${currentDate.getUTCMonth() +
+            1}-${currentDate.getUTCDate()}`;
         this.initHeader();
     }
 
@@ -58,7 +57,7 @@ export default class FileLog extends FileBase {
      */
     public exportFile(): void {
         try {
-            this.createFile(this.PUBLIC_FOLDER_PATH + '/' + this.getFullPath(), this.content, {
+            this.createFile(this.getFullPath(), this.content, {
                 encoding: 'utf-8',
             });
         } catch (error) {
@@ -73,7 +72,7 @@ export default class FileLog extends FileBase {
         let content: string = `Error!\nName: ${error.name}\nMessage: ${error.message}\n Stack: ${error.stack}`;
 
         try {
-            this.createFile(this.PUBLIC_FOLDER_PATH + '/' + this.getFullPath(true), content, {
+            this.createFile(this.getFullPath(true), content, {
                 encoding: 'utf-8',
             });
         } catch (error) {
@@ -89,9 +88,11 @@ export default class FileLog extends FileBase {
         this.fileName =
             this.PREFIX +
             customizeFileName +
-            currentDate.getHours() +
-            currentDate.getMinutes() +
-            currentDate.getSeconds();
+            currentDate.getUTCHours() +
+            '-' +
+            currentDate.getUTCMinutes() +
+            '-' +
+            currentDate.getUTCSeconds();
     }
 
     /**
@@ -110,6 +111,8 @@ export default class FileLog extends FileBase {
      */
     private getFullPath(isError: boolean = false): string {
         return (
+            this.PUBLIC_FOLDER_PATH +
+            '/' +
             this.LOG_ROOT_FOLDER +
             '/' +
             (isError ? this.ERROR_LOG_ROOT_FOLDER : this.folderPath) +

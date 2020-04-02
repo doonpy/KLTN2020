@@ -25,7 +25,7 @@ export default class CheckerStringLength extends CheckerBase {
         }
 
         if (!this.checkMinRange(value.length)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_SMALLER,
@@ -34,7 +34,7 @@ export default class CheckerStringLength extends CheckerBase {
         }
 
         if (!this.checkMaxRange(value.length)) {
-            throw new Exception.Api(
+            throw new Exception.Customize(
                 Common.ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_LARGER,

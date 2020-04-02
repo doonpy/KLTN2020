@@ -1,6 +1,7 @@
 import CatalogController from './catalog.controller';
 import CatalogLogic from './catalog.logic';
 import CatalogModelInterface from './catalog.model.interface';
+import CatalogApiInterface from './catalog.api.interface';
 
 export namespace Catalog {
     export const Logic = CatalogLogic;
@@ -10,4 +11,5 @@ export namespace Catalog {
     export type Controller = CatalogController;
 
     export type DocumentInterface = CatalogModelInterface;
+    export type ApiInterface = CatalogApiInterface;
 }

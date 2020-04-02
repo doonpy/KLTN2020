@@ -1,6 +1,6 @@
-import ExceptionApi from './exception.api';
+import ExceptionCustomize from './exception.customize';
 
 export namespace Exception {
-    export const Api = ExceptionApi;
-    export type Api = ExceptionApi;
+    export const Customize = ExceptionCustomize;
+    export type Customize = ExceptionCustomize;
 }

@@ -11,8 +11,7 @@ const specifyIdPath: string = '/patterns/:id';
 
 export default class PatternController extends ControllerBase {
     private patternLogic: PatternLogic = new PatternLogic();
-    private readonly PARAM_CATALOG_ID: string = 'catalogId';
-    private readonly PARAM_SOURCE_URL_ID: string = 'sourceUrlId';
+    private readonly PARAM_SOURCE_URL_ID: string = 'sourceUrl';
     private readonly PARAM_MAIN_LOCATOR: string = 'mainLocator';
     private readonly PARAM_SUB_LOCATOR: string = 'subLocator';
     private readonly PARAM_TITLE_LOCATOR: string = 'title';
@@ -39,11 +38,8 @@ export default class PatternController extends ControllerBase {
     protected createRoute(req: Request, res: Response, next: any): void {
         const validator = new Validator();
 
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
-
-        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.IntegerRange(1, null));
+        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.String());
+        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Url());
 
         validator.addParamValidator(this.PARAM_MAIN_LOCATOR, new Checker.Type.Object());
 
@@ -130,11 +126,8 @@ export default class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_OFFSET, new Checker.Type.Integer());
         validator.addParamValidator(this.PARAM_OFFSET, new Checker.IntegerRange(0, null));
 
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
-
         this.patternLogic
-            .getAll(this.limit, this.offset, this.requestQuery[this.PARAM_CATALOG_ID])
+            .getAll(this.limit, this.offset)
             .then(({ patterns, hasNext }): void => {
                 let patternList: Array<object> = patterns.map(
                     (pattern: PatternModelInterface): object => {
@@ -195,11 +188,8 @@ export default class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
         validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
 
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
-
-        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.IntegerRange(1, null));
+        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.String());
+        validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Url());
 
         validator.addParamValidator(this.PARAM_MAIN_LOCATOR, new Checker.Type.Object());
 
