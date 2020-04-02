@@ -3,7 +3,7 @@ import SocketClient from '../../services/socket/socket';
 import { Grid, Typography } from '@material-ui/core';
 
 export default function TargetListComponent(): JSX.Element {
-    const [targetList, setTargetList]: [Array<Array<string>>, Function] = useState([]);
+    const [targets, setTargetList]: [Array<{ pid: number; targetList: Array<string> }>, Function] = useState([]);
     const socket: SocketIOClient.Socket = SocketClient.getInstance();
 
     socket.on('monitor-target-list', (data: Array<Array<string>>): void => {
@@ -12,12 +12,12 @@ export default function TargetListComponent(): JSX.Element {
 
     return (
         <Grid container justify="center">
-            {targetList.map(
-                (list, key): JSX.Element => {
+            {targets.map(
+                (target, key): JSX.Element => {
                     return (
                         <Grid item xs={4} justify={'center'} key={key}>
-                            <Typography variant={'h5'}>Thread {key}</Typography>
-                            {list.map(
+                            <Typography variant={'h5'}>PID {target.pid}</Typography>
+                            {target.targetList.map(
                                 (item, key): JSX.Element => {
                                     return (
                                         <Typography key={key}>

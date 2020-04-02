@@ -48,17 +48,17 @@ export const getMonitorContent = (
 /**
  * Get target list
  */
-export const getTargets = (jobQueue: BgrQueue.Job): Array<string> => {
+export const getTargets = (jobQueue: BgrQueue.Job): { pid: number; targetList: Array<string> } => {
     if (!jobQueue.checkIsRunning()) {
-        return [];
+        return { pid: process.pid, targetList: [] };
     }
 
     let currentTask: BgrScrape.RawData | BgrScrape.DetailUrl = jobQueue.getCurrentTask();
     if (currentTask) {
-        return currentTask.getTargetList();
+        return { pid: process.pid, targetList: currentTask.getTargetList() };
     }
 
-    return [];
+    return { pid: process.pid, targetList: [] };
 };
 
 /**

@@ -23,7 +23,7 @@ const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DE
 const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1');
 let childProcessList: Array<ChildProcess> = [];
 let monitorContentList: Array<Array<{ pid: number; remainTasks: number; status: boolean }>> = [];
-let targetsList: Array<Array<string>> = [];
+let targetsList: Array<{ pid: number; targetList: Array<string> }> = [];
 let isRunning: boolean = false;
 
 /**
@@ -47,7 +47,7 @@ export const getMonitorContent = (): Array<Array<{
 /**
  * Get target list
  */
-export const getTargetList = (): Array<Array<string>> => {
+export const getTargetList = (): Array<{ pid: number; targetList: Array<string> }> => {
     return targetsList;
 };
 
@@ -64,7 +64,7 @@ const createChildProcess = (catalogIdList: Array<number>, index: number): ChildP
         (message: {
             error?: Error;
             monitorContent?: Array<{ pid: number; remainTasks: number; status: boolean }>;
-            targets: Array<string>;
+            targets: { pid: number; targetList: Array<string> };
         }): void => {
             if (message.error) {
                 childProcessList[index] = createChildProcess(catalogIdList, index);
