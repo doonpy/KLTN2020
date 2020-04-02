@@ -36,10 +36,6 @@ export default class QueueJob extends QueueBase {
 
             if (this.queue.length === 0) {
                 this.stop([{ name: 'Thread ID', value: this.index }]);
-                if (this.isRunning) {
-                    this.logFile.initLogFolder('job-queue');
-                    this.logFile.createFileName(`jq-${this.index}_`);
-                }
                 ChatBotTelegram.sendMessage(
                     StringHandler.replaceString(QueueJobConstant.EXPORT_SUCCESS_LOG, [
                         this.index,

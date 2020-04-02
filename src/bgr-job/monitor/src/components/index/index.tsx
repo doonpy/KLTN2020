@@ -52,7 +52,7 @@ const Index = (): JSX.Element => {
     /**
      * Handle click start button event
      */
-    function handleStartEvent(): void {
+    function handleStartButtonEvent(): void {
         socket.emit('start');
     }
 
@@ -75,7 +75,7 @@ const Index = (): JSX.Element => {
                 <ButtonComponent
                     text={'Start'}
                     className={'start-button'}
-                    onClickHandler={handleStartEvent}
+                    onClickHandler={handleStartButtonEvent}
                     style={{ variant: 'contained', color: 'primary' }}
                 />
             </Grid>

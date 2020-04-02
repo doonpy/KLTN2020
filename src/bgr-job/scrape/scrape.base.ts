@@ -19,7 +19,6 @@ export default abstract class ScrapeBase {
     protected startTime: [number, number] | undefined;
     protected requestLimiter: number = 0;
     protected isRunning: boolean = false;
-    protected currentUrl: string | undefined;
 
     protected readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_MAX_REQUEST || '10');
     protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100');
@@ -196,12 +195,5 @@ export default abstract class ScrapeBase {
         this.logInstance.addLine(
             `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`
         );
-    }
-
-    /**
-     * Get current URL
-     */
-    public getCurrentUrl(): string | undefined {
-        return this.currentUrl;
     }
 }

@@ -9,9 +9,9 @@ import { RawData } from '../../../services/raw-data/raw-data.index';
 import { Catalog } from '../../../services/catalog/catalog.index';
 import { DetailUrl } from '../../../services/detail-url/detail-url.index';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
-import Timeout = NodeJS.Timeout;
 import { ScrapeConstant } from '../scrape.constant';
 import { Pattern } from '../../../services/pattern/pattern.index';
+import Timeout = NodeJS.Timeout;
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly catalogId: number = 0;
@@ -81,6 +81,7 @@ export default class ScrapeRawData extends ScrapeBase {
      * Scrape action
      */
     private scrapeAction(): void {
+        let $: CheerioStatic | undefined;
         let loop: Timeout = setInterval(async (): Promise<void> => {
             if (this.detailUrls.length === 0 && this.requestLimiter === 0) {
                 clearInterval(loop);
@@ -95,21 +96,16 @@ export default class ScrapeRawData extends ScrapeBase {
             if (!currentDetailUrlDocument) {
                 return;
             }
-            this.currentUrl = currentDetailUrlDocument.url;
+            let currentUrl: string = currentDetailUrlDocument.url;
             this.extractedDetailUrl.push(currentDetailUrlDocument.url);
 
-            console.log(this.currentUrl);
-
             this.requestLimiter++;
-            let $: CheerioStatic | undefined = await this.getBody(
-                this.catalog.hostId.domain,
-                currentDetailUrlDocument.url
-            );
+            $ = await this.getBody(this.catalog.hostId.domain, currentUrl);
 
             if (!$) {
                 await this.handleFailedRequest(currentDetailUrlDocument);
             } else {
-                this.handleSuccessRequest($, currentDetailUrlDocument);
+                await this.handleSuccessRequest($, currentDetailUrlDocument);
             }
             this.requestLimiter--;
         }, this.REQUEST_DELAY);
@@ -123,22 +119,36 @@ export default class ScrapeRawData extends ScrapeBase {
         $: CheerioStatic,
         currentDetailUrlDocument: DetailUrl.DocumentInterface
     ): Promise<void> {
-        let propertyTypeData: string = this.extractData($, this.pattern.mainLocator.propertyType).shift() || '';
-        let postDateData: string = this.extractData($, this.pattern.mainLocator.postDate.locator).shift() || '';
-        let titleData: string = this.extractData($, this.pattern.mainLocator.title).shift() || '';
-        let priceData: string = this.extractData($, this.pattern.mainLocator.price).shift() || '';
-        let acreageData: string = this.extractData($, this.pattern.mainLocator.acreage).shift() || '';
-        let addressData: string = this.extractData($, this.pattern.mainLocator.address).shift() || '';
-        let othersData: Array<{ name: string; value: string }> = [];
+        let {
+            propertyType,
+            postDateLocator,
+            title,
+            price,
+            acreage,
+            address,
+        }: {
+            propertyType: string;
+            postDateLocator: string;
+            title: string;
+            price: string;
+            acreage: string;
+            address: string;
+        } = this.pattern.mainLocator;
 
-        for (let i: number = 0; i < this.pattern.subLocator.length; i++) {
-            let data: { name: string; value: string } = {
-                name: this.pattern.subLocator[i].name,
-                value: this.extractData($, this.pattern.subLocator[i].locator).shift() || '',
-            };
+        let propertyTypeData: string = this.extractData($, propertyType).shift() || '';
+        let postDateData: string = this.extractData($, postDateLocator).shift() || '';
+        let titleData: string = this.extractData($, title).shift() || '';
+        let priceData: string = this.extractData($, price).shift() || '';
+        let acreageData: string = this.extractData($, acreage).shift() || '';
+        let addressData: string = this.extractData($, address).shift() || '';
 
-            othersData.push(data);
-        }
+        let othersData: Array<{ name: string; value: string }> = this.pattern.subLocator.map(
+            (subLocatorItem: { locator: string; name: string }): { name: string; value: string } =>
+                Object({
+                    name: subLocatorItem.name,
+                    value: this.extractData($, subLocatorItem.locator).shift() || '',
+                })
+        );
 
         let rawData: RawData.DocumentInterface = this.handleScrapedData(
             currentDetailUrlDocument._id,
@@ -166,7 +176,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
             this.saveAmount++;
         } catch (error) {
-            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `ID: ${rawData._id}`);
+            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `ID: ${rawData._id | -1}`);
         }
     }
 
@@ -262,9 +272,9 @@ export default class ScrapeRawData extends ScrapeBase {
     }
 
     /**
-     * Get extracted detail URL
+     * Get page number scraped
      */
-    public getExtractedDetailUrl(): Array<string> {
+    public getTargetList(): Array<string> {
         return this.extractedDetailUrl;
     }
 }

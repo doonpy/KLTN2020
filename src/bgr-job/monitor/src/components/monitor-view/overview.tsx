@@ -3,15 +3,13 @@ import SocketClient from '../../services/socket/socket';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 
 type MonitorContent = Array<{
-    threadIndex: number;
+    pid: number;
     remainTasks: number;
     status: boolean;
-    phase: string | boolean;
-    targetList: Array<string>;
 }>;
 
 interface Column {
-    id: 'threadIndex' | 'remainTasks' | 'status' | 'phase';
+    id: 'pid' | 'remainTasks' | 'status';
     label: string;
     minWidth?: number;
     align?: 'right';
@@ -19,19 +17,13 @@ interface Column {
 }
 
 const columns: Column[] = [
-    { id: 'threadIndex', label: 'Thread index', minWidth: 100 },
+    { id: 'pid', label: 'PID', minWidth: 100 },
     { id: 'remainTasks', label: 'Remain tasks', minWidth: 100 },
     {
         id: 'status',
         label: 'Status',
         minWidth: 100,
         format: (value): string => (value ? 'Running' : 'Stop'),
-    },
-    {
-        id: 'phase',
-        label: 'Phase',
-        minWidth: 170,
-        format: (value): string => (value as string) || 'N/A',
     },
 ];
 
@@ -65,8 +57,11 @@ export default function OverViewComponent(): JSX.Element {
                     <TableBody>
                         {monitorContent.map(
                             (row): JSX.Element => {
+                                if (!row.pid) {
+                                    return <TableRow></TableRow>;
+                                }
                                 return (
-                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.threadIndex}>
+                                    <TableRow hover role="checkbox" tabIndex={-1} key={row.pid}>
                                         {columns.map((column) => {
                                             const value: string | boolean | Array<string> | number = row[column.id];
                                             return (

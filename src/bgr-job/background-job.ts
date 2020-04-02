@@ -8,6 +8,9 @@ import ConsoleLog from '../util/console/console.log';
 import { ConsoleConstant } from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
 import initSocketServer from './socket.io';
+import Timeout = NodeJS.Timeout;
+import { ChildProcess, fork } from 'child_process';
+import path from 'path';
 
 dotenv.config();
 
@@ -18,19 +21,10 @@ const SCHEDULE_TIME_DELAY_HOUR: number = parseInt(process.env.SCHEDULE_TIME_DELA
 const SCHEDULE_TIME_DELAY_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0'); // minute
 const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0'); // second
 const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1');
-let jobQueueList: Array<BgrQueue.Job> = [];
+let childProcessList: Array<ChildProcess> = [];
+let monitorContentList: Array<Array<{ pid: number; remainTasks: number; status: boolean }>> = [];
+let targetsList: Array<Array<string>> = [];
 let isRunning: boolean = false;
-
-/**
- * Initialize job queue list
- */
-const initJobQueueList = (): void => {
-    jobQueueList = [];
-    for (let i: number = 0; i < THREAD_AMOUNT; i++) {
-        let jobQueue: BgrQueue.Job = new BgrQueue.Job(i);
-        jobQueueList.push(jobQueue);
-    }
-};
 
 /**
  * @return boolean
@@ -42,110 +36,137 @@ export const checkIsRunning = (): boolean => {
 /**
  * Get monitor content
  */
-export const getMonitorContent = (): Array<{
-    threadIndex: number;
+export const getMonitorContent = (): Array<Array<{
+    pid: number;
     remainTasks: number;
     status: boolean;
-    phase: string | boolean;
-}> => {
-    return jobQueueList.map((jobQueue, index): any => {
-        let returnContent: {
-            threadIndex: number;
-            remainTasks: number;
-            status: boolean;
-            phase: string | boolean;
-        } = {
-            threadIndex: index,
-            remainTasks: jobQueue.getRemainElements(),
-            status: jobQueue.isRunning,
-            phase: false,
-        };
-
-        let currentTask: any = jobQueue.getCurrentTask();
-        if (jobQueue.isRunning && currentTask) {
-            returnContent.phase = currentTask.getPhase();
-        }
-
-        return returnContent;
-    });
+}>> => {
+    return monitorContentList;
 };
 
 /**
  * Get target list
  */
 export const getTargetList = (): Array<Array<string>> => {
-    return jobQueueList.map(
-        (jobQueue): Array<string> => {
-            let currentTask: any = jobQueue.getCurrentTask();
-            if (jobQueue.isRunning && currentTask) {
-                return currentTask.getScrapedPageNumber();
+    return targetsList;
+};
+
+/**
+ * Create child process with each job queue
+ * @param catalogIdList
+ * @param index
+ */
+const createChildProcess = (catalogIdList: Array<number>, index: number): ChildProcess => {
+    let childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.job-queue'));
+
+    childProcess.on(
+        'message',
+        (message: {
+            error?: Error;
+            monitorContent?: Array<{ pid: number; remainTasks: number; status: boolean }>;
+            targets: Array<string>;
+        }): void => {
+            if (message.error) {
+                childProcessList[index] = createChildProcess(catalogIdList, index);
+                return;
             }
-            return [];
+
+            if (message.targets) {
+                targetsList[index] = message.targets;
+            }
+
+            if (message.monitorContent) {
+                monitorContentList[index] = message.monitorContent;
+            }
         }
     );
+
+    childProcess.send({ catalogIdList });
+
+    return childProcess;
 };
 
 /**
  * Script of background job.
  */
-const script = async function exec(): Promise<void> {
+const script = async (): Promise<void> => {
     isRunning = true;
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
-    initJobQueueList();
-    let catalogIdList: Array<number> = (await new Catalog.Logic().getAll()).catalogs.map(catalog => {
-        return catalog._id;
-    });
+
+    let catalogIdList: Array<number> = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
+    let catalogIdListDivided: Array<Array<number>> = [];
 
     for (const catalogId of catalogIdList) {
         if (!catalogId) {
             continue;
         }
-        let scrapeDetailUrlJob: BgrScrape.DetailUrl = new BgrScrape.DetailUrl(catalogId);
         let threadIndex: number = catalogId % THREAD_AMOUNT;
-        jobQueueList[threadIndex].pushElement(scrapeDetailUrlJob);
+
+        if (!catalogIdListDivided[threadIndex]) {
+            catalogIdListDivided[threadIndex] = [];
+        }
+
+        catalogIdListDivided[threadIndex].push(catalogId);
     }
 
-    for (const jobQueue of jobQueueList) {
-        if (!jobQueue.isRunning && jobQueue.getRemainElements() > 0) {
-            jobQueue.start();
+    catalogIdListDivided.forEach((catalogIdList, index): void => {
+        childProcessList[index] = createChildProcess(catalogIdList, index);
+    });
+
+    const checkEndLoop: Timeout = setInterval((): void => {
+        for (const childProcess of childProcessList) {
+            if (!childProcess.killed) {
+                return;
+            }
         }
-    }
+
+        clearInterval(checkEndLoop);
+        monitorContentList = [];
+        targetsList = [];
+        isRunning = false;
+    }, 0);
 };
 
 /**
  * Start of background job.
  *
- * @param {boolean} force - Run without timer
+ * @param {boolean} force
  */
 export const start = async (force: boolean = false): Promise<void> => {
+    if (isRunning) {
+        return;
+    }
+
     if (force) {
         await script();
         return;
     }
 
-    let expectTime: Date = new Date();
-    expectTime.setUTCHours(SCHEDULE_TIME_HOUR);
-    expectTime.setUTCMinutes(SCHEDULE_TIME_MINUTE);
-    expectTime.setUTCSeconds(SCHEDULE_TIME_SECOND);
-    if (!DateTime.isExactTime(expectTime, true)) {
-        return;
-    }
+    setInterval(async (): Promise<void> => {
+        let expectTime: Date = new Date();
+        expectTime.setUTCHours(SCHEDULE_TIME_HOUR);
+        expectTime.setUTCMinutes(SCHEDULE_TIME_MINUTE);
+        expectTime.setUTCSeconds(SCHEDULE_TIME_SECOND);
+        if (!DateTime.isExactTime(expectTime, true)) {
+            return;
+        }
 
-    await script();
+        await script();
 
-    const delayTime: number =
-        (SCHEDULE_TIME_DELAY_SECOND || 1) *
-        (SCHEDULE_TIME_DELAY_MINUTE ? SCHEDULE_TIME_DELAY_MINUTE * 60 : 1) *
-        (SCHEDULE_TIME_DELAY_HOUR ? SCHEDULE_TIME_DELAY_HOUR * 3600 : 1);
-    setTimeout(script, 1000 * delayTime);
+        const delayTime: number =
+            (SCHEDULE_TIME_DELAY_SECOND || 1) *
+            (SCHEDULE_TIME_DELAY_MINUTE ? SCHEDULE_TIME_DELAY_MINUTE * 60 : 1) *
+            (SCHEDULE_TIME_DELAY_HOUR ? SCHEDULE_TIME_DELAY_HOUR * 3600 : 1);
+        setTimeout(script, 1000 * delayTime);
+    }, 1000);
 };
 
 /**
  * Main
  */
+new ChatBotTelegram();
 new Database.MongoDb().connect().then(
     async (): Promise<void> => {
-        new ChatBotTelegram();
         try {
             await start();
             initSocketServer();

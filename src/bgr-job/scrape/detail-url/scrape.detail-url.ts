@@ -4,12 +4,12 @@ import ScrapeBase from '../scrape.base';
 import CatalogModelInterface from '../../../services/catalog/catalog.model.interface';
 import _ from 'lodash';
 import StringHandler from '../../../util/string-handler/string-handler';
-import { ScrapeDetailUrlConstantChatBotMessage, ScrapeDetailUrlConstantPhase } from './scrape.detail-url.constant';
+import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
 import { BgrScrape } from '../scrape.index';
-import Timeout = NodeJS.Timeout;
 import UrlHandler from '../../../util/url-handler/url-handler';
 import { ScrapeConstant } from '../scrape.constant';
+import Timeout = NodeJS.Timeout;
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private readonly catalogId: number;
@@ -20,7 +20,6 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     private pageNumberQueue: Array<string> = [];
     private scrapedPageNumber: Array<string> = [];
     private existedDetailUrls: Array<string> = [];
-    private phase: string = '';
 
     private readonly ATTRIBUTE_TO_GET_DATA: string = 'href';
 
@@ -54,14 +53,9 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 catalogId: this.catalogId,
             };
             this.existedDetailUrls = (await this.detailUrlLogic.getAllWithConditions(queryConditions)).map(
-                (existedDetailUrl): string => {
-                    return existedDetailUrl.url;
-                }
+                (existedDetailUrl): string => existedDetailUrl.url
             );
-            this.phase = StringHandler.replaceString(ScrapeDetailUrlConstantPhase.DETAIL_URL, [
-                this.catalog.title,
-                this.catalogId,
-            ]);
+
             this.scrapeAction();
         } catch (error) {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
@@ -86,16 +80,14 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 return;
             }
 
-            this.currentUrl = this.pageNumberQueue.shift();
-            if (!this.currentUrl) {
+            let currentUrl: string | undefined = this.pageNumberQueue.shift();
+            if (!currentUrl) {
                 return;
             }
 
-            console.log(this.currentUrl);
-
             this.requestLimiter++;
-            let $: CheerioStatic | undefined = await this.getBody(this.catalog.hostId.domain, this.currentUrl);
-            this.scrapedPageNumber.push(this.currentUrl);
+            let $: CheerioStatic | undefined = await this.getBody(this.catalog.hostId.domain, currentUrl);
+            this.scrapedPageNumber.push(currentUrl);
             this.scrapedPageNumber = _.uniq(this.scrapedPageNumber);
 
             if (!$) {
@@ -157,19 +149,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 this.logInstance.getUrl(),
             ])
         );
-
-        await this.scrapeRawData.start();
-        this.phase = StringHandler.replaceString(ScrapeDetailUrlConstantPhase.RAW_DATA, [
-            this.catalog.title,
-            this.catalogId,
-        ]);
-        let checkLoop: Timeout = setInterval((): void => {
-            if (this.scrapeRawData.isTaskRunning()) {
-                return;
-            }
-            clearInterval(checkLoop);
-            this.isRunning = false;
-        }, 0);
+        this.isRunning = false;
     }
 
     /**
@@ -179,30 +159,15 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      * @return Array<string>
      */
     private urlSanitizeAndFilter(sourceUrls: Array<string>, filterArray: Array<string>): Array<string> {
-        sourceUrls = _.uniq(
-            sourceUrls.map((url): string => {
-                return UrlHandler.sanitizeUrl(url);
-            })
-        );
+        sourceUrls = _.uniq(sourceUrls.map((url): string => UrlHandler.sanitizeUrl(url)));
 
         return sourceUrls.filter((url: string): boolean => url !== '' && filterArray.indexOf(url) < 0);
     }
 
     /**
-     * Get phase
-     */
-    public getPhase(): string {
-        return this.phase;
-    }
-
-    /**
      * Get page number scraped
      */
-    public getScrapedPageNumber(): Array<string> {
-        if (!this.scrapeRawData.isTaskRunning()) {
-            return this.scrapedPageNumber;
-        }
-
-        return this.scrapeRawData.getExtractedDetailUrl();
+    public getTargetList(): Array<string> {
+        return this.scrapedPageNumber;
     }
 }
