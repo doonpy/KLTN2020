@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: ./tools/docker/node-server/Dockerfile
+    image: node-server:latest
     container_name: node-server
     entrypoint:
       - /bin/sh
@@ -22,7 +23,7 @@ services:
       - 80:3000
 
   bgr-job:
-    image: kltn2020_node-server:latest
+    image: node-server:latest
     container_name: bgr-job
     entrypoint:
       - /bin/sh
@@ -47,6 +48,7 @@ services:
     build:
       context: .
       dockerfile: ./tools/docker/monitor-server/Dockerfile
+    image: monitor-server:latest
     container_name: monitor-server
     restart: unless-stopped
     working_dir: /usr/src/app
