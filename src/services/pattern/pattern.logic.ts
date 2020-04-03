@@ -4,10 +4,7 @@ import PatternModelInterface from './pattern.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { Database } from '../database/database.index';
-import {
-    PatternErrorResponseMessage,
-    PatternErrorResponseRootCause,
-} from './pattern.error-response';
+import { PatternErrorResponseMessage, PatternErrorResponseRootCause } from './pattern.error-response';
 import { Common } from '../../common/common.index';
 import PatternApiInterface from './pattern.api.interface';
 
@@ -76,11 +73,7 @@ export default class PatternLogic extends LogicBase {
      *
      * @return Promise<PatternModelInterface>
      */
-    public async create({
-        sourceUrl,
-        mainLocator,
-        subLocator,
-    }: PatternModelInterface): Promise<PatternModelInterface> {
+    public async create({ sourceUrl, mainLocator, subLocator }: PatternModelInterface): Promise<PatternModelInterface> {
         try {
             return await new PatternModel({
                 sourceUrl: sourceUrl,
@@ -116,8 +109,7 @@ export default class PatternLogic extends LogicBase {
 
             pattern.sourceUrl = sourceUrl || pattern.sourceUrl;
             if (mainLocator) {
-                pattern.mainLocator.propertyType =
-                    mainLocator.propertyType || pattern.mainLocator.propertyType;
+                pattern.mainLocator.propertyType = mainLocator.propertyType || pattern.mainLocator.propertyType;
                 pattern.mainLocator.title = mainLocator.title || pattern.mainLocator.title;
                 pattern.mainLocator.price = mainLocator.price || pattern.mainLocator.price;
                 pattern.mainLocator.acreage = mainLocator.acreage || pattern.mainLocator.acreage;

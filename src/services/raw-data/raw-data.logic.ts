@@ -4,10 +4,7 @@ import RawDataModelInterface from './raw-data.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { RawDataConstant } from './raw-data.constant';
-import {
-    RawDataErrorResponseMessage,
-    RawDataErrorResponseRootCause,
-} from './raw-data.error-response';
+import { RawDataErrorResponseMessage, RawDataErrorResponseRootCause } from './raw-data.error-response';
 import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { DetailUrl } from '../detail-url/detail-url.index';
@@ -180,8 +177,7 @@ export default class RawDataLogic extends LogicBase {
             rawData.detailUrlId = detailUrlId || rawData.detailUrlId;
             rawData.transactionType =
                 typeof transactionType !== 'undefined' ? transactionType : rawData.transactionType;
-            rawData.propertyType =
-                typeof propertyType !== 'undefined' ? propertyType : rawData.propertyType;
+            rawData.propertyType = typeof propertyType !== 'undefined' ? propertyType : rawData.propertyType;
             rawData.postDate = postDate || rawData.postDate;
             rawData.title = title || rawData.title;
 
@@ -203,11 +199,9 @@ export default class RawDataLogic extends LogicBase {
                         return;
                     }
 
-                    let otherSimilarIndex = rawData.others.findIndex(
-                        (o: { name: string; value: string }): boolean => {
-                            return o.name === other.name;
-                        }
-                    );
+                    let otherSimilarIndex = rawData.others.findIndex((o: { name: string; value: string }): boolean => {
+                        return o.name === other.name;
+                    });
                     if (otherSimilarIndex >= 0) {
                         rawData.others[otherSimilarIndex] = other;
                     }
@@ -256,9 +250,8 @@ export default class RawDataLogic extends LogicBase {
      * @return index number
      */
     public static getPropertyTypeIndex(propertyTypeData: string): number {
-        let index: number = RawDataConstant.DEFINITION.TYPE_OF_PROPERTY.findIndex(
-            (property: Array<string>) =>
-                new RegExp(property.join('|')).test(propertyTypeData.toLowerCase())
+        let index: number = RawDataConstant.DEFINITION.TYPE_OF_PROPERTY.findIndex((property: Array<string>) =>
+            new RegExp(property.join('|')).test(propertyTypeData.toLowerCase())
         );
 
         if (index === -1) {
@@ -424,15 +417,11 @@ export default class RawDataLogic extends LogicBase {
 
         if (typeof propertyType !== 'undefined') {
             data.propertyType =
-                RawDataConstant.DEFINITION.TYPE_OF_PROPERTY[propertyType][
-                    parseInt(process.env.LANGUAGE || '0')
-                ] || '';
+                RawDataConstant.DEFINITION.TYPE_OF_PROPERTY[propertyType][parseInt(process.env.LANGUAGE || '0')] || '';
         }
 
         if (detailUrlId && Object.keys(detailUrlId).length > 0) {
-            data.detailUrl = DetailUrl.Logic.convertToResponse(
-                <DetailUrl.DocumentInterface>detailUrlId
-            );
+            data.detailUrl = DetailUrl.Logic.convertToResponse(<DetailUrl.DocumentInterface>detailUrlId);
         }
 
         if (postDate) {

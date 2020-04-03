@@ -31,9 +31,7 @@ export default class App {
      *
      * @param middleWares
      */
-    private bindMiddlewares(middleWares: {
-        forEach: (arg0: (middleWare: any) => void) => void;
-    }): void {
+    private bindMiddlewares(middleWares: { forEach: (arg0: (middleWare: any) => void) => void }): void {
         middleWares.forEach((middleWare: any): void => {
             this.app.use(middleWare);
         });

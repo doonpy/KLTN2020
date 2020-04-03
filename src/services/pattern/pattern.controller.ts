@@ -56,16 +56,10 @@ export default class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_ADDRESS_LOCATOR, new Checker.StringLength(1, null));
 
         validator.addParamValidator(this.PARAM_PROPERTY_TYPE_LOCATOR, new Checker.Type.String());
-        validator.addParamValidator(
-            this.PARAM_PROPERTY_TYPE_LOCATOR,
-            new Checker.StringLength(1, null)
-        );
+        validator.addParamValidator(this.PARAM_PROPERTY_TYPE_LOCATOR, new Checker.StringLength(1, null));
 
         validator.addParamValidator(this.PARAM_POST_DATE_LOCATOR, new Checker.Type.String());
-        validator.addParamValidator(
-            this.PARAM_POST_DATE_LOCATOR,
-            new Checker.StringLength(1, null)
-        );
+        validator.addParamValidator(this.PARAM_POST_DATE_LOCATOR, new Checker.StringLength(1, null));
 
         validator.addParamValidator(this.PARAM_SUB_LOCATOR, new Checker.Type.Object());
 
@@ -129,11 +123,9 @@ export default class PatternController extends ControllerBase {
         this.patternLogic
             .getAll(this.limit, this.offset)
             .then(({ patterns, hasNext }): void => {
-                let patternList: Array<object> = patterns.map(
-                    (pattern: PatternModelInterface): object => {
-                        return PatternLogic.convertToResponse(pattern);
-                    }
-                );
+                let patternList: Array<object> = patterns.map((pattern: PatternModelInterface): object => {
+                    return PatternLogic.convertToResponse(pattern);
+                });
 
                 let responseBody: object = {
                     patterns: patternList,
@@ -206,16 +198,10 @@ export default class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_ADDRESS_LOCATOR, new Checker.StringLength(1, null));
 
         validator.addParamValidator(this.PARAM_PROPERTY_TYPE_LOCATOR, new Checker.Type.String());
-        validator.addParamValidator(
-            this.PARAM_PROPERTY_TYPE_LOCATOR,
-            new Checker.StringLength(1, null)
-        );
+        validator.addParamValidator(this.PARAM_PROPERTY_TYPE_LOCATOR, new Checker.StringLength(1, null));
 
         validator.addParamValidator(this.PARAM_POST_DATE_LOCATOR, new Checker.Type.String());
-        validator.addParamValidator(
-            this.PARAM_POST_DATE_LOCATOR,
-            new Checker.StringLength(1, null)
-        );
+        validator.addParamValidator(this.PARAM_POST_DATE_LOCATOR, new Checker.StringLength(1, null));
 
         validator.addParamValidator(this.PARAM_SUB_LOCATOR, new Checker.Type.Object());
 
@@ -230,11 +216,7 @@ export default class PatternController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedPattern: PatternModelInterface | undefined): void => {
                 if (editedPattern) {
-                    this.sendResponse(
-                        Common.ResponseStatusCode.OK,
-                        PatternLogic.convertToResponse(editedPattern),
-                        res
-                    );
+                    this.sendResponse(Common.ResponseStatusCode.OK, PatternLogic.convertToResponse(editedPattern), res);
                 }
             })
             .catch((error: Error): void => {

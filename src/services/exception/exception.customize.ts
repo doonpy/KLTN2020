@@ -4,12 +4,7 @@ export default class ExceptionCustomize extends Error {
     public readonly statusCode: number;
     public readonly cause: string;
 
-    constructor(
-        statusCode: number,
-        message: string,
-        cause: string = '',
-        valueCause: Array<any> = []
-    ) {
+    constructor(statusCode: number, message: string, cause: string = '', valueCause: Array<any> = []) {
         super();
         this.statusCode = statusCode;
         this.message = message;

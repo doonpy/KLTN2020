@@ -25,16 +25,11 @@ export default class HostLogic extends LogicBase {
     ): Promise<{ hosts: Array<HostModelInterface>; hasNext: boolean }> {
         try {
             let conditions: object = {
-                $or: [
-                    { name: { $regex: keyword, $options: 'i' } },
-                    { domain: { $regex: keyword, $options: 'i' } },
-                ],
+                $or: [{ name: { $regex: keyword, $options: 'i' } }, { domain: { $regex: keyword, $options: 'i' } }],
             };
-            let hostQuery: DocumentQuery<
-                Array<HostModelInterface>,
-                HostModelInterface,
-                object
-            > = HostModel.find(conditions);
+            let hostQuery: DocumentQuery<Array<HostModelInterface>, HostModelInterface, object> = HostModel.find(
+                conditions
+            );
             let remainHostQuery: Query<number> = HostModel.countDocuments(conditions);
 
             if (offset) {
@@ -158,10 +153,7 @@ export default class HostLogic extends LogicBase {
     /**
      * @param domain
      */
-    public static checkHostExistedWithDomain = async (
-        domain: string,
-        isNot: boolean = false
-    ): Promise<void> => {
+    public static checkHostExistedWithDomain = async (domain: string, isNot: boolean = false): Promise<void> => {
         let result: number = await HostModel.countDocuments({ domain: domain }).exec();
 
         if (!isNot && result === 0) {
@@ -218,13 +210,7 @@ export default class HostLogic extends LogicBase {
     /**
      * @param host
      */
-    public static convertToResponse({
-        _id,
-        name,
-        domain,
-        cTime,
-        mTime,
-    }: HostModelInterface): HostApiInterface {
+    public static convertToResponse({ _id, name, domain, cTime, mTime }: HostModelInterface): HostApiInterface {
         let data: HostApiInterface = {
             id: null,
             name: null,

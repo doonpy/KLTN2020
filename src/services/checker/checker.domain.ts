@@ -4,9 +4,7 @@ import { Common } from '../../common/common.index';
 import { CheckerFailedResponse } from './checker.failed-response';
 
 export default class CheckerDomain extends CheckerBase {
-    private VALID_DOMAIN: RegExp = new RegExp(
-        /^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.([\d\w\-]+))+$/
-    );
+    private VALID_DOMAIN: RegExp = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.([\d\w\-]+))+$/);
 
     /**
      * @param paramName

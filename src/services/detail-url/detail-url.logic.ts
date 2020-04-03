@@ -5,10 +5,7 @@ import DetailUrlModelInterface from './detail-url.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { Database } from '../database/database.index';
-import {
-    DetailUrlErrorResponseMessage,
-    DetailUrlErrorResponseRootCause,
-} from './detail-url.error-response';
+import { DetailUrlErrorResponseMessage, DetailUrlErrorResponseRootCause } from './detail-url.error-response';
 import { Common } from '../../common/common.index';
 import DetailUrlApiInterface from './detail-url.api.interface';
 
@@ -133,9 +130,7 @@ export default class DetailUrlLogic extends LogicBase {
             await DetailUrlLogic.checkDetailUrlExistedWithId(id);
             await Catalog.Logic.checkCatalogExistedWithId(catalogId);
 
-            let detailUrl: DetailUrlModelInterface | null = await DetailUrlModel.findById(
-                id
-            ).exec();
+            let detailUrl: DetailUrlModelInterface | null = await DetailUrlModel.findById(id).exec();
             if (!detailUrl) {
                 return;
             }
@@ -146,12 +141,9 @@ export default class DetailUrlLogic extends LogicBase {
 
             detailUrl.catalogId = catalogId || detailUrl.catalogId;
             detailUrl.url = url || detailUrl.url;
-            detailUrl.isExtracted =
-                isExtracted !== detailUrl.isExtracted ? isExtracted : detailUrl.isExtracted;
+            detailUrl.isExtracted = isExtracted !== detailUrl.isExtracted ? isExtracted : detailUrl.isExtracted;
             detailUrl.requestRetries =
-                requestRetries !== detailUrl.requestRetries
-                    ? requestRetries
-                    : detailUrl.requestRetries;
+                requestRetries !== detailUrl.requestRetries ? requestRetries : detailUrl.requestRetries;
 
             return await (await detailUrl.save())
                 .populate({ path: 'catalogId', populate: { path: 'hostId' } })
@@ -282,10 +274,9 @@ export default class DetailUrlLogic extends LogicBase {
         isPopulate: boolean = false
     ): Promise<Array<DetailUrlModelInterface>> {
         try {
-            let query: DocumentQuery<
-                Array<DetailUrlModelInterface>,
-                DetailUrlModelInterface
-            > = DetailUrlModel.find(conditions);
+            let query: DocumentQuery<Array<DetailUrlModelInterface>, DetailUrlModelInterface> = DetailUrlModel.find(
+                conditions
+            );
             if (isPopulate) {
                 query.populate({
                     path: 'catalogId',

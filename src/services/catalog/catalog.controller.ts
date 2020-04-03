@@ -50,11 +50,9 @@ export default class CatalogController extends ControllerBase {
         this.catalogLogic
             .getAll(this.requestQuery[this.PARAM_HOST_ID], this.keyword, this.limit, this.offset)
             .then(({ catalogs, hasNext }): void => {
-                let catalogList: Array<object> = catalogs.map(
-                    (catalog: CatalogModelInterface): object => {
-                        return CatalogLogic.convertToResponse(catalog);
-                    }
-                );
+                let catalogList: Array<object> = catalogs.map((catalog: CatalogModelInterface): object => {
+                    return CatalogLogic.convertToResponse(catalog);
+                });
 
                 let responseBody: object = {
                     catalogs: catalogList,
@@ -129,11 +127,7 @@ export default class CatalogController extends ControllerBase {
         this.catalogLogic
             .create(this.requestBody)
             .then((createdHost: CatalogModelInterface): void => {
-                this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
-                    CatalogLogic.convertToResponse(createdHost),
-                    res
-                );
+                this.sendResponse(Common.ResponseStatusCode.CREATED, CatalogLogic.convertToResponse(createdHost), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -176,11 +170,7 @@ export default class CatalogController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedCatalog: CatalogModelInterface | undefined): void => {
                 if (editedCatalog) {
-                    this.sendResponse(
-                        Common.ResponseStatusCode.OK,
-                        CatalogLogic.convertToResponse(editedCatalog),
-                        res
-                    );
+                    this.sendResponse(Common.ResponseStatusCode.OK, CatalogLogic.convertToResponse(editedCatalog), res);
                 }
             })
             .catch((error: Error): void => {

@@ -13,10 +13,7 @@ const rawDataSchema = new Schema(
         },
         transactionType: {
             type: Schema.Types.Number,
-            enum: [
-                RawDataConstant.TYPE_OF_TRANSACTION.SALE,
-                RawDataConstant.TYPE_OF_TRANSACTION.RENT,
-            ],
+            enum: [RawDataConstant.TYPE_OF_TRANSACTION.SALE, RawDataConstant.TYPE_OF_TRANSACTION.RENT],
         },
         propertyType: {
             type: Schema.Types.Number,

@@ -10,10 +10,8 @@ export default class FileLog extends FileBase {
     private readonly LOG_ROOT_FOLDER: string = 'logs';
     private readonly ERROR_LOG_ROOT_FOLDER: string = 'error';
     private readonly PREFIX: string = 'log_';
-    private readonly FULL_HOST_URI: string | any = `${process.env.SERVER_PROTOCOL ||
-        'http://'}${process.env.SERVER_URI || '127.0.0.1'}${
-        process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'
-    }`;
+    private readonly FULL_HOST_URI: string | any = `${process.env.SERVER_PROTOCOL || 'http://'}${process.env
+        .SERVER_URI || '127.0.0.1'}${process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'}`;
 
     constructor() {
         super();
@@ -33,13 +31,7 @@ export default class FileLog extends FileBase {
         }
 
         this.createFolder(
-            this.PUBLIC_FOLDER_PATH +
-                '/' +
-                this.LOG_ROOT_FOLDER +
-                '/' +
-                this.folderPath +
-                '/' +
-                this.dateFolder
+            this.PUBLIC_FOLDER_PATH + '/' + this.LOG_ROOT_FOLDER + '/' + this.folderPath + '/' + this.dateFolder
         );
         this.createFolder(
             this.PUBLIC_FOLDER_PATH +

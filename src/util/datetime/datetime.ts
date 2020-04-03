@@ -14,11 +14,7 @@ export default class DateTime extends Date {
      * @param format
      * @param delimiter
      */
-    public static convertStringToDate(
-        value: string,
-        format: string,
-        delimiter: DateTimeDelimiter
-    ): Date {
+    public static convertStringToDate(value: string, format: string, delimiter: DateTimeDelimiter): Date {
         format = format.toLowerCase();
         let separatedFormat: Array<string> = format.split(delimiter);
         let separatedValue: Array<string> = value.split(delimiter);
@@ -80,8 +76,8 @@ export default class DateTime extends Date {
         let minutes: number = Math.floor(totalSeconds / 60);
         let seconds: number = totalSeconds % 60;
 
-        return `${days} days ${hours < 9 ? `0${hours}` : hours}:${
-            minutes < 9 ? `0${minutes}` : minutes
-        }:${seconds < 9 ? `0${seconds}` : seconds}`;
+        return `${days} days ${hours < 9 ? `0${hours}` : hours}:${minutes < 9 ? `0${minutes}` : minutes}:${
+            seconds < 9 ? `0${seconds}` : seconds
+        }`;
     }
 }

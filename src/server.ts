@@ -20,12 +20,7 @@ const app = new App({
         new DetailUrl.Controller(),
         new RawData.Controller(),
     ],
-    middleWares: [
-        cors(),
-        bodyParser.json(),
-        bodyParser.urlencoded({ extended: true }),
-        requestLogger,
-    ],
+    middleWares: [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
 });
 
 app.enableListen();

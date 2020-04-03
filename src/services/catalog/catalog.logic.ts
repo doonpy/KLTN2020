@@ -4,10 +4,7 @@ import { Host } from '../host/host.index';
 import CatalogModelInterface from './catalog.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
-import {
-    CatalogErrorResponseMessage,
-    CatalogErrorResponseRootCause,
-} from './catalog.error-response';
+import { CatalogErrorResponseMessage, CatalogErrorResponseRootCause } from './catalog.error-response';
 import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { Pattern } from '../pattern/pattern.index';
