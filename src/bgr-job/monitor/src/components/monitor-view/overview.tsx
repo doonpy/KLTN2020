@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import SocketClient from '../../services/socket/socket';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 
-type MonitorContent = Array<{
+type MonitorContent = {
     pid: number;
     remainTasks: number;
-    status: boolean;
-}>;
+    currentTarget: string;
+};
 
 interface Column {
-    id: 'pid' | 'remainTasks' | 'status';
+    id: 'pid' | 'remainTasks' | 'currentTarget';
     label: string;
     minWidth?: number;
     align?: 'right';
@@ -20,19 +20,18 @@ const columns: Column[] = [
     { id: 'pid', label: 'PID', minWidth: 100 },
     { id: 'remainTasks', label: 'Remain tasks', minWidth: 100 },
     {
-        id: 'status',
-        label: 'Status',
+        id: 'currentTarget',
+        label: 'Current target',
         minWidth: 100,
-        format: (value): string => (value ? 'Running' : 'Stop'),
     },
 ];
 
 export default function OverViewComponent(): JSX.Element {
-    const [monitorContent, setMonitorContent]: [MonitorContent, Function] = useState([]);
+    const [monitorContent, setMonitorContent]: [Array<MonitorContent>, Function] = useState([]);
     const socket: SocketIOClient.Socket = SocketClient.getInstance();
 
-    socket.on('monitor-overview', (data: MonitorContent): void => {
-        setMonitorContent(data);
+    socket.on('monitor-overview', (data: Array<MonitorContent>): void => {
+        setMonitorContent(data.filter((item) => item));
     });
 
     return (
@@ -57,8 +56,8 @@ export default function OverViewComponent(): JSX.Element {
                     <TableBody>
                         {monitorContent.map(
                             (row): JSX.Element => {
-                                if (!row.pid) {
-                                    return <TableRow></TableRow>;
+                                if (!row.hasOwnProperty('pid')) {
+                                    return <TableRow />;
                                 }
                                 return (
                                     <TableRow hover role="checkbox" tabIndex={-1} key={row.pid}>

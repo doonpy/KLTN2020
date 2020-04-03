@@ -1,6 +1,6 @@
 import http from 'http';
 import socketIo, { Server, Socket } from 'socket.io';
-import { checkIsRunning, getMonitorContent, getTargetList, start } from './background-job';
+import { checkIsRunning, getMonitorContent, getTargetsList, start } from './background-job';
 import Timeout = NodeJS.Timeout;
 
 /**
@@ -23,7 +23,7 @@ export default (): void => {
 
         let monitorContentLoop: Timeout = setInterval((): void => {
             socket.emit('monitor-overview', getMonitorContent());
-            socket.emit('monitor-target-list', getTargetList());
+            socket.emit('monitor-target-list', getTargetsList());
         }, 1000);
 
         socket.on('disconnect', (): void => {

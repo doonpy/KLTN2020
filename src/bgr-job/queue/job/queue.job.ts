@@ -7,7 +7,7 @@ export default class QueueJob extends QueueBase {
     private readonly index: number;
     private currentTask: any | undefined;
 
-    constructor(index: number = -1, delayTime: number | undefined = undefined) {
+    constructor(index: number = process.pid, delayTime: number | undefined = undefined) {
         super();
         this.delayTime = delayTime || this.QUEUE_DELAY_DEFAULT;
         this.index = index;

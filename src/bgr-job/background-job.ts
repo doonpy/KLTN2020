@@ -1,6 +1,4 @@
-import { BgrScrape } from './scrape/scrape.index';
 import { Catalog } from '../services/catalog/catalog.index';
-import { BgrQueue } from './queue/queue.index';
 import { Database } from '../services/database/database.index';
 import * as dotenv from 'dotenv';
 import ChatBotTelegram from '../services/chatbot/chatBotTelegram';
@@ -14,6 +12,17 @@ import path from 'path';
 
 dotenv.config();
 
+interface MonitorContent {
+    pid: number;
+    remainTasks: number;
+    currentTarget: string;
+}
+
+interface Targets {
+    pid: number;
+    targetList: Array<string>;
+}
+
 const SCHEDULE_TIME_HOUR: number = parseInt(process.env.SCHEDULE_TIME_HOUR || '0'); // hour
 const SCHEDULE_TIME_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_MINUTE || '0'); // minute
 const SCHEDULE_TIME_SECOND: number = parseInt(process.env.SCHEDULE_TIME_SECOND || '0'); // second
@@ -22,8 +31,8 @@ const SCHEDULE_TIME_DELAY_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_DE
 const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0'); // second
 const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1');
 let childProcessList: Array<ChildProcess> = [];
-let monitorContentList: Array<Array<{ pid: number; remainTasks: number; status: boolean }>> = [];
-let targetsList: Array<{ pid: number; targetList: Array<string> }> = [];
+let monitorContentList: Array<MonitorContent> = [];
+let targetsList: Array<Targets> = [];
 let isRunning: boolean = false;
 
 /**
@@ -36,47 +45,55 @@ export const checkIsRunning = (): boolean => {
 /**
  * Get monitor content
  */
-export const getMonitorContent = (): Array<Array<{
-    pid: number;
-    remainTasks: number;
-    status: boolean;
-}>> => {
-    return monitorContentList;
-};
+export const getMonitorContent = (): Array<MonitorContent> => monitorContentList;
 
 /**
  * Get target list
  */
-export const getTargetList = (): Array<{ pid: number; targetList: Array<string> }> => {
-    return targetsList;
+export const getTargetsList = (): Array<Targets> => targetsList;
+
+/**
+ * Check is background job complete
+ */
+const completeCheck = (): void => {
+    if (childProcessList.length > 0) {
+        return;
+    }
+
+    monitorContentList = [];
+    targetsList = [];
+    isRunning = false;
 };
 
 /**
  * Create child process with each job queue
  * @param catalogIdList
- * @param index
  */
-const createChildProcess = (catalogIdList: Array<number>, index: number): ChildProcess => {
+const createChildProcess = (catalogIdList: Array<number>): ChildProcess => {
     let childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.job-queue'));
 
     childProcess.on(
         'message',
-        (message: {
-            error?: Error;
-            monitorContent?: Array<{ pid: number; remainTasks: number; status: boolean }>;
-            targets: { pid: number; targetList: Array<string> };
-        }): void => {
+        (message: { error?: Error; monitorContent?: MonitorContent; targets: Targets; isComplete?: boolean }): void => {
             if (message.error) {
-                childProcessList[index] = createChildProcess(catalogIdList, index);
+                childProcessList.splice(childProcess.pid, 1);
+                let childProcess2 = createChildProcess(catalogIdList);
+                childProcessList[childProcess2.pid] = childProcess2;
                 return;
             }
 
             if (message.targets) {
-                targetsList[index] = message.targets;
+                targetsList[childProcess.pid] = message.targets;
             }
 
             if (message.monitorContent) {
-                monitorContentList[index] = message.monitorContent;
+                monitorContentList[childProcess.pid] = message.monitorContent;
+            }
+
+            if (message.isComplete) {
+                childProcessList.splice(childProcess.pid, 1);
+                monitorContentList[childProcess.pid].currentTarget = 'N/A';
+                completeCheck();
             }
         }
     );
@@ -109,22 +126,10 @@ const script = async (): Promise<void> => {
         catalogIdListDivided[threadIndex].push(catalogId);
     }
 
-    catalogIdListDivided.forEach((catalogIdList, index): void => {
-        childProcessList[index] = createChildProcess(catalogIdList, index);
+    catalogIdListDivided.forEach((catalogIdList): void => {
+        let childProcess: ChildProcess = createChildProcess(catalogIdList);
+        childProcessList[childProcess.pid] = childProcess;
     });
-
-    const checkEndLoop: Timeout = setInterval((): void => {
-        for (const childProcess of childProcessList) {
-            if (!childProcess.killed) {
-                return;
-            }
-        }
-
-        clearInterval(checkEndLoop);
-        monitorContentList = [];
-        targetsList = [];
-        isRunning = false;
-    }, 0);
 };
 
 /**

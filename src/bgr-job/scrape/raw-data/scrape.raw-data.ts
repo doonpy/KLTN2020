@@ -277,4 +277,11 @@ export default class ScrapeRawData extends ScrapeBase {
     public getTargetList(): Array<string> {
         return this.extractedDetailUrl;
     }
+
+    /**
+     * Get catalog target
+     */
+    public getCatalog(): Catalog.DocumentInterface {
+        return this.catalog;
+    }
 }

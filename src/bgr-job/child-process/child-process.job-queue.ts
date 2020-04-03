@@ -5,6 +5,13 @@ import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
 import { BgrScrape } from '../scrape/scrape.index';
 import ChatBotTelegram from '../../services/chatbot/chatBotTelegram';
+import { Catalog } from '../../services/catalog/catalog.index';
+
+interface MonitorContent {
+    pid: number;
+    remainTasks: number;
+    currentTarget: string;
+}
 
 /**
  * Initialize job queue
@@ -34,17 +41,21 @@ const initJobQueueList = (catalogIdList: Array<number>): BgrQueue.Job => {
  */
 export const getMonitorContent = (
     jobQueue: BgrQueue.Job
-): {
-    pid: number;
-    remainTasks: number;
-    status: boolean;
-} =>
-    Object({
+): { pid: number; remainTasks: number; currentTarget: string } => {
+    let monitorContent: MonitorContent = {
         pid: <any>process.pid,
         remainTasks: jobQueue.getRemainElements(),
-        status: true,
-    });
+        currentTarget: 'N/A',
+    };
 
+    let currentTask: BgrScrape.DetailUrl | BgrScrape.RawData = jobQueue.getCurrentTask();
+    let catalog: Catalog.DocumentInterface = currentTask.getCatalog();
+    if (catalog) {
+        monitorContent.currentTarget = `${catalog.title} (ID:${catalog._id})`;
+    }
+
+    return monitorContent;
+};
 /**
  * Get target list
  */
@@ -85,12 +96,17 @@ process.on(
             setInterval((): void => {
                 if (!jobQueue.checkIsRunning()) {
                     new ConsoleLog(ConsoleConstant.Type.INFO, `[PID:${pid} Crawl complete. Killing process...`).show();
+                    (<any>process).send({ isComplete: true });
                     process.exit(1);
                     return;
                 }
 
                 (<any>process).send({ monitorContent: getMonitorContent(jobQueue), targets: getTargets(jobQueue) });
             }, 1000);
+
+            setTimeout((): void => {
+                process.kill(1);
+            }, 1000 * 3600 * catalogIdList.length);
         } catch (error) {
             (<any>process).send({ error });
             new ConsoleLog(

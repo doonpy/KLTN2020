@@ -170,4 +170,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     public getTargetList(): Array<string> {
         return this.scrapedPageNumber;
     }
+
+    /**
+     * Get catalog target
+     */
+    public getCatalog(): Catalog.DocumentInterface {
+        return this.catalog;
+    }
 }

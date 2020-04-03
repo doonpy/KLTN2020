@@ -7,15 +7,18 @@ export default function TargetListComponent(): JSX.Element {
     const socket: SocketIOClient.Socket = SocketClient.getInstance();
 
     socket.on('monitor-target-list', (data: Array<Array<string>>): void => {
-        setTargetList(data);
+        setTargetList(data.filter((item) => item));
     });
 
     return (
         <Grid container justify="center">
             {targets.map(
                 (target, key): JSX.Element => {
+                    if (!target.pid) {
+                        return <Grid />;
+                    }
                     return (
-                        <Grid item xs={4} justify={'center'} key={key}>
+                        <Grid item xs justify={'center'} key={key}>
                             <Typography variant={'h5'}>PID {target.pid}</Typography>
                             {target.targetList.map(
                                 (item, key): JSX.Element => {
