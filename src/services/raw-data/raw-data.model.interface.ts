@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 import { DetailUrl } from '../detail-url/detail-url.index';
+import { Coordinate } from '../coordinate/coordinate.index';
 
 export default interface RawDataModelInterface extends mongoose.Document {
     _id: number;
@@ -23,6 +24,8 @@ export default interface RawDataModelInterface extends mongoose.Document {
             value: string;
         }
     ];
+    coordinate: Coordinate.DocumentInterface | number;
+    isGrouped: boolean;
     cTime: string;
     mTime: string;
 }

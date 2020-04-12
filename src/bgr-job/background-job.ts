@@ -5,17 +5,17 @@ import ChatBotTelegram from '../services/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import { ConsoleConstant } from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
-import initSocketServer from './socket.io';
-import Timeout = NodeJS.Timeout;
 import { ChildProcess, fork } from 'child_process';
 import path from 'path';
+import Timeout = NodeJS.Timeout;
 
 dotenv.config();
 
 interface MonitorContent {
     pid: number;
-    remainTasks: number;
-    currentTarget: string;
+    scrapeType: string;
+    catalogId: number;
+    catalogTitle: string;
 }
 
 interface Targets {
@@ -30,77 +30,62 @@ const SCHEDULE_TIME_DELAY_HOUR: number = parseInt(process.env.SCHEDULE_TIME_DELA
 const SCHEDULE_TIME_DELAY_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0'); // minute
 const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0'); // second
 const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1');
-let childProcessList: Array<ChildProcess> = [];
+const SCRAPE_TYPE_DETAIL_URL: string = 'detail-url';
+const SCRAPE_TYPE_RAW_DATA: string = 'raw-data';
+let childProcessAmount: number = 0;
 let monitorContentList: Array<MonitorContent> = [];
 let targetsList: Array<Targets> = [];
 let isRunning: boolean = false;
+let scrapeType: string = SCRAPE_TYPE_DETAIL_URL;
 
 /**
- * @return boolean
+ * Execute group data child process
  */
-export const checkIsRunning = (): boolean => {
-    return isRunning;
+const executeGroupDataChildProcess = (): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
+    childProcess.on('exit', (): void => {
+        isRunning = false;
+        new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
+    });
+    childProcess.send({});
 };
 
 /**
- * Get monitor content
+ * Execute clean data child process
  */
-export const getMonitorContent = (): Array<MonitorContent> => monitorContentList;
-
-/**
- * Get target list
- */
-export const getTargetsList = (): Array<Targets> => targetsList;
-
-/**
- * Check is background job complete
- */
-const completeCheck = (): void => {
-    if (childProcessList.length > 0) {
-        return;
-    }
-
-    monitorContentList = [];
-    targetsList = [];
-    isRunning = false;
-};
-
-/**
- * Create child process with each job queue
- * @param catalogIdList
- */
-const createChildProcess = (catalogIdList: Array<number>): ChildProcess => {
-    let childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.job-queue'));
-
+const executeCleanDataChildProcess = (): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.clean-data'));
     childProcess.on(
-        'message',
-        (message: { error?: Error; monitorContent?: MonitorContent; targets: Targets; isComplete?: boolean }): void => {
-            if (message.error) {
-                childProcessList.splice(childProcess.pid, 1);
-                let childProcess2 = createChildProcess(catalogIdList);
-                childProcessList[childProcess2.pid] = childProcess2;
-                return;
-            }
-
-            if (message.targets) {
-                targetsList[childProcess.pid] = message.targets;
-            }
-
-            if (message.monitorContent) {
-                monitorContentList[childProcess.pid] = message.monitorContent;
-            }
-
-            if (message.isComplete) {
-                childProcessList.splice(childProcess.pid, 1);
-                monitorContentList[childProcess.pid].currentTarget = 'N/A';
-                completeCheck();
-            }
+        'exit',
+        async (): Promise<void> => {
+            executeGroupDataChildProcess();
         }
     );
+    childProcess.send({});
+};
 
-    childProcess.send({ catalogIdList });
+/**
+ * Execute scrape child process
+ * @param catalogId
+ */
+const executeScrapeChildProcess = (catalogId: number | undefined): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
+    childProcess.on('exit', (): void => {
+        childProcessAmount--;
+    });
+    childProcess.send({ catalogId, scrapeType });
+    childProcessAmount++;
+};
 
-    return childProcess;
+/**
+ * Execute add coordinate process
+ */
+const executeAddCoordinateChildProcess = (): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
+    childProcess.on('exit', (): void => {
+        executeCleanDataChildProcess();
+    });
+    childProcess.send({});
 };
 
 /**
@@ -110,26 +95,38 @@ const script = async (): Promise<void> => {
     isRunning = true;
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
 
-    let catalogIdList: Array<number> = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
-    let catalogIdListDivided: Array<Array<number>> = [];
+    const catalogIdList: Array<number> = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
+    const catalogIdListLen: number = catalogIdList.length;
+    let count: number = 0;
+    let loop: Timeout = setInterval((): void => {
+        if (catalogIdList.length === 0 && childProcessAmount === 0) {
+            clearInterval(loop);
+            monitorContentList = [];
+            targetsList = [];
+            executeAddCoordinateChildProcess();
+            return;
+        }
 
-    for (const catalogId of catalogIdList) {
+        if (childProcessAmount >= THREAD_AMOUNT) {
+            return;
+        }
+
+        let catalogId: number | undefined = catalogIdList.shift();
         if (!catalogId) {
-            continue;
+            return;
         }
-        let threadIndex: number = catalogId % THREAD_AMOUNT;
-
-        if (!catalogIdListDivided[threadIndex]) {
-            catalogIdListDivided[threadIndex] = [];
+        if (scrapeType === SCRAPE_TYPE_DETAIL_URL) {
+            catalogIdList.push(catalogId);
         }
 
-        catalogIdListDivided[threadIndex].push(catalogId);
-    }
+        executeScrapeChildProcess(catalogId);
+        count++;
 
-    catalogIdListDivided.forEach((catalogIdList): void => {
-        let childProcess: ChildProcess = createChildProcess(catalogIdList);
-        childProcessList[childProcess.pid] = childProcess;
-    });
+        if (count === catalogIdListLen) {
+            scrapeType = scrapeType === SCRAPE_TYPE_DETAIL_URL ? SCRAPE_TYPE_RAW_DATA : SCRAPE_TYPE_DETAIL_URL;
+            count = 0;
+        }
+    }, 0);
 };
 
 /**
@@ -147,23 +144,26 @@ export const start = async (force: boolean = false): Promise<void> => {
         return;
     }
 
-    setInterval(async (): Promise<void> => {
-        let expectTime: Date = new Date();
-        expectTime.setUTCHours(SCHEDULE_TIME_HOUR);
-        expectTime.setUTCMinutes(SCHEDULE_TIME_MINUTE);
-        expectTime.setUTCSeconds(SCHEDULE_TIME_SECOND);
-        if (!DateTime.isExactTime(expectTime, true)) {
-            return;
-        }
+    (function clock() {
+        let checkTimeLoop: Timeout = setInterval(async (): Promise<void> => {
+            let expectTime: Date = new Date();
+            expectTime.setUTCHours(SCHEDULE_TIME_HOUR);
+            expectTime.setUTCMinutes(SCHEDULE_TIME_MINUTE);
+            expectTime.setUTCSeconds(SCHEDULE_TIME_SECOND);
+            if (!DateTime.isExactTime(expectTime, true)) {
+                return;
+            }
 
-        await script();
+            clearInterval(checkTimeLoop);
+            await script();
 
-        const delayTime: number =
-            (SCHEDULE_TIME_DELAY_SECOND || 1) *
-            (SCHEDULE_TIME_DELAY_MINUTE ? SCHEDULE_TIME_DELAY_MINUTE * 60 : 1) *
-            (SCHEDULE_TIME_DELAY_HOUR ? SCHEDULE_TIME_DELAY_HOUR * 3600 : 1);
-        setTimeout(script, 1000 * delayTime);
-    }, 1000);
+            const delayTime: number =
+                (SCHEDULE_TIME_DELAY_SECOND || 1) *
+                (SCHEDULE_TIME_DELAY_MINUTE ? SCHEDULE_TIME_DELAY_MINUTE * 60 : 1) *
+                (SCHEDULE_TIME_DELAY_HOUR ? SCHEDULE_TIME_DELAY_HOUR * 3600 : 1);
+            setTimeout(clock, 1000 * delayTime);
+        }, 1000);
+    })();
 };
 
 /**
@@ -174,10 +174,10 @@ new Database.MongoDb().connect().then(
     async (): Promise<void> => {
         try {
             await start();
-            initSocketServer();
+            await script();
         } catch (error) {
-            ChatBotTelegram.sendMessage(
-                `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\n→ Message: <code>${error.message}</code>`
+            await ChatBotTelegram.sendMessage(
+                `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`
             );
             new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.message}`).show();
         }

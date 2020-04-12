@@ -51,6 +51,8 @@ const rawDataSchema = new Schema(
                 _id: false,
             },
         ],
+        coordinate: { type: Schema.Types.Number, ref: 'coordinate' },
+        isGrouped: { type: Schema.Types.Boolean, default: false },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
@@ -60,5 +62,8 @@ rawDataSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     incrementBy: 1,
 });
+
+rawDataSchema.index({ isGrouped: 1 });
+rawDataSchema.index({ detailUrlId: 1 });
 
 export default mongoose.model<RawDataModelInterface>('raw_data', rawDataSchema);

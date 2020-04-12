@@ -1,5 +1,3 @@
-/// <reference path="./host.error-response.ts" />
-
 import HostModel from './host.model';
 import { Exception } from '../exception/exception.index';
 import HostModelInterface from './host.model.interface';

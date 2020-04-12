@@ -11,30 +11,33 @@ import DetailUrlApiInterface from './detail-url.api.interface';
 
 export default class DetailUrlLogic extends LogicBase {
     /**
+     * @param conditions
+     * @param isPopulate
      * @param limit
      * @param offset
-     * @param catalogId
      *
      * @return Promise<{ catalogs: Array<DetailUrlModelInterface>; hasNext: boolean }>
      */
     public async getAll(
-        catalogId: number,
-        limit: number,
-        offset: number
+        conditions: { [key: string]: any },
+        isPopulate: boolean,
+        limit?: number,
+        offset?: number
     ): Promise<{ detailUrls: Array<DetailUrlModelInterface>; hasNext: boolean }> {
         try {
-            let conditions: object = {
-                catalogId: catalogId || { $gt: 0 },
-            };
             let detailUrlQuery: DocumentQuery<
                 Array<DetailUrlModelInterface>,
                 DetailUrlModelInterface,
                 object
-            > = DetailUrlModel.find(conditions).populate({
-                path: 'catalogId',
-                populate: { path: 'hostId' },
-            });
+            > = DetailUrlModel.find(conditions);
             let remainDetailUrlQuery: Query<number> = DetailUrlModel.countDocuments(conditions);
+
+            if (isPopulate) {
+                detailUrlQuery.populate({
+                    path: 'catalogId',
+                    populate: { path: 'hostId' },
+                });
+            }
 
             if (offset) {
                 detailUrlQuery.skip(offset);
@@ -95,7 +98,7 @@ export default class DetailUrlLogic extends LogicBase {
     }: DetailUrlModelInterface): Promise<DetailUrlModelInterface> {
         try {
             await Catalog.Logic.checkCatalogExistedWithId(catalogId);
-            await DetailUrlLogic.checkDetailUrlExistedWithUrl(url, catalogId, true);
+            await DetailUrlLogic.checkDetailUrlExistedWithUrl(url, true);
 
             return await (
                 await new DetailUrlModel({
@@ -136,7 +139,7 @@ export default class DetailUrlLogic extends LogicBase {
             }
 
             if (detailUrl.url !== url) {
-                await DetailUrlLogic.checkDetailUrlExistedWithUrl(url, catalogId);
+                await DetailUrlLogic.checkDetailUrlExistedWithUrl(url);
             }
 
             detailUrl.catalogId = catalogId || detailUrl.catalogId;
@@ -179,20 +182,11 @@ export default class DetailUrlLogic extends LogicBase {
 
     /**
      * @param url
-     * @param catalogId
      * @param isNot
      */
-    public static async checkDetailUrlExistedWithUrl(
-        url: string,
-        catalogId: Catalog.DocumentInterface | number,
-        isNot: boolean = false
-    ): Promise<void> {
-        if (typeof catalogId === 'object') {
-            catalogId = catalogId._id;
-        }
+    public static async checkDetailUrlExistedWithUrl(url: string, isNot: boolean = false): Promise<void> {
         let result: number = await DetailUrlModel.countDocuments({
             url: url,
-            catalogId: catalogId || { $gt: 0 },
         }).exec();
 
         if (!isNot && result === 0) {
@@ -247,74 +241,32 @@ export default class DetailUrlLogic extends LogicBase {
     }
 
     /**
-     * @param id
-     * @param catalogId
-     */
-    public static async isDetailUrlBelongCatalog(
-        id: number | string | DetailUrlModelInterface,
-        catalogId: number | string | Catalog.DocumentInterface
-    ): Promise<boolean> {
-        if (typeof id === 'object') {
-            id = id._id;
-        }
-        if (typeof catalogId === 'object') {
-            catalogId = catalogId._id;
-        }
-        return (await DetailUrlModel.countDocuments({ _id: id, catalogId: catalogId }).exec()) > 0;
-    }
-
-    /**
-     * @param conditions
-     * @param isPopulate
-     *
-     * @return Promise<Array<DetailUrlModelInterface>>
-     */
-    public async getAllWithConditions(
-        conditions: object = {},
-        isPopulate: boolean = false
-    ): Promise<Array<DetailUrlModelInterface>> {
-        try {
-            let query: DocumentQuery<Array<DetailUrlModelInterface>, DetailUrlModelInterface> = DetailUrlModel.find(
-                conditions
-            );
-            if (isPopulate) {
-                query.populate({
-                    path: 'catalogId',
-                    populate: { path: 'hostId' },
-                });
-            }
-
-            return await DetailUrlModel.find(conditions).exec();
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    /**
      * @param catalogId
      * @param url
      *
      * @return DetailUrlModelInterface
      */
-    public createDocument(catalogId: number | string, url: string): DetailUrlModelInterface {
+    public static createDocument(catalogId: number | string, url: string): DetailUrlModelInterface {
         return new DetailUrlModel({
             catalogId: catalogId,
             url: url,
         });
     }
 
+    public static async aggregationQuery(aggregations: Array<object>): Promise<Array<any>> {
+        return await DetailUrlModel.aggregate(aggregations)
+            .allowDiskUse(true)
+            .exec();
+    }
+
     /**
      * @param pattern
+     * @param isPopulate
      */
-    public static convertToResponse({
-        _id,
-        catalogId,
-        url,
-        isExtracted,
-        requestRetries,
-        cTime,
-        mTime,
-    }: DetailUrlModelInterface): DetailUrlApiInterface {
+    public static convertToResponse(
+        { _id, catalogId, url, isExtracted, requestRetries, cTime, mTime }: DetailUrlModelInterface,
+        isPopulate?: boolean
+    ): DetailUrlApiInterface {
         let data: DetailUrlApiInterface = {
             id: null,
             catalog: null,
@@ -329,8 +281,10 @@ export default class DetailUrlLogic extends LogicBase {
             data.id = _id;
         }
 
-        if (catalogId && Object.keys(catalogId).length > 0) {
+        if (catalogId && Object.keys(catalogId).length > 0 && isPopulate) {
             data.catalog = Catalog.Logic.convertToResponse(<Catalog.DocumentInterface>catalogId);
+        } else {
+            data.catalog = <number>catalogId;
         }
 
         if (url) {

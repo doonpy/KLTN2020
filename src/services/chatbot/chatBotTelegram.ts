@@ -27,19 +27,19 @@ export default class ChatBotTelegram extends ChatBotBase {
     /**
      * @param message
      */
-    public static sendMessage(message: string): void {
-        receiverList.forEach(
-            async (receiver: number | string): Promise<void> => {
-                try {
-                    if (!telegramBot) {
-                        return;
-                    }
-                    await telegramBot.sendMessage(receiver, message, { parse_mode: 'HTML' });
-                } catch (error) {
-                    throw error;
+    public static async sendMessage(message: string): Promise<void> {
+        for (const receiver of receiverList) {
+            try {
+                if (!telegramBot) {
+                    return;
                 }
+                await telegramBot.sendMessage(receiver, `<b>[PID: ${process.pid}]</b>\n${message}`, {
+                    parse_mode: 'HTML',
+                });
+            } catch (error) {
+                throw error;
             }
-        );
+        }
     }
 
     /**
@@ -57,10 +57,7 @@ export default class ChatBotTelegram extends ChatBotBase {
                 return;
             }
             receiverList.push(msg.chat.id);
-            await telegramBot.sendMessage(
-                msg.chat.id,
-                `🤖<b>[Message]</b>🤖\n✅ Subscribe to notifications success.`
-            );
+            await telegramBot.sendMessage(msg.chat.id, `🤖<b>[Message]</b>🤖\n✅ Subscribe to notifications success.`);
         });
     }
 }

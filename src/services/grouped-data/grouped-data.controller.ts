@@ -1,20 +1,18 @@
 import ControllerBase from '../controller.base';
+import GroupedDataLogic from './grouped-data.logic';
 import { Request, Response } from 'express';
 import Validator from '../validator/validator';
 import { Checker } from '../checker/checker.index';
-import DetailUrlLogic from './detail-url.logic';
-import DetailUrlModelInterface from './detail-url.model.interface';
 import { Common } from '../../common/common.index';
+import GroupedDataModelInterface from './grouped-data.model.interface';
+import GroupedDataApiInterface from './grouped-data.api.interface';
 
-const commonPath: string = '/detail-urls';
-const specifyIdPath: string = '/detail-urls/:id';
+const commonPath: string = '/grouped-dataset';
+const specifyIdPath: string = '/grouped-dataset/:id';
 
-export default class DetailUrlController extends ControllerBase {
-    private detailUrlLogic: DetailUrlLogic = new DetailUrlLogic();
-    private readonly PARAM_CATALOG_ID: string = 'catalogId';
-    private readonly PARAM_URL: string = 'url';
-    private readonly PARAM_IS_EXTRACTED: string = 'isExtracted';
-    private readonly PARAM_REQUEST_RETRIES: string = 'requestRetries';
+export default class GroupedDataController extends ControllerBase {
+    private groupedDataLogic: GroupedDataLogic = new GroupedDataLogic();
+    private readonly PARAM_ITEMS: string = 'items';
 
     constructor() {
         super();
@@ -28,7 +26,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute = (req: Request, res: Response, next: any): void => {
+    protected getAllRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -39,25 +37,19 @@ export default class DetailUrlController extends ControllerBase {
 
         validator.addParamValidator(this.PARAM_POPULATE, new Checker.Type.Boolean());
 
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
-
         validator.validate(this.requestQuery);
 
-        this.detailUrlLogic
-            .getAll(
-                { [this.PARAM_CATALOG_ID]: this.requestQuery[this.PARAM_CATALOG_ID] },
-                this.populate,
-                this.limit,
-                this.offset
-            )
-            .then(({ detailUrls, hasNext }): void => {
-                let detailUrlList: Array<object> = detailUrls.map((detailUrl: DetailUrlModelInterface): object => {
-                    return DetailUrlLogic.convertToResponse(detailUrl, this.populate);
-                });
+        this.groupedDataLogic
+            .getAll(this.populate, this.limit, this.offset)
+            .then(({ groupedDataset, hasNext }): void => {
+                let groupedDataList: Array<GroupedDataApiInterface> = groupedDataset.map(
+                    (groupedData: GroupedDataModelInterface): GroupedDataApiInterface => {
+                        return GroupedDataLogic.convertToResponse(groupedData);
+                    }
+                );
 
                 let responseBody: object = {
-                    detailUrls: detailUrlList,
+                    groupedDataset: groupedDataList,
                     hasNext: hasNext,
                 };
 
@@ -73,7 +65,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (req: Request, res: Response, next: any): void => {
+    protected getWithIdRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -81,13 +73,13 @@ export default class DetailUrlController extends ControllerBase {
 
         validator.validate(this.requestParams);
 
-        this.detailUrlLogic
+        this.groupedDataLogic
             .getById(this.requestParams[this.PARAM_ID])
-            .then((detailUrl: DetailUrlModelInterface | null): void => {
+            .then((groupedData: GroupedDataModelInterface | null): void => {
                 let responseBody: object = {};
-                if (detailUrl) {
+                if (groupedData) {
                     responseBody = {
-                        detailUrl: DetailUrlLogic.convertToResponse(detailUrl),
+                        groupedData: GroupedDataLogic.convertToResponse(groupedData),
                     };
                 }
 
@@ -103,23 +95,19 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute = (req: Request, res: Response, next: any): void => {
+    protected createRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
-
-        validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
-        validator.addParamValidator(this.PARAM_URL, new Checker.StringLength(1, null));
+        validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
 
         validator.validate(this.requestBody);
 
-        this.detailUrlLogic
+        this.groupedDataLogic
             .create(this.requestBody)
-            .then((createdDetailUrl: DetailUrlModelInterface): void => {
+            .then((createdGroupedData: GroupedDataModelInterface): void => {
                 this.sendResponse(
                     Common.ResponseStatusCode.CREATED,
-                    DetailUrlLogic.convertToResponse(createdDetailUrl),
+                    GroupedDataLogic.convertToResponse(createdGroupedData),
                     res
                 );
             })
@@ -133,33 +121,24 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute = (req: Request, res: Response, next: any): void => {
+    protected updateRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
         validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
 
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
-
-        validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
-        validator.addParamValidator(this.PARAM_URL, new Checker.StringLength(1, 100));
-
-        validator.addParamValidator(this.PARAM_IS_EXTRACTED, new Checker.Type.Boolean());
-
-        validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.Type.Integer());
-        validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.IntegerRange(0, null));
+        validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
 
         validator.validate(this.requestParams);
         validator.validate(this.requestBody);
 
-        this.detailUrlLogic
+        this.groupedDataLogic
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
-            .then((editedDetailUrl: DetailUrlModelInterface | undefined): void => {
-                if (editedDetailUrl) {
+            .then((editedGroupedData: GroupedDataModelInterface | undefined): void => {
+                if (editedGroupedData) {
                     this.sendResponse(
                         Common.ResponseStatusCode.OK,
-                        DetailUrlLogic.convertToResponse(editedDetailUrl),
+                        GroupedDataLogic.convertToResponse(editedGroupedData, this.populate),
                         res
                     );
                 }
@@ -174,7 +153,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute = (req: Request, res: Response, next: any): void => {
+    protected deleteRoute = (req: Request, res: Response, next: any): any => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -182,7 +161,7 @@ export default class DetailUrlController extends ControllerBase {
 
         validator.validate(this.requestParams);
 
-        this.detailUrlLogic
+        this.groupedDataLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
                 this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);

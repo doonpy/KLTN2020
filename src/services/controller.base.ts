@@ -7,6 +7,7 @@ export default abstract class ControllerBase {
 
     protected limit: number = 100;
     protected offset: number = 0;
+    protected populate: boolean = false;
     protected keyword: string = '';
     protected hasNext: boolean = false;
     protected requestBody: any = {};
@@ -19,6 +20,7 @@ export default abstract class ControllerBase {
     protected readonly PARAM_LIMIT: string = 'limit';
     protected readonly PARAM_OFFSET: string = 'offset';
     protected readonly PARAM_KEYWORD: string = 'keyword';
+    protected readonly PARAM_POPULATE: string = 'populate';
 
     protected constructor() {}
 
@@ -81,6 +83,7 @@ export default abstract class ControllerBase {
 
         this.limit = limit || this.limit;
         this.offset = offset || this.offset;
+        this.populate = req.query.populate === 'true';
         this.keyword = req.query.keyword ? req.query.keyword.trim() : this.keyword;
 
         this.requestParams = {};

@@ -44,20 +44,6 @@ services:
     ports:
       - 6789:6789
 
-  monitor-server:
-    build:
-      context: .
-      dockerfile: ./tools/docker/monitor-server/Dockerfile
-    image: monitor-server:latest
-    container_name: monitor-server
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    environment:
-      - NODE_ENV=production
-    tty: true
-    ports:
-      - 5000:80
-
 #  mongo-db:
 #    image: mongo
 #    container_name: mongo-db

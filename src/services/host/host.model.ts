@@ -18,4 +18,6 @@ hostSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
+hostSchema.index({ domain: 1 });
+
 export default mongoose.model<HostModelInterface>('host', hostSchema);

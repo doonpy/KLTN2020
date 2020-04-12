@@ -8,6 +8,7 @@ import { Catalog } from './services/catalog/catalog.index';
 import { Pattern } from './services/pattern/pattern.index';
 import { DetailUrl } from './services/detail-url/detail-url.index';
 import { requestLogger } from './middleware/request-logger/request-logger';
+import { GroupedData } from './services/grouped-data/grouped-data.index';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const app = new App({
         new Pattern.Controller(),
         new DetailUrl.Controller(),
         new RawData.Controller(),
+        new GroupedData.Controller(),
     ],
     middleWares: [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
 });
