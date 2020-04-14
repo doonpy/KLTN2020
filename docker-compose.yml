@@ -3,8 +3,8 @@ services:
   node-server:
     build:
       context: .
-      dockerfile: ./tools/docker/node-server/Dockerfile
-    image: node-server:latest
+      dockerfile: Dockerfile
+    image: pk2020:latest
     container_name: node-server
     entrypoint:
       - /bin/sh
@@ -23,7 +23,7 @@ services:
       - 3000:3000
 
   bgr-job:
-    image: node-server:latest
+    image: pk2020:latest
     container_name: bgr-job
     entrypoint:
       - /bin/sh
@@ -41,16 +41,3 @@ services:
     tty: true
     volumes:
       - ./public:/usr/src/app/public
-
-#  mongo-db:
-#    image: mongo
-#    container_name: mongo-db
-#    restart: unless-stopped
-#    tty: true
-#    environment:
-#      - MONGO_INITDB_ROOT_USERNAME=alice
-#      - MONGO_INITDB_ROOT_PASSWORD=alice
-#    ports:
-#      - 27017-27019:27017-27019
-#    volumes:
-#      - ./mongo-data:/data/db

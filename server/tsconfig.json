@@ -18,8 +18,5 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true
-  },
-  "exclude": [
-    "./bgr-job/monitor/*"
-  ]
+  }
 }
