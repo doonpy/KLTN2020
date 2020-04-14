@@ -33,6 +33,7 @@ export default class ConsoleLog {
                 break;
         }
 
+        // tslint:disable-next-line:no-console
         console.log(`${prefix} ${this._msgContent}`);
     }
 }

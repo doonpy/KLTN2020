@@ -5,11 +5,13 @@ import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { RawDataConstant } from './raw-data.constant';
 import { RawDataErrorResponseMessage, RawDataErrorResponseRootCause } from './raw-data.error-response';
-import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { DetailUrl } from '../detail-url/detail-url.index';
 import RawDataApiInterface from './raw-data.api.interface';
 import { Coordinate } from '../coordinate/coordinate.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
+import DetailUrlModelInterface from '../detail-url/detail-url.model.interface';
+import CoordinateModelInterface from '../coordinate/coordinate.model.interface';
 
 export default class RawDataLogic extends LogicBase {
     /**
@@ -24,14 +26,14 @@ export default class RawDataLogic extends LogicBase {
         isPopulate?: boolean,
         limit?: number,
         offset?: number
-    ): Promise<{ rawDataset: Array<RawDataModelInterface>; hasNext: boolean }> {
+    ): Promise<{ rawDataset: RawDataModelInterface[]; hasNext: boolean }> {
         try {
-            let rawDatasetQuery: DocumentQuery<
-                Array<RawDataModelInterface>,
+            const rawDatasetQuery: DocumentQuery<
+                RawDataModelInterface[],
                 RawDataModelInterface,
                 object
             > = RawDataModel.find(conditions || {});
-            let remainRawDatasetQuery: Query<number> = RawDataModel.countDocuments(conditions || {});
+            const remainRawDatasetQuery: Query<number> = RawDataModel.countDocuments(conditions || {});
 
             if (isPopulate) {
                 rawDatasetQuery
@@ -54,16 +56,16 @@ export default class RawDataLogic extends LogicBase {
                 rawDatasetQuery.limit(limit);
             }
 
-            let rawDataset: Array<RawDataModelInterface> = await rawDatasetQuery.exec();
-            let remainRawDataset = await remainRawDatasetQuery.exec();
+            const rawDataset: RawDataModelInterface[] = await rawDatasetQuery.exec();
+            const remainRawDataset = await remainRawDatasetQuery.exec();
 
             return {
-                rawDataset: rawDataset,
+                rawDataset,
                 hasNext: rawDataset.length < remainRawDataset,
             };
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -91,7 +93,7 @@ export default class RawDataLogic extends LogicBase {
                 .exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -120,15 +122,15 @@ export default class RawDataLogic extends LogicBase {
 
             return await (
                 await new RawDataModel({
-                    detailUrlId: detailUrlId,
-                    transactionType: transactionType,
-                    propertyType: propertyType,
-                    postDate: postDate,
-                    title: title,
-                    price: price,
-                    acreage: acreage,
-                    address: address,
-                    others: others,
+                    detailUrlId,
+                    transactionType,
+                    propertyType,
+                    postDate,
+                    title,
+                    price,
+                    acreage,
+                    address,
+                    others,
                     coordinate: null,
                     isGrouped: false,
                 }).save()
@@ -144,7 +146,7 @@ export default class RawDataLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -177,7 +179,7 @@ export default class RawDataLogic extends LogicBase {
             await DetailUrl.Logic.checkDetailUrlExistedWithId(detailUrlId);
             await RawDataLogic.checkRawDataExistedWithId(id);
 
-            let rawData: RawDataModelInterface | null = await RawDataModel.findById(id).exec();
+            const rawData: RawDataModelInterface | null = await RawDataModel.findById(id).exec();
             if (!rawData) {
                 return;
             }
@@ -213,9 +215,11 @@ export default class RawDataLogic extends LogicBase {
                         return;
                     }
 
-                    let otherSimilarIndex = rawData.others.findIndex((o: { name: string; value: string }): boolean => {
-                        return o.name === other.name;
-                    });
+                    const otherSimilarIndex = rawData.others.findIndex(
+                        (o: { name: string; value: string }): boolean => {
+                            return o.name === other.name;
+                        }
+                    );
                     if (otherSimilarIndex >= 0) {
                         rawData.others[otherSimilarIndex] = other;
                     }
@@ -236,7 +240,7 @@ export default class RawDataLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -254,7 +258,7 @@ export default class RawDataLogic extends LogicBase {
             await RawDataModel.findByIdAndDelete(id).exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -265,13 +269,13 @@ export default class RawDataLogic extends LogicBase {
      * @param detailUrlId
      * @return Promise<void>
      */
-    public async deleteByDetailUrlId(detailUrlId: number | string): Promise<void> {
+    public async deleteByDetailUrlId(detailUrlId: number): Promise<void> {
         try {
             await RawDataLogic.checkRawDataExistedWithDetailUrlId(detailUrlId);
-            await RawDataModel.findOneAndDelete({ detailUrlId: detailUrlId });
+            await RawDataModel.findOneAndDelete({ detailUrlId });
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -282,7 +286,7 @@ export default class RawDataLogic extends LogicBase {
      * @return index number
      */
     public static getPropertyTypeIndex(propertyTypeData: string): number {
-        let index: number = RawDataConstant.DEFINITION.TYPE_OF_PROPERTY.findIndex((property: Array<string>) =>
+        const index: number = RawDataConstant.DEFINITION.TYPE_OF_PROPERTY.findIndex((property: string[]) =>
             new RegExp(property.join('|')).test(propertyTypeData.toLowerCase())
         );
 
@@ -304,11 +308,13 @@ export default class RawDataLogic extends LogicBase {
         if (typeof id === 'object') {
             id = id._id;
         }
-        let result: number = await RawDataModel.countDocuments({ _id: id }).exec();
+        const result: number = await RawDataModel.countDocuments({
+            _id: id as number,
+        }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_1,
                 RawDataErrorResponseRootCause.RD_RC_1,
                 ['id', id]
@@ -317,7 +323,7 @@ export default class RawDataLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_2,
                 RawDataErrorResponseRootCause.RD_RC_2,
                 ['id', id]
@@ -330,17 +336,19 @@ export default class RawDataLogic extends LogicBase {
      * @param isNot
      */
     public static async checkRawDataExistedWithDetailUrlId(
-        detailUrlId: DetailUrl.DocumentInterface | number | string,
+        detailUrlId: DetailUrlModelInterface | number | string,
         isNot: boolean = false
     ): Promise<void> {
         if (typeof detailUrlId === 'object') {
             detailUrlId = detailUrlId._id;
         }
-        let result: number = await RawDataModel.countDocuments({ detailUrlId: detailUrlId }).exec();
+        const result: number = await RawDataModel.countDocuments({
+            _id: detailUrlId as number,
+        }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_1,
                 RawDataErrorResponseRootCause.RD_RC_1,
                 ['detailUrlId', detailUrlId]
@@ -349,7 +357,7 @@ export default class RawDataLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 RawDataErrorResponseMessage.RD_MSG_2,
                 RawDataErrorResponseRootCause.RD_RC_2,
                 ['detailUrlId', detailUrlId]
@@ -385,21 +393,21 @@ export default class RawDataLogic extends LogicBase {
             measureUnit: string;
         },
         address: string,
-        others: Array<{
+        others: {
             name: string;
             value: string;
-        }>
+        }[]
     ): RawDataModelInterface {
         return new RawDataModel({
-            detailUrlId: detailUrlId,
-            transactionType: transactionType,
-            propertyType: propertyType,
-            postDate: postDate,
-            title: title,
-            price: price,
-            acreage: acreage,
-            address: address,
-            others: others,
+            detailUrlId,
+            transactionType,
+            propertyType,
+            postDate,
+            title,
+            price,
+            acreage,
+            address,
+            others,
         });
     }
 
@@ -427,7 +435,7 @@ export default class RawDataLogic extends LogicBase {
         }: RawDataModelInterface,
         isPopulate?: boolean
     ): RawDataApiInterface {
-        let data: RawDataApiInterface = {
+        const data: RawDataApiInterface = {
             id: null,
             transactionType: null,
             propertyType: null,
@@ -451,19 +459,21 @@ export default class RawDataLogic extends LogicBase {
         if (typeof transactionType !== 'undefined') {
             data.transactionType =
                 RawDataConstant.DEFINITION.TYPE_OF_TRANSACTION[transactionType][
-                    parseInt(process.env.LANGUAGE || '0')
+                    parseInt(process.env.LANGUAGE || '0', 10)
                 ] || '';
         }
 
         if (typeof propertyType !== 'undefined') {
             data.propertyType =
-                RawDataConstant.DEFINITION.TYPE_OF_PROPERTY[propertyType][parseInt(process.env.LANGUAGE || '0')] || '';
+                RawDataConstant.DEFINITION.TYPE_OF_PROPERTY[propertyType][parseInt(process.env.LANGUAGE || '0', 10)] ||
+                '';
         }
 
-        if (detailUrlId && Object.keys(detailUrlId).length > 0 && isPopulate) {
-            data.detailUrl = DetailUrl.Logic.convertToResponse(<DetailUrl.DocumentInterface>detailUrlId);
-        } else {
-            data.detailUrl = <number>detailUrlId;
+        if (detailUrlId) {
+            data.detailUrl =
+                Object.keys(detailUrlId).length > 0 && isPopulate
+                    ? DetailUrl.Logic.convertToResponse(detailUrlId as DetailUrlModelInterface)
+                    : (detailUrlId as number);
         }
 
         if (postDate) {
@@ -494,7 +504,7 @@ export default class RawDataLogic extends LogicBase {
         }
 
         if (Object.keys(coordinate).length > 0) {
-            data.coordinate = Coordinate.Logic.convertToResponse(<Coordinate.DocumentInterface>coordinate);
+            data.coordinate = Coordinate.Logic.convertToResponse(coordinate as CoordinateModelInterface);
         }
 
         if (typeof isGrouped !== 'undefined') {

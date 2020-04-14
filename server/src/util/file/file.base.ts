@@ -3,10 +3,7 @@ import { FileErrorResponse } from './file.error-response';
 import StringHandler from '../string-handler/string-handler';
 
 export default class FileBase {
-    private readonly CONTENT_ROOT_FOLDER: string = process.env.CONTENT_ROOT_FOLDER || './src';
     protected readonly PUBLIC_FOLDER_PATH: string = process.env.PUBLIC_FOLDER_PATH || './public';
-
-    constructor() {}
 
     /**
      * Check path is existed. The 'path' must start from content root.
@@ -56,9 +53,7 @@ export default class FileBase {
      */
     public readFile(filePath: string): string {
         if (!this.isPathExisted(filePath)) {
-            throw Error(
-                StringHandler.replaceString(FileErrorResponse.Message.FILE_ERR_3, [filePath])
-            );
+            throw Error(StringHandler.replaceString(FileErrorResponse.Message.FILE_ERR_3, [filePath]));
         }
         return fs.readFileSync(filePath, { encoding: 'utf-8' });
     }

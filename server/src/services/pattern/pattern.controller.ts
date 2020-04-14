@@ -1,10 +1,10 @@
 import ControllerBase from '../controller.base';
 import PatternLogic from './pattern.logic';
 import { Request, Response } from 'express';
-import Validator from '../validator/validator';
-import { Checker } from '../checker/checker.index';
+import Validator from '../../util/validator/validator';
+import { Checker } from '../../util/checker/checker.index';
 import PatternModelInterface from './pattern.model.interface';
-import { Common } from '../../common/common.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 const commonPath: string = '/patterns';
 const specifyIdPath: string = '/patterns/:id';
@@ -72,11 +72,7 @@ export default class PatternController extends ControllerBase {
         this.patternLogic
             .create(this.requestBody)
             .then((createdPattern: PatternModelInterface): void => {
-                this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
-                    PatternLogic.convertToResponse(createdPattern),
-                    res
-                );
+                this.sendResponse(ResponseStatusCode.CREATED, PatternLogic.convertToResponse(createdPattern), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -99,7 +95,7 @@ export default class PatternController extends ControllerBase {
         this.patternLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);
+                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -123,16 +119,16 @@ export default class PatternController extends ControllerBase {
         this.patternLogic
             .getAll(this.limit, this.offset)
             .then(({ patterns, hasNext }): void => {
-                let patternList: Array<object> = patterns.map((pattern: PatternModelInterface): object => {
+                const patternList: object[] = patterns.map((pattern: PatternModelInterface): object => {
                     return PatternLogic.convertToResponse(pattern);
                 });
 
-                let responseBody: object = {
+                const responseBody: object = {
                     patterns: patternList,
-                    hasNext: hasNext,
+                    hasNext,
                 };
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -162,7 +158,7 @@ export default class PatternController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -216,7 +212,7 @@ export default class PatternController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedPattern: PatternModelInterface | undefined): void => {
                 if (editedPattern) {
-                    this.sendResponse(Common.ResponseStatusCode.OK, PatternLogic.convertToResponse(editedPattern), res);
+                    this.sendResponse(ResponseStatusCode.OK, PatternLogic.convertToResponse(editedPattern), res);
                 }
             })
             .catch((error: Error): void => {

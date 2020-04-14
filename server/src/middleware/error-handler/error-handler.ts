@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { Exception } from '../../services/exception/exception.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ExceptionCustomize from '../../services/exception/exception.customize';
 
 /**
  * Catch 404 and forward to error handler
@@ -9,13 +11,13 @@ import { Exception } from '../../services/exception/exception.index';
  * @param next
  */
 export const notFoundRoute = (req: Request, res: Response, next: any): void => {
-    const Exception = require('../../services/exception/exception.index').Exception;
+    const exceptionModule = require('../../services/exception/exception.index');
     const ErrorHandlerConstant = require('./error-handler.constant').ErrorHandlerConstant;
     const Common = require('../../common/common.index').Common;
 
     next(
-        new Exception.Customize(
-            Common.ResponseStatusCode.NOT_FOUND,
+        new exceptionModule.Exception.Customize(
+            ResponseStatusCode.NOT_FOUND,
             ErrorHandlerConstant.PATH_NOT_FOUND,
             '%s does not exits.',
             [req.path]
@@ -32,7 +34,7 @@ export const notFoundRoute = (req: Request, res: Response, next: any): void => {
  * @param next
  */
 export const errorHandler = (
-    { statusCode, message, cause, stack }: Exception.Customize,
+    { statusCode, message, cause, stack }: ExceptionCustomize,
     req: Request,
     res: Response,
     next: any
@@ -43,26 +45,26 @@ export const errorHandler = (
     if (process.env.NODE_ENV === 'development') {
         body = {
             error: {
-                message: message,
+                message,
                 rootCause: cause,
                 input: convertToString([req.params, req.query, req.body]),
-                stack: stack,
+                stack,
             },
         };
     } else {
         body = {
             error: {
-                message: message,
+                message,
                 rootCause: cause,
                 input: convertToString([req.params, req.query, req.body]),
             },
         };
     }
 
-    if (statusCode === Common.ResponseStatusCode.NO_CONTENT) {
+    if (statusCode === ResponseStatusCode.NO_CONTENT) {
         res.status(statusCode).json();
     } else {
-        res.status(statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR).json(body);
+        res.status(statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR).json(body);
     }
 };
 
@@ -72,22 +74,22 @@ export const errorHandler = (
  *
  * @param inputs
  */
-const convertToString = (inputs: Array<{ [key: string]: string }>): string => {
-    let inputString: Array<string> = [];
+const convertToString = (inputs: { [key: string]: string }[]): string => {
+    const inputString: string[] = [];
 
     if (inputs.length === 0) {
         return '';
     }
 
     inputs.forEach((input: { [key: string]: string }) => {
-        let keys: Array<string> = Object.keys(input);
+        const keys: string[] = Object.keys(input);
 
         if (keys.length === 0) {
             return;
         }
 
         keys.forEach((key: string) => {
-            let value: any = input[key];
+            const value: any = input[key];
 
             if (typeof value === 'object') {
                 inputString.push(`'${key}' => {${convertToString([value])}}`);

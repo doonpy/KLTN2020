@@ -2,7 +2,7 @@ import CheckerBase from '../checker/checker.base';
 import ValidatorParam from './validator.param';
 
 export default class Validator {
-    private paramValidators: Array<ValidatorParam> = [];
+    private paramValidators: ValidatorParam[] = [];
 
     /**
      * @param name

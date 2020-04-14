@@ -1,19 +1,19 @@
 import CheckerTypeBase from './checker.type.base';
-import { Exception } from '../../exception/exception.index';
-import { Common } from '../../../common/common.index';
 import { CheckerTypeFailedResponse } from './checker.type.failed-response';
+import { ResponseStatusCode } from '../../../common/common.response-status.code';
+import { Exception } from '../../../services/exception/exception.index';
 
-export default class CheckerTypeBoolean extends CheckerTypeBase {
+export default class CheckerTypeArray extends CheckerTypeBase {
     /**
      * @param paramName
      * @param value
      */
     public checkType(paramName: string, value: any): void {
-        if (value !== 'true' && value !== 'false') {
+        if (!Array.isArray(value)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerTypeFailedResponse.Message.INVALID_TYPE,
-                CheckerTypeFailedResponse.RootCause.BOOLEAN,
+                CheckerTypeFailedResponse.RootCause.ARRAY,
                 [paramName]
             );
         }

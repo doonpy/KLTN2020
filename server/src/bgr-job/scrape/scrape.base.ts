@@ -1,29 +1,32 @@
 import cherrio from 'cheerio';
-import ChatBotTelegram from '../../services/chatbot/chatBotTelegram';
+import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import { Response } from 'request';
 import StringHandler from '../../util/string-handler/string-handler';
 import CatalogModelInterface from '../../services/catalog/catalog.model.interface';
 import Request from '../../util/request/request';
 import { ScrapeConstant } from './scrape.constant';
-import { Common } from '../../common/common.index';
 import { File } from '../../util/file/file.index';
 import DateTime from '../../util/datetime/datetime';
-import { Exception } from '../../services/exception/exception.index';
 import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
+import FileLog from '../../util/file/file.log';
+import ExceptionCustomize from '../../services/exception/exception.customize';
 
 export default abstract class ScrapeBase {
-    protected readonly logInstance: File.Log = new File.Log();
+    protected readonly logInstance: FileLog = new File.Log();
     protected failedRequestCounter: number = 0;
     protected successRequestCounter: number = 0;
     protected countNumber: number = 0;
     protected startTime: [number, number] | undefined;
     protected requestCounter: number = 0;
     protected isRunning: boolean = false;
+    protected telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
 
-    protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100');
+    protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100', 10);
 
-    protected constructor() {}
+    protected constructor() {
+    }
 
     /**
      * @param domain
@@ -32,22 +35,22 @@ export default abstract class ScrapeBase {
      * @return Promise<CheerioStatic | undefined>
      */
     protected async getBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
-        let url: string = path.includes(domain) ? path : domain + path;
+        const url: string = path.includes(domain) ? path : domain + path;
         try {
             const response: Response = await new Request(url).send();
             const statusCode: number = response.statusCode;
 
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
-                `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
+                `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`,
             ).show();
 
-            if (response.statusCode !== Common.ResponseStatusCode.OK || response.request.uri.href !== url) {
+            if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
                 this.writeLog(
                     ScrapeConstant.LOG_ACTION.REQUEST,
                     `${statusCode === 200 ? 404 : response.statusCode} (${response.elapsedTime}ms): '${
                         response.request.path
-                    }'`
+                    }'`,
                 );
                 this.failedRequestCounter++;
                 return;
@@ -55,7 +58,7 @@ export default abstract class ScrapeBase {
 
             this.writeLog(
                 ScrapeConstant.LOG_ACTION.REQUEST,
-                `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+                `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`,
             );
 
             this.successRequestCounter++;
@@ -72,14 +75,14 @@ export default abstract class ScrapeBase {
      *
      * @return dataArray
      */
-    protected extractData($: CheerioStatic, locator: string, attribute: string = ''): Array<string> {
-        let elementsSelected = $(locator);
+    protected extractData($: CheerioStatic, locator: string, attribute: string = ''): string[] {
+        const elementsSelected = $(locator);
 
         if (elementsSelected.length === 0) {
             return [this.getDataOfElement(elementsSelected, attribute)];
         }
 
-        let dataArray: Array<string> = [];
+        const dataArray: string[] = [];
         elementsSelected.each((index: number, element: CheerioElement): void => {
             dataArray.push(this.getDataOfElement($(element), attribute));
         });
@@ -98,9 +101,9 @@ export default abstract class ScrapeBase {
         if (attribute) {
             data = element.attr(attribute) || '';
         } else {
-            element.contents().each((index: number, element: any): void => {
-                if (element.nodeType === ScrapeConstant.NODE_TYPE.TEXT) {
-                    data += element.data;
+            element.contents().each((index: number, item: any): void => {
+                if (item.nodeType === ScrapeConstant.NODE_TYPE.TEXT) {
+                    data += item.data;
                 }
             });
         }
@@ -111,7 +114,7 @@ export default abstract class ScrapeBase {
     /**
      * Abstract start method
      */
-    public abstract async start(nextProcess: Function | undefined): Promise<void>;
+    public abstract async start(): Promise<void>;
 
     /**
      * Finish action abstract method.
@@ -136,10 +139,10 @@ export default abstract class ScrapeBase {
      */
     protected exportLog(
         catalog: CatalogModelInterface,
-        customizeFooter: Array<{ name: string; value: string | number }> = []
+        customizeFooter: { name: string; value: string | number }[] = [],
     ): void {
-        let endTime: [number, number] = process.hrtime(this.startTime);
-        let footerLogContent: Array<{ name: string; value: number | string }> = [
+        const endTime: [number, number] = process.hrtime(this.startTime);
+        let footerLogContent: { name: string; value: number | string }[] = [
             {
                 name: 'Execution time',
                 value: StringHandler.replaceString(`${DateTime.convertTotalSecondsToTime(endTime[0])}::%i`, [
@@ -193,9 +196,9 @@ export default abstract class ScrapeBase {
      * @param action
      * @param content
      */
-    protected writeErrorLog(error: Error | Exception.Customize, action: string, content: string): void {
+    protected writeErrorLog(error: Error | ExceptionCustomize, action: string, content: string): void {
         this.logInstance.addLine(
-            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`
+            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`,
         );
     }
 }

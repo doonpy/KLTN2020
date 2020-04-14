@@ -5,10 +5,12 @@ import CatalogModelInterface from './catalog.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { CatalogErrorResponseMessage, CatalogErrorResponseRootCause } from './catalog.error-response';
-import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { Pattern } from '../pattern/pattern.index';
 import CatalogApiInterface from './catalog.api.interface';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
+import HostModelInterface from '../host/host.model.interface';
+import PatternModelInterface from '../pattern/pattern.model.interface';
 
 export default class CatalogLogic extends LogicBase {
     /**
@@ -20,21 +22,21 @@ export default class CatalogLogic extends LogicBase {
      * @return Promise<{ catalogs: Array<CatalogModelInterface>; hasNext: boolean }>
      */
     public async getAll(
-        hostId: number | undefined = undefined,
-        keyword: string | undefined = undefined,
-        limit: number | undefined = undefined,
-        offset: number | undefined = undefined
-    ): Promise<{ catalogs: Array<CatalogModelInterface>; hasNext: boolean }> {
+        hostId?: number,
+        keyword?: string,
+        limit?: number,
+        offset?: number
+    ): Promise<{ catalogs: CatalogModelInterface[]; hasNext: boolean }> {
         try {
-            let conditions: object = {
+            const conditions: object = {
                 $or: [
                     { title: { $regex: keyword || '', $options: 'i' } },
                     { url: { $regex: keyword || '', $options: 'i' } },
                 ],
                 hostId: hostId || { $gt: 0 }, // get all without host id
             };
-            let catalogQuery: DocumentQuery<
-                Array<CatalogModelInterface>,
+            const catalogQuery: DocumentQuery<
+                CatalogModelInterface[],
                 CatalogModelInterface,
                 object
             > = CatalogModel.find(conditions)
@@ -46,7 +48,7 @@ export default class CatalogLogic extends LogicBase {
                         populate: { path: 'catalogId', populate: { path: 'hostId' } },
                     },
                 });
-            let remainCatalogQuery: Query<number> = CatalogModel.countDocuments(conditions);
+            const remainCatalogQuery: Query<number> = CatalogModel.countDocuments(conditions);
 
             if (offset) {
                 catalogQuery.skip(offset);
@@ -57,13 +59,13 @@ export default class CatalogLogic extends LogicBase {
                 catalogQuery.limit(limit);
             }
 
-            let catalogs: Array<CatalogModelInterface> = await catalogQuery.exec();
-            let remainCatalog: number = await remainCatalogQuery.exec();
+            const catalogs: CatalogModelInterface[] = await catalogQuery.exec();
+            const remainCatalog: number = await remainCatalogQuery.exec();
 
-            return { catalogs: catalogs, hasNext: catalogs.length < remainCatalog };
+            return { catalogs, hasNext: catalogs.length < remainCatalog };
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -91,7 +93,7 @@ export default class CatalogLogic extends LogicBase {
                 .exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -119,10 +121,10 @@ export default class CatalogLogic extends LogicBase {
 
             return await (
                 await new CatalogModel({
-                    title: title,
-                    url: url,
-                    locator: locator,
-                    hostId: hostId,
+                    title,
+                    url,
+                    locator,
+                    hostId,
                     patternId: patternId || 0,
                 }).save()
             )
@@ -137,7 +139,7 @@ export default class CatalogLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -161,7 +163,7 @@ export default class CatalogLogic extends LogicBase {
                 await Pattern.Logic.checkPatternExistedWithId(patternId);
             }
 
-            let catalog: CatalogModelInterface | null = await CatalogModel.findById(id).exec();
+            const catalog: CatalogModelInterface | null = await CatalogModel.findById(id).exec();
             if (!catalog) {
                 return;
             }
@@ -191,7 +193,7 @@ export default class CatalogLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -211,7 +213,7 @@ export default class CatalogLogic extends LogicBase {
             return null;
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -225,20 +227,20 @@ export default class CatalogLogic extends LogicBase {
      */
     public static checkCatalogExistedWithUrl = async (
         url: string,
-        hostId?: Host.DocumentInterface | number,
+        hostId?: HostModelInterface | number,
         isNot: boolean = false
     ): Promise<void> => {
         if (typeof hostId === 'object') {
             hostId = hostId._id;
         }
-        let result: number = await CatalogModel.countDocuments({
-            url: url,
+        const result: number = await CatalogModel.countDocuments({
+            url,
             hostId: hostId || { $gt: 0 },
         }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_1,
                 CatalogErrorResponseRootCause.CTL_RC_1,
                 ['url', url]
@@ -247,7 +249,7 @@ export default class CatalogLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_2,
                 CatalogErrorResponseRootCause.CTL_RC_2,
                 ['url', url]
@@ -266,11 +268,13 @@ export default class CatalogLogic extends LogicBase {
         if (typeof id === 'object') {
             id = id._id;
         }
-        let result: number = await CatalogModel.countDocuments({ _id: id }).exec();
+        const result: number = await CatalogModel.countDocuments({
+            _id: id as number,
+        }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_1,
                 CatalogErrorResponseRootCause.CTL_RC_1,
                 ['id', id]
@@ -279,7 +283,7 @@ export default class CatalogLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_2,
                 CatalogErrorResponseRootCause.CTL_RC_2,
                 ['id', id]
@@ -300,7 +304,7 @@ export default class CatalogLogic extends LogicBase {
         cTime,
         mTime,
     }: CatalogModelInterface): CatalogApiInterface {
-        let data: CatalogApiInterface = {
+        const data: CatalogApiInterface = {
             id: null,
             title: null,
             url: null,
@@ -328,11 +332,11 @@ export default class CatalogLogic extends LogicBase {
         }
 
         if (hostId && Object.keys(hostId).length > 0) {
-            data.host = Host.Logic.convertToResponse(<Host.DocumentInterface>hostId);
+            data.host = Host.Logic.convertToResponse(hostId as HostModelInterface);
         }
 
         if (patternId && Object.keys(patternId).length > 0) {
-            data.pattern = Pattern.Logic.convertToResponse(<Pattern.DocumentInterface>patternId);
+            data.pattern = Pattern.Logic.convertToResponse(patternId as PatternModelInterface);
         }
 
         if (cTime) {

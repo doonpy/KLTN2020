@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import ControllerBase from '../controller.base';
 import HostLogic from './host.logic';
-import Validator from '../validator/validator';
-import { Checker } from '../checker/checker.index';
+import Validator from '../../util/validator/validator';
+import { Checker } from '../../util/checker/checker.index';
 import HostModelInterface from './host.model.interface';
-import { Common } from '../../common/common.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 const commonPath: string = '/hosts';
 const specifyIdPath: string = '/hosts/:id';
@@ -42,16 +42,16 @@ export default class HostController extends ControllerBase {
         this.hostLogic
             .getAll(this.keyword, this.limit, this.offset)
             .then(({ hosts, hasNext }): void => {
-                let hostList: Array<object> = hosts.map((host: HostModelInterface): object => {
+                const hostList: object[] = hosts.map((host: HostModelInterface): object => {
                     return HostLogic.convertToResponse(host);
                 });
 
-                let responseBody: object = {
+                const responseBody: object = {
                     hosts: hostList,
-                    hasNext: hasNext,
+                    hasNext,
                 };
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -81,7 +81,7 @@ export default class HostController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -108,11 +108,7 @@ export default class HostController extends ControllerBase {
         this.hostLogic
             .create(this.requestBody)
             .then((createdHost: HostModelInterface): void => {
-                this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
-                    HostLogic.convertToResponse(createdHost),
-                    res
-                );
+                this.sendResponse(ResponseStatusCode.CREATED, HostLogic.convertToResponse(createdHost), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -144,11 +140,7 @@ export default class HostController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedHost: HostModelInterface | undefined): void => {
                 if (editedHost) {
-                    this.sendResponse(
-                        Common.ResponseStatusCode.OK,
-                        HostLogic.convertToResponse(editedHost),
-                        res
-                    );
+                    this.sendResponse(ResponseStatusCode.OK, HostLogic.convertToResponse(editedHost), res);
                 }
             })
             .catch((error: Error): void => {
@@ -172,7 +164,7 @@ export default class HostController extends ControllerBase {
         this.hostLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);
+                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

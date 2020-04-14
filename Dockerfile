@@ -6,7 +6,7 @@ RUN mkdir public
 
 COPY ./server/* ./
 
-RUN npm install && npm run build
+RUN npm install && npm run server-bgr-build-prod
 
 COPY ./tools/docker/node-server/command.sh command.sh
 

@@ -1,13 +1,13 @@
-import { Common } from '../../common/common.index';
-import { Exception } from '../exception/exception.index';
 import CheckerBase from './checker.base';
+import { Exception } from '../../services/exception/exception.index';
 import { CheckerFailedResponse } from './checker.failed-response';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
-export default class CheckerDecimalRange extends CheckerBase {
+export default class CheckerStringLength extends CheckerBase {
     private readonly minRange: number;
     private readonly maxRange: number;
 
-    constructor(minRange: number, maxRange: number | null) {
+    constructor(minRange: number, maxRange: number | null = null) {
         super();
         this.minRange = minRange;
         this.maxRange = maxRange || Number.MAX_SAFE_INTEGER;
@@ -18,29 +18,27 @@ export default class CheckerDecimalRange extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: any): void {
-        let value: any | null = this.getValue(paramName, input);
+        const value: any | null = this.getValue(paramName, input);
 
         if (!value) {
             return;
         }
 
-        value = Number(value);
-
-        if (!this.checkMinRange(value)) {
+        if (!this.checkMinRange(value.length)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_SMALLER,
-                [paramName, this.minRange, value]
+                [paramName, this.minRange, value.length]
             );
         }
 
-        if (!this.checkMaxRange(value)) {
+        if (!this.checkMaxRange(value.length)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_LARGER,
-                [paramName, this.maxRange, value]
+                [paramName, this.minRange, value.length]
             );
         }
     }

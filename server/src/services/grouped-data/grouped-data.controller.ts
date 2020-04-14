@@ -1,11 +1,11 @@
 import ControllerBase from '../controller.base';
 import GroupedDataLogic from './grouped-data.logic';
 import { Request, Response } from 'express';
-import Validator from '../validator/validator';
-import { Checker } from '../checker/checker.index';
-import { Common } from '../../common/common.index';
+import Validator from '../../util/validator/validator';
+import { Checker } from '../../util/checker/checker.index';
 import GroupedDataModelInterface from './grouped-data.model.interface';
 import GroupedDataApiInterface from './grouped-data.api.interface';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 const commonPath: string = '/grouped-dataset';
 const specifyIdPath: string = '/grouped-dataset/:id';
@@ -42,18 +42,18 @@ export default class GroupedDataController extends ControllerBase {
         this.groupedDataLogic
             .getAll(this.populate, this.limit, this.offset)
             .then(({ groupedDataset, hasNext }): void => {
-                let groupedDataList: Array<GroupedDataApiInterface> = groupedDataset.map(
+                const groupedDataList: GroupedDataApiInterface[] = groupedDataset.map(
                     (groupedData: GroupedDataModelInterface): GroupedDataApiInterface => {
                         return GroupedDataLogic.convertToResponse(groupedData);
                     }
                 );
 
-                let responseBody: object = {
+                const responseBody: object = {
                     groupedDataset: groupedDataList,
-                    hasNext: hasNext,
+                    hasNext,
                 };
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -83,7 +83,7 @@ export default class GroupedDataController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -106,7 +106,7 @@ export default class GroupedDataController extends ControllerBase {
             .create(this.requestBody)
             .then((createdGroupedData: GroupedDataModelInterface): void => {
                 this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
+                    ResponseStatusCode.CREATED,
                     GroupedDataLogic.convertToResponse(createdGroupedData),
                     res
                 );
@@ -137,7 +137,7 @@ export default class GroupedDataController extends ControllerBase {
             .then((editedGroupedData: GroupedDataModelInterface | undefined): void => {
                 if (editedGroupedData) {
                     this.sendResponse(
-                        Common.ResponseStatusCode.OK,
+                        ResponseStatusCode.OK,
                         GroupedDataLogic.convertToResponse(editedGroupedData, this.populate),
                         res
                     );
@@ -164,7 +164,7 @@ export default class GroupedDataController extends ControllerBase {
         this.groupedDataLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);
+                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

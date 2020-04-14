@@ -1,13 +1,13 @@
 import CheckerBase from './checker.base';
-import { Exception } from '../exception/exception.index';
-import { Common } from '../../common/common.index';
+import { Exception } from '../../services/exception/exception.index';
 import { CheckerFailedResponse } from './checker.failed-response';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
-export default class CheckerStringLength extends CheckerBase {
+export default class CheckerIntegerRange extends CheckerBase {
     private readonly minRange: number;
     private readonly maxRange: number;
 
-    constructor(minRange: number, maxRange: number | null = null) {
+    constructor(minRange: number, maxRange: number | null) {
         super();
         this.minRange = minRange;
         this.maxRange = maxRange || Number.MAX_SAFE_INTEGER;
@@ -24,21 +24,23 @@ export default class CheckerStringLength extends CheckerBase {
             return;
         }
 
-        if (!this.checkMinRange(value.length)) {
+        value = Number(value);
+
+        if (!this.checkMinRange(value)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_SMALLER,
-                [paramName, this.minRange, value.length]
+                [paramName, this.minRange, value]
             );
         }
 
-        if (!this.checkMaxRange(value.length)) {
+        if (!this.checkMaxRange(value)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_LARGER,
-                [paramName, this.minRange, value.length]
+                [paramName, this.minRange, value]
             );
         }
     }

@@ -16,16 +16,16 @@ export default class DateTime extends Date {
      */
     public static convertStringToDate(value: string, format: string, delimiter: DateTimeDelimiter): Date {
         format = format.toLowerCase();
-        let separatedFormat: Array<string> = format.split(delimiter);
-        let separatedValue: Array<string> = value.split(delimiter);
-        let dayIndex: number = separatedFormat.indexOf('dd');
-        let monthIndex: number = separatedFormat.indexOf('mm');
-        let yearIndex: number = separatedFormat.indexOf('yyyy');
+        const separatedFormat: string[] = format.split(delimiter);
+        const separatedValue: string[] = value.split(delimiter);
+        const dayIndex: number = separatedFormat.indexOf('dd');
+        const monthIndex: number = separatedFormat.indexOf('mm');
+        const yearIndex: number = separatedFormat.indexOf('yyyy');
 
         return new Date(
-            parseInt(separatedValue[yearIndex]),
-            parseInt(separatedValue[monthIndex]) - 1,
-            parseInt(separatedValue[dayIndex])
+            parseInt(separatedValue[yearIndex], 10),
+            parseInt(separatedValue[monthIndex], 10) - 1,
+            parseInt(separatedValue[dayIndex], 10)
         );
     }
 
@@ -36,7 +36,7 @@ export default class DateTime extends Date {
      * @return boolean
      */
     public static isExactTime(expectTime: Date, isUtcTime: boolean = false): boolean {
-        let currentTime: Date = new Date();
+        const currentTime: Date = new Date();
 
         if (!isUtcTime) {
             if (expectTime.getHours() !== currentTime.getHours()) {
@@ -69,12 +69,12 @@ export default class DateTime extends Date {
      * @return string
      */
     public static convertTotalSecondsToTime(totalSeconds: number): string {
-        let days: number = Math.floor(totalSeconds / 86400);
+        const days: number = Math.floor(totalSeconds / 86400);
         totalSeconds %= 86400;
-        let hours: number = Math.floor(totalSeconds / 3600);
+        const hours: number = Math.floor(totalSeconds / 3600);
         totalSeconds %= 3600;
-        let minutes: number = Math.floor(totalSeconds / 60);
-        let seconds: number = totalSeconds % 60;
+        const minutes: number = Math.floor(totalSeconds / 60);
+        const seconds: number = totalSeconds % 60;
 
         return `${days} days ${hours < 9 ? `0${hours}` : hours}:${minutes < 9 ? `0${minutes}` : minutes}:${
             seconds < 9 ? `0${seconds}` : seconds

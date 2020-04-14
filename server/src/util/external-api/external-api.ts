@@ -70,12 +70,13 @@ export default class ExternalApi {
         )}`;
 
         try {
-            let response: GeocodeResponse = <GeocodeResponse>(
-                (<unknown>await new Request(endPointUrl, requestOptions).send())
-            );
+            let response: GeocodeResponse = ((await new Request(
+                endPointUrl,
+                requestOptions
+            ).send()) as unknown) as GeocodeResponse;
 
             while (response.type === 'ApplicationError' || !response.Response.View.length) {
-                let addressPart: Array<string> = address.split(/\,\s*/);
+                const addressPart: string[] = address.split(/\,\s*/);
                 address = addressPart.slice(1).join(', ');
                 if (!address) {
                     return { lat: NaN, lng: NaN };
@@ -83,7 +84,10 @@ export default class ExternalApi {
                 endPointUrl = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
                     address
                 )}`;
-                response = await (<GeocodeResponse>(<unknown>await new Request(endPointUrl, requestOptions).send()));
+                response = await (((await new Request(
+                    endPointUrl,
+                    requestOptions
+                ).send()) as unknown) as GeocodeResponse);
             }
 
             return {

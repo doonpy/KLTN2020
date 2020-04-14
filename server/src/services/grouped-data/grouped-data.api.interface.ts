@@ -1,8 +1,8 @@
-import { RawData } from '../raw-data/raw-data.index';
+import RawDataApiInterface from '../raw-data/raw-data.api.interface';
 
 export default interface GroupedDataApiInterface {
     id: number | null;
-    items: Array<RawData.ApiInterface> | null | Array<number>;
+    items: RawDataApiInterface[] | null | number[];
     createAt: string | null;
     updateAt: string | null;
 }

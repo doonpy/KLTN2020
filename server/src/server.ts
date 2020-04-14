@@ -13,7 +13,7 @@ import { GroupedData } from './services/grouped-data/grouped-data.index';
 dotenv.config();
 
 const app = new App({
-    port: parseInt(process.env.SERVER_PORT || '3000'),
+    port: parseInt(process.env.SERVER_PORT || '3000', 10),
     controllers: [
         new Host.Controller(),
         new Catalog.Controller(),

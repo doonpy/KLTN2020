@@ -1,7 +1,7 @@
 import { Catalog } from '../services/catalog/catalog.index';
 import { Database } from '../services/database/database.index';
 import * as dotenv from 'dotenv';
-import ChatBotTelegram from '../services/chatbot/chatBotTelegram';
+import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import { ConsoleConstant } from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
@@ -20,21 +20,21 @@ interface MonitorContent {
 
 interface Targets {
     pid: number;
-    targetList: Array<string>;
+    targetList: string[];
 }
 
-const SCHEDULE_TIME_HOUR: number = parseInt(process.env.SCHEDULE_TIME_HOUR || '0'); // hour
-const SCHEDULE_TIME_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_MINUTE || '0'); // minute
-const SCHEDULE_TIME_SECOND: number = parseInt(process.env.SCHEDULE_TIME_SECOND || '0'); // second
-const SCHEDULE_TIME_DELAY_HOUR: number = parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0'); // hour
-const SCHEDULE_TIME_DELAY_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0'); // minute
-const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0'); // second
-const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1');
+const SCHEDULE_TIME_HOUR: number = parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10); // hour
+const SCHEDULE_TIME_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_MINUTE || '0', 10); // minute
+const SCHEDULE_TIME_SECOND: number = parseInt(process.env.SCHEDULE_TIME_SECOND || '0', 10); // second
+const SCHEDULE_TIME_DELAY_HOUR: number = parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0', 10); // hour
+const SCHEDULE_TIME_DELAY_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0', 10); // minute
+const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0', 10); // second
+const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1', 10);
 const SCRAPE_TYPE_DETAIL_URL: string = 'detail-url';
 const SCRAPE_TYPE_RAW_DATA: string = 'raw-data';
 let childProcessAmount: number = 0;
-let monitorContentList: Array<MonitorContent> = [];
-let targetsList: Array<Targets> = [];
+let monitorContentList: MonitorContent[] = [];
+let targetsList: Targets[] = [];
 let isRunning: boolean = false;
 let scrapeType: string = SCRAPE_TYPE_DETAIL_URL;
 
@@ -95,10 +95,10 @@ const script = async (): Promise<void> => {
     isRunning = true;
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
 
-    const catalogIdList: Array<number> = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
+    const catalogIdList: number[] = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
     const catalogIdListLen: number = catalogIdList.length;
     let count: number = 0;
-    let loop: Timeout = setInterval((): void => {
+    const loop: Timeout = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
             clearInterval(loop);
             monitorContentList = [];
@@ -111,7 +111,7 @@ const script = async (): Promise<void> => {
             return;
         }
 
-        let catalogId: number | undefined = catalogIdList.shift();
+        const catalogId: number | undefined = catalogIdList.shift();
         if (!catalogId) {
             return;
         }
@@ -145,8 +145,8 @@ export const start = async (force: boolean = false): Promise<void> => {
     }
 
     (function clock() {
-        let checkTimeLoop: Timeout = setInterval(async (): Promise<void> => {
-            let expectTime: Date = new Date();
+        const checkTimeLoop: Timeout = setInterval(async (): Promise<void> => {
+            const expectTime: Date = new Date();
             expectTime.setUTCHours(SCHEDULE_TIME_HOUR);
             expectTime.setUTCMinutes(SCHEDULE_TIME_MINUTE);
             expectTime.setUTCSeconds(SCHEDULE_TIME_SECOND);
@@ -169,14 +169,14 @@ export const start = async (force: boolean = false): Promise<void> => {
 /**
  * Main
  */
-new ChatBotTelegram();
 new Database.MongoDb().connect().then(
     async (): Promise<void> => {
+        const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
         try {
             // await start();
             await script();
         } catch (error) {
-            await ChatBotTelegram.sendMessage(
+            await telegramChatBotInstance.sendMessage(
                 `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`
             );
             new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.message}`).show();

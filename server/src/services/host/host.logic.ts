@@ -5,8 +5,8 @@ import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { Database } from '../database/database.index';
 import { HostErrorResponseMessage, HostErrorResponseRootCause } from './host.error-response';
-import { Common } from '../../common/common.index';
 import HostApiInterface from './host.api.interface';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 export default class HostLogic extends LogicBase {
     /**
@@ -20,15 +20,15 @@ export default class HostLogic extends LogicBase {
         keyword: string,
         limit: number,
         offset: number
-    ): Promise<{ hosts: Array<HostModelInterface>; hasNext: boolean }> {
+    ): Promise<{ hosts: HostModelInterface[]; hasNext: boolean }> {
         try {
-            let conditions: object = {
+            const conditions: object = {
                 $or: [{ name: { $regex: keyword, $options: 'i' } }, { domain: { $regex: keyword, $options: 'i' } }],
             };
-            let hostQuery: DocumentQuery<Array<HostModelInterface>, HostModelInterface, object> = HostModel.find(
+            const hostQuery: DocumentQuery<HostModelInterface[], HostModelInterface, object> = HostModel.find(
                 conditions
             );
-            let remainHostQuery: Query<number> = HostModel.countDocuments(conditions);
+            const remainHostQuery: Query<number> = HostModel.countDocuments(conditions);
 
             if (offset) {
                 hostQuery.skip(offset);
@@ -38,13 +38,13 @@ export default class HostLogic extends LogicBase {
                 hostQuery.limit(limit);
             }
 
-            let hosts: Array<HostModelInterface> = await hostQuery.exec();
-            let remainHost: number = await remainHostQuery.exec();
+            const hosts: HostModelInterface[] = await hostQuery.exec();
+            const remainHost: number = await remainHostQuery.exec();
 
-            return { hosts: hosts, hasNext: hosts.length < remainHost };
+            return { hosts, hasNext: hosts.length < remainHost };
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -63,7 +63,7 @@ export default class HostLogic extends LogicBase {
             return await HostModel.findById(id).exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -80,12 +80,12 @@ export default class HostLogic extends LogicBase {
             await HostLogic.checkHostExistedWithDomain(domain, true);
 
             return await new HostModel({
-                name: name,
-                domain: domain,
+                name,
+                domain,
             }).save();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -105,7 +105,7 @@ export default class HostLogic extends LogicBase {
         try {
             await HostLogic.checkHostExistedWithId(id);
 
-            let host: HostModelInterface | null = await HostModel.findById(id).exec();
+            const host: HostModelInterface | null = await HostModel.findById(id).exec();
 
             if (!host) {
                 return;
@@ -121,7 +121,7 @@ export default class HostLogic extends LogicBase {
             return await host.save();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -141,7 +141,7 @@ export default class HostLogic extends LogicBase {
             return null;
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -152,11 +152,11 @@ export default class HostLogic extends LogicBase {
      * @param domain
      */
     public static checkHostExistedWithDomain = async (domain: string, isNot: boolean = false): Promise<void> => {
-        let result: number = await HostModel.countDocuments({ domain: domain }).exec();
+        const result: number = await HostModel.countDocuments({ domain }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_1,
                 HostErrorResponseRootCause.HO_RC_1,
                 ['domain', domain]
@@ -165,7 +165,7 @@ export default class HostLogic extends LogicBase {
 
         if (!isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_2,
                 HostErrorResponseRootCause.HO_RC_2,
                 ['domain', domain]
@@ -184,11 +184,11 @@ export default class HostLogic extends LogicBase {
         if (typeof id === 'object') {
             id = id._id;
         }
-        let result: number = await HostModel.countDocuments({ _id: id }).exec();
+        const result: number = await HostModel.countDocuments({ _id: id as number }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_1,
                 HostErrorResponseRootCause.HO_RC_1,
                 ['id', id]
@@ -197,7 +197,7 @@ export default class HostLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 HostErrorResponseMessage.HO_MSG_2,
                 HostErrorResponseRootCause.HO_RC_2,
                 ['id', id]
@@ -209,7 +209,7 @@ export default class HostLogic extends LogicBase {
      * @param host
      */
     public static convertToResponse({ _id, name, domain, cTime, mTime }: HostModelInterface): HostApiInterface {
-        let data: HostApiInterface = {
+        const data: HostApiInterface = {
             id: null,
             name: null,
             domain: null,

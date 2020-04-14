@@ -1,5 +1,6 @@
-import { Host } from '../host/host.index';
 import { Pattern } from '../pattern/pattern.index';
+import HostApiInterface from '../host/host.api.interface';
+import PatternApiInterface from '../pattern/pattern.api.interface';
 
 export default interface CatalogApiInterface {
     id: number | null;
@@ -9,8 +10,8 @@ export default interface CatalogApiInterface {
         detailUrl: string;
         pageNumber: string;
     } | null;
-    host: Host.ApiInterface | null;
-    pattern: Pattern.ApiInterface | null;
+    host: HostApiInterface | null;
+    pattern: PatternApiInterface | null;
     createAt: string | null;
     updateAt: string | null;
 }

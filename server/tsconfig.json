@@ -3,13 +3,12 @@
     "target": "es5",
     "module": "commonjs",
     "lib": [
-      "esnext",
       "dom",
-      "dom.iterable"
+      "es6"
     ],
-    "allowJs": true,
+    "allowJs": false,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "../dist/server",
     "strict": true,
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
@@ -17,16 +16,6 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-  },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "**/*.ts"
-  ]
+    "forceConsistentCasingInFileNames": true
+  }
 }

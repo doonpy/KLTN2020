@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 import { Exception } from '../../exception/exception.index';
-
 import { DatabaseFailedResponseRootCause } from '../database.failed-response';
-import { Common } from '../../../common/common.index';
+import { ResponseStatusCode } from '../../../common/common.response-status.code';
 
 export default class DatabaseMongodb {
     private readonly dbHost: string = process.env.DB_HOST || '';
@@ -38,7 +37,7 @@ export default class DatabaseMongodb {
             });
         } catch (error) {
             new Exception.Customize(
-                Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 DatabaseFailedResponseRootCause.DB_RC_1
             ).raise();
@@ -48,7 +47,11 @@ export default class DatabaseMongodb {
     /**
      * Disconnect to database
      */
-    public disconnect() {
-        mongoose.disconnect().then(() => {});
+    public async disconnect() {
+        try {
+            await mongoose.disconnect();
+        } catch (e) {
+            throw e;
+        }
     }
 }

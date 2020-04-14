@@ -1,7 +1,7 @@
-import { Exception } from '../exception/exception.index';
+import { Exception } from '../../services/exception/exception.index';
 import CheckerBase from './checker.base';
-import { Common } from '../../common/common.index';
 import { CheckerFailedResponse } from './checker.failed-response';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 export default class CheckerDomain extends CheckerBase {
     private VALID_DOMAIN: RegExp = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w\-]+)(\.([\d\w\-]+))+$/);
@@ -11,7 +11,7 @@ export default class CheckerDomain extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: object): void {
-        let value: any | null = this.getValue(paramName, input);
+        const value: any | null = this.getValue(paramName, input);
 
         if (!value) {
             return;
@@ -19,7 +19,7 @@ export default class CheckerDomain extends CheckerBase {
 
         if (!this.VALID_DOMAIN.test(value)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.DOMAIN,
                 [value]

@@ -1,10 +1,10 @@
 import * as mongoose from 'mongoose';
-import { DetailUrl } from '../detail-url/detail-url.index';
-import { Coordinate } from '../coordinate/coordinate.index';
+import DetailUrlModelInterface from '../detail-url/detail-url.model.interface';
+import CoordinateModelInterface from '../coordinate/coordinate.model.interface';
 
 export default interface RawDataModelInterface extends mongoose.Document {
     _id: number;
-    detailUrlId: DetailUrl.DocumentInterface | number;
+    detailUrlId: DetailUrlModelInterface | number;
     transactionType: number;
     propertyType: number;
     postDate: string;
@@ -24,7 +24,7 @@ export default interface RawDataModelInterface extends mongoose.Document {
             value: string;
         }
     ];
-    coordinate: Coordinate.DocumentInterface | number;
+    coordinate: CoordinateModelInterface | number;
     isGrouped: boolean;
     cTime: string;
     mTime: string;

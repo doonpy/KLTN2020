@@ -1,10 +1,10 @@
 import ControllerBase from '../controller.base';
 import { Request, Response } from 'express';
-import Validator from '../validator/validator';
-import { Checker } from '../checker/checker.index';
+import Validator from '../../util/validator/validator';
+import { Checker } from '../../util/checker/checker.index';
 import DetailUrlLogic from './detail-url.logic';
 import DetailUrlModelInterface from './detail-url.model.interface';
-import { Common } from '../../common/common.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 const commonPath: string = '/detail-urls';
 const specifyIdPath: string = '/detail-urls/:id';
@@ -52,16 +52,16 @@ export default class DetailUrlController extends ControllerBase {
                 this.offset
             )
             .then(({ detailUrls, hasNext }): void => {
-                let detailUrlList: Array<object> = detailUrls.map((detailUrl: DetailUrlModelInterface): object => {
+                const detailUrlList: object[] = detailUrls.map((detailUrl: DetailUrlModelInterface): object => {
                     return DetailUrlLogic.convertToResponse(detailUrl, this.populate);
                 });
 
-                let responseBody: object = {
+                const responseBody: object = {
                     detailUrls: detailUrlList,
-                    hasNext: hasNext,
+                    hasNext,
                 };
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -91,7 +91,7 @@ export default class DetailUrlController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -117,11 +117,7 @@ export default class DetailUrlController extends ControllerBase {
         this.detailUrlLogic
             .create(this.requestBody)
             .then((createdDetailUrl: DetailUrlModelInterface): void => {
-                this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
-                    DetailUrlLogic.convertToResponse(createdDetailUrl),
-                    res
-                );
+                this.sendResponse(ResponseStatusCode.CREATED, DetailUrlLogic.convertToResponse(createdDetailUrl), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -157,11 +153,7 @@ export default class DetailUrlController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedDetailUrl: DetailUrlModelInterface | undefined): void => {
                 if (editedDetailUrl) {
-                    this.sendResponse(
-                        Common.ResponseStatusCode.OK,
-                        DetailUrlLogic.convertToResponse(editedDetailUrl),
-                        res
-                    );
+                    this.sendResponse(ResponseStatusCode.OK, DetailUrlLogic.convertToResponse(editedDetailUrl), res);
                 }
             })
             .catch((error: Error): void => {
@@ -185,7 +177,7 @@ export default class DetailUrlController extends ControllerBase {
         this.detailUrlLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);
+                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

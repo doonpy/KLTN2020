@@ -3,11 +3,13 @@ import GroupedDataModelInterface from './grouped-data.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
 import GroupedDataModel from './grouped-data.model';
 import { Exception } from '../exception/exception.index';
-import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { GroupedDataErrorResponseMessage, GroupedDataErrorResponseRootCause } from './grouped-data.error-response';
 import { RawData } from '../raw-data/raw-data.index';
 import GroupedDataApiInterface from './grouped-data.api.interface';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
+import RawDataModelInterface from '../raw-data/raw-data.model.interface';
+import RawDataApiInterface from '../raw-data/raw-data.api.interface';
 
 export default class GroupedDataLogic extends LogicBase {
     /**
@@ -21,14 +23,17 @@ export default class GroupedDataLogic extends LogicBase {
         isPopulate: boolean,
         limit?: number | undefined,
         offset?: number | undefined
-    ): Promise<{ groupedDataset: Array<GroupedDataModelInterface>; hasNext: boolean }> {
+    ): Promise<{
+        groupedDataset: GroupedDataModelInterface[];
+        hasNext: boolean;
+    }> {
         try {
-            let groupedDataQuery: DocumentQuery<
-                Array<GroupedDataModelInterface>,
+            const groupedDataQuery: DocumentQuery<
+                GroupedDataModelInterface[],
                 GroupedDataModelInterface,
                 object
             > = GroupedDataModel.find();
-            let remainGroupedDataQuery: Query<number> = GroupedDataModel.countDocuments();
+            const remainGroupedDataQuery: Query<number> = GroupedDataModel.countDocuments();
 
             if (isPopulate) {
                 groupedDataQuery
@@ -51,13 +56,13 @@ export default class GroupedDataLogic extends LogicBase {
                 groupedDataQuery.limit(limit);
             }
 
-            let groupedDataset: Array<GroupedDataModelInterface> = await groupedDataQuery.exec();
-            let remainCatalog: number = await remainGroupedDataQuery.exec();
+            const groupedDataset: GroupedDataModelInterface[] = await groupedDataQuery.exec();
+            const remainCatalog: number = await remainGroupedDataQuery.exec();
 
-            return { groupedDataset: groupedDataset, hasNext: groupedDataset.length < remainCatalog };
+            return { groupedDataset, hasNext: groupedDataset.length < remainCatalog };
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -85,7 +90,7 @@ export default class GroupedDataLogic extends LogicBase {
                 .exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -97,7 +102,7 @@ export default class GroupedDataLogic extends LogicBase {
      *
      * @return Promise<object>
      */
-    public async create(items: Array<number>): Promise<GroupedDataModelInterface> {
+    public async create(items: number[]): Promise<GroupedDataModelInterface> {
         try {
             for (const item of items) {
                 await RawData.Logic.checkRawDataExistedWithId(item);
@@ -105,7 +110,7 @@ export default class GroupedDataLogic extends LogicBase {
 
             return await (
                 await new GroupedDataModel({
-                    items: items,
+                    items,
                 }).save()
             )
                 .populate({
@@ -119,7 +124,7 @@ export default class GroupedDataLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -142,7 +147,7 @@ export default class GroupedDataLogic extends LogicBase {
                 await RawData.Logic.checkRawDataExistedWithId(item);
             }
 
-            let groupedData: GroupedDataModelInterface | null = await GroupedDataModel.findById(id).exec();
+            const groupedData: GroupedDataModelInterface | null = await GroupedDataModel.findById(id).exec();
             if (!groupedData) {
                 return;
             }
@@ -161,7 +166,7 @@ export default class GroupedDataLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -181,7 +186,7 @@ export default class GroupedDataLogic extends LogicBase {
             return null;
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -193,17 +198,19 @@ export default class GroupedDataLogic extends LogicBase {
      * @param isNot
      */
     public static async checkGroupedDataExistedWithId(
-        id: string | number | RawData.DocumentInterface,
+        id: string | number | RawDataModelInterface,
         isNot: boolean = false
     ): Promise<void> {
         if (typeof id === 'object') {
             id = id._id;
         }
-        let result: number = await GroupedDataModel.countDocuments({ _id: id }).exec();
+        const result: number = await GroupedDataModel.countDocuments({
+            _id: id as number,
+        }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 GroupedDataErrorResponseMessage.GRD_MSG_1,
                 GroupedDataErrorResponseRootCause.GRD_RC_1,
                 ['id', id]
@@ -212,7 +219,7 @@ export default class GroupedDataLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 GroupedDataErrorResponseMessage.GRD_MSG_2,
                 GroupedDataErrorResponseRootCause.GRD_RC_2,
                 ['id', id]
@@ -222,11 +229,11 @@ export default class GroupedDataLogic extends LogicBase {
 
     /**
      * Create grouped data document
-     * @param {Array<RawData.DocumentInterface>} items
+     * @param {Array<number>} items
      * @return {GroupedDataModelInterface}
      */
-    public static createDocument(items: Array<RawData.DocumentInterface>): GroupedDataModelInterface {
-        return new GroupedDataModel({ items: items });
+    public static createDocument(items: number[]): GroupedDataModelInterface {
+        return new GroupedDataModel({ items });
     }
 
     /**
@@ -234,8 +241,8 @@ export default class GroupedDataLogic extends LogicBase {
      * @param {Array<object>} aggregations
      * @return {Promise<Array<any>>}
      */
-    public static async aggregationQuery(aggregations: Array<object>): Promise<Array<any>> {
-        return await GroupedDataModel.aggregate(aggregations).exec();
+    public static async aggregationQuery(aggregations: object[]): Promise<any[]> {
+        return GroupedDataModel.aggregate(aggregations).exec();
     }
 
     /**
@@ -246,7 +253,7 @@ export default class GroupedDataLogic extends LogicBase {
         { _id, items, cTime, mTime }: GroupedDataModelInterface,
         isPopulate?: boolean
     ): GroupedDataApiInterface {
-        let data: GroupedDataApiInterface = {
+        const data: GroupedDataApiInterface = {
             id: null,
             items: null,
             createAt: null,
@@ -260,12 +267,12 @@ export default class GroupedDataLogic extends LogicBase {
         if (items) {
             if (isPopulate) {
                 data.items = items.map(
-                    (item): RawData.ApiInterface => {
-                        return RawData.Logic.convertToResponse(<RawData.DocumentInterface>item);
+                    (item): RawDataApiInterface => {
+                        return RawData.Logic.convertToResponse(item as RawDataModelInterface);
                     }
                 );
             } else {
-                data.items = <Array<number>>items;
+                data.items = items as number[];
             }
         }
 

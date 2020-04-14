@@ -6,8 +6,9 @@ import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { Database } from '../database/database.index';
 import { DetailUrlErrorResponseMessage, DetailUrlErrorResponseRootCause } from './detail-url.error-response';
-import { Common } from '../../common/common.index';
 import DetailUrlApiInterface from './detail-url.api.interface';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
+import CatalogModelInterface from '../catalog/catalog.model.interface';
 
 export default class DetailUrlLogic extends LogicBase {
     /**
@@ -23,14 +24,14 @@ export default class DetailUrlLogic extends LogicBase {
         isPopulate: boolean,
         limit?: number,
         offset?: number
-    ): Promise<{ detailUrls: Array<DetailUrlModelInterface>; hasNext: boolean }> {
+    ): Promise<{ detailUrls: DetailUrlModelInterface[]; hasNext: boolean }> {
         try {
-            let detailUrlQuery: DocumentQuery<
-                Array<DetailUrlModelInterface>,
+            const detailUrlQuery: DocumentQuery<
+                DetailUrlModelInterface[],
                 DetailUrlModelInterface,
                 object
             > = DetailUrlModel.find(conditions);
-            let remainDetailUrlQuery: Query<number> = DetailUrlModel.countDocuments(conditions);
+            const remainDetailUrlQuery: Query<number> = DetailUrlModel.countDocuments(conditions);
 
             if (isPopulate) {
                 detailUrlQuery.populate({
@@ -48,16 +49,16 @@ export default class DetailUrlLogic extends LogicBase {
                 detailUrlQuery.limit(limit);
             }
 
-            let detailUrls: Array<DetailUrlModelInterface> = await detailUrlQuery.exec();
-            let remainDetailUrl: number = await remainDetailUrlQuery.exec();
+            const detailUrls: DetailUrlModelInterface[] = await detailUrlQuery.exec();
+            const remainDetailUrl: number = await remainDetailUrlQuery.exec();
 
             return {
-                detailUrls: detailUrls,
+                detailUrls,
                 hasNext: detailUrls.length < remainDetailUrl,
             };
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -78,7 +79,7 @@ export default class DetailUrlLogic extends LogicBase {
                 .exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -102,8 +103,8 @@ export default class DetailUrlLogic extends LogicBase {
 
             return await (
                 await new DetailUrlModel({
-                    catalogId: catalogId,
-                    url: url,
+                    catalogId,
+                    url,
                     isExtracted: isExtracted || false,
                     requestRetries: requestRetries || 0,
                 }).save()
@@ -112,7 +113,7 @@ export default class DetailUrlLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -133,7 +134,7 @@ export default class DetailUrlLogic extends LogicBase {
             await DetailUrlLogic.checkDetailUrlExistedWithId(id);
             await Catalog.Logic.checkCatalogExistedWithId(catalogId);
 
-            let detailUrl: DetailUrlModelInterface | null = await DetailUrlModel.findById(id).exec();
+            const detailUrl: DetailUrlModelInterface | null = await DetailUrlModel.findById(id).exec();
             if (!detailUrl) {
                 return;
             }
@@ -153,7 +154,7 @@ export default class DetailUrlLogic extends LogicBase {
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -173,7 +174,7 @@ export default class DetailUrlLogic extends LogicBase {
             return null;
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -185,13 +186,13 @@ export default class DetailUrlLogic extends LogicBase {
      * @param isNot
      */
     public static async checkDetailUrlExistedWithUrl(url: string, isNot: boolean = false): Promise<void> {
-        let result: number = await DetailUrlModel.countDocuments({
-            url: url,
+        const result: number = await DetailUrlModel.countDocuments({
+            url,
         }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_1,
                 DetailUrlErrorResponseRootCause.DU_RC_1,
                 ['url', url]
@@ -200,7 +201,7 @@ export default class DetailUrlLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_2,
                 DetailUrlErrorResponseRootCause.DU_RC_2,
                 ['url', url]
@@ -219,11 +220,13 @@ export default class DetailUrlLogic extends LogicBase {
         if (typeof id === 'object') {
             id = id._id;
         }
-        let result: number = await DetailUrlModel.countDocuments({ _id: id }).exec();
+        const result: number = await DetailUrlModel.countDocuments({
+            _id: id as number,
+        }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_1,
                 DetailUrlErrorResponseRootCause.DU_RC_1,
                 ['id', id]
@@ -232,7 +235,7 @@ export default class DetailUrlLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 DetailUrlErrorResponseMessage.DU_MSG_2,
                 DetailUrlErrorResponseRootCause.DU_RC_2,
                 ['id', id]
@@ -248,13 +251,13 @@ export default class DetailUrlLogic extends LogicBase {
      */
     public static createDocument(catalogId: number | string, url: string): DetailUrlModelInterface {
         return new DetailUrlModel({
-            catalogId: catalogId,
-            url: url,
+            catalogId,
+            url,
         });
     }
 
-    public static async aggregationQuery(aggregations: Array<object>): Promise<Array<any>> {
-        return await DetailUrlModel.aggregate(aggregations)
+    public static async aggregationQuery(aggregations: object[]): Promise<any[]> {
+        return DetailUrlModel.aggregate(aggregations)
             .allowDiskUse(true)
             .exec();
     }
@@ -267,7 +270,7 @@ export default class DetailUrlLogic extends LogicBase {
         { _id, catalogId, url, isExtracted, requestRetries, cTime, mTime }: DetailUrlModelInterface,
         isPopulate?: boolean
     ): DetailUrlApiInterface {
-        let data: DetailUrlApiInterface = {
+        const data: DetailUrlApiInterface = {
             id: null,
             catalog: null,
             url: null,
@@ -281,17 +284,18 @@ export default class DetailUrlLogic extends LogicBase {
             data.id = _id;
         }
 
-        if (catalogId && Object.keys(catalogId).length > 0 && isPopulate) {
-            data.catalog = Catalog.Logic.convertToResponse(<Catalog.DocumentInterface>catalogId);
-        } else {
-            data.catalog = <number>catalogId;
+        if (catalogId) {
+            data.catalog =
+                Object.keys(catalogId).length > 0 && isPopulate
+                    ? Catalog.Logic.convertToResponse(catalogId as CatalogModelInterface)
+                    : (catalogId as number);
         }
 
         if (url) {
             data.url = url;
         }
 
-        if (isExtracted !== null || isExtracted !== undefined) {
+        if (isExtracted !== null) {
             data.isExtracted = isExtracted;
         }
 

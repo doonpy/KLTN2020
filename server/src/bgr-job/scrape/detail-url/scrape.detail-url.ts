@@ -4,30 +4,29 @@ import ScrapeBase from '../scrape.base';
 import CatalogModelInterface from '../../../services/catalog/catalog.model.interface';
 import StringHandler from '../../../util/string-handler/string-handler';
 import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
-import ChatBotTelegram from '../../../services/chatbot/chatBotTelegram';
-import { BgrScrape } from '../scrape.index';
 import UrlHandler from '../../../util/url-handler/url-handler';
 import { ScrapeConstant } from '../scrape.constant';
-import Timeout = NodeJS.Timeout;
 import ConsoleLog from '../../../util/console/console.log';
 import { ConsoleConstant } from '../../../util/console/console.constant';
+import DetailUrlLogic from '../../../services/detail-url/detail-url.logic';
+import CatalogLogic from '../../../services/catalog/catalog.logic';
+import DetailUrlModelInterface from '../../../services/detail-url/detail-url.model.interface';
+import Timeout = NodeJS.Timeout;
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private readonly catalogId: number;
-    private detailUrlLogic: DetailUrl.Logic = new DetailUrl.Logic();
-    private catalogLogic: Catalog.Logic = new Catalog.Logic();
+    private detailUrlLogic: DetailUrlLogic = new DetailUrl.Logic();
+    private catalogLogic: CatalogLogic = new Catalog.Logic();
     private catalog: CatalogModelInterface | any;
-    private scrapeRawData: BgrScrape.RawData;
-    private pageNumberQueue: Array<string> = [];
-    private scrapedPageNumber: Array<string> = [];
-    private readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_DETAIL_URL_MAX_REQUEST || '1');
+    private pageNumberQueue: string[] = [];
+    private scrapedPageNumber: string[] = [];
+    private readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_DETAIL_URL_MAX_REQUEST || '1', 10);
 
     private readonly ATTRIBUTE_TO_GET_DATA: string = 'href';
 
     constructor(catalogId: number) {
         super();
         this.catalogId = catalogId;
-        this.scrapeRawData = new BgrScrape.RawData(catalogId);
         this.logInstance.initLogFolder('detail-url-scrape');
         this.logInstance.createFileName('cid-' + catalogId + '_');
     }
@@ -43,7 +42,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             await Catalog.Logic.checkCatalogExistedWithId(this.catalogId);
             this.catalog = await this.catalogLogic.getById(this.catalogId);
 
-            await ChatBotTelegram.sendMessage(
+            await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.START, [
                     this.catalog.title,
                     this.catalog.id,
@@ -54,7 +53,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         } catch (error) {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
             this.addSummaryErrorLog(ScrapeDetailUrlConstantChatBotMessage.ERROR, error, this.catalogId);
-            await ChatBotTelegram.sendMessage(
+            await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(error.message, [this.catalogId, error.message, this.logInstance.getUrl()])
             );
             this.isRunning = false;
@@ -70,7 +69,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     private scrapeAction(): void {
         this.pageNumberQueue = [this.catalog.url];
 
-        let loop: Timeout = setInterval(async (): Promise<void> => {
+        const loop: Timeout = setInterval(async (): Promise<void> => {
             if (this.pageNumberQueue.length === 0 && this.requestCounter === 0) {
                 clearInterval(loop);
                 this.finishAction();
@@ -86,7 +85,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             }
 
             this.requestCounter++;
-            let $: CheerioStatic | undefined = await this.getBody(this.catalog.hostId.domain, currentUrl);
+            const $: CheerioStatic | undefined = await this.getBody(this.catalog.hostId.domain, currentUrl);
             this.scrapedPageNumber.push(currentUrl);
 
             if (!$) {
@@ -103,7 +102,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      * @param $
      */
     private async handleSuccessRequest($: CheerioStatic): Promise<void> {
-        let newDetailUrlList: Array<string> = this.extractData(
+        let newDetailUrlList: string[] = this.extractData(
             $,
             this.catalog.locator.detailUrl,
             this.ATTRIBUTE_TO_GET_DATA
@@ -114,11 +113,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             const result: number = (await this.detailUrlLogic.getAll({ url: newDetailUrl }, false)).detailUrls.length;
             if (!result) {
                 try {
-                    const detailUrlDoc: DetailUrl.DocumentInterface = DetailUrl.Logic.createDocument(
+                    const detailUrlDoc: DetailUrlModelInterface = DetailUrl.Logic.createDocument(
                         this.catalogId,
                         newDetailUrl
                     );
-                    const createdDoc: DetailUrl.DocumentInterface = await this.detailUrlLogic.create(detailUrlDoc);
+                    const createdDoc: DetailUrlModelInterface = await this.detailUrlLogic.create(detailUrlDoc);
                     this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
                 } catch (error) {
                     this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `URL: ${newDetailUrl}`);
@@ -126,7 +125,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             }
         }
 
-        let newPageNumberUrls: Array<string> = this.extractData(
+        let newPageNumberUrls: string[] = this.extractData(
             $,
             this.catalog.locator.pageNumber,
             this.ATTRIBUTE_TO_GET_DATA
@@ -148,7 +147,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      */
     protected async finishAction(): Promise<void> {
         this.exportLog(this.catalog);
-        await ChatBotTelegram.sendMessage(
+        await this.telegramChatBotInstance.sendMessage(
             StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [
                 this.catalog.title,
                 this.catalog.id,
@@ -166,14 +165,14 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     /**
      * Get page number scraped
      */
-    public getTargetList(): Array<string> {
+    public getTargetList(): string[] {
         return this.scrapedPageNumber;
     }
 
     /**
      * Get catalog target
      */
-    public getCatalog(): Catalog.DocumentInterface {
+    public getCatalog(): CatalogModelInterface {
         return this.catalog;
     }
 }

@@ -5,8 +5,8 @@ import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import { Database } from '../database/database.index';
 import { PatternErrorResponseMessage, PatternErrorResponseRootCause } from './pattern.error-response';
-import { Common } from '../../common/common.index';
 import PatternApiInterface from './pattern.api.interface';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 export default class PatternLogic extends LogicBase {
     /**
@@ -18,14 +18,14 @@ export default class PatternLogic extends LogicBase {
     public async getAll(
         limit: number,
         offset: number
-    ): Promise<{ patterns: Array<PatternModelInterface>; hasNext: boolean }> {
+    ): Promise<{ patterns: PatternModelInterface[]; hasNext: boolean }> {
         try {
-            let patternQuery: DocumentQuery<
-                Array<PatternModelInterface>,
+            const patternQuery: DocumentQuery<
+                PatternModelInterface[],
                 PatternModelInterface,
                 object
             > = PatternModel.find();
-            let remainPatternQuery: Query<number> = PatternModel.countDocuments();
+            const remainPatternQuery: Query<number> = PatternModel.countDocuments();
 
             if (offset) {
                 patternQuery.skip(offset);
@@ -36,13 +36,13 @@ export default class PatternLogic extends LogicBase {
                 patternQuery.limit(limit);
             }
 
-            let patterns: Array<PatternModelInterface> = await patternQuery.exec();
-            let remainPattern: number = await remainPatternQuery.exec();
+            const patterns: PatternModelInterface[] = await patternQuery.exec();
+            const remainPattern: number = await remainPatternQuery.exec();
 
-            return { patterns: patterns, hasNext: patterns.length < remainPattern };
+            return { patterns, hasNext: patterns.length < remainPattern };
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -61,7 +61,7 @@ export default class PatternLogic extends LogicBase {
             return await PatternModel.findById(id).exec();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -76,13 +76,13 @@ export default class PatternLogic extends LogicBase {
     public async create({ sourceUrl, mainLocator, subLocator }: PatternModelInterface): Promise<PatternModelInterface> {
         try {
             return await new PatternModel({
-                sourceUrl: sourceUrl,
-                mainLocator: mainLocator,
-                subLocator: subLocator,
+                sourceUrl,
+                mainLocator,
+                subLocator,
             }).save();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -102,7 +102,7 @@ export default class PatternLogic extends LogicBase {
         try {
             await PatternLogic.checkPatternExistedWithId(id);
 
-            let pattern: PatternModelInterface | null = await PatternModel.findById(id).exec();
+            const pattern: PatternModelInterface | null = await PatternModel.findById(id).exec();
             if (!pattern) {
                 return;
             }
@@ -128,7 +128,7 @@ export default class PatternLogic extends LogicBase {
                     if (!pattern) {
                         return;
                     }
-                    let subLocatorSimilarIndex = pattern.subLocator.findIndex(
+                    const subLocatorSimilarIndex = pattern.subLocator.findIndex(
                         (s: { name: string; locator: string }): boolean => {
                             return s.name === subLocatorItem.name;
                         }
@@ -142,7 +142,7 @@ export default class PatternLogic extends LogicBase {
             return await pattern.save();
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -162,7 +162,7 @@ export default class PatternLogic extends LogicBase {
             return null;
         } catch (error) {
             throw new Exception.Customize(
-                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
                 error.message,
                 error.cause || Database.FailedResponse.RootCause.DB_RC_2
             );
@@ -178,7 +178,7 @@ export default class PatternLogic extends LogicBase {
     ): Promise<void> {
         if (!id) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 PatternErrorResponseMessage.PTN_MSG_1,
                 PatternErrorResponseRootCause.PTN_RC_1,
                 ['id', id]
@@ -188,11 +188,13 @@ export default class PatternLogic extends LogicBase {
         if (typeof id === 'object') {
             id = id._id;
         }
-        let result: number = await PatternModel.countDocuments({ _id: id }).exec();
+        const result: number = await PatternModel.countDocuments({
+            _id: id as number,
+        }).exec();
 
         if (!isNot && result === 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 PatternErrorResponseMessage.PTN_MSG_1,
                 PatternErrorResponseRootCause.PTN_RC_1,
                 ['id', id]
@@ -201,7 +203,7 @@ export default class PatternLogic extends LogicBase {
 
         if (isNot && result > 0) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 PatternErrorResponseMessage.PTN_MSG_2,
                 PatternErrorResponseRootCause.PTN_RC_2,
                 ['id', id]
@@ -220,7 +222,7 @@ export default class PatternLogic extends LogicBase {
         cTime,
         mTime,
     }: PatternModelInterface): PatternApiInterface {
-        let data: PatternApiInterface = {
+        const data: PatternApiInterface = {
             id: null,
             sourceUrl: null,
             mainLocator: null,

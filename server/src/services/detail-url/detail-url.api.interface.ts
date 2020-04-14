@@ -1,8 +1,8 @@
-import { Catalog } from '../catalog/catalog.index';
+import CatalogApiInterface from '../catalog/catalog.api.interface';
 
 export default interface DetailUrlApiInterface {
     id: number | null;
-    catalog: Catalog.ApiInterface | null | number;
+    catalog: CatalogApiInterface | null | number;
     url: string | null;
     isExtracted: boolean | null;
     requestRetries: number | null;

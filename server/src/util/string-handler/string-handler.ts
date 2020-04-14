@@ -3,7 +3,7 @@ export default class StringHandler {
      * @param originalString
      * @param value
      */
-    public static replaceString(originalString: string, value: Array<any>): string {
+    public static replaceString(originalString: string, value: any[]): string {
         const REPLACE_SIGN_STRING: string = 's';
         const REPLACE_SIGN_INTEGER: string = 'i';
         const REPLACE_SIGN_JSON: string = 'j';
@@ -82,29 +82,33 @@ export default class StringHandler {
      */
     private static calculateSimilarRate(firstString: string, secondString: string): number {
         function termFreqMap(str: string): { [key: string]: number } {
-            let words: Array<string> = str.split(' ');
-            let termFreq: { [key: string]: number } = {};
+            const words: string[] = str.split(' ');
+            const termFreq: { [key: string]: number } = {};
             words.forEach(w => {
                 termFreq[w] = (termFreq[w] || 0) + 1;
             });
             return termFreq;
         }
 
-        function addKeysToDict(map: { [key: string]: number }, dict: { [key: string]: boolean }): void {
-            for (const key in map) {
-                dict[key] = true;
+        function addKeysToDictionary(map: { [key: string]: number }, dictionary: { [key: string]: boolean }): void {
+            for (const key of Object.keys(map)) {
+                dictionary[key] = true;
             }
         }
 
-        function termFreqMapToVector(map: { [key: string]: number }, dict: { [key: string]: boolean }): Array<number> {
-            let termFreqVector: Array<number> = [];
-            for (const term in dict) {
-                termFreqVector.push(map[term] || 0);
+        function termFreqMapToVector(map: { [key: string]: number }, dictionary: { [key: string]: boolean }): number[] {
+            const termFreqVector: number[] = [];
+            for (const term in dictionary) {
+                if (map.hasOwnProperty(term)) {
+                    termFreqVector.push(map[term]);
+                } else {
+                    termFreqVector.push(0);
+                }
             }
             return termFreqVector;
         }
 
-        function vecDotProduct(vecA: Array<number>, vecB: Array<number>): number {
+        function vecDotProduct(vecA: number[], vecB: number[]): number {
             let product: number = 0;
             for (let i = 0; i < vecA.length; i++) {
                 product += vecA[i] * vecB[i];
@@ -112,36 +116,36 @@ export default class StringHandler {
             return product;
         }
 
-        function vecMagnitude(vec: Array<number>): number {
+        function vecMagnitude(vec: number[]): number {
             let sum: number = 0;
-            for (let i = 0; i < vec.length; i++) {
-                sum += vec[i] * vec[i];
+            for (const item of vec) {
+                sum += item * item;
             }
             return Math.sqrt(sum);
         }
 
-        function cosineSimilarity(vecA: Array<number>, vecB: Array<number>): number {
+        function cosineSimilarity(vecA: number[], vecB: number[]): number {
             return vecDotProduct(vecA, vecB) / (vecMagnitude(vecA) * vecMagnitude(vecB));
         }
 
         const termFreqA: { [key: string]: number } = termFreqMap(firstString);
         const termFreqB: { [key: string]: number } = termFreqMap(secondString);
 
-        let dict: { [key: string]: boolean } = {};
-        addKeysToDict(termFreqA, dict);
-        addKeysToDict(termFreqB, dict);
+        const dict: { [key: string]: boolean } = {};
+        addKeysToDictionary(termFreqA, dict);
+        addKeysToDictionary(termFreqB, dict);
 
-        const termFreqVecA: Array<number> = termFreqMapToVector(termFreqA, dict);
-        const termFreqVecB: Array<number> = termFreqMapToVector(termFreqB, dict);
+        const termFreqVecA: number[] = termFreqMapToVector(termFreqA, dict);
+        const termFreqVecB: number[] = termFreqMapToVector(termFreqB, dict);
 
         return cosineSimilarity(termFreqVecA, termFreqVecB);
     }
 
     /**
      * Upper case first character of string (not include trim string)
-     * @param string
+     * @param str
      */
-    public static upperCaseFirstCharacter(string: string): string {
-        return string.replace(/[a-z]/, (character): string => character.toUpperCase());
+    public static upperCaseFirstCharacter(str: string): string {
+        return str.replace(/[a-z]/, (character): string => character.toUpperCase());
     }
 }

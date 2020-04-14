@@ -5,17 +5,20 @@ import { convertAcreageValue, convertPriceValue } from './group-data.helper';
 import StringHandler from '../../util/string-handler/string-handler';
 import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
-import Timeout = NodeJS.Timeout;
 import GroupedDataLogic from '../../services/grouped-data/grouped-data.logic';
+import RawDataModelInterface from '../../services/raw-data/raw-data.model.interface';
+import FileLog from '../../util/file/file.log';
+import RawDataLogic from '../../services/raw-data/raw-data.logic';
+import GroupedDataModelInterface from '../../services/grouped-data/grouped-data.model.interface';
 
 interface AggregationGroupDataResult {
     _id: number;
-    represent: RawData.DocumentInterface;
+    represent: RawDataModelInterface;
 }
 
 export default class GroupData {
     private startTime: [number, number] | undefined;
-    private logInstance: File.Log = new File.Log();
+    private logInstance: FileLog = new File.Log();
     private isRunning: boolean = false;
 
     private readonly EXPECTED_POINT: number = 9;
@@ -36,20 +39,20 @@ export default class GroupData {
         this.startTime = process.hrtime();
         this.isRunning = true;
         try {
-            const rawDataLogic: RawData.Logic = new RawData.Logic();
-            const groupedDataLogic: GroupedData.Logic = new GroupedData.Logic();
+            const rawDataLogic: RawDataLogic = new RawData.Logic();
+            const groupedDataLogic: GroupedDataLogic = new GroupedData.Logic();
             const limit: number = 1000;
             let offset: number = 0;
             let queryResult: {
-                rawDataset: Array<RawData.DocumentInterface>;
+                rawDataset: RawDataModelInterface[];
                 hasNext: boolean;
             } = await rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
 
             while (queryResult.hasNext || queryResult.rawDataset.length > 0) {
-                let rawDataset: Array<RawData.DocumentInterface> = queryResult.rawDataset;
+                const rawDataset: RawDataModelInterface[] = queryResult.rawDataset;
                 rawDataLoop: for (const rawData of rawDataset) {
                     rawData.isGrouped = true;
-                    let aggregations: Array<object> = [
+                    const aggregations: object[] = [
                         {
                             $lookup: {
                                 from: 'raw_datas',
@@ -78,12 +81,10 @@ export default class GroupData {
                             },
                         },
                     ];
-                    let queryResult: Array<AggregationGroupDataResult> = await GroupedDataLogic.aggregationQuery(
-                        aggregations
-                    );
-                    for (const result of queryResult) {
+                    const results: AggregationGroupDataResult[] = await GroupedDataLogic.aggregationQuery(aggregations);
+                    for (const result of results) {
                         if (this.isBelongGroupData(rawData, result.represent)) {
-                            const groupData: GroupedData.DocumentInterface | null = await groupedDataLogic.getById(
+                            const groupData: GroupedDataModelInterface | null = await groupedDataLogic.getById(
                                 result._id
                             );
                             if (groupData) {
@@ -116,13 +117,10 @@ export default class GroupData {
 
     /**
      * Check whether raw data belong any group data
-     * @param {RawData.DocumentInterface} rawData
-     * @param {RawData.DocumentInterface} representGroupedData
+     * @param {RawDataModelInterface} rawData
+     * @param {RawDataModelInterface} representGroupedData
      */
-    private isBelongGroupData(
-        rawData: RawData.DocumentInterface,
-        representGroupedData: RawData.DocumentInterface
-    ): boolean {
+    private isBelongGroupData(rawData: RawDataModelInterface, representGroupedData: RawDataModelInterface): boolean {
         let totalPoint: number = 0;
 
         totalPoint += this.calculateStringAttributePoint(representGroupedData, rawData, 'title');
@@ -150,14 +148,11 @@ export default class GroupData {
 
     /**
      * Calculate acreage distance point
-     * @param {RawData.DocumentInterface} firstTarget
-     * @param {RawData.DocumentInterface} secondTarget
+     * @param {RawDataModelInterface} firstTarget
+     * @param {RawDataModelInterface} secondTarget
      * @return {number} points
      */
-    private calculateAcreagePoint(
-        firstTarget: RawData.DocumentInterface,
-        secondTarget: RawData.DocumentInterface
-    ): number {
+    private calculateAcreagePoint(firstTarget: RawDataModelInterface, secondTarget: RawDataModelInterface): number {
         if (!Number(firstTarget.acreage.value) && !Number(secondTarget.acreage.value)) {
             return this.ATTR_POINT_ACREAGE;
         }
@@ -166,11 +161,11 @@ export default class GroupData {
             return 0;
         }
 
-        let firstAcreageObj: { value: number; measureUnit: string } = {
+        const firstAcreageObj: { value: number; measureUnit: string } = {
             value: Number(firstTarget.acreage.value),
             measureUnit: firstTarget.acreage.measureUnit,
         };
-        let secondAcreageObj: { value: number; measureUnit: string } = {
+        const secondAcreageObj: { value: number; measureUnit: string } = {
             value: Number(secondTarget.acreage.value),
             measureUnit: secondTarget.acreage.measureUnit,
         };
@@ -195,14 +190,11 @@ export default class GroupData {
 
     /**
      * Calculate price distance point
-     * @param {RawData.DocumentInterface} firstTarget
-     * @param {RawData.DocumentInterface} secondTarget
+     * @param {RawDataModelInterface} firstTarget
+     * @param {RawDataModelInterface} secondTarget
      * @return {number} points
      */
-    private calculatePricePoint(
-        firstTarget: RawData.DocumentInterface,
-        secondTarget: RawData.DocumentInterface
-    ): number {
+    private calculatePricePoint(firstTarget: RawDataModelInterface, secondTarget: RawDataModelInterface): number {
         if (!Number(firstTarget.price.value) && !Number(secondTarget.price.value)) {
             return this.ATTR_POINT_PRICE;
         }
@@ -211,11 +203,11 @@ export default class GroupData {
             return 0;
         }
 
-        let firstPriceObj: { value: number; currency: string } = {
+        const firstPriceObj: { value: number; currency: string } = {
             value: Number(firstTarget.price.value),
             currency: firstTarget.price.currency,
         };
-        let secondPriceObj: { value: number; currency: string } = {
+        const secondPriceObj: { value: number; currency: string } = {
             value: Number(secondTarget.price.value),
             currency: secondTarget.price.currency,
         };
@@ -235,14 +227,14 @@ export default class GroupData {
 
     /**
      * Calculate string attribute point
-     * @param {RawData.DocumentInterface} firstTarget
-     * @param {RawData.DocumentInterface} secondTarget
+     * @param {RawDataModelInterface} firstTarget
+     * @param {RawDataModelInterface} secondTarget
      * @param {'title'|'address'} type
      * @return {number} points
      */
     private calculateStringAttributePoint(
-        firstTarget: RawData.DocumentInterface,
-        secondTarget: RawData.DocumentInterface,
+        firstTarget: RawDataModelInterface,
+        secondTarget: RawDataModelInterface,
         type: 'title' | 'address'
     ): number {
         let attrPoint: number = 0;

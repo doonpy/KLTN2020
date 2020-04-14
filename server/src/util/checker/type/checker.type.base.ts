@@ -6,7 +6,7 @@ export default abstract class CheckerTypeBase extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: any): void {
-        let value: any | null = this.getValue(paramName, input);
+        const value: any | null = this.getValue(paramName, input);
 
         if (!value) {
             return;

@@ -1,6 +1,4 @@
 export default class UrlHandler {
-    constructor() {}
-
     /**
      * Remove domain from URL
      *

@@ -1,11 +1,11 @@
 import ControllerBase from '../controller.base';
 import { Request, Response } from 'express';
-import Validator from '../validator/validator';
-import { Checker } from '../checker/checker.index';
+import Validator from '../../util/validator/validator';
+import { Checker } from '../../util/checker/checker.index';
 import RawDataLogic from './raw-data.logic';
 import RawDataModelInterface from './raw-data.model.interface';
 import { RawDataConstant } from './raw-data.constant';
-import { Common } from '../../common/common.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 const commonPath: string = '/raw-dataset';
 const specifyIdPath: string = '/raw-dataset/:id';
@@ -105,11 +105,7 @@ export default class RawDataController extends ControllerBase {
         this.rawDataLogic
             .create(this.requestBody)
             .then((createdRawData: RawDataModelInterface): void => {
-                this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
-                    RawDataLogic.convertToResponse(createdRawData),
-                    res
-                );
+                this.sendResponse(ResponseStatusCode.CREATED, RawDataLogic.convertToResponse(createdRawData), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -132,7 +128,7 @@ export default class RawDataController extends ControllerBase {
         this.rawDataLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);
+                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -162,22 +158,24 @@ export default class RawDataController extends ControllerBase {
 
         this.rawDataLogic
             .getAll(
-                { detailUrlId: this.requestQuery[this.PARAM_DETAIL_URL_ID] || { $gt: 0 } },
+                {
+                    detailUrlId: this.requestQuery[this.PARAM_DETAIL_URL_ID] || { $gt: 0 },
+                },
                 this.populate,
                 this.limit,
                 this.offset
             )
             .then(({ rawDataset, hasNext }): void => {
-                let rawDataList: Array<object> = rawDataset.map((rawDataItem: RawDataModelInterface): object => {
+                const rawDataList: object[] = rawDataset.map((rawDataItem: RawDataModelInterface): object => {
                     return RawDataLogic.convertToResponse(rawDataItem, this.populate);
                 });
 
-                let responseBody: object = {
+                const responseBody: object = {
                     rawDataset: rawDataList,
-                    hasNext: hasNext,
+                    hasNext,
                 };
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -207,7 +205,7 @@ export default class RawDataController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -291,7 +289,7 @@ export default class RawDataController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedRawData: RawDataModelInterface | undefined): void => {
                 if (editedRawData) {
-                    this.sendResponse(Common.ResponseStatusCode.OK, RawDataLogic.convertToResponse(editedRawData), res);
+                    this.sendResponse(ResponseStatusCode.OK, RawDataLogic.convertToResponse(editedRawData), res);
                 }
             })
             .catch((error: Error): void => {

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import ControllerBase from '../controller.base';
 import CatalogLogic from './catalog.logic';
-import Validator from '../validator/validator';
-import { Checker } from '../checker/checker.index';
+import Validator from '../../util/validator/validator';
+import { Checker } from '../../util/checker/checker.index';
 import CatalogModelInterface from './catalog.model.interface';
-import { Common } from '../../common/common.index';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
 const commonPath: string = '/catalogs';
 const specifyIdPath: string = '/catalogs/:id';
@@ -50,16 +50,16 @@ export default class CatalogController extends ControllerBase {
         this.catalogLogic
             .getAll(this.requestQuery[this.PARAM_HOST_ID], this.keyword, this.limit, this.offset)
             .then(({ catalogs, hasNext }): void => {
-                let catalogList: Array<object> = catalogs.map((catalog: CatalogModelInterface): object => {
+                const catalogList: object[] = catalogs.map((catalog: CatalogModelInterface): object => {
                     return CatalogLogic.convertToResponse(catalog);
                 });
 
-                let responseBody: object = {
+                const responseBody: object = {
                     catalogs: catalogList,
-                    hasNext: hasNext,
+                    hasNext,
                 };
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -89,7 +89,7 @@ export default class CatalogController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(Common.ResponseStatusCode.OK, responseBody, res);
+                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -127,11 +127,7 @@ export default class CatalogController extends ControllerBase {
         this.catalogLogic
             .create(this.requestBody)
             .then((createdCatalog: CatalogModelInterface): void => {
-                this.sendResponse(
-                    Common.ResponseStatusCode.CREATED,
-                    CatalogLogic.convertToResponse(createdCatalog),
-                    res
-                );
+                this.sendResponse(ResponseStatusCode.CREATED, CatalogLogic.convertToResponse(createdCatalog), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -174,7 +170,7 @@ export default class CatalogController extends ControllerBase {
             .update(this.requestParams[this.PARAM_ID], this.requestBody)
             .then((editedCatalog: CatalogModelInterface | undefined): void => {
                 if (editedCatalog) {
-                    this.sendResponse(Common.ResponseStatusCode.OK, CatalogLogic.convertToResponse(editedCatalog), res);
+                    this.sendResponse(ResponseStatusCode.OK, CatalogLogic.convertToResponse(editedCatalog), res);
                 }
             })
             .catch((error: Error): void => {
@@ -198,7 +194,7 @@ export default class CatalogController extends ControllerBase {
         this.catalogLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(Common.ResponseStatusCode.NO_CONTENT, {}, res);
+                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

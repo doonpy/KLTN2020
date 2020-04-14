@@ -1,9 +1,9 @@
 import * as mongoose from 'mongoose';
-import { Catalog } from '../catalog/catalog.index';
+import CatalogModelInterface from '../catalog/catalog.model.interface';
 
 export default interface DetailUrlModelInterface extends mongoose.Document {
     _id: number;
-    catalogId: Catalog.DocumentInterface | number;
+    catalogId: CatalogModelInterface | number;
     url: string;
     isExtracted: boolean;
     requestRetries: number;

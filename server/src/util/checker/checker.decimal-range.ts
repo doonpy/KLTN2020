@@ -1,9 +1,9 @@
+import { Exception } from '../../services/exception/exception.index';
 import CheckerBase from './checker.base';
-import { Exception } from '../exception/exception.index';
-import { Common } from '../../common/common.index';
 import { CheckerFailedResponse } from './checker.failed-response';
+import { ResponseStatusCode } from '../../common/common.response-status.code';
 
-export default class CheckerIntegerRange extends CheckerBase {
+export default class CheckerDecimalRange extends CheckerBase {
     private readonly minRange: number;
     private readonly maxRange: number;
 
@@ -28,7 +28,7 @@ export default class CheckerIntegerRange extends CheckerBase {
 
         if (!this.checkMinRange(value)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_SMALLER,
                 [paramName, this.minRange, value]
@@ -37,10 +37,10 @@ export default class CheckerIntegerRange extends CheckerBase {
 
         if (!this.checkMaxRange(value)) {
             throw new Exception.Customize(
-                Common.ResponseStatusCode.BAD_REQUEST,
+                ResponseStatusCode.BAD_REQUEST,
                 CheckerFailedResponse.Message.INVALID_VALUE,
                 CheckerFailedResponse.RootCause.OUT_OF_RANGE_LARGER,
-                [paramName, this.minRange, value]
+                [paramName, this.maxRange, value]
             );
         }
     }

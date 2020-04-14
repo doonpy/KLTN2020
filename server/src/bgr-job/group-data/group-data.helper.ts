@@ -26,8 +26,8 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
  */
 export const convertPriceValue = (value: number, fromUnit: string, toUnit: string): number => {
     const CURRENCY_PATTERN: RegExp = new RegExp(/tỷ|tỉ|triệu|nghìn|ngàn/);
-    const fromUnitCurrencyArray: Array<string> | null = fromUnit.match(CURRENCY_PATTERN);
-    const toUnitCurrencyArray: Array<string> | null = toUnit.match(CURRENCY_PATTERN);
+    const fromUnitCurrencyArray: string[] | null = fromUnit.match(CURRENCY_PATTERN);
+    const toUnitCurrencyArray: string[] | null = toUnit.match(CURRENCY_PATTERN);
     fromUnit = fromUnitCurrencyArray ? fromUnitCurrencyArray.shift() || '' : '';
     toUnit = toUnitCurrencyArray ? toUnitCurrencyArray.shift() || '' : '';
 

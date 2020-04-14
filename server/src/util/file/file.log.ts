@@ -15,7 +15,7 @@ export default class FileLog extends FileBase {
 
     constructor() {
         super();
-        let currentDate: Date = new Date();
+        const currentDate: Date = new Date();
         this.dateFolder = `${currentDate.getUTCFullYear()}-${currentDate.getUTCMonth() +
             1}-${currentDate.getUTCDate()}`;
         this.initHeader();
@@ -61,7 +61,7 @@ export default class FileLog extends FileBase {
      * Create error log file.
      */
     private createErrorLog(error: Error): void {
-        let content: string = `Error!\nName: ${error.name}\nMessage: ${error.message}\n Stack: ${error.stack}`;
+        const content: string = `Error!\nName: ${error.name}\nMessage: ${error.message}\n Stack: ${error.stack}`;
 
         try {
             this.createFile(this.getFullPath(true), content, {
@@ -76,7 +76,7 @@ export default class FileLog extends FileBase {
      * Create file name with current date time.
      */
     public createFileName(customizeFileName: string = ''): void {
-        let currentDate: Date = new Date();
+        const currentDate: Date = new Date();
         this.fileName =
             this.PREFIX +
             customizeFileName +
@@ -140,7 +140,7 @@ export default class FileLog extends FileBase {
      * Initialize header of log file
      */
     private initHeader(): void {
-        let currentDate: Date = new Date();
+        const currentDate: Date = new Date();
 
         this.addLine(`Date: ${currentDate.toLocaleDateString()}`);
         this.addLine(`Time: ${currentDate.toLocaleTimeString()}`);
@@ -152,7 +152,7 @@ export default class FileLog extends FileBase {
      *
      * @param contentList
      */
-    public initFooter(contentList: Array<{ name: string; value: string | number }>): void {
+    public initFooter(contentList: { name: string; value: string | number }[]): void {
         this.addLine(`-------- SUMMARY -------`);
         for (const item of contentList) {
             this.addLine(`-> ${item.name}: ${item.value}`);

@@ -1,15 +1,10 @@
-import {
-    DatabaseFailedResponseMessage,
-    DatabaseFailedResponseRootCause,
-} from './database.failed-response';
+import { DatabaseFailedResponseMessage, DatabaseFailedResponseRootCause } from './database.failed-response';
 import DatabaseMongodb from './mongodb/database.mongodb';
 
-export namespace Database {
-    export const FailedResponse = {
+export const Database = {
+    FailedResponse: {
         Message: DatabaseFailedResponseMessage,
         RootCause: DatabaseFailedResponseRootCause,
-    };
-
-    export const MongoDb = DatabaseMongodb;
-    export type MongoDb = DatabaseMongodb;
-}
+    },
+    MongoDb: DatabaseMongodb,
+};

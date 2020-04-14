@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { Common } from '../common/common.index';
+import { ResponseStatusCode } from '../common/common.response-status.code';
 
 export default abstract class ControllerBase {
     protected commonPath: string = '';
@@ -78,13 +78,13 @@ export default abstract class ControllerBase {
      * @param next
      */
     private initInputs(req: Request, res: Response, next: any): void {
-        let limit: number = Number(req.query.limit);
-        let offset: number = Number(req.query.offset);
+        const limit: number = Number(req.query.limit);
+        const offset: number = Number(req.query.offset);
 
         this.limit = limit || this.limit;
         this.offset = offset || this.offset;
         this.populate = req.query.populate === 'true';
-        this.keyword = req.query.keyword ? req.query.keyword.trim() : this.keyword;
+        this.keyword = (req.query.keyword ? decodeURI(req.query.keyword as string) : this.keyword).trim();
 
         this.requestParams = {};
         if (Object.keys(req.params).length > 0) {
@@ -110,11 +110,11 @@ export default abstract class ControllerBase {
      * @param res
      */
     protected sendResponse(
-        statusCode: number = Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+        statusCode: number = ResponseStatusCode.INTERNAL_SERVER_ERROR,
         body: object = {},
         res: Response
     ): void {
-        if (statusCode === Common.ResponseStatusCode.NO_CONTENT) {
+        if (statusCode === ResponseStatusCode.NO_CONTENT) {
             res.status(statusCode).json();
         } else {
             res.status(statusCode).json(body);

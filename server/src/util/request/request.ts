@@ -7,7 +7,7 @@ export default class Request {
             'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
             Accept: 'text/plain,text/html,*/*',
         },
-        timeout: parseInt(process.env.REQUEST_TIMEOUT || '10000'),
+        timeout: parseInt(process.env.REQUEST_TIMEOUT || '10000', 10),
         resolveWithFullResponse: true,
         time: true,
     };
