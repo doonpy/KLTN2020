@@ -2,7 +2,6 @@
   "name": "gt2020-serverside",
   "version": "1.0.0",
   "description": "Graduation thesis 2020 - server side",
-  "main": "app.js",
   "scripts": {
     "node-server-dev": "ts-node src/server.ts",
     "node-server-prod": "node dist/server.js",
