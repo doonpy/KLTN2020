@@ -9,9 +9,11 @@
     "bgr-dev": "ts-node src/bgr-job/background-job.ts",
     "server-bgr-build-dev": "tsc -w server/tsconfig.json",
     "server-bgr-build-prod": "tsc -p server/tsconfig.json",
+    "server-bgr-tslint": "tslint --fix -c tslint.json 'server/src/**/*.ts'",
     "view-dev": "next view",
     "view-prod": "next start",
-    "view-build": "next build"
+    "view-build": "next build",
+    "view-tslint": "tslint --fix -c tslint.json 'view/pages/**/*.ts'"
   },
   "repository": {
     "type": "git",
