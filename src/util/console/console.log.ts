@@ -16,23 +16,23 @@ export default class ConsoleLog {
      * @return
      */
     public show(): void {
-        let message = chalk.green(`[${new Date().toUTCString()}]`);
+        let prefix = chalk.bold(chalk.cyan(`[PID: ${process.pid}]`) + chalk.green(`[${new Date().toUTCString()}]`));
 
         switch (this._msgType) {
             case ConsoleConstant.Type.INFO:
-                message += chalk.blue(ConsoleConstant.Tag[ConsoleConstant.Type.INFO]);
+                prefix += chalk.blue(ConsoleConstant.Tag[ConsoleConstant.Type.INFO]);
                 break;
             case ConsoleConstant.Type.DEBUG:
-                message += chalk.yellow(ConsoleConstant.Tag[ConsoleConstant.Type.DEBUG]);
+                prefix += chalk.yellow(ConsoleConstant.Tag[ConsoleConstant.Type.DEBUG]);
                 break;
             case ConsoleConstant.Type.ERROR:
-                message += chalk.red(ConsoleConstant.Tag[ConsoleConstant.Type.ERROR]);
+                prefix += chalk.red(ConsoleConstant.Tag[ConsoleConstant.Type.ERROR]);
                 break;
             default:
-                message += chalk.gray(ConsoleConstant.Tag[ConsoleConstant.Type.UNKNOWN]);
+                prefix += chalk.gray(ConsoleConstant.Tag[ConsoleConstant.Type.UNKNOWN]);
                 break;
         }
 
-        console.log(message, this._msgContent);
+        console.log(`${prefix} ${this._msgContent}`);
     }
 }

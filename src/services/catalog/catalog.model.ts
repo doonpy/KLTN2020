@@ -4,7 +4,7 @@ import CatalogModelInterface from './catalog.model.interface';
 
 autoIncrement.initialize(mongoose.connection);
 
-const CatalogSchema: Schema = new Schema(
+const catalogSchema: Schema = new Schema(
     {
         title: { type: Schema.Types.String },
         url: { type: Schema.Types.String },
@@ -24,10 +24,12 @@ const CatalogSchema: Schema = new Schema(
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
 
-CatalogSchema.plugin(autoIncrement.plugin, {
+catalogSchema.plugin(autoIncrement.plugin, {
     model: 'catalog',
     startAt: 1,
     incrementBy: 1,
 });
 
-export default mongoose.model<CatalogModelInterface>('catalog', CatalogSchema);
+catalogSchema.index({ url: 1 });
+
+export default mongoose.model<CatalogModelInterface>('catalog', catalogSchema);

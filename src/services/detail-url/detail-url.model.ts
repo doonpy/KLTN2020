@@ -20,4 +20,6 @@ detailUrlSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
+detailUrlSchema.index({ url: 1 });
+
 export default mongoose.model<DetailUrlModelInterface>('detail_url', detailUrlSchema);

@@ -8,8 +8,9 @@ import { ScrapeConstant } from './scrape.constant';
 import { Common } from '../../common/common.index';
 import { File } from '../../util/file/file.index';
 import DateTime from '../../util/datetime/datetime';
-import _ from 'lodash';
 import { Exception } from '../../services/exception/exception.index';
+import ConsoleLog from '../../util/console/console.log';
+import { ConsoleConstant } from '../../util/console/console.constant';
 
 export default abstract class ScrapeBase {
     protected readonly logInstance: File.Log = new File.Log();
@@ -17,10 +18,9 @@ export default abstract class ScrapeBase {
     protected successRequestCounter: number = 0;
     protected countNumber: number = 0;
     protected startTime: [number, number] | undefined;
-    protected requestLimiter: number = 0;
+    protected requestCounter: number = 0;
     protected isRunning: boolean = false;
 
-    protected readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_MAX_REQUEST || '10');
     protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100');
 
     protected constructor() {}
@@ -34,8 +34,13 @@ export default abstract class ScrapeBase {
     protected async getBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
         let url: string = path.includes(domain) ? path : domain + path;
         try {
-            let response: Response = await new Request(url).send();
-            let statusCode: number = response.statusCode;
+            const response: Response = await new Request(url).send();
+            const statusCode: number = response.statusCode;
+
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
+            ).show();
 
             if (response.statusCode !== Common.ResponseStatusCode.OK || response.request.uri.href !== url) {
                 this.writeLog(
@@ -123,9 +128,6 @@ export default abstract class ScrapeBase {
         this.logInstance.addLine(`- ERROR: ${error.message}`);
         this.logInstance.addLine(`- CATALOG ID: ${catalogId}`);
         this.logInstance.exportFile();
-        ChatBotTelegram.sendMessage(
-            StringHandler.replaceString(message, [catalogId, error.message, this.logInstance.getUrl()])
-        );
     }
 
     /**
@@ -161,7 +163,7 @@ export default abstract class ScrapeBase {
                 value: this.failedRequestCounter,
             },
         ];
-        footerLogContent = _.merge(footerLogContent, customizeFooter);
+        footerLogContent = footerLogContent.concat(customizeFooter);
 
         this.logInstance.initFooter(footerLogContent);
         this.logInstance.exportFile();

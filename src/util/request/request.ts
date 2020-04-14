@@ -1,8 +1,8 @@
-import requestPromise from 'request-promise';
+import requestPromise, { RequestPromiseOptions } from 'request-promise';
 import { Response } from 'request';
 
 export default class Request {
-    private readonly options: object = {
+    private readonly options: RequestPromiseOptions = {
         headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
             Accept: 'text/plain,text/html,*/*',
@@ -11,9 +11,12 @@ export default class Request {
         resolveWithFullResponse: true,
         time: true,
     };
-    private readonly url: string = '';
+    private readonly url: string;
 
-    constructor(url: string) {
+    constructor(url: string, options?: object) {
+        if (options) {
+            this.options = options;
+        }
         this.url = url;
     }
 

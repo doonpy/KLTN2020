@@ -126,8 +126,12 @@ export default class CatalogController extends ControllerBase {
 
         this.catalogLogic
             .create(this.requestBody)
-            .then((createdHost: CatalogModelInterface): void => {
-                this.sendResponse(Common.ResponseStatusCode.CREATED, CatalogLogic.convertToResponse(createdHost), res);
+            .then((createdCatalog: CatalogModelInterface): void => {
+                this.sendResponse(
+                    Common.ResponseStatusCode.CREATED,
+                    CatalogLogic.convertToResponse(createdCatalog),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);

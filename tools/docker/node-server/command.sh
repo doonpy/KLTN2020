@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm start
+npm run node-server-prod

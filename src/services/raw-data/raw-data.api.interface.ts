@@ -1,8 +1,9 @@
 import { DetailUrl } from '../detail-url/detail-url.index';
+import { Coordinate } from '../coordinate/coordinate.index';
 
 export default interface RawDataApiInterface {
     id: number | null;
-    detailUrl: DetailUrl.ApiInterface | null;
+    detailUrl: DetailUrl.ApiInterface | null | number;
     transactionType: string | null;
     propertyType: string | null;
     postDate: string | null;
@@ -25,6 +26,8 @@ export default interface RawDataApiInterface {
           ]
         | []
         | null;
+    coordinate: Coordinate.ApiInterface | null;
+    isGrouped: boolean | null;
     createAt: string | null;
     updateAt: string | null;
 }

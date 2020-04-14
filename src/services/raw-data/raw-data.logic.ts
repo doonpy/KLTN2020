@@ -9,34 +9,41 @@ import { Common } from '../../common/common.index';
 import { Database } from '../database/database.index';
 import { DetailUrl } from '../detail-url/detail-url.index';
 import RawDataApiInterface from './raw-data.api.interface';
+import { Coordinate } from '../coordinate/coordinate.index';
 
 export default class RawDataLogic extends LogicBase {
     /**
      * @param limit
      * @param offset
-     * @param detailUrlId
-     *
+     * @param conditions
+     * @param isPopulate
      * @return Promise<{ rawDataset: Array<RawDataModelInterface>; hasNext: boolean }>
      */
     public async getAll(
-        limit: number,
-        offset: number,
-        detailUrlId: number
+        conditions?: object,
+        isPopulate?: boolean,
+        limit?: number,
+        offset?: number
     ): Promise<{ rawDataset: Array<RawDataModelInterface>; hasNext: boolean }> {
         try {
-            let conditions: object = {};
             let rawDatasetQuery: DocumentQuery<
                 Array<RawDataModelInterface>,
                 RawDataModelInterface,
                 object
-            > = RawDataModel.find(conditions).populate({
-                path: 'detailUrlId',
-                populate: {
-                    path: 'catalogId',
-                    populate: { path: 'hostId' },
-                },
-            });
-            let remainRawDatasetQuery: Query<number> = RawDataModel.countDocuments(conditions);
+            > = RawDataModel.find(conditions || {});
+            let remainRawDatasetQuery: Query<number> = RawDataModel.countDocuments(conditions || {});
+
+            if (isPopulate) {
+                rawDatasetQuery
+                    .populate({
+                        path: 'detailUrlId',
+                        populate: {
+                            path: 'catalogId',
+                            populate: { path: 'hostId' },
+                        },
+                    })
+                    .populate('coordinate');
+            }
 
             if (offset) {
                 rawDatasetQuery.skip(offset);
@@ -80,6 +87,7 @@ export default class RawDataLogic extends LogicBase {
                         populate: { path: 'hostId' },
                     },
                 })
+                .populate('coordinate')
                 .exec();
         } catch (error) {
             throw new Exception.Customize(
@@ -121,6 +129,8 @@ export default class RawDataLogic extends LogicBase {
                     acreage: acreage,
                     address: address,
                     others: others,
+                    coordinate: null,
+                    isGrouped: false,
                 }).save()
             )
                 .populate({
@@ -130,6 +140,7 @@ export default class RawDataLogic extends LogicBase {
                         populate: { path: 'hostId' },
                     },
                 })
+                .populate('coordinate')
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
@@ -157,7 +168,9 @@ export default class RawDataLogic extends LogicBase {
             price,
             acreage,
             address,
+            coordinate,
             others,
+            isGrouped,
         }: RawDataModelInterface
     ): Promise<RawDataModelInterface | undefined> {
         try {
@@ -192,6 +205,7 @@ export default class RawDataLogic extends LogicBase {
             }
 
             rawData.address = address || rawData.address;
+            rawData.coordinate = coordinate || rawData.coordinate;
 
             if (others && others.length > 0) {
                 others.forEach((other: { name: string; value: string } | any): void => {
@@ -208,6 +222,8 @@ export default class RawDataLogic extends LogicBase {
                 });
             }
 
+            rawData.isGrouped = typeof isGrouped !== 'undefined' ? isGrouped : rawData.isGrouped;
+
             return await (await rawData.save())
                 .populate({
                     path: 'detailUrlId',
@@ -216,6 +232,7 @@ export default class RawDataLogic extends LogicBase {
                         populate: { path: 'hostId' },
                     },
                 })
+                .populate('coordinate')
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
@@ -231,12 +248,27 @@ export default class RawDataLogic extends LogicBase {
      *
      * @return Promise<null>
      */
-    public async delete(id: string): Promise<null> {
+    public async delete(id: number | string): Promise<void> {
         try {
             await RawDataLogic.checkRawDataExistedWithId(id);
             await RawDataModel.findByIdAndDelete(id).exec();
+        } catch (error) {
+            throw new Exception.Customize(
+                error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
+                error.message,
+                error.cause || Database.FailedResponse.RootCause.DB_RC_2
+            );
+        }
+    }
 
-            return null;
+    /**
+     * @param detailUrlId
+     * @return Promise<void>
+     */
+    public async deleteByDetailUrlId(detailUrlId: number | string): Promise<void> {
+        try {
+            await RawDataLogic.checkRawDataExistedWithDetailUrlId(detailUrlId);
+            await RawDataModel.findOneAndDelete({ detailUrlId: detailUrlId });
         } catch (error) {
             throw new Exception.Customize(
                 error.statusCode || Common.ResponseStatusCode.INTERNAL_SERVER_ERROR,
@@ -338,7 +370,7 @@ export default class RawDataLogic extends LogicBase {
      * @param address
      * @param others
      */
-    public createDocument(
+    public static createDocument(
         detailUrlId: string | number,
         transactionType: number,
         propertyType: number,
@@ -373,22 +405,28 @@ export default class RawDataLogic extends LogicBase {
 
     /**
      * @param rawData
+     * @param isPopulate
      */
 
-    public static convertToResponse({
-        _id,
-        transactionType,
-        propertyType,
-        detailUrlId,
-        postDate,
-        title,
-        price,
-        acreage,
-        address,
-        others,
-        cTime,
-        mTime,
-    }: RawDataModelInterface): RawDataApiInterface {
+    public static convertToResponse(
+        {
+            _id,
+            transactionType,
+            propertyType,
+            detailUrlId,
+            postDate,
+            title,
+            price,
+            acreage,
+            address,
+            others,
+            coordinate,
+            isGrouped,
+            cTime,
+            mTime,
+        }: RawDataModelInterface,
+        isPopulate?: boolean
+    ): RawDataApiInterface {
         let data: RawDataApiInterface = {
             id: null,
             transactionType: null,
@@ -400,6 +438,8 @@ export default class RawDataLogic extends LogicBase {
             acreage: null,
             address: null,
             others: null,
+            coordinate: null,
+            isGrouped: null,
             createAt: null,
             updateAt: null,
         };
@@ -420,8 +460,10 @@ export default class RawDataLogic extends LogicBase {
                 RawDataConstant.DEFINITION.TYPE_OF_PROPERTY[propertyType][parseInt(process.env.LANGUAGE || '0')] || '';
         }
 
-        if (detailUrlId && Object.keys(detailUrlId).length > 0) {
+        if (detailUrlId && Object.keys(detailUrlId).length > 0 && isPopulate) {
             data.detailUrl = DetailUrl.Logic.convertToResponse(<DetailUrl.DocumentInterface>detailUrlId);
+        } else {
+            data.detailUrl = <number>detailUrlId;
         }
 
         if (postDate) {
@@ -449,6 +491,14 @@ export default class RawDataLogic extends LogicBase {
 
         if (others.length > 0) {
             data.others = others;
+        }
+
+        if (Object.keys(coordinate).length > 0) {
+            data.coordinate = Coordinate.Logic.convertToResponse(<Coordinate.DocumentInterface>coordinate);
+        }
+
+        if (typeof isGrouped !== 'undefined') {
+            data.isGrouped = isGrouped;
         }
 
         if (cTime) {

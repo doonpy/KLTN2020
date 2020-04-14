@@ -3,7 +3,7 @@ import { Exception } from '../../exception/exception.index';
 import { Common } from '../../../common/common.index';
 import { CheckerTypeFailedResponse } from './checker.type.failed-response';
 
-const DECIMAL_NUMERIC_CHARACTER_PATTERN = new RegExp(/^([1-9]+)?0?\.[0-9]+$/);
+const DECIMAL_NUMERIC_CHARACTER_PATTERN = new RegExp(/(^([1-9]+)?0?\.[0-9]+$)|\d/);
 
 export default class CheckerTypeDecimal extends CheckerTypeBase {
     /**
