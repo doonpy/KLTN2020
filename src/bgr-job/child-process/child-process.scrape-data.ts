@@ -11,12 +11,6 @@ process.on(
             new ChatBotTelegram();
             await new Database.MongoDb().connect();
 
-            setTimeout(async (): Promise<void> => {
-                new ConsoleLog(ConsoleConstant.Type.ERROR, `Timeout. Killing scrape data process...`).show();
-                await ChatBotTelegram.sendMessage(`<b>🤖[Scrape data]🤖</b>\n❌ Timeout. Killing process...`);
-                process.kill(1);
-            }, 1000 * 3600 * 2);
-
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape - TYPE: ${scrapeType} - CID: ${catalogId}`).show();
 
             let scrapeJob: BgrScrape.RawData | BgrScrape.DetailUrl | undefined;

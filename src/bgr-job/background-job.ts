@@ -58,7 +58,7 @@ const executeCleanDataChildProcess = (): void => {
     childProcess.on(
         'exit',
         async (): Promise<void> => {
-            executeGroupDataChildProcess();
+            executeAddCoordinateChildProcess();
         }
     );
     childProcess.send({});
@@ -83,7 +83,7 @@ const executeScrapeChildProcess = (catalogId: number | undefined): void => {
 const executeAddCoordinateChildProcess = (): void => {
     const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
     childProcess.on('exit', (): void => {
-        executeCleanDataChildProcess();
+        executeGroupDataChildProcess();
     });
     childProcess.send({});
 };
@@ -103,7 +103,7 @@ const script = async (): Promise<void> => {
             clearInterval(loop);
             monitorContentList = [];
             targetsList = [];
-            executeAddCoordinateChildProcess();
+            executeCleanDataChildProcess();
             return;
         }
 
@@ -173,7 +173,7 @@ new ChatBotTelegram();
 new Database.MongoDb().connect().then(
     async (): Promise<void> => {
         try {
-            await start();
+            // await start();
             await script();
         } catch (error) {
             await ChatBotTelegram.sendMessage(

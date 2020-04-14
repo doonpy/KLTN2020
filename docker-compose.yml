@@ -20,7 +20,7 @@ services:
     volumes:
       - ./public:/usr/src/app/public
     ports:
-      - 80:3000
+      - 3000:3000
 
   bgr-job:
     image: node-server:latest
@@ -41,8 +41,6 @@ services:
     tty: true
     volumes:
       - ./public:/usr/src/app/public
-    ports:
-      - 6789:6789
 
 #  mongo-db:
 #    image: mongo

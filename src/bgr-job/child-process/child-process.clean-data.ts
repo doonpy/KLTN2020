@@ -4,7 +4,6 @@ import { RawData } from '../../services/raw-data/raw-data.index';
 import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
 import ChatBotTelegram from '../../services/chatbot/chatBotTelegram';
-import { setProcessTimeout } from './child-process.util';
 
 process.on(
     'message',
@@ -44,8 +43,6 @@ process.on(
             const documents: Array<any> = await DetailUrl.Logic.aggregationQuery(aggregations);
             const detailUrlLogic: DetailUrl.Logic = new DetailUrl.Logic();
             const rawDataLogic: RawData.Logic = new RawData.Logic();
-
-            setProcessTimeout('clean data', 60 * documents.length);
 
             for (const document of documents) {
                 for (let i: number = 1; i < document.docList.length; i++) {

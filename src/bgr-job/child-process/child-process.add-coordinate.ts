@@ -4,8 +4,6 @@ import { Coordinate } from '../../services/coordinate/coordinate.index';
 import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
 import ChatBotTelegram from '../../services/chatbot/chatBotTelegram';
-import { setProcessTimeout } from './child-process.util';
-import Timeout = NodeJS.Timeout;
 
 process.on(
     'message',
@@ -30,9 +28,8 @@ process.on(
                 limit,
                 offset
             );
-            let processTimeout: Timeout = setProcessTimeout('add coordinate', 60 * queryResult.rawDataset.length);
 
-            while (queryResult.hasNext && queryResult.rawDataset.length > 0) {
+            while (queryResult.hasNext || queryResult.rawDataset.length > 0) {
                 for (const rawData of queryResult.rawDataset) {
                     const coordinateDoc: Coordinate.DocumentInterface | null = await coordinateLogic.create(
                         rawData.address
@@ -49,8 +46,6 @@ process.on(
                 }
                 offset += limit;
                 queryResult = await rawDataLogic.getAll({ coordinate: null }, false, limit, offset);
-                clearTimeout(processTimeout);
-                processTimeout = setProcessTimeout('add coordinate', 60 * queryResult.rawDataset.length);
             }
 
             await ChatBotTelegram.sendMessage(`<b>🤖[Add coordinate]🤖</b>\n✅ Add coordinate complete.`);

@@ -31,13 +31,15 @@ export default class GroupedDataLogic extends LogicBase {
             let remainGroupedDataQuery: Query<number> = GroupedDataModel.countDocuments();
 
             if (isPopulate) {
-                groupedDataQuery.populate({
-                    path: 'items',
-                    populate: {
-                        path: 'detailUrlId coordinate',
-                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
-                    },
-                });
+                groupedDataQuery
+                    .populate({
+                        path: 'items',
+                        populate: {
+                            path: 'detailUrlId',
+                            populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                        },
+                    })
+                    .populate('coordinate');
             }
 
             if (offset) {
@@ -75,10 +77,11 @@ export default class GroupedDataLogic extends LogicBase {
                 .populate({
                     path: 'items',
                     populate: {
-                        path: 'detailUrlId coordinate',
+                        path: 'detailUrlId',
                         populate: { path: 'catalogId', populate: { path: 'hostId' } },
                     },
                 })
+                .populate('coordinate')
                 .exec();
         } catch (error) {
             throw new Exception.Customize(
@@ -107,8 +110,12 @@ export default class GroupedDataLogic extends LogicBase {
             )
                 .populate({
                     path: 'items',
-                    populate: { path: 'detailUrlId', populate: { path: 'catalogId', populate: { path: 'hostId' } } },
+                    populate: {
+                        path: 'detailUrlId',
+                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                    },
                 })
+                .populate('coordinate')
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(
@@ -145,8 +152,12 @@ export default class GroupedDataLogic extends LogicBase {
             return await (await groupedData.save())
                 .populate({
                     path: 'items',
-                    populate: { path: 'detailUrlId', populate: { path: 'catalogId', populate: { path: 'hostId' } } },
+                    populate: {
+                        path: 'detailUrlId',
+                        populate: { path: 'catalogId', populate: { path: 'hostId' } },
+                    },
                 })
+                .populate('coordinate')
                 .execPopulate();
         } catch (error) {
             throw new Exception.Customize(

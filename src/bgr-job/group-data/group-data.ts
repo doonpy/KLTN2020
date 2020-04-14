@@ -5,7 +5,6 @@ import { convertAcreageValue, convertPriceValue } from './group-data.helper';
 import StringHandler from '../../util/string-handler/string-handler';
 import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
-import { setProcessTimeout } from '../child-process/child-process.util';
 import Timeout = NodeJS.Timeout;
 import GroupedDataLogic from '../../services/grouped-data/grouped-data.logic';
 
@@ -45,9 +44,8 @@ export default class GroupData {
                 rawDataset: Array<RawData.DocumentInterface>;
                 hasNext: boolean;
             } = await rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
-            let processTimeout: Timeout = setProcessTimeout('group data', 60 * queryResult.rawDataset.length);
 
-            while (queryResult.hasNext && queryResult.rawDataset.length > 0) {
+            while (queryResult.hasNext || queryResult.rawDataset.length > 0) {
                 let rawDataset: Array<RawData.DocumentInterface> = queryResult.rawDataset;
                 rawDataLoop: for (const rawData of rawDataset) {
                     rawData.isGrouped = true;
@@ -109,8 +107,6 @@ export default class GroupData {
                 }
                 offset += limit;
                 queryResult = await rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
-                clearTimeout(processTimeout);
-                processTimeout = setProcessTimeout('group data', 60 * queryResult.rawDataset.length);
             }
         } catch (error) {
             this.isRunning = false;
