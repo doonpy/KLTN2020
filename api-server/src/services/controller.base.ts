@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
 import { ResponseStatusCode } from '../common/common.response-status.code';
 
 export default abstract class ControllerBase {
@@ -14,7 +14,7 @@ export default abstract class ControllerBase {
     protected requestParams: any = {};
     protected requestQuery: any = {};
 
-    protected router: any = express.Router();
+    protected router: any = Router();
 
     protected readonly PARAM_ID: string = 'id';
     protected readonly PARAM_LIMIT: string = 'limit';

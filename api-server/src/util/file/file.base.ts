@@ -23,10 +23,6 @@ export default class FileBase {
         let pathTracker: string = '';
 
         for (const path of folderPath.split('/')) {
-            if (!path || new RegExp(/^\.+/).test(path)) {
-                continue;
-            }
-
             pathTracker += path + '/';
             if (this.isPathExisted(pathTracker)) {
                 continue;

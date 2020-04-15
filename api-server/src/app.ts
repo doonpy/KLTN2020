@@ -55,7 +55,9 @@ export default class App {
      * Setting assets
      */
     private settingAssets(): void {
-        this.app.use(express.static(path.join(__dirname, '../public')));
+        if (process.env.PUBLIC_FOLDER_PATH) {
+            this.app.use(express.static(path.join(__dirname, process.env.PUBLIC_FOLDER_PATH)));
+        }
     }
 
     /**
@@ -63,10 +65,17 @@ export default class App {
      */
     public enableListen(): void {
         this.app.listen(this.serverPort, (): void => {
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `App listening on the ${process.env.SERVER_PROTOCOL}${process.env.SERVER_URI}:${this.serverPort}`
-            ).show();
+            if (process.env.NODE_ENV !== 'production') {
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `App listening on the http://localhost:${this.serverPort}`
+                ).show();
+            } else {
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `App listening on the ${process.env.SERVER_PROTOCOL}://${process.env.SERVER_URI}:${this.serverPort}`
+                ).show();
+            }
         });
     }
 }

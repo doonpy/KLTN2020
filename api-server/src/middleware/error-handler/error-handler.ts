@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { Exception } from '../../services/exception/exception.index';
 import { ResponseStatusCode } from '../../common/common.response-status.code';
 import ExceptionCustomize from '../../services/exception/exception.customize';
 
@@ -12,13 +11,10 @@ import ExceptionCustomize from '../../services/exception/exception.customize';
  */
 export const notFoundRoute = (req: Request, res: Response, next: any): void => {
     const exceptionModule = require('../../services/exception/exception.index');
-    const ErrorHandlerConstant = require('./error-handler.constant').ErrorHandlerConstant;
-    const Common = require('../../common/common.index').Common;
-
     next(
         new exceptionModule.Exception.Customize(
             ResponseStatusCode.NOT_FOUND,
-            ErrorHandlerConstant.PATH_NOT_FOUND,
+            require('./error-handler.constant').ErrorHandlerConstant.PATH_NOT_FOUND,
             '%s does not exits.',
             [req.path]
         )
@@ -39,7 +35,6 @@ export const errorHandler = (
     res: Response,
     next: any
 ): void => {
-    const Common = require('../../common/common.index').Common;
     let body: object = {};
 
     if (process.env.NODE_ENV === 'development') {

@@ -1,7 +1,4 @@
 import mongoose from 'mongoose';
-import { Exception } from '../../exception/exception.index';
-import { DatabaseFailedResponseRootCause } from '../database.failed-response';
-import { ResponseStatusCode } from '../../../common/common.response-status.code';
 
 export default class DatabaseMongodb {
     private readonly dbHost: string = process.env.DB_HOST || '';
@@ -36,11 +33,7 @@ export default class DatabaseMongodb {
                 dbName: this.dbName,
             });
         } catch (error) {
-            new Exception.Customize(
-                ResponseStatusCode.INTERNAL_SERVER_ERROR,
-                error.message,
-                DatabaseFailedResponseRootCause.DB_RC_1
-            ).raise();
+            throw error;
         }
     }
 

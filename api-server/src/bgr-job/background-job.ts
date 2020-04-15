@@ -1,15 +1,13 @@
 import { Catalog } from '../services/catalog/catalog.index';
 import { Database } from '../services/database/database.index';
-import * as dotenv from 'dotenv';
 import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import { ConsoleConstant } from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
 import { ChildProcess, fork } from 'child_process';
-import path from 'path';
+import * as path from 'path';
 import Timeout = NodeJS.Timeout;
-
-dotenv.config();
+import { initEnv } from '../util/environment/environment';
 
 interface MonitorContent {
     pid: number;
@@ -169,6 +167,7 @@ export const start = async (force: boolean = false): Promise<void> => {
 /**
  * Main
  */
+initEnv();
 new Database.MongoDb().connect().then(
     async (): Promise<void> => {
         const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();

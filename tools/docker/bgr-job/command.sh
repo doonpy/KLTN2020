@@ -1,3 +1,3 @@
 #!/bin/bash
 
-npm run bgr-prod
+npm run start:bgr-job

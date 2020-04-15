@@ -25,8 +25,7 @@ export default abstract class ScrapeBase {
 
     protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100', 10);
 
-    protected constructor() {
-    }
+    protected constructor() {}
 
     /**
      * @param domain
@@ -42,7 +41,7 @@ export default abstract class ScrapeBase {
 
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
-                `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`,
+                `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
             ).show();
 
             if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
@@ -50,7 +49,7 @@ export default abstract class ScrapeBase {
                     ScrapeConstant.LOG_ACTION.REQUEST,
                     `${statusCode === 200 ? 404 : response.statusCode} (${response.elapsedTime}ms): '${
                         response.request.path
-                    }'`,
+                    }'`
                 );
                 this.failedRequestCounter++;
                 return;
@@ -58,7 +57,7 @@ export default abstract class ScrapeBase {
 
             this.writeLog(
                 ScrapeConstant.LOG_ACTION.REQUEST,
-                `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`,
+                `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
             );
 
             this.successRequestCounter++;
@@ -139,7 +138,7 @@ export default abstract class ScrapeBase {
      */
     protected exportLog(
         catalog: CatalogModelInterface,
-        customizeFooter: { name: string; value: string | number }[] = [],
+        customizeFooter: { name: string; value: string | number }[] = []
     ): void {
         const endTime: [number, number] = process.hrtime(this.startTime);
         let footerLogContent: { name: string; value: number | string }[] = [
@@ -198,7 +197,7 @@ export default abstract class ScrapeBase {
      */
     protected writeErrorLog(error: Error | ExceptionCustomize, action: string, content: string): void {
         this.logInstance.addLine(
-            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`,
+            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`
         );
     }
 }

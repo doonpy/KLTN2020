@@ -1,21 +1,18 @@
 version: '3'
 services:
-  node-server:
+  api-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: tools/docker/Dockerfile
     image: pk2020:latest
-    container_name: node-server
+    container_name: api-server
     entrypoint:
       - /bin/sh
-      - ./command.sh
+      - api-command.sh
     restart: unless-stopped
     working_dir: /usr/src/app
     environment:
       - NODE_ENV=production
-      - SERVER_PORT=3000
-      - SERVER_PROTOCOL=http://
-      - SERVER_URI=pk2020.tk
     tty: true
     volumes:
       - ./public:/usr/src/app/public
@@ -27,17 +24,29 @@ services:
     container_name: bgr-job
     entrypoint:
       - /bin/sh
-      - ./bgr-job-command.sh
+      - bgr-job-command.sh
     restart: unless-stopped
     working_dir: /usr/src/app
     environment:
       - NODE_ENV=production
-      - SERVER_PROTOCOL=http://
-      - SERVER_URI=pk2020.tk
-      - SERVER_PORT=6789
-      - SERVER_PORT_WEB=80
     depends_on:
-      - node-server
+      - api-server
     tty: true
     volumes:
       - ./public:/usr/src/app/public
+
+  web-server:
+    image: pk2020:latest
+    container_name: web-server
+    entrypoint:
+      - /bin/sh
+      - web-command.sh
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - api-server
+    tty: true
+    ports:
+      - 3001:3001
