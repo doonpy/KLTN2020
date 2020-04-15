@@ -10,7 +10,7 @@
     "start:api": "node dist/api-bgr-job/server.js",
     "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/bgr-job/background-job.js",
     "start:web": "next start dist/web -p 3001",
-    "build": "npm-run-all clean tslint build:api-bgr-job build:web --print-label",
+    "build": "npm-run-all clean build:api-bgr-job build:web --print-label",
     "build:api-bgr-job": "tsc --build --extendedDiagnostics api-server",
     "build:web": "next build web-server",
     "tslint": "tslint --fix -c tslint.json 'web-server/**/*.ts' 'api-server/**/*.ts'"
