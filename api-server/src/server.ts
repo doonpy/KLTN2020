@@ -9,19 +9,30 @@ import { DetailUrl } from './services/detail-url/detail-url.index';
 import { requestLogger } from './middleware/request-logger/request-logger';
 import { GroupedData } from './services/grouped-data/grouped-data.index';
 import { initEnv } from './util/environment/environment';
+import DatabaseMongodb from './services/database/mongodb/database.mongodb';
 
-initEnv();
-const app = new App({
-    port: parseInt(process.env.SERVER_PORT || '3000', 10),
-    controllers: [
-        new Host.Controller(),
-        new Catalog.Controller(),
-        new Pattern.Controller(),
-        new DetailUrl.Controller(),
-        new RawData.Controller(),
-        new GroupedData.Controller(),
-    ],
-    middleWares: [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
-});
+/**
+ * Main
+ */
+(async (): Promise<void> => {
+    try {
+        initEnv();
+        const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
+        const appInstance: App = App.getInstance();
 
-app.enableListen();
+        await mongoDbInstance.connect();
+        await appInstance.start(
+            [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
+            [
+                new Host.Controller(),
+                new Catalog.Controller(),
+                new Pattern.Controller(),
+                new DetailUrl.Controller(),
+                new RawData.Controller(),
+                new GroupedData.Controller(),
+            ]
+        );
+    } catch (error) {
+        throw error;
+    }
+})();

@@ -1,14 +1,25 @@
 export const EnvironmentVariables: { [key: string]: string | number } = {
+    // For development
+    DB_HOST_DEV: '159.65.0.142',
+    DB_PORT_DEV: '27017',
+    DB_NAME_DEV: 'kltn2020-v2',
+    DB_USERNAME_DEV: 'alice',
+    DB_PASS_DEV: 'alice',
+
+    SERVER_PROTOCOL_DEV: 'http',
+    SERVER_DOMAIN_DEV: 'localhost',
+    SERVER_PORT_DEV: '3000',
+
+    // For deployment
     DB_HOST: '159.65.0.142',
     DB_PORT: '27017',
-    DB_NAME: 'kltn2020-v2',
+    DB_NAME: 'kltn2020',
     DB_USERNAME: 'alice',
     DB_PASS: 'alice',
-    DB_AUTH_SOURCE: 'kltn2020-v2',
 
-    SERVER_PORT: '3000',
     SERVER_PROTOCOL: 'https',
-    SERVER_URI: 'pk2020.tk',
+    SERVER_DOMAIN: 'pk2020.tk',
+    SERVER_PORT: '3000',
 
     // Background Job Config
     // Thread amount
