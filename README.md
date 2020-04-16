@@ -22,7 +22,7 @@ Updating
 `npm run dev:api`
 - To run Background job: 
 `npm run dev:bgr-job`
-- To run web server: 
+- To run Web server: 
 `npm run dev:web`
 
 ### For deployment
@@ -32,7 +32,7 @@ Updating
 `docker-compose up --build -d`
 
 ### Notes
-- You can config enviroment variables with:
+- You can config environment variables with:
     - REST API server and Background job: [api-server/src/env.ts](/api-server/src/env.ts)
     - Web server: [web-server/next-env.d.ts](/web-server/next-env.d.ts)
 
