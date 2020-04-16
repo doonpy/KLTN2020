@@ -8,13 +8,15 @@ import RawDataLogic from '../../services/raw-data/raw-data.logic';
 import CoordinateLogic from '../../services/coordinate/coordinate.logic';
 import RawDataModelInterface from '../../services/raw-data/raw-data.model.interface';
 import CoordinateModelInterface from '../../services/coordinate/coordinate.model.interface';
+import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
 
 process.on(
     'message',
     async (): Promise<void> => {
         const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
+        const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
         try {
-            await new Database.MongoDb().connect();
+            await mongoDbInstance.connect();
 
             await telegramChatBotInstance.sendMessage(`<b>🤖[Add coordinate]🤖</b>\n📝 Start add coordinate...`);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start add coordinate...`).show();

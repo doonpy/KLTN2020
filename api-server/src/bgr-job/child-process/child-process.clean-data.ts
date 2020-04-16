@@ -7,13 +7,15 @@ import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import DetailUrlLogic from '../../services/detail-url/detail-url.logic';
 import RawDataLogic from '../../services/raw-data/raw-data.logic';
 import RawDataModelInterface from '../../services/raw-data/raw-data.model.interface';
+import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
 
 process.on(
     'message',
     async (): Promise<void> => {
         const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
+        const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
         try {
-            await new Database.MongoDb().connect();
+            await mongoDbInstance.connect();
 
             await telegramChatBotInstance.sendMessage(`<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start clean data...`).show();

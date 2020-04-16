@@ -1,13 +1,12 @@
 import { Catalog } from '../services/catalog/catalog.index';
-import { Database } from '../services/database/database.index';
 import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import { ConsoleConstant } from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
+import DatabaseMongodb from '../services/database/mongodb/database.mongodb';
 import Timeout = NodeJS.Timeout;
-import { initEnv } from '../util/environment/environment';
 
 interface MonitorContent {
     pid: number;
@@ -21,13 +20,6 @@ interface Targets {
     targetList: string[];
 }
 
-const SCHEDULE_TIME_HOUR: number = parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10); // hour
-const SCHEDULE_TIME_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_MINUTE || '0', 10); // minute
-const SCHEDULE_TIME_SECOND: number = parseInt(process.env.SCHEDULE_TIME_SECOND || '0', 10); // second
-const SCHEDULE_TIME_DELAY_HOUR: number = parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0', 10); // hour
-const SCHEDULE_TIME_DELAY_MINUTE: number = parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0', 10); // minute
-const SCHEDULE_TIME_DELAY_SECOND: number = parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0', 10); // second
-const THREAD_AMOUNT: number = parseInt(process.env.THREAD_AMOUNT || '1', 10);
 const SCRAPE_TYPE_DETAIL_URL: string = 'detail-url';
 const SCRAPE_TYPE_RAW_DATA: string = 'raw-data';
 let childProcessAmount: number = 0;
@@ -105,7 +97,7 @@ const script = async (): Promise<void> => {
             return;
         }
 
-        if (childProcessAmount >= THREAD_AMOUNT) {
+        if (childProcessAmount >= parseInt(process.env.THREAD_AMOUNT || '1', 10)) {
             return;
         }
 
@@ -145,9 +137,9 @@ export const start = async (force: boolean = false): Promise<void> => {
     (function clock() {
         const checkTimeLoop: Timeout = setInterval(async (): Promise<void> => {
             const expectTime: Date = new Date();
-            expectTime.setUTCHours(SCHEDULE_TIME_HOUR);
-            expectTime.setUTCMinutes(SCHEDULE_TIME_MINUTE);
-            expectTime.setUTCSeconds(SCHEDULE_TIME_SECOND);
+            expectTime.setUTCHours(parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10));
+            expectTime.setUTCMinutes(parseInt(process.env.SCHEDULE_TIME_MINUTE || '0', 10));
+            expectTime.setUTCSeconds(parseInt(process.env.SCHEDULE_TIME_SECOND || '0', 10));
             if (!DateTime.isExactTime(expectTime, true)) {
                 return;
             }
@@ -156,9 +148,13 @@ export const start = async (force: boolean = false): Promise<void> => {
             await script();
 
             const delayTime: number =
-                (SCHEDULE_TIME_DELAY_SECOND || 1) *
-                (SCHEDULE_TIME_DELAY_MINUTE ? SCHEDULE_TIME_DELAY_MINUTE * 60 : 1) *
-                (SCHEDULE_TIME_DELAY_HOUR ? SCHEDULE_TIME_DELAY_HOUR * 3600 : 1);
+                parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0', 10) *
+                (parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0', 10)
+                    ? parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0', 10) * 60
+                    : 1) *
+                (parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0', 10)
+                    ? parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0', 10) * 3600
+                    : 1);
             setTimeout(clock, 1000 * delayTime);
         }, 1000);
     })();
@@ -167,19 +163,18 @@ export const start = async (force: boolean = false): Promise<void> => {
 /**
  * Main
  */
-initEnv();
-new Database.MongoDb().connect().then(
-    async (): Promise<void> => {
-        const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-        try {
-            // await start();
-            await script();
-        } catch (error) {
-            await telegramChatBotInstance.sendMessage(
-                `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`
-            );
-            new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.message}`).show();
-        }
-        isRunning = false;
+(async (): Promise<void> => {
+    const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
+    const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
+    try {
+        await mongoDbInstance.connect();
+        await start();
+        await script();
+    } catch (error) {
+        await telegramChatBotInstance.sendMessage(
+            `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`
+        );
+        new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.message}`).show();
     }
-);
+    isRunning = false;
+})();

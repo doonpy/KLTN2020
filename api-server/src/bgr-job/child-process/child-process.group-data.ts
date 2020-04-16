@@ -3,13 +3,15 @@ import ConsoleLog from '../../util/console/console.log';
 import { ConsoleConstant } from '../../util/console/console.constant';
 import GroupData from '../group-data/group-data';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
+import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
 
 process.on(
     'message',
     async (): Promise<void> => {
         const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
+        const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
         try {
-            await new Database.MongoDb().connect();
+            await mongoDbInstance.connect();
 
             await telegramChatBotInstance.sendMessage(`<b>🤖[Group data]🤖</b>\n📝 Start group data...`);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start group data...`).show();
