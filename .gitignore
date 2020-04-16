@@ -60,9 +60,6 @@ data/
 #.idea
 ../.idea/
 
-#pm2 ecosystem
-ecosystem.config.js
-
 # yarn.lock
 yarn.lock
 
