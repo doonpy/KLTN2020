@@ -1,6 +1,6 @@
-export const ScrapeConstant = {
+export default {
     NODE_TYPE: {
-        TEXT: 3,
+        TEXT: 'text',
     },
     LOG_ACTION: {
         CREATE: 'CREATE',

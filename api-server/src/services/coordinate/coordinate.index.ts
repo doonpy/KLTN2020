@@ -1,5 +1,5 @@
 import CoordinateLogic from './coordinate.logic';
 
-export const Coordinate = {
+export default {
     Logic: CoordinateLogic,
 };

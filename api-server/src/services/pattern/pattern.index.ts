@@ -1,7 +1,7 @@
 import PatternLogic from './pattern.logic';
 import PatternController from './pattern.controller';
 
-export const Pattern = {
+export default {
     Logic: PatternLogic,
     Controller: PatternController,
 };

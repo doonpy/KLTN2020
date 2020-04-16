@@ -1,10 +1,10 @@
-import { RawData } from '../../services/raw-data/raw-data.index';
-import { File } from '../../util/file/file.index';
-import { GroupedData } from '../../services/grouped-data/grouped-data.index';
+import RawData from '../../services/raw-data/raw-data.index';
+import File from '../../util/file/file.index';
+import GroupedData from '../../services/grouped-data/grouped-data.index';
 import { convertAcreageValue, convertPriceValue } from './group-data.helper';
 import StringHandler from '../../util/string-handler/string-handler';
 import ConsoleLog from '../../util/console/console.log';
-import { ConsoleConstant } from '../../util/console/console.constant';
+import ConsoleConstant from '../../util/console/console.constant';
 import GroupedDataLogic from '../../services/grouped-data/grouped-data.logic';
 import RawDataModelInterface from '../../services/raw-data/raw-data.model.interface';
 import FileLog from '../../util/file/file.log';
@@ -18,13 +18,19 @@ interface AggregationGroupDataResult {
 
 export default class GroupData {
     private startTime: [number, number] | undefined;
+
     private logInstance: FileLog = new File.Log();
-    private isRunning: boolean = false;
+
+    private isRunning = false;
 
     private readonly EXPECTED_POINT: number = 9;
+
     private readonly ATTR_POINT_TITLE: number = 4;
+
     private readonly ATTR_POINT_PRICE: number = 1;
+
     private readonly ATTR_POINT_ACREAGE: number = 2;
+
     private readonly ATTR_POINT_ADDRESS: number = 3;
 
     constructor() {
@@ -41,15 +47,15 @@ export default class GroupData {
         try {
             const rawDataLogic: RawDataLogic = new RawData.Logic();
             const groupedDataLogic: GroupedDataLogic = new GroupedData.Logic();
-            const limit: number = 1000;
-            let offset: number = 0;
+            const limit = 1000;
+            let offset = 0;
             let queryResult: {
                 rawDataset: RawDataModelInterface[];
                 hasNext: boolean;
             } = await rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
 
             while (queryResult.hasNext || queryResult.rawDataset.length > 0) {
-                const rawDataset: RawDataModelInterface[] = queryResult.rawDataset;
+                const { rawDataset } = queryResult;
                 rawDataLoop: for (const rawData of rawDataset) {
                     rawData.isGrouped = true;
                     const aggregations: object[] = [
@@ -121,7 +127,7 @@ export default class GroupData {
      * @param {RawDataModelInterface} representGroupedData
      */
     private isBelongGroupData(rawData: RawDataModelInterface, representGroupedData: RawDataModelInterface): boolean {
-        let totalPoint: number = 0;
+        let totalPoint = 0;
 
         totalPoint += this.calculateStringAttributePoint(representGroupedData, rawData, 'title');
         if (totalPoint > this.EXPECTED_POINT) {
@@ -237,20 +243,17 @@ export default class GroupData {
         secondTarget: RawDataModelInterface,
         type: 'title' | 'address'
     ): number {
-        let attrPoint: number = 0;
-        let firstString: string = '';
-        let secondString: string = '';
-        switch (type) {
-            case 'address':
-                attrPoint = this.ATTR_POINT_ADDRESS;
-                firstString = firstTarget.address;
-                secondString = secondTarget.address;
-                break;
-            case 'title':
-                attrPoint = this.ATTR_POINT_TITLE;
-                firstString = firstTarget.title;
-                secondString = secondTarget.title;
-                break;
+        let attrPoint = 0;
+        let firstString = '';
+        let secondString = '';
+        if (type === 'address') {
+            attrPoint = this.ATTR_POINT_ADDRESS;
+            firstString = firstTarget.address;
+            secondString = secondTarget.address;
+        } else {
+            attrPoint = this.ATTR_POINT_TITLE;
+            firstString = firstTarget.title;
+            secondString = secondTarget.title;
         }
 
         if (!firstString || !secondString) {

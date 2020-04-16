@@ -1,4 +1,4 @@
-export const CheckerFailedResponse = {
+export default {
     Message: {
         INVALID_VALUE: 'Input have incorrect data.',
     },

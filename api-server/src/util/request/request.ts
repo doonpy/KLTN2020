@@ -11,6 +11,7 @@ export default class Request {
         resolveWithFullResponse: true,
         time: true,
     };
+
     private readonly url: string;
 
     constructor(url: string, options?: object) {
@@ -26,10 +27,6 @@ export default class Request {
      * @return Promise<Response>
      */
     public async send(): Promise<Response> {
-        try {
-            return await requestPromise(this.url, this.options);
-        } catch (error) {
-            throw error;
-        }
+        return (await requestPromise(this.url, this.options)) as Response;
     }
 }

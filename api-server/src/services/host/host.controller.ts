@@ -1,17 +1,19 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import ControllerBase from '../controller.base';
 import HostLogic from './host.logic';
 import Validator from '../../util/validator/validator';
-import { Checker } from '../../util/checker/checker.index';
+import Checker from '../../util/checker/checker.index';
 import HostModelInterface from './host.model.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
-const commonPath: string = '/hosts';
-const specifyIdPath: string = '/hosts/:id';
+const commonPath = '/hosts';
+const specifyIdPath = '/hosts/:id';
 
 export default class HostController extends ControllerBase {
     private hostLogic: HostLogic = new HostLogic();
+
     private readonly PARAM_NAME: string = 'name';
+
     private readonly PARAM_DOMAIN: string = 'domain';
 
     constructor() {
@@ -26,7 +28,7 @@ export default class HostController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute = (req: Request, res: Response, next: any): void => {
+    protected getAllRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -51,7 +53,7 @@ export default class HostController extends ControllerBase {
                     hasNext,
                 };
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -63,7 +65,7 @@ export default class HostController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (req: Request, res: Response, next: any): void => {
+    protected getWithIdRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -81,7 +83,7 @@ export default class HostController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -93,7 +95,7 @@ export default class HostController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute = (req: Request, res: Response, next: any): void => {
+    protected createRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_DOMAIN, new Checker.Type.String());
@@ -103,12 +105,12 @@ export default class HostController extends ControllerBase {
         validator.addParamValidator(this.PARAM_NAME, new Checker.Type.String());
         validator.addParamValidator(this.PARAM_NAME, new Checker.StringLength(1, 100));
 
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.hostLogic
-            .create(this.requestBody)
+            .create((this.requestBody as unknown) as HostModelInterface)
             .then((createdHost: HostModelInterface): void => {
-                this.sendResponse(ResponseStatusCode.CREATED, HostLogic.convertToResponse(createdHost), res);
+                ControllerBase.sendResponse(ResponseStatusCode.CREATED, HostLogic.convertToResponse(createdHost), res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -120,7 +122,7 @@ export default class HostController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute = (req: Request, res: Response, next: any): void => {
+    protected updateRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -134,13 +136,13 @@ export default class HostController extends ControllerBase {
         validator.addParamValidator(this.PARAM_NAME, new Checker.StringLength(1, 100));
 
         validator.validate(this.requestParams);
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.hostLogic
-            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as HostModelInterface)
             .then((editedHost: HostModelInterface | undefined): void => {
                 if (editedHost) {
-                    this.sendResponse(ResponseStatusCode.OK, HostLogic.convertToResponse(editedHost), res);
+                    ControllerBase.sendResponse(ResponseStatusCode.OK, HostLogic.convertToResponse(editedHost), res);
                 }
             })
             .catch((error: Error): void => {
@@ -153,7 +155,7 @@ export default class HostController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute = (req: Request, res: Response, next: any): void => {
+    protected deleteRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -164,7 +166,7 @@ export default class HostController extends ControllerBase {
         this.hostLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+                ControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

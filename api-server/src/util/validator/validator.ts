@@ -17,7 +17,7 @@ export default class Validator {
      *
      * @return boolean
      */
-    public validate(input: object): void {
+    public validate(input: { [key: string]: string } | null | string): void {
         this.paramValidators.forEach(validatorItem => {
             validatorItem.validate(input);
         });

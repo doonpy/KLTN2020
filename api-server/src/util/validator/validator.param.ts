@@ -2,6 +2,7 @@ import CheckerBase from '../checker/checker.base';
 
 export default class ValidatorParam {
     private readonly paramName: string;
+
     private checker: CheckerBase;
 
     constructor(paramName: string, checker: CheckerBase) {
@@ -14,7 +15,7 @@ export default class ValidatorParam {
      *
      * @return boolean
      */
-    public validate(input: object): void {
+    public validate(input: { [key: string]: string } | null | string): void {
         this.checker.check(this.paramName, input);
     }
 }

@@ -2,10 +2,10 @@ import LogicBase from '../logic.base';
 import CoordinateModel from './coordinate.model';
 import CoordinateModelInterface from './coordinate.model.interface';
 import ExternalApi from '../../util/external-api/external-api';
-import { Exception } from '../exception/exception.index';
-import { Database } from '../database/database.index';
+import Exception from '../exception/exception.index';
+import Database from '../database/database.index';
 import CoordinateApiInterface from './coordinate.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CoordinateLogic extends LogicBase {
     /**

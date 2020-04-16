@@ -3,7 +3,7 @@ export default abstract class CheckerBase {
      * @param paramName
      * @param input
      */
-    public abstract check(paramName: string, input: object): void;
+    public abstract check(paramName: string, input: { [key: string]: string } | null | string): void;
 
     /**
      * Get value
@@ -13,14 +13,14 @@ export default abstract class CheckerBase {
      *
      * @return any | null
      */
-    public getValue(key: string, input: any): any | null {
+    public getValue(key: string, input: { [key: string]: string } | null | string): string | null {
         if (key === '') {
-            return input;
+            return input as string;
         }
-        if (!input[key]) {
+        if (!(input as { [key: string]: string })[key]) {
             return null;
         }
 
-        return input[key];
+        return (input as { [key: string]: string })[key];
     }
 }

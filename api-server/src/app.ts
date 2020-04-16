@@ -1,14 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Application } from 'express';
 import path from 'path';
 import ConsoleLog from './util/console/console.log';
-import { ConsoleConstant } from './util/console/console.constant';
+import ConsoleConstant from './util/console/console.constant';
 import { errorHandler, notFoundRoute } from './middleware/error-handler/error-handler';
+import ControllerBase from './services/controller.base';
 
 export default class App {
     private static instance: App | undefined;
+
     private app: Application;
+
     private readonly protocol: string | undefined;
+
     private readonly domain: string | undefined;
+
     private readonly serverPort: string | undefined;
 
     constructor() {
@@ -35,12 +41,9 @@ export default class App {
         return this.instance;
     }
 
-    public start(
-        middlewareArray: { forEach: (arg0: (middleWare: any) => void) => void },
-        controllerArray: { forEach: (arg0: (middleWare: any) => void) => void }
-    ): void {
+    public start(middlewareArray: Array<any>, controllerArray: ControllerBase[]): void {
         this.settingAssets();
-        this.bindMiddlewares(middlewareArray);
+        this.bindMiddleware(middlewareArray);
         this.bindRoutes(controllerArray);
         this.enableListen();
     }
@@ -48,11 +51,11 @@ export default class App {
     /**
      * Bind middleware
      *
-     * @param middleWares
+     * @param middlewareArray
      */
-    private bindMiddlewares(middleWares: { forEach: (arg0: (middleWare: any) => void) => void }): void {
-        middleWares.forEach((middleWare: any): void => {
-            this.app.use(middleWare);
+    private bindMiddleware(middlewareArray: Array<any>): void {
+        middlewareArray.forEach((middleware: any): void => {
+            this.app.use(middleware);
         });
     }
 
@@ -61,8 +64,8 @@ export default class App {
      *
      * @param routes
      */
-    private bindRoutes(routes: { forEach: (arg0: (controller: any) => void) => void }): void {
-        routes.forEach((controller: any): void => {
+    private bindRoutes(routes: ControllerBase[]): void {
+        routes.forEach((controller: ControllerBase): void => {
             this.app.use('/api/v1', controller.router);
         });
 

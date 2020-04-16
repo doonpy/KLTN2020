@@ -1,7 +1,7 @@
 import HostLogic from './host.logic';
 import HostController from './host.controller';
 
-export const Host = {
+export default {
     Logic: HostLogic,
     Controller: HostController,
 };

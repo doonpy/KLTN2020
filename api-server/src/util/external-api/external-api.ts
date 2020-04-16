@@ -65,37 +65,30 @@ export default class ExternalApi {
             },
             json: true,
         };
-        let endPointUrl: string = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
+        let endPointUrl = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
             address
         )}`;
 
-        try {
-            let response: GeocodeResponse = ((await new Request(
-                endPointUrl,
-                requestOptions
-            ).send()) as unknown) as GeocodeResponse;
+        let response: GeocodeResponse = ((await new Request(
+            endPointUrl,
+            requestOptions
+        ).send()) as unknown) as GeocodeResponse;
 
-            while (response.type === 'ApplicationError' || !response.Response.View.length) {
-                const addressPart: string[] = address.split(/\,\s*/);
-                address = addressPart.slice(1).join(', ');
-                if (!address) {
-                    return { lat: NaN, lng: NaN };
-                }
-                endPointUrl = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
-                    address
-                )}`;
-                response = await (((await new Request(
-                    endPointUrl,
-                    requestOptions
-                ).send()) as unknown) as GeocodeResponse);
+        while (response.type === 'ApplicationError' || !response.Response.View.length) {
+            const addressPart: string[] = address.split(/,\s*/);
+            address = addressPart.slice(1).join(', ');
+            if (!address) {
+                return { lat: NaN, lng: NaN };
             }
-
-            return {
-                lat: response.Response.View[0].Result[0].Location.DisplayPosition.Latitude,
-                lng: response.Response.View[0].Result[0].Location.DisplayPosition.Longitude,
-            };
-        } catch (error) {
-            throw error;
+            endPointUrl = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
+                address
+            )}`;
+            response = await (((await new Request(endPointUrl, requestOptions).send()) as unknown) as GeocodeResponse);
         }
+
+        return {
+            lat: response.Response.View[0].Result[0].Location.DisplayPosition.Latitude,
+            lng: response.Response.View[0].Result[0].Location.DisplayPosition.Longitude,
+        };
     }
 }

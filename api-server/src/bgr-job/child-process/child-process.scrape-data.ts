@@ -1,11 +1,12 @@
 import ConsoleLog from '../../util/console/console.log';
-import { ConsoleConstant } from '../../util/console/console.constant';
-import { Database } from '../../services/database/database.index';
+import ConsoleConstant from '../../util/console/console.constant';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import ScrapeBase from '../scrape/scrape.base';
 import ScrapeDetailUrl from '../scrape/detail-url/scrape.detail-url';
 import ScrapeRawData from '../scrape/raw-data/scrape.raw-data';
 import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
+import CatalogModelInterface from '../../services/catalog/catalog.model.interface';
+import CatalogLogic from '../../services/catalog/catalog.logic';
 
 process.on(
     'message',
@@ -17,15 +18,18 @@ process.on(
 
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape - TYPE: ${scrapeType} - CID: ${catalogId}`).show();
 
-            let scrapeJob: ScrapeBase | undefined;
-            switch (scrapeType) {
-                case 'detail-url':
-                    scrapeJob = new ScrapeDetailUrl(catalogId);
-                    break;
-                case 'raw-data':
-                    scrapeJob = new ScrapeRawData(catalogId);
-                    break;
+            const catalogLogic: CatalogLogic = new CatalogLogic();
+            const catalog: CatalogModelInterface | null = await catalogLogic.getById(catalogId);
+            if (!catalog) {
+                return;
             }
+            let scrapeJob: ScrapeDetailUrl | ScrapeRawData | undefined;
+            if (scrapeType === 'detail-url') {
+                scrapeJob = new ScrapeDetailUrl(catalog);
+            } else {
+                scrapeJob = new ScrapeRawData(catalog);
+            }
+
             if (scrapeJob) {
                 await scrapeJob.start();
             } else {

@@ -1,14 +1,19 @@
 import mongoose from 'mongoose';
 import ConsoleLog from '../../../util/console/console.log';
-import { ConsoleConstant } from '../../../util/console/console.constant';
-import { initEnv } from '../../../util/environment/environment';
+import ConsoleConstant from '../../../util/console/console.constant';
+import initEnv from '../../../util/environment/environment';
 
 export default class DatabaseMongodb {
     private static instance: DatabaseMongodb | undefined;
+
     private readonly dbHost: string | undefined;
+
     private readonly dbPort: string | undefined;
+
     private readonly dbName: string | undefined;
+
     private readonly username: string | undefined;
+
     private readonly password: string | undefined;
 
     constructor() {
@@ -44,34 +49,26 @@ export default class DatabaseMongodb {
      * Open connection to database
      */
     public async connect(): Promise<void> {
-        try {
-            const connString: string = `mongodb://${this.dbHost as string}:${this.dbPort as string}`;
-            await mongoose.connect(connString, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-                useFindAndModify: false,
-                useCreateIndex: true,
-                auth: {
-                    user: this.username as string,
-                    password: this.password as string,
-                },
-                authSource: this.dbName,
-                dbName: this.dbName,
-            });
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Successful connection to (DB: ${this.dbName}).`).show();
-        } catch (error) {
-            throw error;
-        }
+        const connString = `mongodb://${this.dbHost as string}:${this.dbPort as string}`;
+        await mongoose.connect(connString, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+            useCreateIndex: true,
+            auth: {
+                user: this.username as string,
+                password: this.password as string,
+            },
+            authSource: this.dbName,
+            dbName: this.dbName,
+        });
+        new ConsoleLog(ConsoleConstant.Type.INFO, `Successful connection to (DB: ${this.dbName}).`).show();
     }
 
     /**
      * Disconnect to database
      */
-    public async disconnect() {
-        try {
-            await mongoose.disconnect();
-        } catch (e) {
-            throw e;
-        }
+    public async disconnect(): Promise<void> {
+        await mongoose.disconnect();
     }
 }

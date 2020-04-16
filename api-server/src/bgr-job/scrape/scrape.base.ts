@@ -1,31 +1,36 @@
 import cherrio from 'cheerio';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import { Response } from 'request';
+import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import StringHandler from '../../util/string-handler/string-handler';
 import CatalogModelInterface from '../../services/catalog/catalog.model.interface';
 import Request from '../../util/request/request';
-import { ScrapeConstant } from './scrape.constant';
-import { File } from '../../util/file/file.index';
+import ScrapeConstant from './scrape.constant';
+import File from '../../util/file/file.index';
 import DateTime from '../../util/datetime/datetime';
 import ConsoleLog from '../../util/console/console.log';
-import { ConsoleConstant } from '../../util/console/console.constant';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ConsoleConstant from '../../util/console/console.constant';
+import ResponseStatusCode from '../../common/common.response-status.code';
 import FileLog from '../../util/file/file.log';
 import ExceptionCustomize from '../../services/exception/exception.customize';
 
-export default abstract class ScrapeBase {
+export default class ScrapeBase {
     protected readonly logInstance: FileLog = new File.Log();
-    protected failedRequestCounter: number = 0;
-    protected successRequestCounter: number = 0;
-    protected countNumber: number = 0;
+
+    protected failedRequestCounter = 0;
+
+    protected successRequestCounter = 0;
+
+    protected countNumber = 0;
+
     protected startTime: [number, number] | undefined;
-    protected requestCounter: number = 0;
-    protected isRunning: boolean = false;
+
+    protected requestCounter = 0;
+
+    protected isRunning = false;
+
     protected telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
 
     protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100', 10);
-
-    protected constructor() {}
 
     /**
      * @param domain
@@ -35,36 +40,32 @@ export default abstract class ScrapeBase {
      */
     protected async getBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
         const url: string = path.includes(domain) ? path : domain + path;
-        try {
-            const response: Response = await new Request(url).send();
-            const statusCode: number = response.statusCode;
+        const response: Response = await new Request(url).send();
+        const { statusCode } = response;
 
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
-            ).show();
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
+        ).show();
 
-            if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
-                this.writeLog(
-                    ScrapeConstant.LOG_ACTION.REQUEST,
-                    `${statusCode === 200 ? 404 : response.statusCode} (${response.elapsedTime}ms): '${
-                        response.request.path
-                    }'`
-                );
-                this.failedRequestCounter++;
-                return;
-            }
-
+        if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
             this.writeLog(
                 ScrapeConstant.LOG_ACTION.REQUEST,
-                `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+                `${statusCode === 200 ? 404 : response.statusCode} (${response.elapsedTime}ms): '${
+                    response.request.path
+                }'`
             );
-
-            this.successRequestCounter++;
-            return cherrio.load(response.body);
-        } catch (error) {
-            return;
+            this.failedRequestCounter += 1;
+            return undefined;
         }
+
+        this.writeLog(
+            ScrapeConstant.LOG_ACTION.REQUEST,
+            `${statusCode} (${response.elapsedTime}ms): '${response.request.path}'`
+        );
+
+        this.successRequestCounter += 1;
+        return cherrio.load(response.body);
     }
 
     /**
@@ -74,16 +75,16 @@ export default abstract class ScrapeBase {
      *
      * @return dataArray
      */
-    protected extractData($: CheerioStatic, locator: string, attribute: string = ''): string[] {
+    protected static extractData($: CheerioStatic, locator: string, attribute = ''): string[] {
         const elementsSelected = $(locator);
 
         if (elementsSelected.length === 0) {
-            return [this.getDataOfElement(elementsSelected, attribute)];
+            return [ScrapeBase.getDataOfElement(elementsSelected, attribute)];
         }
 
         const dataArray: string[] = [];
         elementsSelected.each((index: number, element: CheerioElement): void => {
-            dataArray.push(this.getDataOfElement($(element), attribute));
+            dataArray.push(ScrapeBase.getDataOfElement($(element), attribute));
         });
 
         return dataArray;
@@ -95,13 +96,13 @@ export default abstract class ScrapeBase {
      *
      * @return string data
      */
-    private getDataOfElement(element: Cheerio, attribute: string = ''): string {
-        let data: string = '';
+    private static getDataOfElement(element: Cheerio, attribute = ''): string {
+        let data = '';
         if (attribute) {
             data = element.attr(attribute) || '';
         } else {
-            element.contents().each((index: number, item: any): void => {
-                if (item.nodeType === ScrapeConstant.NODE_TYPE.TEXT) {
+            element.contents().each((index, item): void => {
+                if (item.type === ScrapeConstant.NODE_TYPE.TEXT) {
                     data += item.data;
                 }
             });
@@ -109,16 +110,6 @@ export default abstract class ScrapeBase {
 
         return StringHandler.cleanText(data, new RegExp(/\r\n|\n|\r/gm));
     }
-
-    /**
-     * Abstract start method
-     */
-    public abstract async start(): Promise<void>;
-
-    /**
-     * Finish action abstract method.
-     */
-    protected abstract finishAction(): void;
 
     /**
      * @param message
@@ -149,14 +140,6 @@ export default abstract class ScrapeBase {
                 ]),
             },
             {
-                name: 'Catalog ID',
-                value: catalog._id,
-            },
-            {
-                name: 'Catalog title',
-                value: catalog.title,
-            },
-            {
                 name: 'Success request(s)',
                 value: this.successRequestCounter,
             },
@@ -185,7 +168,8 @@ export default abstract class ScrapeBase {
      * @param content
      */
     protected writeLog(action: string, content: string): void {
-        this.logInstance.addLine(`[${new Date().toLocaleString()}] - ${++this.countNumber} >> ${action}: ${content}`);
+        this.countNumber += 1;
+        this.logInstance.addLine(`[${new Date().toLocaleString()}] - ${this.countNumber} >> ${action}: ${content}`);
     }
 
     /**
@@ -196,8 +180,9 @@ export default abstract class ScrapeBase {
      * @param content
      */
     protected writeErrorLog(error: Error | ExceptionCustomize, action: string, content: string): void {
+        this.countNumber += 1;
         this.logInstance.addLine(
-            `[${new Date().toLocaleString()}] - ${++this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`
+            `[${new Date().toLocaleString()}] - ${this.countNumber} >> ERR: ${error.message} | ${action}: ${content}`
         );
     }
 }

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { FileErrorResponse } from './file.error-response';
+import FileErrorResponse from './file.error-response';
 import StringHandler from '../string-handler/string-handler';
 
 export default class FileBase {
@@ -20,10 +20,10 @@ export default class FileBase {
      * @param folderPath
      */
     public createFolder(folderPath: string): void {
-        let pathTracker: string = '';
+        let pathTracker = '';
 
         for (const path of folderPath.split('/')) {
-            pathTracker += path + '/';
+            pathTracker += `${path}/`;
             if (this.isPathExisted(pathTracker)) {
                 continue;
             }

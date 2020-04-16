@@ -1,4 +1,3 @@
-import { Pattern } from '../pattern/pattern.index';
 import HostApiInterface from '../host/host.api.interface';
 import PatternApiInterface from '../pattern/pattern.api.interface';
 

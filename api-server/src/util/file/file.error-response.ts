@@ -1,4 +1,4 @@
-export const FileErrorResponse = {
+export default {
     Message: {
         FILE_ERR_1: 'Folder %s does not exist.',
         FILE_ERR_2: 'Export file failed.',

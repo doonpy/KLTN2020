@@ -1,29 +1,42 @@
+import { NextFunction, Request, Response } from 'express';
 import ControllerBase from '../controller.base';
-import { Request, Response } from 'express';
 import Validator from '../../util/validator/validator';
-import { Checker } from '../../util/checker/checker.index';
+import Checker from '../../util/checker/checker.index';
 import RawDataLogic from './raw-data.logic';
 import RawDataModelInterface from './raw-data.model.interface';
-import { RawDataConstant } from './raw-data.constant';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import RawDataConstant from './raw-data.constant';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
-const commonPath: string = '/raw-dataset';
-const specifyIdPath: string = '/raw-dataset/:id';
+const commonPath = '/raw-dataset';
+const specifyIdPath = '/raw-dataset/:id';
 
 export default class RawDataController extends ControllerBase {
     private rawDataLogic: RawDataLogic = new RawDataLogic();
+
     private readonly PARAM_DETAIL_URL_ID: string = 'detailUrlId';
+
     private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
+
     private readonly PARAM_PROPERTY_TYPE: string = 'propertyType';
+
     private readonly PARAM_POST_DATE: string = 'postDate';
+
     private readonly PARAM_TITLE: string = 'title';
+
     private readonly PARAM_PRICE: string = 'price';
+
     private readonly PARAM_PRICE_CURRENCY: string = 'currency';
+
     private readonly PARAM_ACREAGE: string = 'acreage';
+
     private readonly PARAM_ACREAGE_MEASURE_UNIT: string = 'measureUnit';
+
     private readonly PARAM_ADDRESS: string = 'address';
+
     private readonly PARAM_OTHERS: string = 'others';
+
     private readonly PARAM_OTHERS_NAME: string = 'name';
+
     private readonly PARAM_VALUE: string = 'value';
 
     constructor() {
@@ -38,7 +51,7 @@ export default class RawDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute(req: Request, res: Response, next: any): void {
+    protected createRoute(req: Request, res: Response, next: NextFunction): void {
         const bodyValidator = new Validator();
         const priceValidator = new Validator();
         const acreageValidator = new Validator();
@@ -93,19 +106,19 @@ export default class RawDataController extends ControllerBase {
 
         othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
 
-        bodyValidator.validate(this.requestBody);
-        priceValidator.validate(this.requestBody[this.PARAM_PRICE]);
-        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE]);
-        othersValidator.validate(this.requestBody[this.PARAM_OTHERS]);
-
-        if (this.requestBody[this.PARAM_ACREAGE].measureUnit) {
-            encodeURI(this.requestBody[this.PARAM_ACREAGE].measureUnit);
-        }
+        bodyValidator.validate((this.requestBody as unknown) as string);
+        priceValidator.validate(this.requestBody[this.PARAM_PRICE] as {[key:string]:string});
+        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE] as {[key:string]:string});
+        othersValidator.validate(this.requestBody[this.PARAM_OTHERS] as {[key:string]:string});
 
         this.rawDataLogic
-            .create(this.requestBody)
+            .create((this.requestBody as unknown) as RawDataModelInterface)
             .then((createdRawData: RawDataModelInterface): void => {
-                this.sendResponse(ResponseStatusCode.CREATED, RawDataLogic.convertToResponse(createdRawData), res);
+                ControllerBase.sendResponse(
+                    ResponseStatusCode.CREATED,
+                    RawDataLogic.convertToResponse(createdRawData),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -117,7 +130,7 @@ export default class RawDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute(req: Request, res: Response, next: any): void {
+    protected deleteRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -128,7 +141,7 @@ export default class RawDataController extends ControllerBase {
         this.rawDataLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+                ControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -140,7 +153,7 @@ export default class RawDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute(req: Request, res: Response, next: any): void {
+    protected getAllRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -175,7 +188,7 @@ export default class RawDataController extends ControllerBase {
                     hasNext,
                 };
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -187,7 +200,7 @@ export default class RawDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute(req: Request, res: Response, next: any): void {
+    protected getWithIdRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -205,7 +218,7 @@ export default class RawDataController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -217,7 +230,7 @@ export default class RawDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute(req: Request, res: Response, next: any): void {
+    protected updateRoute(req: Request, res: Response, next: NextFunction): void {
         const bodyValidator = new Validator();
         const priceValidator = new Validator();
         const acreageValidator = new Validator();
@@ -276,20 +289,20 @@ export default class RawDataController extends ControllerBase {
 
         othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
 
-        bodyValidator.validate(this.requestBody);
-        priceValidator.validate(this.requestBody[this.PARAM_PRICE]);
-        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE]);
-        othersValidator.validate(this.requestBody[this.PARAM_OTHERS]);
-
-        if (this.requestBody[this.PARAM_ACREAGE].measureUnit) {
-            encodeURI(this.requestBody[this.PARAM_ACREAGE].measureUnit);
-        }
+        bodyValidator.validate((this.requestBody as unknown) as string);
+        priceValidator.validate(this.requestBody[this.PARAM_PRICE] as {[key:string]:string});
+        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE] as {[key:string]:string});
+        othersValidator.validate(this.requestBody[this.PARAM_OTHERS] as {[key:string]:string});
 
         this.rawDataLogic
-            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as RawDataModelInterface)
             .then((editedRawData: RawDataModelInterface | undefined): void => {
                 if (editedRawData) {
-                    this.sendResponse(ResponseStatusCode.OK, RawDataLogic.convertToResponse(editedRawData), res);
+                    ControllerBase.sendResponse(
+                        ResponseStatusCode.OK,
+                        RawDataLogic.convertToResponse(editedRawData),
+                        res
+                    );
                 }
             })
             .catch((error: Error): void => {

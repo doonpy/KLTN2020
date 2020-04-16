@@ -1,11 +1,13 @@
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 
-const ADMIN_TELEGRAM_ID: number = 896052128;
+const ADMIN_TELEGRAM_ID = 896052128;
 const receiverList: (number | string)[] = [ADMIN_TELEGRAM_ID];
 
 export default class ChatBotTelegram {
     private static instance: ChatBotTelegram = new ChatBotTelegram();
+
     private telegramBot = new TelegramBot(process.env.CHAT_BOT_TELEGRAM_TOKEN || '');
+
     constructor() {
         this.bindListener();
     }
@@ -26,16 +28,13 @@ export default class ChatBotTelegram {
      */
     public async sendMessage(message: string): Promise<void> {
         for (const receiver of receiverList) {
-            try {
-                if (!this.telegramBot) {
-                    return;
-                }
-                await this.telegramBot.sendMessage(receiver, `<b>[PID: ${process.pid}]</b>\n${message}`, {
-                    parse_mode: 'HTML',
-                });
-            } catch (error) {
-                throw error;
+            if (!this.telegramBot) {
+                return;
             }
+            await this.telegramBot.sendMessage(receiver, `<b>[PID: ${process.pid}]</b>\n${message}`, {
+                // eslint-disable-next-line @typescript-eslint/camelcase
+                parse_mode: 'HTML',
+            });
         }
     }
 

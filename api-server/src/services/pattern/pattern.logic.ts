@@ -1,12 +1,12 @@
-import PatternModel from './pattern.model';
-import { Exception } from '../exception/exception.index';
-import PatternModelInterface from './pattern.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
+import PatternModel from './pattern.model';
+import Exception from '../exception/exception.index';
+import PatternModelInterface from './pattern.model.interface';
 import LogicBase from '../logic.base';
-import { Database } from '../database/database.index';
+import Database from '../database/database.index';
 import { PatternErrorResponseMessage, PatternErrorResponseRootCause } from './pattern.error-response';
 import PatternApiInterface from './pattern.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class PatternLogic extends LogicBase {
     /**
@@ -104,7 +104,7 @@ export default class PatternLogic extends LogicBase {
 
             const pattern: PatternModelInterface | null = await PatternModel.findById(id).exec();
             if (!pattern) {
-                return;
+                return undefined;
             }
 
             pattern.sourceUrl = sourceUrl || pattern.sourceUrl;
@@ -168,13 +168,14 @@ export default class PatternLogic extends LogicBase {
             );
         }
     }
+
     /**
      * @param id
      * @param isNot
      */
     public static async checkPatternExistedWithId(
         id: number | string | PatternModelInterface,
-        isNot: boolean = false
+        isNot = false
     ): Promise<void> {
         if (!id) {
             throw new Exception.Customize(

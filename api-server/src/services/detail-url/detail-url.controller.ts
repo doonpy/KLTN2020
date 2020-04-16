@@ -1,19 +1,23 @@
+import { NextFunction, Request, Response } from 'express';
 import ControllerBase from '../controller.base';
-import { Request, Response } from 'express';
 import Validator from '../../util/validator/validator';
-import { Checker } from '../../util/checker/checker.index';
+import Checker from '../../util/checker/checker.index';
 import DetailUrlLogic from './detail-url.logic';
 import DetailUrlModelInterface from './detail-url.model.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
-const commonPath: string = '/detail-urls';
-const specifyIdPath: string = '/detail-urls/:id';
+const commonPath = '/detail-urls';
+const specifyIdPath = '/detail-urls/:id';
 
 export default class DetailUrlController extends ControllerBase {
     private detailUrlLogic: DetailUrlLogic = new DetailUrlLogic();
+
     private readonly PARAM_CATALOG_ID: string = 'catalogId';
+
     private readonly PARAM_URL: string = 'url';
+
     private readonly PARAM_IS_EXTRACTED: string = 'isExtracted';
+
     private readonly PARAM_REQUEST_RETRIES: string = 'requestRetries';
 
     constructor() {
@@ -28,7 +32,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute = (req: Request, res: Response, next: any): void => {
+    protected getAllRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -61,7 +65,7 @@ export default class DetailUrlController extends ControllerBase {
                     hasNext,
                 };
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -73,7 +77,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (req: Request, res: Response, next: any): void => {
+    protected getWithIdRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -91,7 +95,7 @@ export default class DetailUrlController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -103,7 +107,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute = (req: Request, res: Response, next: any): void => {
+    protected createRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
@@ -112,12 +116,16 @@ export default class DetailUrlController extends ControllerBase {
         validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
         validator.addParamValidator(this.PARAM_URL, new Checker.StringLength(1, null));
 
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.detailUrlLogic
-            .create(this.requestBody)
+            .create((this.requestBody as unknown) as DetailUrlModelInterface)
             .then((createdDetailUrl: DetailUrlModelInterface): void => {
-                this.sendResponse(ResponseStatusCode.CREATED, DetailUrlLogic.convertToResponse(createdDetailUrl), res);
+                ControllerBase.sendResponse(
+                    ResponseStatusCode.CREATED,
+                    DetailUrlLogic.convertToResponse(createdDetailUrl),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -129,7 +137,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute = (req: Request, res: Response, next: any): void => {
+    protected updateRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -147,13 +155,17 @@ export default class DetailUrlController extends ControllerBase {
         validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.IntegerRange(0, null));
 
         validator.validate(this.requestParams);
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.detailUrlLogic
-            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as DetailUrlModelInterface)
             .then((editedDetailUrl: DetailUrlModelInterface | undefined): void => {
                 if (editedDetailUrl) {
-                    this.sendResponse(ResponseStatusCode.OK, DetailUrlLogic.convertToResponse(editedDetailUrl), res);
+                    ControllerBase.sendResponse(
+                        ResponseStatusCode.OK,
+                        DetailUrlLogic.convertToResponse(editedDetailUrl),
+                        res
+                    );
                 }
             })
             .catch((error: Error): void => {
@@ -166,7 +178,7 @@ export default class DetailUrlController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute = (req: Request, res: Response, next: any): void => {
+    protected deleteRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -177,7 +189,7 @@ export default class DetailUrlController extends ControllerBase {
         this.detailUrlLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+                ControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

@@ -1,10 +1,11 @@
 import CheckerBase from './checker.base';
-import { Exception } from '../../services/exception/exception.index';
-import { CheckerFailedResponse } from './checker.failed-response';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import Exception from '../../services/exception/exception.index';
+import CheckerFailedResponse from './checker.failed-response';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerIntegerRange extends CheckerBase {
     private readonly minRange: number;
+
     private readonly maxRange: number;
 
     constructor(minRange: number, maxRange: number | null) {
@@ -17,8 +18,8 @@ export default class CheckerIntegerRange extends CheckerBase {
      * @param paramName
      * @param input
      */
-    public check(paramName: string, input: any): void {
-        let value: any | null = this.getValue(paramName, input);
+    public check(paramName: string, input: { [key: string]: string } | null | string): void {
+        let value: string | null | number = this.getValue(paramName, input);
 
         if (!value) {
             return;

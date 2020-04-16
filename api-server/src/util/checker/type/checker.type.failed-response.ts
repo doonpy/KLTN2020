@@ -1,4 +1,4 @@
-export const CheckerTypeFailedResponse = {
+export default {
     RootCause: {
         INTEGER: 'Data type of %s must be integer.',
         DECIMAL: 'Data type of %s must be decimal.',

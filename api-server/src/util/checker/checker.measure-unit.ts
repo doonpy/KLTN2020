@@ -1,7 +1,7 @@
 import CheckerBase from './checker.base';
-import { Exception } from '../../services/exception/exception.index';
-import { CheckerFailedResponse } from './checker.failed-response';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import Exception from '../../services/exception/exception.index';
+import CheckerFailedResponse from './checker.failed-response';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerMeasureUnit extends CheckerBase {
     private readonly measureUnit: string;
@@ -15,8 +15,8 @@ export default class CheckerMeasureUnit extends CheckerBase {
      * @param paramName
      * @param input
      */
-    public check(paramName: string, input: object): void {
-        const value: any | null = this.getValue(paramName, input);
+    public check(paramName: string, input: { [key: string]: string } | null | string): void {
+        const value: string | null = this.getValue(paramName, input);
 
         if (!value) {
             return;

@@ -1,4 +1,4 @@
-export const EnvironmentVariables: { [key: string]: string | number } = {
+export default {
     // For development
     DB_HOST_DEV: '159.65.0.142',
     DB_PORT_DEV: '27017',

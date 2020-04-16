@@ -1,13 +1,13 @@
-import DetailUrlModel from './detail-url.model';
-import { Exception } from '../exception/exception.index';
-import { Catalog } from '../catalog/catalog.index';
-import DetailUrlModelInterface from './detail-url.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
+import DetailUrlModel from './detail-url.model';
+import Exception from '../exception/exception.index';
+import Catalog from '../catalog/catalog.index';
+import DetailUrlModelInterface from './detail-url.model.interface';
 import LogicBase from '../logic.base';
-import { Database } from '../database/database.index';
+import Database from '../database/database.index';
 import { DetailUrlErrorResponseMessage, DetailUrlErrorResponseRootCause } from './detail-url.error-response';
 import DetailUrlApiInterface from './detail-url.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 import CatalogModelInterface from '../catalog/catalog.model.interface';
 
 export default class DetailUrlLogic extends LogicBase {
@@ -20,7 +20,7 @@ export default class DetailUrlLogic extends LogicBase {
      * @return Promise<{ catalogs: Array<DetailUrlModelInterface>; hasNext: boolean }>
      */
     public async getAll(
-        conditions: { [key: string]: any },
+        conditions: object,
         isPopulate: boolean,
         limit?: number,
         offset?: number
@@ -136,7 +136,7 @@ export default class DetailUrlLogic extends LogicBase {
 
             const detailUrl: DetailUrlModelInterface | null = await DetailUrlModel.findById(id).exec();
             if (!detailUrl) {
-                return;
+                return undefined;
             }
 
             if (detailUrl.url !== url) {
@@ -185,7 +185,7 @@ export default class DetailUrlLogic extends LogicBase {
      * @param url
      * @param isNot
      */
-    public static async checkDetailUrlExistedWithUrl(url: string, isNot: boolean = false): Promise<void> {
+    public static async checkDetailUrlExistedWithUrl(url: string, isNot = false): Promise<void> {
         const result: number = await DetailUrlModel.countDocuments({
             url,
         }).exec();
@@ -215,7 +215,7 @@ export default class DetailUrlLogic extends LogicBase {
      */
     public static async checkDetailUrlExistedWithId(
         id: number | string | DetailUrlModelInterface,
-        isNot: boolean = false
+        isNot = false
     ): Promise<void> {
         if (typeof id === 'object') {
             id = id._id;
@@ -256,6 +256,7 @@ export default class DetailUrlLogic extends LogicBase {
         });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public static async aggregationQuery(aggregations: object[]): Promise<any[]> {
         return DetailUrlModel.aggregate(aggregations)
             .allowDiskUse(true)

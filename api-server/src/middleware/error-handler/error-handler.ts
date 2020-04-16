@@ -1,6 +1,42 @@
-import { Request, Response } from 'express';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import { NextFunction, Request, Response } from 'express';
+import ResponseStatusCode from '../../common/common.response-status.code';
 import ExceptionCustomize from '../../services/exception/exception.customize';
+import Exception from '../../services/exception/exception.index';
+import ErrorHandlerConstant from './error-handler.constant';
+
+/**
+ *
+ * @return inputString
+ *
+ * @param inputs
+ */
+const convertToString = (inputs: { [key: string]: string }[]): string => {
+    const inputString: string[] = [];
+
+    if (inputs.length === 0) {
+        return '';
+    }
+
+    inputs.forEach((input: { [key: string]: string }) => {
+        const keys: string[] = Object.keys(input);
+
+        if (keys.length === 0) {
+            return;
+        }
+
+        keys.forEach((key: string) => {
+            const value: object | string | number | undefined | null = input[key];
+
+            if (typeof value === 'object') {
+                inputString.push(`'${key}' => {${convertToString([value])}}`);
+            } else {
+                inputString.push(`'${key}' => '${value}'`);
+            }
+        });
+    });
+
+    return inputString.join(', ');
+};
 
 /**
  * Catch 404 and forward to error handler
@@ -9,12 +45,11 @@ import ExceptionCustomize from '../../services/exception/exception.customize';
  * @param res
  * @param next
  */
-export const notFoundRoute = (req: Request, res: Response, next: any): void => {
-    const exceptionModule = require('../../services/exception/exception.index');
+export const notFoundRoute = (req: Request, res: Response, next: NextFunction): void => {
     next(
-        new exceptionModule.Exception.Customize(
+        new Exception.Customize(
             ResponseStatusCode.NOT_FOUND,
-            require('./error-handler.constant').ErrorHandlerConstant.PATH_NOT_FOUND,
+            ErrorHandlerConstant.PATH_NOT_FOUND,
             '%s does not exits.',
             [req.path]
         )
@@ -33,7 +68,7 @@ export const errorHandler = (
     { statusCode, message, cause, stack }: ExceptionCustomize,
     req: Request,
     res: Response,
-    next: any
+    next: NextFunction
 ): void => {
     let body: object = {};
 
@@ -61,40 +96,6 @@ export const errorHandler = (
     } else {
         res.status(statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR).json(body);
     }
-};
-
-/**
- *
- * @return inputString
- *
- * @param inputs
- */
-const convertToString = (inputs: { [key: string]: string }[]): string => {
-    const inputString: string[] = [];
-
-    if (inputs.length === 0) {
-        return '';
-    }
-
-    inputs.forEach((input: { [key: string]: string }) => {
-        const keys: string[] = Object.keys(input);
-
-        if (keys.length === 0) {
-            return;
-        }
-
-        keys.forEach((key: string) => {
-            const value: any = input[key];
-
-            if (typeof value === 'object') {
-                inputString.push(`'${key}' => {${convertToString([value])}}`);
-            } else {
-                inputString.push(`'${key}' => '${value}'`);
-            }
-        });
-    });
-
-    return inputString.join(', ');
 };
 
 export default { errorHandler, notFoundRoute };

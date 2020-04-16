@@ -1,26 +1,37 @@
+import { NextFunction, Request, Response } from 'express';
 import ControllerBase from '../controller.base';
 import PatternLogic from './pattern.logic';
-import { Request, Response } from 'express';
 import Validator from '../../util/validator/validator';
-import { Checker } from '../../util/checker/checker.index';
+import Checker from '../../util/checker/checker.index';
 import PatternModelInterface from './pattern.model.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
-const commonPath: string = '/patterns';
-const specifyIdPath: string = '/patterns/:id';
+const commonPath = '/patterns';
+const specifyIdPath = '/patterns/:id';
 
 export default class PatternController extends ControllerBase {
     private patternLogic: PatternLogic = new PatternLogic();
+
     private readonly PARAM_SOURCE_URL_ID: string = 'sourceUrl';
+
     private readonly PARAM_MAIN_LOCATOR: string = 'mainLocator';
+
     private readonly PARAM_SUB_LOCATOR: string = 'subLocator';
+
     private readonly PARAM_TITLE_LOCATOR: string = 'title';
+
     private readonly PARAM_PRICE_LOCATOR: string = 'price';
+
     private readonly PARAM_ACREAGE_LOCATOR: string = 'acreage';
+
     private readonly PARAM_ADDRESS_LOCATOR: string = 'address';
+
     private readonly PARAM_PROPERTY_TYPE_LOCATOR: string = 'propertyType';
+
     private readonly PARAM_POST_DATE_LOCATOR: string = 'postDate';
+
     private readonly PARAM_NAME_SUB_LOCATOR: string = 'name';
+
     private readonly PARAM_LOCATOR_SUB_LOCATOR: string = 'locator';
 
     constructor() {
@@ -35,7 +46,7 @@ export default class PatternController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute(req: Request, res: Response, next: any): void {
+    protected createRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.String());
@@ -67,12 +78,16 @@ export default class PatternController extends ControllerBase {
 
         validator.addParamValidator(this.PARAM_NAME_SUB_LOCATOR, new Checker.Type.String());
 
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.patternLogic
-            .create(this.requestBody)
+            .create((this.requestBody as unknown) as PatternModelInterface)
             .then((createdPattern: PatternModelInterface): void => {
-                this.sendResponse(ResponseStatusCode.CREATED, PatternLogic.convertToResponse(createdPattern), res);
+                ControllerBase.sendResponse(
+                    ResponseStatusCode.CREATED,
+                    PatternLogic.convertToResponse(createdPattern),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -84,7 +99,7 @@ export default class PatternController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute(req: Request, res: Response, next: any): void {
+    protected deleteRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -95,7 +110,7 @@ export default class PatternController extends ControllerBase {
         this.patternLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+                ControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -107,7 +122,7 @@ export default class PatternController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute(req: Request, res: Response, next: any): void {
+    protected getAllRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -128,7 +143,7 @@ export default class PatternController extends ControllerBase {
                     hasNext,
                 };
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -140,7 +155,7 @@ export default class PatternController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute(req: Request, res: Response, next: any): void {
+    protected getWithIdRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -158,7 +173,7 @@ export default class PatternController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -170,7 +185,7 @@ export default class PatternController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute(req: Request, res: Response, next: any): void {
+    protected updateRoute(req: Request, res: Response, next: NextFunction): void {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -206,13 +221,17 @@ export default class PatternController extends ControllerBase {
         validator.addParamValidator(this.PARAM_NAME_SUB_LOCATOR, new Checker.Type.String());
 
         validator.validate(this.requestParams);
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.patternLogic
-            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as PatternModelInterface)
             .then((editedPattern: PatternModelInterface | undefined): void => {
                 if (editedPattern) {
-                    this.sendResponse(ResponseStatusCode.OK, PatternLogic.convertToResponse(editedPattern), res);
+                    ControllerBase.sendResponse(
+                        ResponseStatusCode.OK,
+                        PatternLogic.convertToResponse(editedPattern),
+                        res
+                    );
                 }
             })
             .catch((error: Error): void => {

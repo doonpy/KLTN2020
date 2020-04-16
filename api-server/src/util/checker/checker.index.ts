@@ -11,7 +11,7 @@ import CheckerTypeInteger from './type/checker.type.integer';
 import CheckerTypeObject from './type/checker.type.object';
 import CheckerTypeString from './type/checker.type.string';
 
-export const Checker = {
+export default {
     DecimalRange: CheckerDecimalRange,
     Domain: CheckerDomain,
     IntegerRange: CheckerIntegerRange,

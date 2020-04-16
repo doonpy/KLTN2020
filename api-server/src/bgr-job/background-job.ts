@@ -1,31 +1,18 @@
-import { Catalog } from '../services/catalog/catalog.index';
-import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
-import ConsoleLog from '../util/console/console.log';
-import { ConsoleConstant } from '../util/console/console.constant';
-import DateTime from '../util/datetime/datetime';
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
+import Catalog from '../services/catalog/catalog.index';
+import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
+import ConsoleLog from '../util/console/console.log';
+import ConsoleConstant from '../util/console/console.constant';
+import DateTime from '../util/datetime/datetime';
 import DatabaseMongodb from '../services/database/mongodb/database.mongodb';
+
 import Timeout = NodeJS.Timeout;
 
-interface MonitorContent {
-    pid: number;
-    scrapeType: string;
-    catalogId: number;
-    catalogTitle: string;
-}
-
-interface Targets {
-    pid: number;
-    targetList: string[];
-}
-
-const SCRAPE_TYPE_DETAIL_URL: string = 'detail-url';
-const SCRAPE_TYPE_RAW_DATA: string = 'raw-data';
-let childProcessAmount: number = 0;
-let monitorContentList: MonitorContent[] = [];
-let targetsList: Targets[] = [];
-let isRunning: boolean = false;
+const SCRAPE_TYPE_DETAIL_URL = 'detail-url';
+const SCRAPE_TYPE_RAW_DATA = 'raw-data';
+let childProcessAmount = 0;
+let isRunning = false;
 let scrapeType: string = SCRAPE_TYPE_DETAIL_URL;
 
 /**
@@ -36,6 +23,17 @@ const executeGroupDataChildProcess = (): void => {
     childProcess.on('exit', (): void => {
         isRunning = false;
         new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
+    });
+    childProcess.send({});
+};
+
+/**
+ * Execute add coordinate process
+ */
+const executeAddCoordinateChildProcess = (): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
+    childProcess.on('exit', (): void => {
+        executeGroupDataChildProcess();
     });
     childProcess.send({});
 };
@@ -61,21 +59,10 @@ const executeCleanDataChildProcess = (): void => {
 const executeScrapeChildProcess = (catalogId: number | undefined): void => {
     const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
     childProcess.on('exit', (): void => {
-        childProcessAmount--;
+        childProcessAmount -= 1;
     });
     childProcess.send({ catalogId, scrapeType });
-    childProcessAmount++;
-};
-
-/**
- * Execute add coordinate process
- */
-const executeAddCoordinateChildProcess = (): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
-    childProcess.on('exit', (): void => {
-        executeGroupDataChildProcess();
-    });
-    childProcess.send({});
+    childProcessAmount += 1;
 };
 
 /**
@@ -87,12 +74,10 @@ const script = async (): Promise<void> => {
 
     const catalogIdList: number[] = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
     const catalogIdListLen: number = catalogIdList.length;
-    let count: number = 0;
+    let count = 0;
     const loop: Timeout = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
             clearInterval(loop);
-            monitorContentList = [];
-            targetsList = [];
             executeCleanDataChildProcess();
             return;
         }
@@ -110,7 +95,7 @@ const script = async (): Promise<void> => {
         }
 
         executeScrapeChildProcess(catalogId);
-        count++;
+        count += 1;
 
         if (count === catalogIdListLen) {
             scrapeType = scrapeType === SCRAPE_TYPE_DETAIL_URL ? SCRAPE_TYPE_RAW_DATA : SCRAPE_TYPE_DETAIL_URL;
@@ -124,7 +109,7 @@ const script = async (): Promise<void> => {
  *
  * @param {boolean} force
  */
-export const start = async (force: boolean = false): Promise<void> => {
+const start = async (force = false): Promise<void> => {
     if (isRunning) {
         return;
     }
@@ -134,7 +119,7 @@ export const start = async (force: boolean = false): Promise<void> => {
         return;
     }
 
-    (function clock() {
+    (function clock(): void {
         const checkTimeLoop: Timeout = setInterval(async (): Promise<void> => {
             const expectTime: Date = new Date();
             expectTime.setUTCHours(parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10));

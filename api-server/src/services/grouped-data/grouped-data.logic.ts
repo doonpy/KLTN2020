@@ -1,13 +1,13 @@
+import { DocumentQuery, Query } from 'mongoose';
 import LogicBase from '../logic.base';
 import GroupedDataModelInterface from './grouped-data.model.interface';
-import { DocumentQuery, Query } from 'mongoose';
 import GroupedDataModel from './grouped-data.model';
-import { Exception } from '../exception/exception.index';
-import { Database } from '../database/database.index';
+import Exception from '../exception/exception.index';
+import Database from '../database/database.index';
 import { GroupedDataErrorResponseMessage, GroupedDataErrorResponseRootCause } from './grouped-data.error-response';
-import { RawData } from '../raw-data/raw-data.index';
+import RawData from '../raw-data/raw-data.index';
 import GroupedDataApiInterface from './grouped-data.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 import RawDataModelInterface from '../raw-data/raw-data.model.interface';
 import RawDataApiInterface from '../raw-data/raw-data.api.interface';
 
@@ -149,7 +149,7 @@ export default class GroupedDataLogic extends LogicBase {
 
             const groupedData: GroupedDataModelInterface | null = await GroupedDataModel.findById(id).exec();
             if (!groupedData) {
-                return;
+                return undefined;
             }
 
             groupedData.items = items;
@@ -199,7 +199,7 @@ export default class GroupedDataLogic extends LogicBase {
      */
     public static async checkGroupedDataExistedWithId(
         id: string | number | RawDataModelInterface,
-        isNot: boolean = false
+        isNot = false
     ): Promise<void> {
         if (typeof id === 'object') {
             id = id._id;
@@ -228,19 +228,11 @@ export default class GroupedDataLogic extends LogicBase {
     }
 
     /**
-     * Create grouped data document
-     * @param {Array<number>} items
-     * @return {GroupedDataModelInterface}
-     */
-    public static createDocument(items: number[]): GroupedDataModelInterface {
-        return new GroupedDataModel({ items });
-    }
-
-    /**
      * Aggregation query
      * @param {Array<object>} aggregations
      * @return {Promise<Array<any>>}
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public static async aggregationQuery(aggregations: object[]): Promise<any[]> {
         return GroupedDataModel.aggregate(aggregations).exec();
     }

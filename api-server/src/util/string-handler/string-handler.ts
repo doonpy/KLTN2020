@@ -3,14 +3,14 @@ export default class StringHandler {
      * @param originalString
      * @param value
      */
-    public static replaceString(originalString: string, value: any[]): string {
-        const REPLACE_SIGN_STRING: string = 's';
-        const REPLACE_SIGN_INTEGER: string = 'i';
-        const REPLACE_SIGN_JSON: string = 'j';
-        const REPLACE_SIGN_RAW: string = 'r';
+    public static replaceString(originalString: string, value: (string | number)[]): string {
+        const REPLACE_SIGN_STRING = 's';
+        const REPLACE_SIGN_INTEGER = 'i';
+        const REPLACE_SIGN_JSON = 'j';
+        const REPLACE_SIGN_RAW = 'r';
 
-        let completedCause: string = '';
-        let isReplaceSign: boolean = false;
+        let completedCause = '';
+        let isReplaceSign = false;
 
         originalString.split('').forEach((char: string, index: number): void => {
             if (char === '%') {
@@ -29,7 +29,8 @@ export default class StringHandler {
                     case REPLACE_SIGN_JSON:
                         completedCause += `${JSON.stringify(value.shift() || {}) || '{}'}`;
                         break;
-                    case REPLACE_SIGN_RAW:
+                    default:
+                        // REPLACE_SIGN_RAW:
                         completedCause += `${value.shift() || ''}`;
                 }
                 isReplaceSign = false;
@@ -98,18 +99,14 @@ export default class StringHandler {
 
         function termFreqMapToVector(map: { [key: string]: number }, dictionary: { [key: string]: boolean }): number[] {
             const termFreqVector: number[] = [];
-            for (const term in dictionary) {
-                if (map.hasOwnProperty(term)) {
-                    termFreqVector.push(map[term]);
-                } else {
-                    termFreqVector.push(0);
-                }
-            }
+            Object.keys(dictionary).forEach((term: string): void => {
+                termFreqVector.push(map[term] || 0);
+            });
             return termFreqVector;
         }
 
         function vecDotProduct(vecA: number[], vecB: number[]): number {
-            let product: number = 0;
+            let product = 0;
             for (let i = 0; i < vecA.length; i++) {
                 product += vecA[i] * vecB[i];
             }
@@ -117,7 +114,7 @@ export default class StringHandler {
         }
 
         function vecMagnitude(vec: number[]): number {
-            let sum: number = 0;
+            let sum = 0;
             for (const item of vec) {
                 sum += item * item;
             }

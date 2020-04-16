@@ -1,7 +1,7 @@
 import DetailUrlLogic from './detail-url.logic';
 import DetailUrlController from './detail-url.controller';
 
-export const DetailUrl = {
+export default {
     Logic: DetailUrlLogic,
     Controller: DetailUrlController,
 };

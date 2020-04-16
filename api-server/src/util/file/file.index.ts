@@ -1,5 +1,5 @@
 import FileLog from './file.log';
 
-export const File = {
+export default {
     Log: FileLog,
 };

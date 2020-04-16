@@ -1,20 +1,10 @@
-enum DateTimeDelimiter {
-    slash = '/',
-    dash = '_',
-    hyphen = '-',
-    dot = '.',
-}
 export default class DateTime extends Date {
-    constructor() {
-        super();
-    }
-
     /**
      * @param value
      * @param format
      * @param delimiter
      */
-    public static convertStringToDate(value: string, format: string, delimiter: DateTimeDelimiter): Date {
+    public static convertStringToDate(value: string, format: string, delimiter: '/' | '-' | '.' | string): Date {
         format = format.toLowerCase();
         const separatedFormat: string[] = format.split(delimiter);
         const separatedValue: string[] = value.split(delimiter);
@@ -35,7 +25,7 @@ export default class DateTime extends Date {
      *
      * @return boolean
      */
-    public static isExactTime(expectTime: Date, isUtcTime: boolean = false): boolean {
+    public static isExactTime(expectTime: Date, isUtcTime = false): boolean {
         const currentTime: Date = new Date();
 
         if (!isUtcTime) {
@@ -48,17 +38,16 @@ export default class DateTime extends Date {
             }
 
             return expectTime.getSeconds() === currentTime.getSeconds();
-        } else {
-            if (expectTime.getUTCHours() !== currentTime.getUTCHours()) {
-                return false;
-            }
-
-            if (expectTime.getUTCMinutes() !== currentTime.getUTCMinutes()) {
-                return false;
-            }
-
-            return expectTime.getUTCSeconds() === currentTime.getUTCSeconds();
         }
+        if (expectTime.getUTCHours() !== currentTime.getUTCHours()) {
+            return false;
+        }
+
+        if (expectTime.getUTCMinutes() !== currentTime.getUTCMinutes()) {
+            return false;
+        }
+
+        return expectTime.getUTCSeconds() === currentTime.getUTCSeconds();
     }
 
     /**

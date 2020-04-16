@@ -1,15 +1,15 @@
-import RawDataModel from './raw-data.model';
-import { Exception } from '../exception/exception.index';
-import RawDataModelInterface from './raw-data.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
+import RawDataModel from './raw-data.model';
+import Exception from '../exception/exception.index';
+import RawDataModelInterface from './raw-data.model.interface';
 import LogicBase from '../logic.base';
-import { RawDataConstant } from './raw-data.constant';
+import RawDataConstant from './raw-data.constant';
 import { RawDataErrorResponseMessage, RawDataErrorResponseRootCause } from './raw-data.error-response';
-import { Database } from '../database/database.index';
-import { DetailUrl } from '../detail-url/detail-url.index';
+import Database from '../database/database.index';
+import DetailUrl from '../detail-url/detail-url.index';
 import RawDataApiInterface from './raw-data.api.interface';
-import { Coordinate } from '../coordinate/coordinate.index';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import Coordinate from '../coordinate/coordinate.index';
+import ResponseStatusCode from '../../common/common.response-status.code';
 import DetailUrlModelInterface from '../detail-url/detail-url.model.interface';
 import CoordinateModelInterface from '../coordinate/coordinate.model.interface';
 
@@ -181,7 +181,7 @@ export default class RawDataLogic extends LogicBase {
 
             const rawData: RawDataModelInterface | null = await RawDataModel.findById(id).exec();
             if (!rawData) {
-                return;
+                return undefined;
             }
 
             if (rawData.detailUrlId !== detailUrlId) {
@@ -210,7 +210,7 @@ export default class RawDataLogic extends LogicBase {
             rawData.coordinate = coordinate || rawData.coordinate;
 
             if (others && others.length > 0) {
-                others.forEach((other: { name: string; value: string } | any): void => {
+                others.forEach((other: { name: string; value: string }): void => {
                     if (!rawData) {
                         return;
                     }
@@ -266,23 +266,6 @@ export default class RawDataLogic extends LogicBase {
     }
 
     /**
-     * @param detailUrlId
-     * @return Promise<void>
-     */
-    public async deleteByDetailUrlId(detailUrlId: number): Promise<void> {
-        try {
-            await RawDataLogic.checkRawDataExistedWithDetailUrlId(detailUrlId);
-            await RawDataModel.findOneAndDelete({ detailUrlId });
-        } catch (error) {
-            throw new Exception.Customize(
-                error.statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
-                error.message,
-                error.cause || Database.FailedResponse.RootCause.DB_RC_2
-            );
-        }
-    }
-
-    /**
      * @return index number
      */
     public static getPropertyTypeIndex(propertyTypeData: string): number {
@@ -303,7 +286,7 @@ export default class RawDataLogic extends LogicBase {
      */
     public static async checkRawDataExistedWithId(
         id: RawDataModelInterface | number | string,
-        isNot: boolean = false
+        isNot = false
     ): Promise<void> {
         if (typeof id === 'object') {
             id = id._id;
@@ -337,7 +320,7 @@ export default class RawDataLogic extends LogicBase {
      */
     public static async checkRawDataExistedWithDetailUrlId(
         detailUrlId: DetailUrlModelInterface | number | string,
-        isNot: boolean = false
+        isNot = false
     ): Promise<void> {
         if (typeof detailUrlId === 'object') {
             detailUrlId = detailUrlId._id;

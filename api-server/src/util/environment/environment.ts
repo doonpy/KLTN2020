@@ -1,10 +1,10 @@
-import { EnvironmentVariables } from '../../env';
+import EnvironmentVariables from '../../env';
 
-export const initEnv = (): void => {
+export default (): void => {
     Object.keys(EnvironmentVariables).forEach((key): void => {
         if (new RegExp(/_DEV$/).test(key) && process.env.NODE_ENV === 'production') {
             return;
         }
-        process.env[key] = EnvironmentVariables[key] as string;
+        process.env[key] = (EnvironmentVariables as { [key: string]: string | number })[key] as string;
     });
 };

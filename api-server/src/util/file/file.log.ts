@@ -1,17 +1,24 @@
 import FileBase from './file.base';
 
 export default class FileLog extends FileBase {
-    private folderPath: string = '';
+    private folderPath = '';
+
     private readonly dateFolder: string = '';
-    private fileName: string = '';
-    private content: string = '';
-    private extension: string = 'log';
+
+    private fileName = '';
+
+    private content = '';
+
+    private extension = 'log';
 
     private readonly LOG_ROOT_FOLDER: string = 'logs';
+
     private readonly ERROR_LOG_ROOT_FOLDER: string = 'error';
+
     private readonly PREFIX: string = 'log_';
-    private readonly FULL_HOST_URI: string | any = `${process.env.SERVER_PROTOCOL || 'http://'}${process.env
-        .SERVER_URI || '127.0.0.1'}${process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'}`;
+
+    private readonly FULL_HOST_URI: string = `${process.env.SERVER_PROTOCOL || 'http://'}${process.env.SERVER_URI ||
+        '127.0.0.1'}${process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'}`;
 
     constructor() {
         super();
@@ -24,23 +31,15 @@ export default class FileLog extends FileBase {
     /**
      * Initialize log folder if not exists.
      */
-    public initLogFolder(folderPath: string, extension: string = ''): void {
+    public initLogFolder(folderPath: string, extension = ''): void {
         this.folderPath = folderPath;
         if (extension) {
             this.extension = extension;
         }
 
+        this.createFolder(`${this.PUBLIC_FOLDER_PATH}/${this.LOG_ROOT_FOLDER}/${this.folderPath}/${this.dateFolder}`);
         this.createFolder(
-            this.PUBLIC_FOLDER_PATH + '/' + this.LOG_ROOT_FOLDER + '/' + this.folderPath + '/' + this.dateFolder
-        );
-        this.createFolder(
-            this.PUBLIC_FOLDER_PATH +
-                '/' +
-                this.LOG_ROOT_FOLDER +
-                '/' +
-                this.ERROR_LOG_ROOT_FOLDER +
-                '/' +
-                this.dateFolder
+            `${this.PUBLIC_FOLDER_PATH}/${this.LOG_ROOT_FOLDER}/${this.ERROR_LOG_ROOT_FOLDER}/${this.dateFolder}`
         );
     }
 
@@ -61,30 +60,20 @@ export default class FileLog extends FileBase {
      * Create error log file.
      */
     private createErrorLog(error: Error): void {
-        const content: string = `Error!\nName: ${error.name}\nMessage: ${error.message}\n Stack: ${error.stack}`;
-
-        try {
-            this.createFile(this.getFullPath(true), content, {
-                encoding: 'utf-8',
-            });
-        } catch (error) {
-            throw error;
-        }
+        const content = `Error!\nName: ${error.name}\nMessage: ${error.message}\n Stack: ${error.stack}`;
+        this.createFile(this.getFullPath(true), content, {
+            encoding: 'utf-8',
+        });
     }
 
     /**
      * Create file name with current date time.
      */
-    public createFileName(customizeFileName: string = ''): void {
+    public createFileName(customizeFileName = ''): void {
         const currentDate: Date = new Date();
-        this.fileName =
-            this.PREFIX +
+        this.fileName = `${this.PREFIX +
             customizeFileName +
-            currentDate.getUTCHours() +
-            '-' +
-            currentDate.getUTCMinutes() +
-            '-' +
-            currentDate.getUTCSeconds();
+            currentDate.getUTCHours()}-${currentDate.getUTCMinutes()}-${currentDate.getUTCSeconds()}`;
     }
 
     /**
@@ -95,45 +84,23 @@ export default class FileLog extends FileBase {
             return;
         }
 
-        this.content += content.trim() + '\n';
+        this.content += `${content.trim()}\n`;
     }
 
     /**
      * Get full path of log file.
      */
-    private getFullPath(isError: boolean = false): string {
-        return (
-            this.PUBLIC_FOLDER_PATH +
-            '/' +
-            this.LOG_ROOT_FOLDER +
-            '/' +
-            (isError ? this.ERROR_LOG_ROOT_FOLDER : this.folderPath) +
-            '/' +
-            this.dateFolder +
-            '/' +
-            this.fileName +
-            '.' +
-            this.extension
-        );
+    private getFullPath(isError = false): string {
+        return `${this.PUBLIC_FOLDER_PATH}/${this.LOG_ROOT_FOLDER}/${
+            isError ? this.ERROR_LOG_ROOT_FOLDER : this.folderPath
+        }/${this.dateFolder}/${this.fileName}.${this.extension}`;
     }
 
     /**
      * Get full static path of log file.
      */
     public getUrl(): string {
-        return (
-            this.FULL_HOST_URI +
-            '/' +
-            this.LOG_ROOT_FOLDER +
-            '/' +
-            this.folderPath +
-            '/' +
-            this.dateFolder +
-            '/' +
-            this.fileName +
-            '.' +
-            this.extension
-        );
+        return `${this.FULL_HOST_URI}/${this.LOG_ROOT_FOLDER}/${this.folderPath}/${this.dateFolder}/${this.fileName}.${this.extension}`;
     }
 
     /**

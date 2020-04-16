@@ -1,22 +1,29 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import ControllerBase from '../controller.base';
 import CatalogLogic from './catalog.logic';
 import Validator from '../../util/validator/validator';
-import { Checker } from '../../util/checker/checker.index';
+import Checker from '../../util/checker/checker.index';
 import CatalogModelInterface from './catalog.model.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
-const commonPath: string = '/catalogs';
-const specifyIdPath: string = '/catalogs/:id';
+const commonPath = '/catalogs';
+const specifyIdPath = '/catalogs/:id';
 
 export default class CatalogController extends ControllerBase {
     private catalogLogic: CatalogLogic = new CatalogLogic();
+
     private readonly PARAM_PATTERN_ID: string = 'patternId';
+
     private readonly PARAM_TITLE: string = 'title';
+
     private readonly PARAM_URL: string = 'url';
+
     private readonly PARAM_LOCATOR: string = 'locator';
+
     private readonly PARAM_DETAIL_URL: string = 'detailUrl';
+
     private readonly PARAM_PAGE_NUMBER: string = 'pageNumber';
+
     private readonly PARAM_HOST_ID: string = 'hostId';
 
     constructor() {
@@ -31,7 +38,7 @@ export default class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute = (req: Request, res: Response, next: any): any => {
+    protected getAllRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -48,7 +55,7 @@ export default class CatalogController extends ControllerBase {
         validator.validate(this.requestQuery);
 
         this.catalogLogic
-            .getAll(this.requestQuery[this.PARAM_HOST_ID], this.keyword, this.limit, this.offset)
+            .getAll((this.requestQuery[this.PARAM_HOST_ID] as unknown) as number, this.keyword, this.limit, this.offset)
             .then(({ catalogs, hasNext }): void => {
                 const catalogList: object[] = catalogs.map((catalog: CatalogModelInterface): object => {
                     return CatalogLogic.convertToResponse(catalog);
@@ -59,7 +66,7 @@ export default class CatalogController extends ControllerBase {
                     hasNext,
                 };
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -71,7 +78,7 @@ export default class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (req: Request, res: Response, next: any): any => {
+    protected getWithIdRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -89,7 +96,7 @@ export default class CatalogController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -101,7 +108,7 @@ export default class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute = (req: Request, res: Response, next: any): any => {
+    protected createRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
@@ -121,13 +128,17 @@ export default class CatalogController extends ControllerBase {
         validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
         validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
 
-        validator.validate(this.requestBody);
-        validator.validate(this.requestBody.locator || {});
+        validator.validate((this.requestBody as unknown) as string);
+        validator.validate((this.requestBody.locator as unknown) as { [key: string]: string });
 
         this.catalogLogic
-            .create(this.requestBody)
+            .create((this.requestBody as unknown) as CatalogModelInterface)
             .then((createdCatalog: CatalogModelInterface): void => {
-                this.sendResponse(ResponseStatusCode.CREATED, CatalogLogic.convertToResponse(createdCatalog), res);
+                ControllerBase.sendResponse(
+                    ResponseStatusCode.CREATED,
+                    CatalogLogic.convertToResponse(createdCatalog),
+                    res
+                );
             })
             .catch((error: Error): void => {
                 next(error);
@@ -139,7 +150,7 @@ export default class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute = (req: Request, res: Response, next: any): any => {
+    protected updateRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -163,14 +174,18 @@ export default class CatalogController extends ControllerBase {
         validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
 
         validator.validate(this.requestParams);
-        validator.validate(this.requestBody);
-        validator.validate(this.requestBody.locator || {});
+        validator.validate((this.requestBody as unknown) as string);
+        validator.validate((this.requestBody.locator as unknown) as { [key: string]: string });
 
         this.catalogLogic
-            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as CatalogModelInterface)
             .then((editedCatalog: CatalogModelInterface | undefined): void => {
                 if (editedCatalog) {
-                    this.sendResponse(ResponseStatusCode.OK, CatalogLogic.convertToResponse(editedCatalog), res);
+                    ControllerBase.sendResponse(
+                        ResponseStatusCode.OK,
+                        CatalogLogic.convertToResponse(editedCatalog),
+                        res
+                    );
                 }
             })
             .catch((error: Error): void => {
@@ -183,7 +198,7 @@ export default class CatalogController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute = (req: Request, res: Response, next: any): any => {
+    protected deleteRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -194,7 +209,7 @@ export default class CatalogController extends ControllerBase {
         this.catalogLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+                ControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

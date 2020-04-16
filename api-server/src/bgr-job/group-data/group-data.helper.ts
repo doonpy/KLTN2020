@@ -20,16 +20,16 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
 /**
  * Convert price value by currency
  * @param {number} value
- * @param {string} fromUnit
- * @param {string} toUnit
+ * @param {string} fromUnitInput
+ * @param {string} toUnitInput
  * @return {number} returnValue
  */
-export const convertPriceValue = (value: number, fromUnit: string, toUnit: string): number => {
-    const CURRENCY_PATTERN: RegExp = new RegExp(/tỷ|tỉ|triệu|nghìn|ngàn/);
-    const fromUnitCurrencyArray: string[] | null = fromUnit.match(CURRENCY_PATTERN);
-    const toUnitCurrencyArray: string[] | null = toUnit.match(CURRENCY_PATTERN);
-    fromUnit = fromUnitCurrencyArray ? fromUnitCurrencyArray.shift() || '' : '';
-    toUnit = toUnitCurrencyArray ? toUnitCurrencyArray.shift() || '' : '';
+export const convertPriceValue = (value: number, fromUnitInput: string, toUnitInput: string): number => {
+    const CURRENCY_PATTERN = new RegExp(/tỷ|tỉ|triệu|nghìn|ngàn/);
+    const fromUnitCurrencyArray: string[] | null = fromUnitInput.match(CURRENCY_PATTERN);
+    const toUnitCurrencyArray: string[] | null = toUnitInput.match(CURRENCY_PATTERN);
+    const fromUnit: string = fromUnitCurrencyArray ? fromUnitCurrencyArray.shift() || '' : '';
+    const toUnit: string = toUnitCurrencyArray ? toUnitCurrencyArray.shift() || '' : '';
 
     if (!fromUnit || !toUnit) {
         return value;
@@ -38,33 +38,27 @@ export const convertPriceValue = (value: number, fromUnit: string, toUnit: strin
     let returnValue: number = value;
     switch (fromUnit) {
         case 'tỷ' || 'tỉ':
-            switch (toUnit) {
-                case 'triệu':
-                    returnValue = value * 1000;
-                    break;
-                case 'nghìn' || 'ngàn':
-                    returnValue = value * 1000000;
-                    break;
+            if (toUnit === 'triệu') {
+                returnValue = value * 1000;
+            } else {
+                // 'nghìn' || 'ngàn':
+                returnValue = value * 1000000;
             }
             break;
         case 'triệu':
-            switch (toUnit) {
-                case 'tỷ' || 'tỉ':
-                    returnValue = value / 1000;
-                    break;
-                case 'nghìn' || 'ngàn':
-                    returnValue = value * 1000;
-                    break;
+            if (toUnit === 'tỷ' || toUnit === 'tỉ') {
+                returnValue = value / 1000;
+            } else {
+                // 'nghìn' || 'ngàn':
+                returnValue = value * 1000;
             }
             break;
-        case 'nghìn' || 'ngàn':
-            switch (toUnit) {
-                case 'tỷ' || 'tỉ':
-                    returnValue = value / 1000000;
-                    break;
-                case 'triệu':
-                    returnValue = value / 1000;
-                    break;
+        default:
+            if (toUnit === 'tỷ' || toUnit === 'tỉ') {
+                returnValue = value / 1000000;
+            } else {
+                // triệu
+                returnValue = value / 1000;
             }
             break;
     }

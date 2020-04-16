@@ -1,12 +1,12 @@
-import HostModel from './host.model';
-import { Exception } from '../exception/exception.index';
-import HostModelInterface from './host.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
+import HostModel from './host.model';
+import Exception from '../exception/exception.index';
+import HostModelInterface from './host.model.interface';
 import LogicBase from '../logic.base';
-import { Database } from '../database/database.index';
+import Database from '../database/database.index';
 import { HostErrorResponseMessage, HostErrorResponseRootCause } from './host.error-response';
 import HostApiInterface from './host.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class HostLogic extends LogicBase {
     /**
@@ -108,7 +108,7 @@ export default class HostLogic extends LogicBase {
             const host: HostModelInterface | null = await HostModel.findById(id).exec();
 
             if (!host) {
-                return;
+                return undefined;
             }
 
             if (host.domain !== domain) {
@@ -150,8 +150,9 @@ export default class HostLogic extends LogicBase {
 
     /**
      * @param domain
+     * @param isNot
      */
-    public static checkHostExistedWithDomain = async (domain: string, isNot: boolean = false): Promise<void> => {
+    public static checkHostExistedWithDomain = async (domain: string, isNot = false): Promise<void> => {
         const result: number = await HostModel.countDocuments({ domain }).exec();
 
         if (!isNot && result === 0) {
@@ -179,7 +180,7 @@ export default class HostLogic extends LogicBase {
      */
     public static checkHostExistedWithId = async (
         id: string | number | HostModelInterface,
-        isNot: boolean = false
+        isNot = false
     ): Promise<void> => {
         if (typeof id === 'object') {
             id = id._id;

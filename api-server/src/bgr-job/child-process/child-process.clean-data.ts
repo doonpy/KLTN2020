@@ -1,12 +1,10 @@
-import { Database } from '../../services/database/database.index';
-import { DetailUrl } from '../../services/detail-url/detail-url.index';
-import { RawData } from '../../services/raw-data/raw-data.index';
+import DetailUrl from '../../services/detail-url/detail-url.index';
+import RawData from '../../services/raw-data/raw-data.index';
 import ConsoleLog from '../../util/console/console.log';
-import { ConsoleConstant } from '../../util/console/console.constant';
+import ConsoleConstant from '../../util/console/console.constant';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import DetailUrlLogic from '../../services/detail-url/detail-url.logic';
 import RawDataLogic from '../../services/raw-data/raw-data.logic';
-import RawDataModelInterface from '../../services/raw-data/raw-data.model.interface';
 import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
 
 process.on(
@@ -45,12 +43,13 @@ process.on(
                     },
                 },
             ];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const documents: any[] = await DetailUrl.Logic.aggregationQuery(aggregations);
             const detailUrlLogic: DetailUrlLogic = new DetailUrl.Logic();
             const rawDataLogic: RawDataLogic = new RawData.Logic();
 
             for (const document of documents) {
-                for (let i: number = 1; i < document.docList.length; i++) {
+                for (let i = 1; i < document.docList.length; i++) {
                     try {
                         await detailUrlLogic.delete(document.docList[i]._id);
                         new ConsoleLog(
@@ -65,11 +64,9 @@ process.on(
                     }
                     if (document.docList[i].isExtracted) {
                         try {
-                            const rawDataset: RawDataModelInterface[] = (
-                                await rawDataLogic.getAll({
-                                    detailUrlId: document.docList[i]._id,
-                                })
-                            ).rawDataset;
+                            const { rawDataset } = await rawDataLogic.getAll({
+                                detailUrlId: document.docList[i]._id,
+                            });
                             for (const rawData of rawDataset) {
                                 await rawDataLogic.delete(rawData._id);
                                 new ConsoleLog(

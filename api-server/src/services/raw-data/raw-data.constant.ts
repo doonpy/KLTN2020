@@ -1,4 +1,4 @@
-export const RawDataConstant = {
+export default {
     TYPE_OF_TRANSACTION: {
         SALE: 0,
         RENT: 1,

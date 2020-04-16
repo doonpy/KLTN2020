@@ -1,17 +1,18 @@
+import { NextFunction, Request, Response } from 'express';
 import ControllerBase from '../controller.base';
 import GroupedDataLogic from './grouped-data.logic';
-import { Request, Response } from 'express';
 import Validator from '../../util/validator/validator';
-import { Checker } from '../../util/checker/checker.index';
+import Checker from '../../util/checker/checker.index';
 import GroupedDataModelInterface from './grouped-data.model.interface';
 import GroupedDataApiInterface from './grouped-data.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 
-const commonPath: string = '/grouped-dataset';
-const specifyIdPath: string = '/grouped-dataset/:id';
+const commonPath = '/grouped-dataset';
+const specifyIdPath = '/grouped-dataset/:id';
 
 export default class GroupedDataController extends ControllerBase {
     private groupedDataLogic: GroupedDataLogic = new GroupedDataLogic();
+
     private readonly PARAM_ITEMS: string = 'items';
 
     constructor() {
@@ -26,7 +27,7 @@ export default class GroupedDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getAllRoute = (req: Request, res: Response, next: any): any => {
+    protected getAllRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
@@ -53,7 +54,7 @@ export default class GroupedDataController extends ControllerBase {
                     hasNext,
                 };
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -65,7 +66,7 @@ export default class GroupedDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected getWithIdRoute = (req: Request, res: Response, next: any): any => {
+    protected getWithIdRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -83,7 +84,7 @@ export default class GroupedDataController extends ControllerBase {
                     };
                 }
 
-                this.sendResponse(ResponseStatusCode.OK, responseBody, res);
+                ControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
             })
             .catch((error: Error): void => {
                 next(error);
@@ -95,17 +96,17 @@ export default class GroupedDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected createRoute = (req: Request, res: Response, next: any): any => {
+    protected createRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
 
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.groupedDataLogic
-            .create(this.requestBody)
+            .create(this.requestBody[this.PARAM_ITEMS] as number[])
             .then((createdGroupedData: GroupedDataModelInterface): void => {
-                this.sendResponse(
+                ControllerBase.sendResponse(
                     ResponseStatusCode.CREATED,
                     GroupedDataLogic.convertToResponse(createdGroupedData),
                     res
@@ -121,7 +122,7 @@ export default class GroupedDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected updateRoute = (req: Request, res: Response, next: any): any => {
+    protected updateRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -130,13 +131,13 @@ export default class GroupedDataController extends ControllerBase {
         validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
 
         validator.validate(this.requestParams);
-        validator.validate(this.requestBody);
+        validator.validate((this.requestBody as unknown) as string);
 
         this.groupedDataLogic
-            .update(this.requestParams[this.PARAM_ID], this.requestBody)
+            .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as GroupedDataModelInterface)
             .then((editedGroupedData: GroupedDataModelInterface | undefined): void => {
                 if (editedGroupedData) {
-                    this.sendResponse(
+                    ControllerBase.sendResponse(
                         ResponseStatusCode.OK,
                         GroupedDataLogic.convertToResponse(editedGroupedData, this.populate),
                         res
@@ -153,7 +154,7 @@ export default class GroupedDataController extends ControllerBase {
      * @param res
      * @param next
      */
-    protected deleteRoute = (req: Request, res: Response, next: any): any => {
+    protected deleteRoute = (req: Request, res: Response, next: NextFunction): void => {
         const validator = new Validator();
 
         validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
@@ -164,7 +165,7 @@ export default class GroupedDataController extends ControllerBase {
         this.groupedDataLogic
             .delete(this.requestParams[this.PARAM_ID])
             .then((): void => {
-                this.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+                ControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
             })
             .catch((error: Error): void => {
                 next(error);

@@ -1,14 +1,14 @@
-import CatalogModel from './catalog.model';
-import { Exception } from '../exception/exception.index';
-import { Host } from '../host/host.index';
-import CatalogModelInterface from './catalog.model.interface';
 import { DocumentQuery, Query } from 'mongoose';
+import CatalogModel from './catalog.model';
+import Exception from '../exception/exception.index';
+import Host from '../host/host.index';
+import CatalogModelInterface from './catalog.model.interface';
 import LogicBase from '../logic.base';
 import { CatalogErrorResponseMessage, CatalogErrorResponseRootCause } from './catalog.error-response';
-import { Database } from '../database/database.index';
-import { Pattern } from '../pattern/pattern.index';
+import Database from '../database/database.index';
+import Pattern from '../pattern/pattern.index';
 import CatalogApiInterface from './catalog.api.interface';
-import { ResponseStatusCode } from '../../common/common.response-status.code';
+import ResponseStatusCode from '../../common/common.response-status.code';
 import HostModelInterface from '../host/host.model.interface';
 import PatternModelInterface from '../pattern/pattern.model.interface';
 
@@ -79,7 +79,7 @@ export default class CatalogLogic extends LogicBase {
      */
     public async getById(id: string | number): Promise<CatalogModelInterface | null> {
         try {
-            await CatalogLogic.checkCatalogExistedWithId(id);
+            await CatalogLogic.checkCatalogExistedWithId(id as number);
 
             return await CatalogModel.findById(id)
                 .populate('hostId')
@@ -157,7 +157,7 @@ export default class CatalogLogic extends LogicBase {
         { title, url, locator, hostId, patternId }: CatalogModelInterface
     ): Promise<CatalogModelInterface | undefined> {
         try {
-            await CatalogLogic.checkCatalogExistedWithId(id);
+            await CatalogLogic.checkCatalogExistedWithId(id as number);
             await Host.Logic.checkHostExistedWithId(hostId);
             if (patternId) {
                 await Pattern.Logic.checkPatternExistedWithId(patternId);
@@ -165,7 +165,7 @@ export default class CatalogLogic extends LogicBase {
 
             const catalog: CatalogModelInterface | null = await CatalogModel.findById(id).exec();
             if (!catalog) {
-                return;
+                return undefined;
             }
 
             if (catalog.url !== url) {
@@ -205,9 +205,9 @@ export default class CatalogLogic extends LogicBase {
      *
      * @return Promise<null>
      */
-    public async delete(id: string): Promise<null> {
+    public async delete(id: string | number): Promise<null> {
         try {
-            await CatalogLogic.checkCatalogExistedWithId(id);
+            await CatalogLogic.checkCatalogExistedWithId(id as number);
             await CatalogModel.findByIdAndDelete(id).exec();
 
             return null;
@@ -227,12 +227,13 @@ export default class CatalogLogic extends LogicBase {
      */
     public static checkCatalogExistedWithUrl = async (
         url: string,
-        hostId?: HostModelInterface | number,
-        isNot: boolean = false
+        hostId: HostModelInterface | number,
+        isNot = false
     ): Promise<void> => {
         if (typeof hostId === 'object') {
             hostId = hostId._id;
         }
+
         const result: number = await CatalogModel.countDocuments({
             url,
             hostId: hostId || { $gt: 0 },
@@ -258,18 +259,19 @@ export default class CatalogLogic extends LogicBase {
     };
 
     /**
-     * @param id
+     * @param catalogId
      * @param isNot
      */
     public static async checkCatalogExistedWithId(
-        id: string | number | CatalogModelInterface,
-        isNot: boolean = false
+        catalogId: number | CatalogModelInterface,
+        isNot = false
     ): Promise<void> {
-        if (typeof id === 'object') {
-            id = id._id;
+        if (typeof catalogId === 'object') {
+            catalogId = catalogId._id;
         }
+
         const result: number = await CatalogModel.countDocuments({
-            _id: id as number,
+            _id: catalogId,
         }).exec();
 
         if (!isNot && result === 0) {
@@ -277,7 +279,7 @@ export default class CatalogLogic extends LogicBase {
                 ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_1,
                 CatalogErrorResponseRootCause.CTL_RC_1,
-                ['id', id]
+                ['id', catalogId]
             );
         }
 
@@ -286,7 +288,7 @@ export default class CatalogLogic extends LogicBase {
                 ResponseStatusCode.BAD_REQUEST,
                 CatalogErrorResponseMessage.CTL_MSG_2,
                 CatalogErrorResponseRootCause.CTL_RC_2,
-                ['id', id]
+                ['id', catalogId]
             );
         }
     }

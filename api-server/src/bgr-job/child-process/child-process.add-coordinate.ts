@@ -1,8 +1,7 @@
-import { Database } from '../../services/database/database.index';
-import { RawData } from '../../services/raw-data/raw-data.index';
-import { Coordinate } from '../../services/coordinate/coordinate.index';
+import RawData from '../../services/raw-data/raw-data.index';
+import Coordinate from '../../services/coordinate/coordinate.index';
 import ConsoleLog from '../../util/console/console.log';
-import { ConsoleConstant } from '../../util/console/console.constant';
+import ConsoleConstant from '../../util/console/console.constant';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import RawDataLogic from '../../services/raw-data/raw-data.logic';
 import CoordinateLogic from '../../services/coordinate/coordinate.logic';
@@ -23,8 +22,8 @@ process.on(
 
             const rawDataLogic: RawDataLogic = new RawData.Logic();
             const coordinateLogic: CoordinateLogic = new Coordinate.Logic();
-            const limit: number = 1000;
-            let offset: number = 0;
+            const limit = 1000;
+            let offset = 0;
             let queryResult: {
                 rawDataset: RawDataModelInterface[];
                 hasNext: boolean;
@@ -40,15 +39,14 @@ process.on(
                     const coordinateDoc: CoordinateModelInterface | null = await coordinateLogic.create(
                         rawData.address
                     );
-                    if (!coordinateDoc) {
-                        continue;
+                    if (coordinateDoc) {
+                        rawData.coordinate = coordinateDoc._id;
+                        await rawDataLogic.update(rawData._id, rawData);
+                        new ConsoleLog(
+                            ConsoleConstant.Type.INFO,
+                            `Add coordinate - RID:${rawData._id} -> CID:${coordinateDoc._id}`
+                        ).show();
                     }
-                    rawData.coordinate = coordinateDoc._id;
-                    await rawDataLogic.update(rawData._id, rawData);
-                    new ConsoleLog(
-                        ConsoleConstant.Type.INFO,
-                        `Add coordinate - RID:${rawData._id} -> CID:${coordinateDoc._id}`
-                    ).show();
                 }
                 offset += limit;
                 queryResult = await rawDataLogic.getAll({ coordinate: null }, false, limit, offset);

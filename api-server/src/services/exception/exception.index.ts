@@ -1,5 +1,5 @@
 import ExceptionCustomize from './exception.customize';
 
-export const Exception = {
+export default {
     Customize: ExceptionCustomize,
 };

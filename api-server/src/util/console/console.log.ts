@@ -1,8 +1,9 @@
 import chalk from 'chalk';
-import { ConsoleConstant } from './console.constant';
+import ConsoleConstant from './console.constant';
 
 export default class ConsoleLog {
     private readonly _msgType: number;
+
     private readonly _msgContent: string;
 
     constructor(msgType: number, msgContent: string) {
@@ -33,7 +34,7 @@ export default class ConsoleLog {
                 break;
         }
 
-        // tslint:disable-next-line:no-console
+        // eslint-disable-next-line no-console
         console.log(`${prefix} ${this._msgContent}`);
     }
 }

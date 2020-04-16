@@ -1,4 +1,4 @@
-export const ConsoleConstant = {
+export default {
     Type: {
         INFO: 0,
         DEBUG: 1,
