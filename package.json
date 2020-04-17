@@ -5,10 +5,10 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev:api": "ts-node --project api-server/tsconfig.json 'api-server/src/server.ts'",
-    "dev:bgr-job": "ts-node --project api-server/tsconfig.json 'api-server/src/bgr-job/background-job.ts'",
+    "dev:bgr-job": "ts-node --project api-server/tsconfig.json 'api-server/src/background-job/main.ts'",
     "dev:web": "next web-server -p 3001",
     "start:api": "node dist/api-bgr-job/server.js",
-    "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/bgr-job/background-job.js",
+    "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/background-job/main.js",
     "start:web": "next start dist/web -p 3001",
     "build": "npm run clean && npm-run-all -p build:api-bgr-job build:web --print-label",
     "build:api-bgr-job": "tsc --build --extendedDiagnostics api-server",

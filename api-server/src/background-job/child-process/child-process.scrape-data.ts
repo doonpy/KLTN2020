@@ -42,7 +42,7 @@ process.on(
                 process.exit(1);
             }
         } catch (error) {
-            new ConsoleLog(ConsoleConstant.Type.ERROR, error.message).show();
+            new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.cause || error.message}`).show();
             process.exit(1);
         }
     }

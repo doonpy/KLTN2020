@@ -29,7 +29,10 @@ process.on(
             await telegramChatBotInstance.sendMessage(
                 `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
             );
-            new ConsoleLog(ConsoleConstant.Type.ERROR, `Group data failed. Error: ${error.message}`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Group data failed. Error: ${error.cause || error.message}`
+            ).show();
             process.exit(1);
         }
     }

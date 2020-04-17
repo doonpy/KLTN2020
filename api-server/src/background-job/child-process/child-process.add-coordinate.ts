@@ -59,7 +59,10 @@ process.on(
             await telegramChatBotInstance.sendMessage(
                 `<b>🤖[Add coordinate]🤖</b>\n❌ Add coordinate failed.\nError: ${error.message}`
             );
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Add coordinate failed. Error: ${error.message}`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Add coordinate failed. Error: ${error.cause || error.message}`
+            ).show();
             process.exit(1);
         }
     }

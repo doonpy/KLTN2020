@@ -8,23 +8,26 @@ import DateTime from '../util/datetime/datetime';
 import DatabaseMongodb from '../services/database/mongodb/database.mongodb';
 import initEnv from '../util/environment/environment';
 
-import Timeout = NodeJS.Timeout;
-
 const SCRAPE_TYPE_DETAIL_URL = 'detail-url';
 const SCRAPE_TYPE_RAW_DATA = 'raw-data';
 let childProcessAmount = 0;
 let isRunning = false;
 let scrapeType: string = SCRAPE_TYPE_DETAIL_URL;
+let telegramChatBotInstance: ChatBotTelegram | undefined;
 
 /**
  * Execute group data child process
  */
 const executeGroupDataChildProcess = (): void => {
     const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
-    childProcess.on('exit', (): void => {
-        isRunning = false;
-        new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
-    });
+    childProcess.on(
+        'exit',
+        async (): Promise<void> => {
+            isRunning = false;
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
+            await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
+        }
+    );
     childProcess.send({});
 };
 
@@ -72,11 +75,12 @@ const executeScrapeChildProcess = (catalogId: number | undefined): void => {
 const script = async (): Promise<void> => {
     isRunning = true;
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
+    await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
 
     const catalogIdList: number[] = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
     const catalogIdListLen: number = catalogIdList.length;
     let count = 0;
-    const loop: Timeout = setInterval((): void => {
+    const loop: NodeJS.Timeout = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
             clearInterval(loop);
             executeCleanDataChildProcess();
@@ -121,7 +125,7 @@ const start = async (force = false): Promise<void> => {
     }
 
     (function clock(): void {
-        const checkTimeLoop: Timeout = setInterval(async (): Promise<void> => {
+        const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
             const expectTime: Date = new Date();
             expectTime.setUTCHours(parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10));
             expectTime.setUTCMinutes(parseInt(process.env.SCHEDULE_TIME_MINUTE || '0', 10));
@@ -151,10 +155,9 @@ const start = async (force = false): Promise<void> => {
  */
 (async (): Promise<void> => {
     initEnv();
-    const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-    const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
+    telegramChatBotInstance = ChatBotTelegram.getInstance();
     try {
-        await mongoDbInstance.connect();
+        await DatabaseMongodb.getInstance().connect();
         await start(true);
     } catch (error) {
         await telegramChatBotInstance.sendMessage(
