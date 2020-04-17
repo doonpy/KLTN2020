@@ -10,6 +10,7 @@ import RawDataModelInterface from '../../services/raw-data/raw-data.model.interf
 import FileLog from '../../util/file/file.log';
 import RawDataLogic from '../../services/raw-data/raw-data.logic';
 import GroupedDataModelInterface from '../../services/grouped-data/grouped-data.model.interface';
+import Exception from '../../services/exception/exception.index';
 
 interface AggregationGroupDataResult {
     _id: number;
@@ -113,7 +114,11 @@ export default class GroupData {
             }
         } catch (error) {
             this.isRunning = false;
-            throw error;
+            if (error instanceof Exception.Customize) {
+                new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.message} - Cause: ${error.cause}`).show();
+            } else {
+                throw error;
+            }
         }
     }
 

@@ -17,9 +17,6 @@ export default class FileLog extends FileBase {
 
     private readonly PREFIX: string = 'log_';
 
-    private readonly FULL_HOST_URI: string = `${process.env.SERVER_PROTOCOL || 'http://'}${process.env.SERVER_URI ||
-        '127.0.0.1'}${process.env.SERVER_PORT ? `:${process.env.SERVER_PORT_WEB}` : ':3000'}`;
-
     constructor() {
         super();
         const currentDate: Date = new Date();
@@ -94,13 +91,6 @@ export default class FileLog extends FileBase {
         return `${this.PUBLIC_FOLDER_PATH}/${this.LOG_ROOT_FOLDER}/${
             isError ? this.ERROR_LOG_ROOT_FOLDER : this.folderPath
         }/${this.dateFolder}/${this.fileName}.${this.extension}`;
-    }
-
-    /**
-     * Get full static path of log file.
-     */
-    public getUrl(): string {
-        return `${this.FULL_HOST_URI}/${this.LOG_ROOT_FOLDER}/${this.folderPath}/${this.dateFolder}/${this.fileName}.${this.extension}`;
     }
 
     /**

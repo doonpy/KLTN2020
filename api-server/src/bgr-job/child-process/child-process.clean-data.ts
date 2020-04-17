@@ -59,7 +59,7 @@ process.on(
                     } catch (error) {
                         new ConsoleLog(
                             ConsoleConstant.Type.ERROR,
-                            `Delete DID: ${document.docList[i]._id}) failed. Error: ${error.rootCause || error.message}`
+                            `Delete DID: ${document.docList[i]._id}) failed. Error: ${error.cause || error.message}`
                         ).show();
                     }
                     if (document.docList[i].isExtracted) {
@@ -77,7 +77,7 @@ process.on(
                         } catch (error) {
                             new ConsoleLog(
                                 ConsoleConstant.Type.ERROR,
-                                `Delete raw data failed. Error: ${error.rootCause || error.message}`
+                                `Delete raw data failed. Error: ${error.cause || error.message}`
                             ).show();
                         }
                     }

@@ -53,7 +53,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
             this.addSummaryErrorLog(ScrapeDetailUrlConstantChatBotMessage.ERROR, error, this.catalog._id);
             await this.telegramChatBotInstance.sendMessage(
-                StringHandler.replaceString(error.message, [this.catalog._id, error.message, this.logInstance.getUrl()])
+                StringHandler.replaceString(error.message, [this.catalog._id, error.message])
             );
             this.isRunning = false;
             throw new Error(
@@ -158,11 +158,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             },
         ]);
         await this.telegramChatBotInstance.sendMessage(
-            StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [
-                catalog.title,
-                catalog.id,
-                this.logInstance.getUrl(),
-            ])
+            StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [catalog.title, catalog.id])
         );
         this.isRunning = false;
         new ConsoleLog(

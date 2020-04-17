@@ -17,7 +17,7 @@ export default class ConsoleLog {
      * @return
      */
     public show(): void {
-        let prefix = chalk.bold(chalk.cyan(`[PID: ${process.pid}]`) + chalk.green(`[${new Date().toUTCString()}]`));
+        let prefix = chalk.bold(chalk.cyan(`[PID: ${process.pid}]`) + chalk.green(`[${new Date().toLocaleString()}]`));
 
         switch (this._msgType) {
             case ConsoleConstant.Type.INFO:

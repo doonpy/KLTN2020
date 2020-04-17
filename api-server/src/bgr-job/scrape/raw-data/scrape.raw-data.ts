@@ -80,7 +80,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
             this.addSummaryErrorLog(ScrapeRawDataConstantChatBotMessage.ERROR, error, this.catalog._id);
             await this.telegramChatBotInstance.sendMessage(
-                StringHandler.replaceString(error.message, [this.catalog._id, error.message, this.logInstance.getUrl()])
+                StringHandler.replaceString(error.message, [this.catalog._id, error.message])
             );
             throw new Error(
                 `Scrape raw data of catalog ${this.catalog?.title} (ID:${this.catalog._id}) failed.\nError: ${error.message}`
@@ -298,7 +298,6 @@ export default class ScrapeRawData extends ScrapeBase {
             StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.FINISH, [
                 this.catalog.title,
                 this.catalog.id,
-                this.logInstance.getUrl(),
             ])
         );
         this.isRunning = false;
