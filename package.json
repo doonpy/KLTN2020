@@ -13,7 +13,8 @@
     "build": "npm run clean && npm-run-all -p build:api-bgr-job build:web --print-label",
     "build:api-bgr-job": "tsc --build --extendedDiagnostics api-server",
     "build:web": "next build web-server",
-    "eslint": "eslint --fix -c .eslintrc 'web-server/**/*.ts' 'api-server/**/*.ts'"
+    "eslint": "eslint -c .eslintrc 'web-server/**/*.ts' 'api-server/**/*.ts'",
+    "eslint:fix": "eslint --fix -c .eslintrc 'web-server/**/*.ts' 'api-server/**/*.ts'"
   },
   "repository": {
     "type": "git",
