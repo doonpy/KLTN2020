@@ -47,14 +47,14 @@ export default class ChatBotTelegram {
             if (receiverList.findIndex(receiver => receiver === chatId) > 0) {
                 await this.telegramBot.sendMessage(
                     msg.chat.id,
-                    `🤖<b>[Message]</b>🤖\n❌ You have already subscribed to notifications.`,
+                    `🤖<b>[Message]</b>🤖\n❌ You have already subscribed to notifications.`
                 );
                 return;
             }
             receiverList.push(msg.chat.id);
             await this.telegramBot.sendMessage(
                 msg.chat.id,
-                `🤖<b>[Message]</b>🤖\n✅ Subscribe to notifications success.`,
+                `🤖<b>[Message]</b>🤖\n✅ Subscribe to notifications success.`
             );
         });
     }
