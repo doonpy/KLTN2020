@@ -107,9 +107,9 @@ export default class RawDataController extends ControllerBase {
         othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
 
         bodyValidator.validate((this.requestBody as unknown) as string);
-        priceValidator.validate(this.requestBody[this.PARAM_PRICE] as {[key:string]:string});
-        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE] as {[key:string]:string});
-        othersValidator.validate(this.requestBody[this.PARAM_OTHERS] as {[key:string]:string});
+        priceValidator.validate(this.requestBody[this.PARAM_PRICE] as { [key: string]: string });
+        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE] as { [key: string]: string });
+        othersValidator.validate(this.requestBody[this.PARAM_OTHERS] as { [key: string]: string });
 
         this.rawDataLogic
             .create((this.requestBody as unknown) as RawDataModelInterface)
@@ -290,9 +290,9 @@ export default class RawDataController extends ControllerBase {
         othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
 
         bodyValidator.validate((this.requestBody as unknown) as string);
-        priceValidator.validate(this.requestBody[this.PARAM_PRICE] as {[key:string]:string});
-        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE] as {[key:string]:string});
-        othersValidator.validate(this.requestBody[this.PARAM_OTHERS] as {[key:string]:string});
+        priceValidator.validate(this.requestBody[this.PARAM_PRICE] as { [key: string]: string });
+        acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE] as { [key: string]: string });
+        othersValidator.validate(this.requestBody[this.PARAM_OTHERS] as { [key: string]: string });
 
         this.rawDataLogic
             .update(this.requestParams[this.PARAM_ID], (this.requestBody as unknown) as RawDataModelInterface)

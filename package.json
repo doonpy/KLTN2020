@@ -4,8 +4,8 @@
   "description": "Graduation thesis 2020 - server side",
   "scripts": {
     "clean": "rimraf dist",
-    "dev:api": "cd api-server && ts-node src/server.ts",
-    "dev:bgr-job": "cd api-server && ts-node src/bgr-job/background-job.ts",
+    "dev:api": "ts-node --project api-server/tsconfig.json 'api-server/src/server.ts'",
+    "dev:bgr-job": "ts-node --project api-server/tsconfig.json 'api-server/src/bgr-job/background-job.ts'",
     "dev:web": "next web-server -p 3001",
     "start:api": "node dist/api-bgr-job/server.js",
     "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/bgr-job/background-job.js",
