@@ -1,7 +1,6 @@
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import ScrapeBase from '../scrape/scrape.base';
 import ScrapeDetailUrl from '../scrape/detail-url/scrape.detail-url';
 import ScrapeRawData from '../scrape/raw-data/scrape.raw-data';
 import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';

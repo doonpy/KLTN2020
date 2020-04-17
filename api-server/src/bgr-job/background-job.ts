@@ -6,6 +6,7 @@ import ConsoleLog from '../util/console/console.log';
 import ConsoleConstant from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
 import DatabaseMongodb from '../services/database/mongodb/database.mongodb';
+import initEnv from '../util/environment/environment';
 
 import Timeout = NodeJS.Timeout;
 
@@ -149,12 +150,12 @@ const start = async (force = false): Promise<void> => {
  * Main
  */
 (async (): Promise<void> => {
+    initEnv();
     const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
     const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
     try {
         await mongoDbInstance.connect();
-        await start();
-        await script();
+        await start(true);
     } catch (error) {
         await telegramChatBotInstance.sendMessage(
             `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`

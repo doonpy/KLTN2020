@@ -23,6 +23,10 @@ export default class GroupData {
 
     private isRunning = false;
 
+    private rawDataLogic: RawDataLogic = new RawData.Logic();
+
+    private groupedDataLogic: GroupedDataLogic = new GroupedData.Logic();
+
     private readonly EXPECTED_POINT: number = 9;
 
     private readonly ATTR_POINT_TITLE: number = 4;
@@ -41,18 +45,16 @@ export default class GroupData {
     /**
      * Start
      */
-    public async start(): Promise<void> {
+    public async start(transactionType: number): Promise<void> {
         this.startTime = process.hrtime();
         this.isRunning = true;
         try {
-            const rawDataLogic: RawDataLogic = new RawData.Logic();
-            const groupedDataLogic: GroupedDataLogic = new GroupedData.Logic();
             const limit = 1000;
             let offset = 0;
             let queryResult: {
                 rawDataset: RawDataModelInterface[];
                 hasNext: boolean;
-            } = await rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
+            } = await this.rawDataLogic.getAll({ isGrouped: false, transactionType }, false, limit, offset);
 
             while (queryResult.hasNext || queryResult.rawDataset.length > 0) {
                 const { rawDataset } = queryResult;
@@ -76,27 +78,20 @@ export default class GroupData {
                         },
                         {
                             $match: {
-                                $and: [
-                                    {
-                                        'represent.transactionType': rawData.transactionType,
-                                    },
-                                    {
-                                        'represent.propertyType': rawData.propertyType,
-                                    },
-                                ],
+                                'represent.transactionType': rawData.transactionType,
                             },
                         },
                     ];
                     const results: AggregationGroupDataResult[] = await GroupedDataLogic.aggregationQuery(aggregations);
                     for (const result of results) {
                         if (this.isBelongGroupData(rawData, result.represent)) {
-                            const groupData: GroupedDataModelInterface | null = await groupedDataLogic.getById(
+                            const groupData: GroupedDataModelInterface | null = await this.groupedDataLogic.getById(
                                 result._id
                             );
                             if (groupData) {
                                 groupData.items.push(rawData._id);
-                                await groupedDataLogic.update(result._id, groupData);
-                                await rawDataLogic.update(rawData._id, rawData);
+                                await this.groupedDataLogic.update(result._id, groupData);
+                                await this.rawDataLogic.update(rawData._id, rawData);
                                 new ConsoleLog(
                                     ConsoleConstant.Type.INFO,
                                     `Group data - RID: ${rawData._id} -> GID: ${result._id}`
@@ -105,15 +100,16 @@ export default class GroupData {
                             continue rawDataLoop;
                         }
                     }
-                    const groupedDataCreated = await groupedDataLogic.create([rawData._id]);
-                    await rawDataLogic.update(rawData._id, rawData);
+
+                    const groupedDataCreated = await this.groupedDataLogic.create([rawData._id]);
+                    await this.rawDataLogic.update(rawData._id, rawData);
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
                         `Group data - RID: ${rawData._id} -> GID: ${groupedDataCreated._id}`
                     ).show();
                 }
                 offset += limit;
-                queryResult = await rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
+                queryResult = await this.rawDataLogic.getAll({ isGrouped: false }, true, limit, offset);
             }
         } catch (error) {
             this.isRunning = false;

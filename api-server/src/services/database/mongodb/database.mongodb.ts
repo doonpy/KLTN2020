@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import ConsoleLog from '../../../util/console/console.log';
 import ConsoleConstant from '../../../util/console/console.constant';
-import initEnv from '../../../util/environment/environment';
 
 export default class DatabaseMongodb {
     private static instance: DatabaseMongodb | undefined;
@@ -17,7 +16,6 @@ export default class DatabaseMongodb {
     private readonly password: string | undefined;
 
     constructor() {
-        initEnv();
         if (process.env.NODE_ENV === 'production') {
             this.dbHost = process.env.DB_HOST;
             this.dbPort = process.env.DB_PORT;
