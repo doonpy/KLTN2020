@@ -1,13 +1,11 @@
-import RawData from '../../services/raw-data/raw-data.index';
-import Coordinate from '../../services/coordinate/coordinate.index';
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import RawDataLogic from '../../services/raw-data/raw-data.logic';
-import CoordinateLogic from '../../services/coordinate/coordinate.logic';
-import RawDataModelInterface from '../../services/raw-data/raw-data.model.interface';
-import CoordinateModelInterface from '../../services/coordinate/coordinate.model.interface';
-import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
+import RawDataLogic from '../../service/raw-data/raw-data.logic';
+import CoordinateLogic from '../../service/coordinate/coordinate.logic';
+import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
+import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
+import { CoordinateDocumentModel } from '../../service/coordinate/coordinate.interface';
 
 process.on(
     'message',
@@ -20,36 +18,38 @@ process.on(
             await telegramChatBotInstance.sendMessage(`<b>🤖[Add coordinate]🤖</b>\n📝 Start add coordinate...`);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start add coordinate...`).show();
 
-            const rawDataLogic: RawDataLogic = new RawData.Logic();
-            const coordinateLogic: CoordinateLogic = new Coordinate.Logic();
+            const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
+            const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
             const limit = 1000;
             let offset = 0;
-            let queryResult: {
-                rawDataset: RawDataModelInterface[];
+            let rawDataset: {
+                documents: RawDataDocumentModel[];
                 hasNext: boolean;
-            } = await rawDataLogic.getAll(
-                { $or: [{ coordinate: null }, { coordinate: undefined }] },
-                false,
-                limit,
-                offset
-            );
+            } = await rawDataLogic.getAll(limit, offset, { $or: [{ coordinate: null }] });
 
-            while (queryResult.hasNext || queryResult.rawDataset.length > 0) {
-                for (const rawData of queryResult.rawDataset) {
-                    const coordinateDoc: CoordinateModelInterface | null = await coordinateLogic.create(
-                        rawData.address
+            while (rawDataset.hasNext || rawDataset.documents.length > 0) {
+                for (const document of rawDataset.documents) {
+                    const coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(
+                        document.address
                     );
+
                     if (coordinateDoc) {
-                        rawData.coordinate = coordinateDoc._id;
-                        await rawDataLogic.update(rawData._id, rawData);
-                        new ConsoleLog(
-                            ConsoleConstant.Type.INFO,
-                            `Add coordinate - RID:${rawData._id} -> CID:${coordinateDoc._id}`
-                        ).show();
+                        document.coordinate = coordinateDoc._id;
+                    } else {
+                        document.coordinate = (
+                            await coordinateLogic.create(({
+                                location: document.address,
+                            } as unknown) as CoordinateDocumentModel)
+                        )._id;
                     }
+                    await rawDataLogic.update(document._id, document);
+                    new ConsoleLog(
+                        ConsoleConstant.Type.INFO,
+                        `Add coordinate - RID:${document._id} -> CID:${coordinateDoc._id}`
+                    ).show();
                 }
                 offset += limit;
-                queryResult = await rawDataLogic.getAll({ coordinate: null }, false, limit, offset);
+                rawDataset = await rawDataLogic.getAll(limit, offset, { coordinate: null });
             }
 
             await telegramChatBotInstance.sendMessage(`<b>🤖[Add coordinate]🤖</b>\n✅ Add coordinate complete.`);

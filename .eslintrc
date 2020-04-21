@@ -40,6 +40,8 @@
       { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
     ],
     "no-underscore-dangle": "off",
+    "no-return-await": "off",
+    "no-throw-literal": "off",
     "no-await-in-loop": "off",
     "no-restricted-syntax" : "off",
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],

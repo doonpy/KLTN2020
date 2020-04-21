@@ -1,7 +1,9 @@
 import CheckerBase from './checker.base';
-import Exception from '../../services/exception/exception.index';
-import CheckerFailedResponse from './checker.failed-response';
+import CheckerWording from './checker.wording';
+import ExceptionCustomize from '../exception/exception.customize';
+
 import ResponseStatusCode from '../../common/common.response-status.code';
+import StringHandler from '../string-handler/string-handler';
 
 export default class CheckerMeasureUnit extends CheckerBase {
     private readonly measureUnit: string;
@@ -23,12 +25,11 @@ export default class CheckerMeasureUnit extends CheckerBase {
         }
 
         if (this.measureUnit !== encodeURI(value)) {
-            throw new Exception.Customize(
-                ResponseStatusCode.BAD_REQUEST,
-                CheckerFailedResponse.Message.INVALID_VALUE,
-                CheckerFailedResponse.RootCause.MEASURE_UNIT,
-                [value, decodeURI(this.measureUnit)]
-            );
+            throw {
+                statusCode: ResponseStatusCode.BAD_REQUEST,
+                cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
+                message: { wording: CheckerWording.MESSAGE.MSG_CHK_5, value: [value, decodeURI(this.measureUnit)] },
+            };
         }
     }
 }

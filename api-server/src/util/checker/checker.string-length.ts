@@ -1,7 +1,9 @@
 import CheckerBase from './checker.base';
-import Exception from '../../services/exception/exception.index';
-import CheckerFailedResponse from './checker.failed-response';
+import CheckerWording from './checker.wording';
+import ExceptionCustomize from '../exception/exception.customize';
+
 import ResponseStatusCode from '../../common/common.response-status.code';
+import StringHandler from '../string-handler/string-handler';
 
 export default class CheckerStringLength extends CheckerBase {
     private readonly minRange: number;
@@ -26,21 +28,19 @@ export default class CheckerStringLength extends CheckerBase {
         }
 
         if (!this.checkMinRange(value.length)) {
-            throw new Exception.Customize(
-                ResponseStatusCode.BAD_REQUEST,
-                CheckerFailedResponse.Message.INVALID_VALUE,
-                CheckerFailedResponse.RootCause.OUT_OF_RANGE_SMALLER,
-                [paramName, this.minRange, value.length]
-            );
+            throw {
+                statusCode: ResponseStatusCode.BAD_REQUEST,
+                cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
+                message: { wording: CheckerWording.MESSAGE.MSG_CHK_3, value: [paramName, this.minRange, value] },
+            };
         }
 
         if (!this.checkMaxRange(value.length)) {
-            throw new Exception.Customize(
-                ResponseStatusCode.BAD_REQUEST,
-                CheckerFailedResponse.Message.INVALID_VALUE,
-                CheckerFailedResponse.RootCause.OUT_OF_RANGE_LARGER,
-                [paramName, this.minRange, value.length]
-            );
+            throw {
+                statusCode: ResponseStatusCode.BAD_REQUEST,
+                cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
+                message: { wording: CheckerWording.MESSAGE.MSG_CHK_4, value: [paramName, this.maxRange, value] },
+            };
         }
     }
 

@@ -4,8 +4,8 @@
   "description": "Graduation thesis 2020 - server side",
   "scripts": {
     "clean": "rimraf dist",
-    "dev:api": "ts-node --project api-server/tsconfig.json 'api-server/src/server.ts'",
-    "dev:bgr-job": "ts-node --project api-server/tsconfig.json 'api-server/src/background-job/main.ts'",
+    "dev:api": "nodemon --watch api-server/src --ext ts --exec ts-node --project api-server/tsconfig.json api-server/src/server.ts",
+    "dev:bgr-job": "nodemon --watch api-server/src --ext ts --exec ts-node --project api-server/tsconfig.json api-server/src/background-job/main.ts",
     "dev:web": "next web-server -p 3001",
     "start:api": "node dist/api-bgr-job/server.js",
     "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/background-job/main.js",
@@ -71,6 +71,7 @@
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
+    "nodemon": "^2.0.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",

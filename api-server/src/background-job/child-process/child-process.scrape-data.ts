@@ -3,9 +3,9 @@ import ConsoleConstant from '../../util/console/console.constant';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import ScrapeDetailUrl from '../scrape/detail-url/scrape.detail-url';
 import ScrapeRawData from '../scrape/raw-data/scrape.raw-data';
-import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
-import CatalogModelInterface from '../../services/catalog/catalog.model.interface';
-import CatalogLogic from '../../services/catalog/catalog.logic';
+import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
+import { CatalogDocumentModel } from '../../service/catalog/catalog.interface';
+import CatalogLogic from '../../service/catalog/catalog.logic';
 
 process.on(
     'message',
@@ -17,12 +17,11 @@ process.on(
 
             new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape - TYPE: ${scrapeType} - CID: ${catalogId}`).show();
 
-            const catalogLogic: CatalogLogic = new CatalogLogic();
-            const catalog: CatalogModelInterface | null = await catalogLogic.getById(catalogId);
-            if (!catalog) {
-                return;
-            }
+            const catalogLogic: CatalogLogic = CatalogLogic.getInstance();
+            await catalogLogic.checkExistsWithId(catalogId);
+            const catalog: CatalogDocumentModel = await catalogLogic.getById(catalogId, true);
             let scrapeJob: ScrapeDetailUrl | ScrapeRawData | undefined;
+
             if (scrapeType === 'detail-url') {
                 scrapeJob = new ScrapeDetailUrl(catalog);
             } else {

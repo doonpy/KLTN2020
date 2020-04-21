@@ -2,8 +2,8 @@ import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import GroupData from '../group-data/group-data';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import DatabaseMongodb from '../../services/database/mongodb/database.mongodb';
-import RawDataConstant from '../../services/raw-data/raw-data.constant';
+import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
+import RawDataConstant from '../../service/raw-data/raw-data.constant';
 
 process.on(
     'message',

@@ -1,6 +1,5 @@
-import Exception from '../../services/exception/exception.index';
 import CheckerBase from './checker.base';
-import CheckerFailedResponse from './checker.failed-response';
+import CheckerWording from './checker.wording';
 import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerDomain extends CheckerBase {
@@ -18,12 +17,11 @@ export default class CheckerDomain extends CheckerBase {
         }
 
         if (!this.VALID_DOMAIN.test(value)) {
-            throw new Exception.Customize(
-                ResponseStatusCode.BAD_REQUEST,
-                CheckerFailedResponse.Message.INVALID_VALUE,
-                CheckerFailedResponse.RootCause.DOMAIN,
-                [value]
-            );
+            throw {
+                statusCode: ResponseStatusCode.BAD_REQUEST,
+                cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
+                message: { wording: CheckerWording.MESSAGE.MSG_CHK_1, value: [value] },
+            };
         }
     }
 }

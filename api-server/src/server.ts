@@ -1,15 +1,15 @@
 import * as bodyParser from 'body-parser';
 import cors from 'cors';
 import App from './app';
-import RawData from './services/raw-data/raw-data.index';
-import Host from './services/host/host.index';
-import Catalog from './services/catalog/catalog.index';
-import Pattern from './services/pattern/pattern.index';
-import DetailUrl from './services/detail-url/detail-url.index';
 import requestLogger from './middleware/request-logger/request-logger';
-import GroupedData from './services/grouped-data/grouped-data.index';
 import initEnv from './util/environment/environment';
-import DatabaseMongodb from './services/database/mongodb/database.mongodb';
+import DatabaseMongodb from './service/database/mongodb/database.mongodb';
+import HostController from './service/host/host.controller';
+import CatalogController from './service/catalog/catalog.controller';
+import PatternController from './service/pattern/pattern.controller';
+import DetailUrlController from './service/detail-url/detail-url.controller';
+import RawDataController from './service/raw-data/raw-data.controller';
+import GroupedDataController from './service/grouped-data/grouped-data.controller';
 
 /**
  * Main
@@ -23,12 +23,12 @@ import DatabaseMongodb from './services/database/mongodb/database.mongodb';
     await appInstance.start(
         [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
         [
-            new Host.Controller(),
-            new Catalog.Controller(),
-            new Pattern.Controller(),
-            new DetailUrl.Controller(),
-            new RawData.Controller(),
-            new GroupedData.Controller(),
+            HostController.getInstance(),
+            CatalogController.getInstance(),
+            PatternController.getInstance(),
+            DetailUrlController.getInstance(),
+            RawDataController.getInstance(),
+            GroupedDataController.getInstance(),
         ]
     );
 })();

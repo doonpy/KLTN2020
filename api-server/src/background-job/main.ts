@@ -1,12 +1,14 @@
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
-import Catalog from '../services/catalog/catalog.index';
 import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import ConsoleConstant from '../util/console/console.constant';
 import DateTime from '../util/datetime/datetime';
-import DatabaseMongodb from '../services/database/mongodb/database.mongodb';
+import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import initEnv from '../util/environment/environment';
+import CatalogLogic from '../service/catalog/catalog.logic';
+import ScrapeRawData from './scrape/raw-data/scrape.raw-data';
+import ScrapeDetailUrl from './scrape/detail-url/scrape.detail-url';
 
 const SCRAPE_TYPE_DETAIL_URL = 'detail-url';
 const SCRAPE_TYPE_RAW_DATA = 'raw-data';
@@ -77,7 +79,7 @@ const script = async (): Promise<void> => {
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
     await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
 
-    const catalogIdList: number[] = (await new Catalog.Logic().getAll()).catalogs.map(catalog => catalog._id);
+    const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll()).documents.map(catalog => catalog._id);
     const catalogIdListLen: number = catalogIdList.length;
     let count = 0;
     const loop: NodeJS.Timeout = setInterval((): void => {
