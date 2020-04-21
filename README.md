@@ -12,7 +12,7 @@ Master Luong Vi Minh
 ## The overall system architecture
 Updating
 
-## Technical Stacks
+## Technical stacks
 Updating
 
 ## How to run
