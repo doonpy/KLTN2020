@@ -80,16 +80,16 @@ export const errorHandler = (
     if (process.env.NODE_ENV === 'production') {
         body = {
             error: {
-                cause,
-                message,
+                cause: StringHandler.upperCaseFirstCharacter(cause),
+                message: StringHandler.upperCaseFirstCharacter(message),
                 input: convertToString(input as { [key: string]: string | number }[]),
             },
         };
     } else {
         body = {
             error: {
-                cause,
-                message,
+                cause: StringHandler.upperCaseFirstCharacter(cause),
+                message: StringHandler.upperCaseFirstCharacter(message),
                 input: convertToString(input as { [key: string]: string | number }[]),
                 stack,
             },

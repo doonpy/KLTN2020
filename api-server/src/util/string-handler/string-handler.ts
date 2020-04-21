@@ -143,6 +143,9 @@ export default class StringHandler {
      * @param str
      */
     public static upperCaseFirstCharacter(str: string): string {
-        return str.replace(/[a-z]/, (character): string => character.toUpperCase());
+        return str.replace(
+            /^[a-zàáâãèéêìíòóôõùúăđĩũơưạảấầẩẫậắằẳẵặẹẻẽềểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]?/,
+            (character): string => character.toUpperCase()
+        );
     }
 }
