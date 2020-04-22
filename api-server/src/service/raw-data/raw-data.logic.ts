@@ -152,8 +152,8 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
         const rawData: RawDataDocumentModel = await this.getById(id);
 
         rawData.detailUrlId = detailUrlId || rawData.detailUrlId;
-        rawData.transactionType = typeof transactionType !== 'undefined' ? transactionType : rawData.transactionType;
-        rawData.propertyType = typeof propertyType !== 'undefined' ? propertyType : rawData.propertyType;
+        rawData.transactionType = transactionType ?? rawData.transactionType;
+        rawData.propertyType = propertyType ?? rawData.propertyType;
         rawData.postDate = postDate || rawData.postDate;
         rawData.title = title || rawData.title;
 
@@ -185,7 +185,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             });
         }
 
-        rawData.isGrouped = typeof isGrouped !== 'undefined' ? isGrouped : rawData.isGrouped;
+        rawData.isGrouped = isGrouped ?? rawData.isGrouped;
 
         if (isPopulate) {
             return await this.getPopulateDocument(await rawData.save());

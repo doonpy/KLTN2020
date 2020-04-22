@@ -112,7 +112,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.extractedDetailUrl.push(currentDetailUrlDocument.url);
 
             this.requestCounter += 1;
-            const $: CheerioStatic | undefined = await this.getBody(
+            const $: CheerioStatic | undefined = await this.getStaticBody(
                 (this.catalog.hostId as HostDocumentModel).domain,
                 currentUrl
             );

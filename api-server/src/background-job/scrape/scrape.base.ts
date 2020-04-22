@@ -38,8 +38,8 @@ export default class ScrapeBase {
      *
      * @return Promise<CheerioStatic | undefined>
      */
-    protected async getBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
-        const url: string = path.includes(domain) ? path : domain + path;
+    protected async getStaticBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
+        const url: string = path.includes(domain) ? path : domain + (/(^\/)?/.test(path) ? path : `/${path}`);
         const response: Response = await new Request(url).send();
         const { statusCode } = response;
 
