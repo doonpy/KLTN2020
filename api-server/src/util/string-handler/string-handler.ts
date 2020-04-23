@@ -66,12 +66,8 @@ export default class StringHandler {
         const cleanRegExp = new RegExp(
             /[^a-z0-9A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+/g
         );
-        firstString = StringHandler.cleanText(firstString, cleanRegExp)
-            .replace(/\s+/g, ' ')
-            .toLowerCase();
-        secondString = StringHandler.cleanText(secondString, cleanRegExp)
-            .replace(/\s+/g, ' ')
-            .toLowerCase();
+        firstString = StringHandler.cleanText(firstString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
+        secondString = StringHandler.cleanText(secondString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
 
         return this.calculateSimilarRate(firstString, secondString);
     }
@@ -85,7 +81,7 @@ export default class StringHandler {
         function termFreqMap(str: string): { [key: string]: number } {
             const words: string[] = str.split(' ');
             const termFreq: { [key: string]: number } = {};
-            words.forEach(w => {
+            words.forEach((w) => {
                 termFreq[w] = (termFreq[w] || 0) + 1;
             });
             return termFreq;

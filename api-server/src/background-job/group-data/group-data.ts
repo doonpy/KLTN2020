@@ -104,8 +104,9 @@ export default class GroupData {
                                 );
                                 new ConsoleLog(
                                     ConsoleConstant.Type.ERROR,
-                                    `Group data - RID: ${document._id} -> GID: ${item._id} - Error: ${error.cause ||
-                                        error.message}`
+                                    `Group data - RID: ${document._id} -> GID: ${item._id} - Error: ${
+                                        error.cause || error.message
+                                    }`
                                 ).show();
                             }
 

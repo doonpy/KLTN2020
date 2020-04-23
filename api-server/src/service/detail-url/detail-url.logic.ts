@@ -247,9 +247,7 @@ export default class DetailUrlLogic extends CommonServiceLogicBase implements De
      * @return {Promise<any[]>}
      */
     public async aggregationQuery(aggregations: object[]): Promise<object[]> {
-        return DetailUrlModel.aggregate(aggregations)
-            .allowDiskUse(true)
-            .exec();
+        return DetailUrlModel.aggregate(aggregations).allowDiskUse(true).exec();
     }
 
     /**

@@ -79,7 +79,7 @@ const script = async (): Promise<void> => {
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
     await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
 
-    const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll()).documents.map(catalog => catalog._id);
+    const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll()).documents.map((catalog) => catalog._id);
     const catalogIdListLen: number = catalogIdList.length;
     let count = 0;
     const loop: NodeJS.Timeout = setInterval((): void => {
