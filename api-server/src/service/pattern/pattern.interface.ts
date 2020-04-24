@@ -7,22 +7,23 @@ import {
 export interface PatternApiModel extends CommonApiModel {
     sourceUrl: string | null;
     mainLocator: {
-        propertyType: string;
-        title: string;
-        price: string;
-        acreage: string;
-        address: string;
+        propertyType: string | null;
+        title: string | null;
+        describe: string | null;
+        price: string | null;
+        acreage: string | null;
+        address: string | null;
         postDate: {
-            locator: string;
-            format: string;
-            delimiter: string;
+            locator: string | null;
+            format: string | null;
+            delimiter: string | null;
         };
     } | null;
     subLocator:
         | [
               {
-                  name: string;
-                  locator: string;
+                  name: string | null;
+                  locator: string | null;
               }
           ]
         | []
@@ -34,6 +35,7 @@ export interface PatternDocumentModel extends CommonDocumentModel {
     mainLocator: {
         propertyType: string;
         title: string;
+        describe: string;
         price: string;
         acreage: string;
         address: string;

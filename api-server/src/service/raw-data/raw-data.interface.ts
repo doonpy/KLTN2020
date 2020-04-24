@@ -13,20 +13,21 @@ export interface RawDataApiModel extends CommonApiModel {
     propertyType: string | null;
     postDate: string | null;
     title: string | null;
+    describe: string | null;
     price: {
-        value: string;
-        currency: string;
+        value: string | null;
+        currency: string | null;
     } | null;
     acreage: {
-        value: string;
-        measureUnit: string;
+        value: string | null;
+        measureUnit: string | null;
     } | null;
     address: string | null;
     others:
         | [
               {
-                  name: string;
-                  value: string;
+                  name: string | null;
+                  value: string | null;
               }
           ]
         | []
@@ -41,6 +42,7 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     propertyType: number;
     postDate: string;
     title: string;
+    describe: string;
     price: {
         value: string;
         currency: string;

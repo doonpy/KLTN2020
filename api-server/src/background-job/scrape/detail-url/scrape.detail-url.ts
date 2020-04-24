@@ -9,8 +9,7 @@ import ConsoleConstant from '../../../util/console/console.constant';
 import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
 import { HostDocumentModel } from '../../../service/host/host.interface';
 import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
-
-import Timeout = NodeJS.Timeout;
+import ScrapeRawData from '../raw-data/scrape.raw-data';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
@@ -40,6 +39,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape detail URL - CID: ${this.catalog._id}`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -67,7 +67,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     private scrapeAction(): void {
         this.pageNumberQueue = [this.catalog.url];
 
-        const loop: Timeout = setInterval(async (): Promise<void> => {
+        const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
             if (this.pageNumberQueue.length === 0 && this.requestCounter === 0) {
                 clearInterval(loop);
                 await this.finishAction(this.catalog);
@@ -118,6 +118,10 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                         url: newDetailUrl,
                     } as unknown) as DetailUrlDocumentModel);
                     this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
+                    new ConsoleLog(
+                        ConsoleConstant.Type.INFO,
+                        `Scrape detail URL -> DID: ${createdDoc ? createdDoc._id : 'N/A'}`
+                    ).show();
                 } catch (error) {
                     this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `URL: ${newDetailUrl}`);
                 }
@@ -163,7 +167,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             ConsoleConstant.Type.INFO,
             `Scrape detail URL of catalog ${catalog.title} (ID:${catalog._id}) complete.`
         ).show();
-        process.exit(0);
+        await new ScrapeRawData(this.catalog).start();
     }
 
     /**

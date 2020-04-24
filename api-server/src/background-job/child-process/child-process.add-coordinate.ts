@@ -29,19 +29,14 @@ process.on(
 
             while (rawDataset.hasNext || rawDataset.documents.length > 0) {
                 for (const document of rawDataset.documents) {
-                    const coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(
-                        document.address
-                    );
-
-                    if (coordinateDoc) {
-                        document.coordinate = coordinateDoc._id;
-                    } else {
-                        document.coordinate = (
-                            await coordinateLogic.create(({
-                                location: document.address,
-                            } as unknown) as CoordinateDocumentModel)
-                        )._id;
+                    let coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(document.address);
+                    if (!coordinateDoc) {
+                        coordinateDoc = await coordinateLogic.create(({
+                            location: document.address,
+                        } as unknown) as CoordinateDocumentModel);
                     }
+
+                    document.coordinate = coordinateDoc._id;
                     await rawDataLogic.update(document._id, document);
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
@@ -60,7 +55,7 @@ process.on(
                 `<b>🤖[Add coordinate]🤖</b>\n❌ Add coordinate failed.\nError: ${error.message}`
             );
             new ConsoleLog(
-                ConsoleConstant.Type.INFO,
+                ConsoleConstant.Type.ERROR,
                 `Add coordinate failed. Error: ${error.cause || error.message}`
             ).show();
             process.exit(1);

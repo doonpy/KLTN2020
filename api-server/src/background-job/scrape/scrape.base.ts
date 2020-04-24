@@ -45,7 +45,7 @@ export default class ScrapeBase {
 
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
-            `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
+            `Send request -> ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
         ).show();
 
         if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
@@ -108,7 +108,7 @@ export default class ScrapeBase {
             });
         }
 
-        return StringHandler.cleanText(data, new RegExp(/\r\n|\n|\r/gm));
+        return StringHandler.cleanWithPattern(data, new RegExp(/^(\r|\n|\r\n)|(\r|\n|\r\n)$/, 'gm'));
     }
 
     /**

@@ -48,7 +48,7 @@ export default class StringHandler {
      *
      * @return string
      */
-    public static cleanText(rawText: string, pattern: RegExp): string {
+    public static cleanWithPattern(rawText: string, pattern: RegExp): string {
         return rawText.replace(pattern, '');
     }
 
@@ -66,8 +66,8 @@ export default class StringHandler {
         const cleanRegExp = new RegExp(
             /[^a-z0-9A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+/g
         );
-        firstString = StringHandler.cleanText(firstString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
-        secondString = StringHandler.cleanText(secondString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
+        firstString = StringHandler.cleanWithPattern(firstString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
+        secondString = StringHandler.cleanWithPattern(secondString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
 
         return this.calculateSimilarRate(firstString, secondString);
     }

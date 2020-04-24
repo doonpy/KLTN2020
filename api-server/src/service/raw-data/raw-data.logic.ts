@@ -98,6 +98,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             propertyType,
             postDate,
             title,
+            describe,
             price,
             acreage,
             address,
@@ -111,6 +112,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             propertyType,
             postDate,
             title,
+            describe,
             price,
             acreage,
             address,
@@ -140,6 +142,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             propertyType,
             postDate,
             title,
+            describe,
             price,
             acreage,
             address,
@@ -156,6 +159,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
         rawData.propertyType = propertyType ?? rawData.propertyType;
         rawData.postDate = postDate || rawData.postDate;
         rawData.title = title || rawData.title;
+        rawData.describe = describe || rawData.describe;
 
         if (price && Object.keys(price).length > 0) {
             rawData.price.value = price.value || rawData.price.value;
@@ -368,6 +372,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             detailUrlId,
             postDate,
             title,
+            describe,
             price,
             acreage,
             address,
@@ -386,6 +391,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             detailUrl: null,
             postDate: null,
             title: null,
+            describe: null,
             price: null,
             acreage: null,
             address: null,
@@ -420,14 +426,15 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             data.title = title;
         }
 
+        if (describe) {
+            data.describe = describe;
+        }
+
         if (Object.keys(price).length > 0) {
             data.price = price;
         }
 
-        if (Object.keys(acreage).length > 0) {
-            if (acreage.measureUnit) {
-                acreage.measureUnit = decodeURI(acreage.measureUnit);
-            }
+        if (acreage) {
             data.acreage = acreage;
         }
 

@@ -1,23 +1,34 @@
 import { NextFunction, Request, Response, Router } from 'express';
+import { Model, Schema } from 'mongoose';
 import ResponseStatusCode from '../common.response-status.code';
-import { CommonServiceControllerBaseInterface } from './common.service.interface';
+import { CommonDocumentModel, CommonServiceControllerBaseInterface } from './common.service.interface';
 import ExceptionCustomize from '../../util/exception/exception.customize';
 import DatabaseWording from '../../service/database/database.wording';
 import Validator from '../../util/validator/validator';
 import StringHandler from '../../util/string-handler/string-handler';
 import CommonLanguage from '../common.language';
 import Checker from '../../util/checker/checker.index';
+import HostModel from '../../service/host/host.model';
+import CatalogModel from '../../service/catalog/catalog.model';
+import PatternModel from '../../service/pattern/pattern.model';
+import RawDataModel from '../../service/raw-data/raw-data.model';
+import DetailUrlModel from '../../service/detail-url/detail-url.model';
+import GroupedDataModel from '../../service/grouped-data/grouped-data.model';
 
 export default abstract class CommonServiceControllerBase implements CommonServiceControllerBaseInterface {
     protected commonPath = '/:language';
 
     protected specifyIdPath = '/:language';
 
+    protected documentAmountPath = '/:language/doc-amount/:schema';
+
     protected limit = 100;
 
     protected offset = 0;
 
     protected language = 0;
+
+    private schema = '';
 
     protected keyword = '';
 
@@ -42,6 +53,8 @@ export default abstract class CommonServiceControllerBase implements CommonServi
     protected readonly PARAM_KEYWORD: string = 'keyword';
 
     protected readonly PARAM_LANGUAGE: string = 'language';
+
+    private readonly PARAM_SCHEMA: string = 'schema';
 
     /**
      * @param {Request} req
@@ -93,6 +106,10 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             .get(this.specifyIdPath, this.getWithIdRoute.bind(this))
             .put(this.specifyIdPath, this.updateRoute.bind(this))
             .delete(this.specifyIdPath, this.deleteRoute.bind(this));
+
+        this.router
+            .all(this.documentAmountPath, this.initInputs.bind(this))
+            .get(this.documentAmountPath, this.getDocumentAmount.bind(this));
     }
 
     /**
@@ -103,6 +120,60 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      * @return {Promise<void>}
      */
     protected abstract async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void>;
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    private async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            this.validator = new Validator();
+
+            this.validator.addParamValidator(this.PARAM_SCHEMA, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_SCHEMA, new Checker.StringLength(1));
+
+            this.validator.addParamValidator(this.PARAM_LANGUAGE, new Checker.Language());
+
+            this.validator.validate(this.requestParams);
+
+            let schemaModel: Model<CommonDocumentModel> | undefined;
+            switch (this.schema) {
+                case 'hosts':
+                    schemaModel = HostModel;
+                    break;
+                case 'catalogs':
+                    schemaModel = CatalogModel;
+                    break;
+                case 'patterns':
+                    schemaModel = PatternModel;
+                    break;
+                case 'detail-urls':
+                    schemaModel = DetailUrlModel;
+                    break;
+                case 'raw-dataset':
+                    schemaModel = RawDataModel;
+                    break;
+                case 'grouped-dataset':
+                    schemaModel = GroupedDataModel;
+                    break;
+                default:
+                    next();
+                    return;
+            }
+
+            const documentAmount: number = await schemaModel.countDocuments();
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: StringHandler.upperCaseFirstCharacter(this.schema), documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
+    }
 
     /**
      * @param req
@@ -146,6 +217,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
         this.limit = limit || this.limit;
         this.offset = offset || this.offset;
         this.language = CommonLanguage[language] !== undefined ? CommonLanguage[language] : this.language;
+        this.schema = req.params[this.PARAM_SCHEMA];
         this.keyword = (req.query.keyword ? decodeURI(req.query.keyword as string) : this.keyword).trim();
 
         this.requestParams = {};

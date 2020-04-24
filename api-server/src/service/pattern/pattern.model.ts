@@ -8,6 +8,7 @@ const patternSchema: Schema = new Schema(
         mainLocator: {
             propertyType: { type: Schema.Types.String },
             title: { type: Schema.Types.String },
+            describe: { type: Schema.Types.String },
             price: { type: Schema.Types.String },
             acreage: { type: Schema.Types.String },
             address: { type: Schema.Types.String },

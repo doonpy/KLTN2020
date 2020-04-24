@@ -90,6 +90,7 @@ export default class PatternLogic extends CommonServiceLogicBase implements Patt
         if (mainLocator) {
             pattern.mainLocator.propertyType = mainLocator.propertyType || pattern.mainLocator.propertyType;
             pattern.mainLocator.title = mainLocator.title || pattern.mainLocator.title;
+            pattern.mainLocator.describe = mainLocator.describe || pattern.mainLocator.describe;
             pattern.mainLocator.price = mainLocator.price || pattern.mainLocator.price;
             pattern.mainLocator.acreage = mainLocator.acreage || pattern.mainLocator.acreage;
             pattern.mainLocator.address = mainLocator.address || pattern.mainLocator.address;

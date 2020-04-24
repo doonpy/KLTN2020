@@ -55,6 +55,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape raw data - CID: ${this.catalog._id}`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -140,6 +141,7 @@ export default class ScrapeRawData extends ScrapeBase {
             propertyType,
             postDate,
             title,
+            describe,
             price,
             acreage,
             address,
@@ -147,6 +149,7 @@ export default class ScrapeRawData extends ScrapeBase {
             propertyType: string;
             postDate: { locator: string; delimiter: string; format: string };
             title: string;
+            describe: string;
             price: string;
             acreage: string;
             address: string;
@@ -154,6 +157,7 @@ export default class ScrapeRawData extends ScrapeBase {
         const propertyTypeData: string = ScrapeBase.extractData($, propertyType).shift() || '';
         const postDateData: string = ScrapeBase.extractData($, postDate.locator).shift() || '';
         const titleData: string = ScrapeBase.extractData($, title).shift() || '';
+        const describeData: string = ScrapeBase.extractData($, describe).shift() || '';
         const priceData: string = ScrapeBase.extractData($, price).shift() || '';
         const acreageData: string = ScrapeBase.extractData($, acreage).shift() || '';
         const addressData: string = ScrapeBase.extractData($, address).shift() || '';
@@ -176,6 +180,7 @@ export default class ScrapeRawData extends ScrapeBase {
             propertyTypeData,
             postDateData,
             titleData,
+            describeData,
             priceData,
             acreageData,
             addressData,
@@ -191,6 +196,10 @@ export default class ScrapeRawData extends ScrapeBase {
             ]);
             this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${result[0]._id}`);
             this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `Raw data ID: ${result[1] ? result[1]._id : 'N/A'}`);
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape raw data - DID: ${result[0]._id} -> RID: ${result[1] ? result[1]._id : 'N/A'}`
+            ).show();
         } catch (error) {
             this.writeErrorLog(
                 error,
@@ -202,6 +211,10 @@ export default class ScrapeRawData extends ScrapeBase {
                 ScrapeConstant.LOG_ACTION.CREATE,
                 `Raw data from detail URL ID: ${currentDetailUrlDocument._id || -1}`
             );
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Scrape raw data -> DID: ${currentDetailUrlDocument._id}}`
+            ).show();
         }
     }
 
@@ -216,6 +229,10 @@ export default class ScrapeRawData extends ScrapeBase {
             try {
                 await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
                 this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
+                ).show();
             } catch (error) {
                 this.writeErrorLog(
                     error,
@@ -233,6 +250,7 @@ export default class ScrapeRawData extends ScrapeBase {
      * @param propertyTypeData
      * @param postDateData
      * @param titleData
+     * @param describeData
      * @param priceData
      * @param acreageData
      * @param addressData
@@ -243,6 +261,7 @@ export default class ScrapeRawData extends ScrapeBase {
         propertyTypeData: string,
         postDateData: string,
         titleData: string,
+        describeData: string,
         priceData: string,
         acreageData: string,
         addressData: string,
@@ -278,6 +297,7 @@ export default class ScrapeRawData extends ScrapeBase {
             propertyType,
             postDate: postDate.toISOString(),
             title: titleData,
+            describe: describeData,
             price,
             acreage,
             address: addressData,

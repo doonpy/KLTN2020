@@ -34,6 +34,8 @@ export default class RawDataController extends CommonServiceControllerBase {
 
     private readonly PARAM_TITLE: string = 'title';
 
+    private readonly PARAM_DESCRIBE: string = 'describe';
+
     private readonly PARAM_PRICE: string = 'price';
 
     private readonly PARAM_PRICE_CURRENCY: string = 'currency';
@@ -172,6 +174,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
             this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.StringLength(1, null));
 
+            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.Type.String());
+            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.StringLength(1, null));
+
             this.bodyValidator.addParamValidator(this.PARAM_PRICE, new Checker.Type.Object());
 
             this.bodyValidator.addParamValidator(this.PARAM_ACREAGE, new Checker.Type.Object());
@@ -256,6 +261,9 @@ export default class RawDataController extends CommonServiceControllerBase {
 
             this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
             this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.StringLength(1, null));
+
+            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.Type.String());
+            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.StringLength(1, null));
 
             this.bodyValidator.addParamValidator(this.PARAM_PRICE, new Checker.Type.Object());
 

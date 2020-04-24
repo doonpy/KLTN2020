@@ -35,6 +35,7 @@ const rawDataSchema = new Schema(
         },
         postDate: { type: Schema.Types.Date },
         title: { type: Schema.Types.String },
+        describe: { type: Schema.Types.String },
         price: {
             value: { type: Schema.Types.String },
             currency: { type: Schema.Types.String },

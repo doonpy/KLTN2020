@@ -8,13 +8,8 @@ import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import initEnv from '../util/environment/environment';
 import CatalogLogic from '../service/catalog/catalog.logic';
 import ScrapeRawData from './scrape/raw-data/scrape.raw-data';
-import ScrapeDetailUrl from './scrape/detail-url/scrape.detail-url';
 
-const SCRAPE_TYPE_DETAIL_URL = 'detail-url';
-const SCRAPE_TYPE_RAW_DATA = 'raw-data';
-let childProcessAmount = 0;
 let isRunning = false;
-let scrapeType: string = SCRAPE_TYPE_DETAIL_URL;
 let telegramChatBotInstance: ChatBotTelegram | undefined;
 
 /**
@@ -60,28 +55,10 @@ const executeCleanDataChildProcess = (): void => {
 
 /**
  * Execute scrape child process
- * @param catalogId
  */
-const executeScrapeChildProcess = (catalogId: number | undefined): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
-    childProcess.on('exit', (): void => {
-        childProcessAmount -= 1;
-    });
-    childProcess.send({ catalogId, scrapeType });
-    childProcessAmount += 1;
-};
-
-/**
- * Script of background job.
- */
-const script = async (): Promise<void> => {
-    isRunning = true;
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
-    await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
-
+const executeScrapeChildProcess = async (): Promise<void> => {
     const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll()).documents.map((catalog) => catalog._id);
-    const catalogIdListLen: number = catalogIdList.length;
-    let count = 0;
+    let childProcessAmount = 0;
     const loop: NodeJS.Timeout = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
             clearInterval(loop);
@@ -97,17 +74,13 @@ const script = async (): Promise<void> => {
         if (!catalogId) {
             return;
         }
-        if (scrapeType === SCRAPE_TYPE_DETAIL_URL) {
-            catalogIdList.push(catalogId);
-        }
 
-        executeScrapeChildProcess(catalogId);
-        count += 1;
-
-        if (count === catalogIdListLen) {
-            scrapeType = scrapeType === SCRAPE_TYPE_DETAIL_URL ? SCRAPE_TYPE_RAW_DATA : SCRAPE_TYPE_DETAIL_URL;
-            count = 0;
-        }
+        const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
+        childProcess.on('exit', (): void => {
+            childProcessAmount -= 1;
+        });
+        childProcess.send({ catalogId });
+        childProcessAmount += 1;
     }, 0);
 };
 
@@ -121,8 +94,12 @@ const start = async (force = false): Promise<void> => {
         return;
     }
 
+    isRunning = true;
+    new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
+    await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
+
     if (force) {
-        await script();
+        await executeScrapeChildProcess();
         return;
     }
 
@@ -137,7 +114,7 @@ const start = async (force = false): Promise<void> => {
             }
 
             clearInterval(checkTimeLoop);
-            await script();
+            await executeScrapeChildProcess();
 
             const delayTime: number =
                 parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0', 10) *

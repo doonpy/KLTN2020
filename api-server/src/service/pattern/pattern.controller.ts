@@ -22,6 +22,8 @@ export default class PatternController extends CommonServiceControllerBase {
 
     private readonly PARAM_TITLE_LOCATOR: string = 'title';
 
+    private readonly PARAM_DESCRIBE_LOCATOR: string = 'describe';
+
     private readonly PARAM_PRICE_LOCATOR: string = 'price';
 
     private readonly PARAM_ACREAGE_LOCATOR: string = 'acreage';
@@ -135,6 +137,9 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.addParamValidator(this.PARAM_TITLE_LOCATOR, new Checker.Type.String());
             this.validator.addParamValidator(this.PARAM_TITLE_LOCATOR, new Checker.StringLength(1, null));
 
+            this.validator.addParamValidator(this.PARAM_DESCRIBE_LOCATOR, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_DESCRIBE_LOCATOR, new Checker.StringLength(1, null));
+
             this.validator.addParamValidator(this.PARAM_PRICE_LOCATOR, new Checker.Type.String());
             this.validator.addParamValidator(this.PARAM_PRICE_LOCATOR, new Checker.StringLength(1, null));
 
@@ -193,6 +198,9 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.addParamValidator(this.PARAM_TITLE_LOCATOR, new Checker.Type.String());
             this.validator.addParamValidator(this.PARAM_TITLE_LOCATOR, new Checker.StringLength(1, null));
+
+            this.validator.addParamValidator(this.PARAM_DESCRIBE_LOCATOR, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_DESCRIBE_LOCATOR, new Checker.StringLength(1, null));
 
             this.validator.addParamValidator(this.PARAM_PRICE_LOCATOR, new Checker.Type.String());
             this.validator.addParamValidator(this.PARAM_PRICE_LOCATOR, new Checker.StringLength(1, null));

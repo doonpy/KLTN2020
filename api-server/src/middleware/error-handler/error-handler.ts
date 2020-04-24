@@ -50,11 +50,11 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
 export const notFoundRoute = (req: Request, res: Response, next: NextFunction): void => {
     next(
         new ExceptionCustomize(
-            ResponseStatusCode.MSG_CHK_5,
-            ErrorHandlerWording.MESSAGE.MSG_CHK_TYPE_1[CommonLanguage[req.params.language] || 0],
+            ResponseStatusCode.NOT_FOUND,
             StringHandler.replaceString(ErrorHandlerWording.CAUSE.R_1[CommonLanguage[req.params.language] || 0], [
                 req.path,
-            ])
+            ]),
+            ErrorHandlerWording.MESSAGE.MSG_1[CommonLanguage[req.params.language] || 0]
         )
     );
 };
