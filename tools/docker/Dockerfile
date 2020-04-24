@@ -10,4 +10,5 @@ COPY ./tools/docker/background-job/command.sh bgr-job-command.sh
 COPY ./tools/docker/web/command.sh web-command.sh
 
 RUN chmod +x api-command.sh bgr-job-command.sh web-command.sh
+RUN npx next telemetry disable
 RUN npm install && npm run build
