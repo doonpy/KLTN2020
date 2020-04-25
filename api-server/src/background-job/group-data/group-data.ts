@@ -30,11 +30,13 @@ export default class GroupData {
 
     private readonly ATTR_POINT_TITLE: number = 4;
 
+    private readonly ATTR_POINT_DESCRIBE: number = 1;
+
     private readonly ATTR_POINT_PRICE: number = 1;
 
     private readonly ATTR_POINT_ACREAGE: number = 2;
 
-    private readonly ATTR_POINT_ADDRESS: number = 3;
+    private readonly ATTR_POINT_ADDRESS: number = 2;
 
     constructor() {
         this.logInstance.initLogFolder('group-data');
@@ -157,12 +159,13 @@ export default class GroupData {
             return true;
         }
 
-        totalPoint += this.calculatePricePoint(representGroupedData, rawData);
+        totalPoint += this.calculateStringAttributePoint(representGroupedData, rawData, 'describe');
         if (totalPoint > this.EXPECTED_POINT) {
             return true;
         }
 
-        return false;
+        totalPoint += this.calculatePricePoint(representGroupedData, rawData);
+        return totalPoint > this.EXPECTED_POINT;
     }
 
     /**
@@ -248,31 +251,27 @@ export default class GroupData {
      * Calculate string attribute point
      * @param {RawDataDocumentModel} firstTarget
      * @param {RawDataDocumentModel} secondTarget
-     * @param {'title'|'address'} type
+     * @param {'title' | 'address' | 'describe'} type
      * @return {number} points
      */
     private calculateStringAttributePoint(
         firstTarget: RawDataDocumentModel,
         secondTarget: RawDataDocumentModel,
-        type: 'title' | 'address'
+        type: 'title' | 'address' | 'describe'
     ): number {
-        let attrPoint = 0;
-        let firstString = '';
-        let secondString = '';
-        if (type === 'address') {
-            attrPoint = this.ATTR_POINT_ADDRESS;
-            firstString = firstTarget.address;
-            secondString = secondTarget.address;
-        } else {
-            attrPoint = this.ATTR_POINT_TITLE;
-            firstString = firstTarget.title;
-            secondString = secondTarget.title;
+        switch (type) {
+            case 'title':
+                return StringHandler.getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_POINT_TITLE;
+            case 'describe':
+                return (
+                    StringHandler.getSimilarRate(firstTarget.describe, secondTarget.describe) * this.ATTR_POINT_DESCRIBE
+                );
+            case 'address':
+                return (
+                    StringHandler.getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_POINT_ADDRESS
+                );
+            default:
+                return 0;
         }
-
-        if (!firstString || !secondString) {
-            return 0;
-        }
-
-        return StringHandler.getSimilarRate(firstString, secondString) * attrPoint;
     }
 }
