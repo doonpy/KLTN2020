@@ -1,6 +1,5 @@
 import CheckerTypeBase from './checker.type.base';
-import Exception from '../../../services/exception/exception.index';
-import CheckerTypeFailedResponse from './checker.type.failed-response';
+import CheckerWording from '../checker.wording';
 import ResponseStatusCode from '../../../common/common.response-status.code';
 
 export default class CheckerTypeString extends CheckerTypeBase {
@@ -11,12 +10,11 @@ export default class CheckerTypeString extends CheckerTypeBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public checkType(paramName: string, value: any): void {
         if (typeof value !== 'string') {
-            throw new Exception.Customize(
-                ResponseStatusCode.BAD_REQUEST,
-                CheckerTypeFailedResponse.Message.INVALID_TYPE,
-                CheckerTypeFailedResponse.RootCause.STRING,
-                [paramName]
-            );
+            throw {
+                statusCode: ResponseStatusCode.BAD_REQUEST,
+                cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
+                message: { wording: CheckerWording.MESSAGE.MSG_CHK_9, value: [paramName] },
+            };
         }
     }
 }

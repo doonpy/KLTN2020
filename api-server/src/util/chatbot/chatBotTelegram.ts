@@ -44,7 +44,7 @@ export default class ChatBotTelegram {
     private bindListener(): void {
         this.telegramBot.onText(/\/subscribe/, async (msg: Message) => {
             const chatId: number = msg.chat.id;
-            if (receiverList.findIndex(receiver => receiver === chatId) > 0) {
+            if (receiverList.findIndex((receiver) => receiver === chatId) > 0) {
                 await this.telegramBot.sendMessage(
                     msg.chat.id,
                     `🤖<b>[Message]</b>🤖\n❌ You have already subscribed to notifications.`

@@ -10,14 +10,9 @@ import CheckerTypeDecimal from './type/checker.type.decimal';
 import CheckerTypeInteger from './type/checker.type.integer';
 import CheckerTypeObject from './type/checker.type.object';
 import CheckerTypeString from './type/checker.type.string';
+import CheckerLanguage from './checker.language';
 
 export default {
-    DecimalRange: CheckerDecimalRange,
-    Domain: CheckerDomain,
-    IntegerRange: CheckerIntegerRange,
-    MeasureUnit: CheckerMeasureUnit,
-    StringLength: CheckerStringLength,
-    Url: CheckerUrl,
     Type: {
         Array: CheckerTypeArray,
         Boolean: CheckerTypeBoolean,
@@ -26,4 +21,11 @@ export default {
         Object: CheckerTypeObject,
         String: CheckerTypeString,
     },
+    DecimalRange: CheckerDecimalRange,
+    Domain: CheckerDomain,
+    IntegerRange: CheckerIntegerRange,
+    MeasureUnit: CheckerMeasureUnit,
+    StringLength: CheckerStringLength,
+    Url: CheckerUrl,
+    Language: CheckerLanguage,
 };

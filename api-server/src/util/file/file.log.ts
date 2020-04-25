@@ -20,8 +20,9 @@ export default class FileLog extends FileBase {
     constructor() {
         super();
         const currentDate: Date = new Date();
-        this.dateFolder = `${currentDate.getUTCFullYear()}-${currentDate.getUTCMonth() +
-            1}-${currentDate.getUTCDate()}`;
+        this.dateFolder = `${currentDate.getUTCFullYear()}-${
+            currentDate.getUTCMonth() + 1
+        }-${currentDate.getUTCDate()}`;
         this.initHeader();
     }
 
@@ -68,9 +69,9 @@ export default class FileLog extends FileBase {
      */
     public createFileName(customizeFileName = ''): void {
         const currentDate: Date = new Date();
-        this.fileName = `${this.PREFIX +
-            customizeFileName +
-            currentDate.getUTCHours()}-${currentDate.getUTCMinutes()}-${currentDate.getUTCSeconds()}`;
+        this.fileName = `${
+            this.PREFIX + customizeFileName + currentDate.getUTCHours()
+        }-${currentDate.getUTCMinutes()}-${currentDate.getUTCSeconds()}`;
     }
 
     /**

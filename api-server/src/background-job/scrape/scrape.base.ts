@@ -2,7 +2,7 @@ import cherrio from 'cheerio';
 import { Response } from 'request';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import StringHandler from '../../util/string-handler/string-handler';
-import CatalogModelInterface from '../../services/catalog/catalog.model.interface';
+import { CatalogDocumentModel } from '../../service/catalog/catalog.interface';
 import Request from '../../util/request/request';
 import ScrapeConstant from './scrape.constant';
 import File from '../../util/file/file.index';
@@ -11,7 +11,7 @@ import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import ResponseStatusCode from '../../common/common.response-status.code';
 import FileLog from '../../util/file/file.log';
-import ExceptionCustomize from '../../services/exception/exception.customize';
+import ExceptionCustomize from '../../util/exception/exception.customize';
 
 export default class ScrapeBase {
     protected readonly logInstance: FileLog = new File.Log();
@@ -38,14 +38,14 @@ export default class ScrapeBase {
      *
      * @return Promise<CheerioStatic | undefined>
      */
-    protected async getBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
-        const url: string = path.includes(domain) ? path : domain + path;
+    protected async getStaticBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
+        const url: string = path.includes(domain) ? path : domain + (/(^\/)?/.test(path) ? path : `/${path}`);
         const response: Response = await new Request(url).send();
         const { statusCode } = response;
 
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
-            `Scrape: ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
+            `Send request -> ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
         ).show();
 
         if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
@@ -108,7 +108,7 @@ export default class ScrapeBase {
             });
         }
 
-        return StringHandler.cleanText(data, new RegExp(/\r\n|\n|\r/gm));
+        return StringHandler.cleanWithPattern(data, new RegExp(/^(\r|\n|\r\n)|(\r|\n|\r\n)$/, 'gm'));
     }
 
     /**
@@ -128,7 +128,7 @@ export default class ScrapeBase {
      * @param customizeFooter
      */
     protected exportLog(
-        catalog: CatalogModelInterface,
+        catalog: CatalogDocumentModel,
         customizeFooter: { name: string; value: string | number }[] = []
     ): void {
         const endTime: [number, number] = process.hrtime(this.startTime);

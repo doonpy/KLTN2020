@@ -1,10 +1,9 @@
 import CheckerBase from './checker.base';
-import Exception from '../../services/exception/exception.index';
-import CheckerFailedResponse from './checker.failed-response';
+import CheckerWording from './checker.wording';
 import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerUrl extends CheckerBase {
-    private VALID_URL = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.[\d\w-]+)+\/(([\d\w-]+)+\/?)+/);
+    private VALID_URL = new RegExp(/^(((https?:\/\/)(?:www\.)?([\d\w-]+)(\.[\d\w-]+)\/+)|\/)(([\d\w-]+)+\/?)+/);
 
     /**
      * @param paramName
@@ -18,12 +17,11 @@ export default class CheckerUrl extends CheckerBase {
         }
 
         if (!this.VALID_URL.test(value)) {
-            throw new Exception.Customize(
-                ResponseStatusCode.BAD_REQUEST,
-                CheckerFailedResponse.Message.INVALID_VALUE,
-                CheckerFailedResponse.RootCause.URL,
-                [value]
-            );
+            throw {
+                statusCode: ResponseStatusCode.BAD_REQUEST,
+                cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
+                message: { wording: CheckerWording.MESSAGE.MSG_CHK_2, value: [value] },
+            };
         }
     }
 }

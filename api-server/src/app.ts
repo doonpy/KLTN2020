@@ -4,7 +4,7 @@ import path from 'path';
 import ConsoleLog from './util/console/console.log';
 import ConsoleConstant from './util/console/console.constant';
 import { errorHandler, notFoundRoute } from './middleware/error-handler/error-handler';
-import ControllerBase from './services/controller.base';
+import CommonServiceControllerBase from './common/service/common.service.controller.base';
 
 export default class App {
     private static instance: App | undefined;
@@ -41,7 +41,7 @@ export default class App {
         return this.instance;
     }
 
-    public start(middlewareArray: Array<any>, controllerArray: ControllerBase[]): void {
+    public start(middlewareArray: Array<any>, controllerArray: CommonServiceControllerBase[]): void {
         this.settingAssets();
         this.bindMiddleware(middlewareArray);
         this.bindRoutes(controllerArray);
@@ -64,13 +64,12 @@ export default class App {
      *
      * @param routes
      */
-    private bindRoutes(routes: ControllerBase[]): void {
-        routes.forEach((controller: ControllerBase): void => {
+    private bindRoutes(routes: CommonServiceControllerBase[]): void {
+        routes.forEach((controller: CommonServiceControllerBase): void => {
             this.app.use('/api/v1', controller.router);
         });
 
-        this.app.use(notFoundRoute);
-        this.app.use(errorHandler);
+        this.app.use(notFoundRoute, errorHandler);
     }
 
     /**

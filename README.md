@@ -12,7 +12,7 @@ Master Luong Vi Minh
 ## The overall system architecture
 Updating
 
-## Technical Stacks
+## Technical stacks
 Updating
 
 ## How to run
@@ -40,6 +40,7 @@ Updating
 ## Directory structure
 ```
 .
+|-- .github                         # CI job on GitHub
 |-- api-server                      # REST API server
 |   `-- src
 |       |-- bgr-job
@@ -78,7 +79,7 @@ Updating
 |           `-- validator
 |-- archive                         # Source code of Specialized essay 2019
 |-- dist                            # Source code after build
-|-- public                          # Public folder which is created when background job is running.
+|-- public                          # Public folder which is created when background job is running. Contain logs
 |   `-- logs
 |       |-- detail-url-scrape
 |       |-- group-data

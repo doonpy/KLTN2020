@@ -1,39 +1,39 @@
 import { NextFunction, Request, Response } from 'express';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import ExceptionCustomize from '../../services/exception/exception.customize';
-import Exception from '../../services/exception/exception.index';
-import ErrorHandlerConstant from './error-handler.constant';
+import ExceptionCustomize from '../../util/exception/exception.customize';
+import ErrorHandlerWording from './error-handler.wording';
+import StringHandler from '../../util/string-handler/string-handler';
+import CommonLanguage from '../../common/common.language';
 
 /**
+ * @param input
  *
- * @return inputString
- *
- * @param inputs
+ * @return {string} inputString
  */
-const convertToString = (inputs: { [key: string]: string }[]): string => {
+const convertToString = (input: { [key: string]: string | number }[]): string => {
     const inputString: string[] = [];
 
-    if (inputs.length === 0) {
+    if (input.length === 0) {
         return '';
     }
 
-    inputs.forEach((input: { [key: string]: string }) => {
-        const keys: string[] = Object.keys(input);
+    for (const item of input) {
+        const keys: string[] = Object.keys(item);
 
         if (keys.length === 0) {
-            return;
+            continue;
         }
 
-        keys.forEach((key: string) => {
-            const value: object | string | number | undefined | null = input[key];
+        for (const key of keys) {
+            const value: string | number = item[key];
 
             if (typeof value === 'object') {
-                inputString.push(`'${key}' => {${convertToString([value])}}`);
+                inputString.push(`'${key}' => {${convertToString(value)}}`);
             } else {
                 inputString.push(`'${key}' => '${value}'`);
             }
-        });
-    });
+        }
+    }
 
     return inputString.join(', ');
 };
@@ -41,17 +41,20 @@ const convertToString = (inputs: { [key: string]: string }[]): string => {
 /**
  * Catch 404 and forward to error handler
  *
- * @param req
- * @param res
- * @param next
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ *
+ * @return {void}
  */
 export const notFoundRoute = (req: Request, res: Response, next: NextFunction): void => {
     next(
-        new Exception.Customize(
+        new ExceptionCustomize(
             ResponseStatusCode.NOT_FOUND,
-            ErrorHandlerConstant.PATH_NOT_FOUND,
-            '%s does not exits.',
-            [req.path]
+            StringHandler.replaceString(ErrorHandlerWording.CAUSE.R_1[CommonLanguage[req.params.language] || 0], [
+                req.path,
+            ]),
+            ErrorHandlerWording.MESSAGE.MSG_1[CommonLanguage[req.params.language] || 0]
         )
     );
 };
@@ -60,33 +63,35 @@ export const notFoundRoute = (req: Request, res: Response, next: NextFunction): 
  * Error handler
  *
  * @param error
- * @param req
- * @param res
- * @param next
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ *
+ * @return {void}
  */
 export const errorHandler = (
-    { statusCode, message, cause, stack }: ExceptionCustomize,
+    { statusCode, message, cause, stack, input }: ExceptionCustomize,
     req: Request,
     res: Response,
     next: NextFunction
 ): void => {
     let body: object = {};
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'production') {
         body = {
             error: {
-                message,
-                rootCause: cause,
-                input: convertToString([req.params, req.query, req.body]),
-                stack,
+                cause: StringHandler.upperCaseFirstCharacter(cause),
+                message: StringHandler.upperCaseFirstCharacter(message),
+                input: convertToString(input as { [key: string]: string | number }[]),
             },
         };
     } else {
         body = {
             error: {
-                message,
-                rootCause: cause,
-                input: convertToString([req.params, req.query, req.body]),
+                cause: StringHandler.upperCaseFirstCharacter(cause),
+                message: StringHandler.upperCaseFirstCharacter(message),
+                input: convertToString(input as { [key: string]: string | number }[]),
+                stack,
             },
         };
     }

@@ -53,7 +53,9 @@
         "@typescript-eslint/explicit-member-accessibility": 0,
         "react/prop-types": 0,
         "react/display-name": 0,
-        "import/prefer-default-export": 0
+        "import/prefer-default-export": 0,
+        "no-return-await": "off",
+        "no-throw-literal": "off"
     },
     "settings": {
         "import/resolver": {

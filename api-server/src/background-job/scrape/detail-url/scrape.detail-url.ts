@@ -1,22 +1,20 @@
-import DetailUrl from '../../../services/detail-url/detail-url.index';
 import ScrapeBase from '../scrape.base';
-import CatalogModelInterface from '../../../services/catalog/catalog.model.interface';
+import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
 import StringHandler from '../../../util/string-handler/string-handler';
 import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 import UrlHandler from '../../../util/url-handler/url-handler';
 import ScrapeConstant from '../scrape.constant';
 import ConsoleLog from '../../../util/console/console.log';
 import ConsoleConstant from '../../../util/console/console.constant';
-import DetailUrlLogic from '../../../services/detail-url/detail-url.logic';
-import DetailUrlModelInterface from '../../../services/detail-url/detail-url.model.interface';
-import HostModelInterface from '../../../services/host/host.model.interface';
-
-import Timeout = NodeJS.Timeout;
+import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
+import { HostDocumentModel } from '../../../service/host/host.interface';
+import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
+import ScrapeRawData from '../raw-data/scrape.raw-data';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
-    private detailUrlLogic: DetailUrlLogic = new DetailUrl.Logic();
+    private detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
 
-    private readonly catalog: CatalogModelInterface;
+    private readonly catalog: CatalogDocumentModel;
 
     private pageNumberQueue: string[] = [];
 
@@ -26,7 +24,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
 
     private readonly ATTRIBUTE_TO_GET_DATA: string = 'href';
 
-    constructor(catalog: CatalogModelInterface) {
+    constructor(catalog: CatalogDocumentModel) {
         super();
         this.catalog = catalog;
         this.logInstance.initLogFolder('detail-url-scrape');
@@ -41,6 +39,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape detail URL - CID: ${this.catalog._id}`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -67,10 +66,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      */
     private scrapeAction(): void {
         this.pageNumberQueue = [this.catalog.url];
-        const loop: Timeout = setInterval(async (): Promise<void> => {
+
+        const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
             if (this.pageNumberQueue.length === 0 && this.requestCounter === 0) {
                 clearInterval(loop);
-                this.finishAction(this.catalog);
+                await this.finishAction(this.catalog);
             }
 
             if (this.requestCounter > this.MAX_REQUEST) {
@@ -83,8 +83,8 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             }
 
             this.requestCounter += 1;
-            const $: CheerioStatic | undefined = await this.getBody(
-                (this.catalog.hostId as HostModelInterface).domain,
+            const $: CheerioStatic | undefined = await this.getStaticBody(
+                (this.catalog.hostId as HostDocumentModel).domain,
                 currentUrl
             );
             this.scrapedPageNumber.push(currentUrl);
@@ -111,15 +111,17 @@ export default class ScrapeDetailUrl extends ScrapeBase {
 
         newDetailUrlList = newDetailUrlList.map((url): string => UrlHandler.sanitizeUrl(url));
         for (const newDetailUrl of newDetailUrlList) {
-            const result: number = (await this.detailUrlLogic.getAll({ url: newDetailUrl }, false)).detailUrls.length;
-            if (!result) {
+            if (!(await this.detailUrlLogic.isExistsWithUrl(newDetailUrl))) {
                 try {
-                    const detailUrlDoc: DetailUrlModelInterface = DetailUrl.Logic.createDocument(
-                        this.catalog._id,
-                        newDetailUrl
-                    );
-                    const createdDoc: DetailUrlModelInterface = await this.detailUrlLogic.create(detailUrlDoc);
+                    const createdDoc: DetailUrlDocumentModel = await this.detailUrlLogic.create(({
+                        catalogId: this.catalog._id,
+                        url: newDetailUrl,
+                    } as unknown) as DetailUrlDocumentModel);
                     this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
+                    new ConsoleLog(
+                        ConsoleConstant.Type.INFO,
+                        `Scrape detail URL -> DID: ${createdDoc ? createdDoc._id : 'N/A'}`
+                    ).show();
                 } catch (error) {
                     this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.CREATE, `URL: ${newDetailUrl}`);
                 }
@@ -146,7 +148,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     /**
      * Finish scrape action.
      */
-    protected async finishAction(catalog: CatalogModelInterface): Promise<void> {
+    protected async finishAction(catalog: CatalogDocumentModel): Promise<void> {
         this.exportLog(catalog, [
             {
                 name: 'Catalog ID',
@@ -165,7 +167,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             ConsoleConstant.Type.INFO,
             `Scrape detail URL of catalog ${catalog.title} (ID:${catalog._id}) complete.`
         ).show();
-        process.exit(0);
+        await new ScrapeRawData(this.catalog).start();
     }
 
     /**
@@ -178,7 +180,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     /**
      * Get catalog target
      */
-    public getCatalog(): CatalogModelInterface {
+    public getCatalog(): CatalogDocumentModel {
         return this.catalog;
     }
 }

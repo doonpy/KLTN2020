@@ -1,34 +1,31 @@
 import ScrapeBase from '../scrape.base';
-import PatternModelInterface from '../../../services/pattern/pattern.model.interface';
-import RawDataLogic from '../../../services/raw-data/raw-data.logic';
+import RawDataLogic from '../../../service/raw-data/raw-data.logic';
 import DateTime from '../../../util/datetime/datetime';
 import StringHandler from '../../../util/string-handler/string-handler';
 import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
-import RawData from '../../../services/raw-data/raw-data.index';
-import DetailUrl from '../../../services/detail-url/detail-url.index';
 import ScrapeConstant from '../scrape.constant';
 import ConsoleLog from '../../../util/console/console.log';
 import ConsoleConstant from '../../../util/console/console.constant';
-import DetailUrlLogic from '../../../services/detail-url/detail-url.logic';
-import CatalogModelInterface from '../../../services/catalog/catalog.model.interface';
-import DetailUrlModelInterface from '../../../services/detail-url/detail-url.model.interface';
-import RawDataModelInterface from '../../../services/raw-data/raw-data.model.interface';
-import HostModelInterface from '../../../services/host/host.model.interface';
-
-import Timeout = NodeJS.Timeout;
+import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
+import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
+import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
+import { PatternDocumentModel } from '../../../service/pattern/pattern.interface';
+import { HostDocumentModel } from '../../../service/host/host.interface';
+import { RawDataDocumentModel } from '../../../service/raw-data/raw-data.interface';
+import RawDataConstant from '../../../service/raw-data/raw-data.constant';
 
 export default class ScrapeRawData extends ScrapeBase {
-    private readonly detailUrlLogic: DetailUrlLogic = new DetailUrl.Logic();
+    private readonly detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
 
-    private readonly rawDataLogic: RawDataLogic = new RawData.Logic();
+    private readonly rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
 
     private extractedDetailUrl: string[] = [];
 
-    private readonly catalog: CatalogModelInterface;
+    private readonly catalog: CatalogDocumentModel;
 
-    private detailUrls: DetailUrlModelInterface[] = [];
+    private detailUrls: DetailUrlDocumentModel[] = [];
 
-    private pattern: PatternModelInterface;
+    private pattern: PatternDocumentModel;
 
     private saveAmount = 0;
 
@@ -40,22 +37,25 @@ export default class ScrapeRawData extends ScrapeBase {
 
     private readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_RAW_DATA_MAX_REQUEST || '1', 10);
 
-    constructor(catalog: CatalogModelInterface) {
+    constructor(catalog: CatalogDocumentModel) {
         super();
         this.catalog = catalog;
-        this.pattern = catalog.patternId as PatternModelInterface;
+        this.pattern = catalog.patternId as PatternDocumentModel;
         this.logInstance.initLogFolder('raw-data-scrape');
         this.logInstance.createFileName(`cid-${catalog._id}_`);
     }
 
     /**
-     * Start raw data scraper.
+     * Start raw data scraper
+     *
+     * @return {Promise<void>}
      */
     public async start(): Promise<void> {
         try {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape raw data - CID: ${this.catalog._id}`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -68,10 +68,10 @@ export default class ScrapeRawData extends ScrapeBase {
                 isExtracted: this.NOT_EXTRACTED,
                 requestRetries: { $lt: this.MAX_REQUEST_RETRIES },
             };
-            this.detailUrls = (await this.detailUrlLogic.getAll(queryConditions, false)).detailUrls;
+            this.detailUrls = (await this.detailUrlLogic.getAll(undefined, undefined, queryConditions)).documents;
 
             if (this.detailUrls.length === 0) {
-                this.finishAction();
+                await this.finishAction();
                 return;
             }
 
@@ -89,10 +89,12 @@ export default class ScrapeRawData extends ScrapeBase {
     }
 
     /**
-     * Scrape action
+     * Scrape action with loop
+     *
+     * @return {void}
      */
     private scrapeAction(): void {
-        const loop: Timeout = setInterval(async (): Promise<void> => {
+        const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
             if (this.detailUrls.length === 0 && this.requestCounter === 0) {
                 clearInterval(loop);
                 await this.finishAction();
@@ -102,7 +104,7 @@ export default class ScrapeRawData extends ScrapeBase {
                 return;
             }
 
-            const currentDetailUrlDocument: DetailUrlModelInterface | undefined = this.detailUrls.shift();
+            const currentDetailUrlDocument: DetailUrlDocumentModel | undefined = this.detailUrls.shift();
             if (!currentDetailUrlDocument) {
                 return;
             }
@@ -111,8 +113,8 @@ export default class ScrapeRawData extends ScrapeBase {
             this.extractedDetailUrl.push(currentDetailUrlDocument.url);
 
             this.requestCounter += 1;
-            const $: CheerioStatic | undefined = await this.getBody(
-                (this.catalog.hostId as HostModelInterface).domain,
+            const $: CheerioStatic | undefined = await this.getStaticBody(
+                (this.catalog.hostId as HostDocumentModel).domain,
                 currentUrl
             );
 
@@ -126,17 +128,20 @@ export default class ScrapeRawData extends ScrapeBase {
     }
 
     /**
-     * @param $
-     * @param currentDetailUrlDocument
+     * @param {CheerioStatic} $
+     * @param {DetailUrlDocumentModel} currentDetailUrlDocument
+     *
+     * @return {Promise<void>}
      */
     protected async handleSuccessRequest(
         $: CheerioStatic,
-        currentDetailUrlDocument: DetailUrlModelInterface
+        currentDetailUrlDocument: DetailUrlDocumentModel
     ): Promise<void> {
         const {
             propertyType,
             postDate,
             title,
+            describe,
             price,
             acreage,
             address,
@@ -144,15 +149,15 @@ export default class ScrapeRawData extends ScrapeBase {
             propertyType: string;
             postDate: { locator: string; delimiter: string; format: string };
             title: string;
+            describe: string;
             price: string;
             acreage: string;
             address: string;
         } = this.pattern.mainLocator;
-        const targetDetailUrl: DetailUrlModelInterface = currentDetailUrlDocument;
-
         const propertyTypeData: string = ScrapeBase.extractData($, propertyType).shift() || '';
         const postDateData: string = ScrapeBase.extractData($, postDate.locator).shift() || '';
         const titleData: string = ScrapeBase.extractData($, title).shift() || '';
+        const describeData: string = ScrapeBase.extractData($, describe).shift() || '';
         const priceData: string = ScrapeBase.extractData($, price).shift() || '';
         const acreageData: string = ScrapeBase.extractData($, acreage).shift() || '';
         const addressData: string = ScrapeBase.extractData($, address).shift() || '';
@@ -170,63 +175,82 @@ export default class ScrapeRawData extends ScrapeBase {
             })
         );
 
-        const rawData: RawDataModelInterface = this.handleScrapedData(
-            targetDetailUrl._id,
+        const rawData: RawDataDocumentModel = this.handleScrapedData(
+            currentDetailUrlDocument._id,
             propertyTypeData,
             postDateData,
             titleData,
+            describeData,
             priceData,
             acreageData,
             addressData,
             othersData
         );
-        targetDetailUrl.isExtracted = this.EXTRACTED;
+        currentDetailUrlDocument.isExtracted = this.EXTRACTED;
+        currentDetailUrlDocument.requestRetries += 1;
 
         try {
-            await this.detailUrlLogic.update(targetDetailUrl._id, targetDetailUrl);
-            this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${targetDetailUrl._id}`);
+            const result: (DetailUrlDocumentModel | RawDataDocumentModel)[] = await Promise.all([
+                this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument),
+                this.rawDataLogic.create(rawData),
+            ]);
+            this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${result[0]._id}`);
+            this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `Raw data ID: ${result[1] ? result[1]._id : 'N/A'}`);
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape raw data - DID: ${result[0]._id} -> RID: ${result[1] ? result[1]._id : 'N/A'}`
+            ).show();
         } catch (error) {
-            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${targetDetailUrl._id}`);
-        }
-
-        try {
-            const createdDoc: RawDataModelInterface = await this.rawDataLogic.create(rawData);
-            this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `Raw data ID: ${createdDoc ? createdDoc._id : 'N/A'}`);
-            this.saveAmount += 1;
-        } catch (error) {
+            this.writeErrorLog(
+                error,
+                ScrapeConstant.LOG_ACTION.UPDATE,
+                `Detail URL ID: ${currentDetailUrlDocument._id}`
+            );
             this.writeErrorLog(
                 error,
                 ScrapeConstant.LOG_ACTION.CREATE,
                 `Raw data from detail URL ID: ${currentDetailUrlDocument._id || -1}`
             );
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Scrape raw data -> DID: ${currentDetailUrlDocument._id}}`
+            ).show();
         }
     }
 
     /**
      * @param currentDetailUrlDocument
      */
-    protected async handleFailedRequest(currentDetailUrlDocument: DetailUrlModelInterface): Promise<void> {
-        const targetDetailUrl: DetailUrlModelInterface = currentDetailUrlDocument;
-        targetDetailUrl.requestRetries += 1;
-        if (targetDetailUrl.requestRetries < this.MAX_REQUEST_RETRIES) {
-            this.detailUrls.push(targetDetailUrl);
+    protected async handleFailedRequest(currentDetailUrlDocument: DetailUrlDocumentModel): Promise<void> {
+        currentDetailUrlDocument.requestRetries += 1;
+        if (currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES) {
+            this.detailUrls.push(currentDetailUrlDocument);
         } else {
             try {
-                await this.detailUrlLogic.update(targetDetailUrl._id, targetDetailUrl);
-                this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${targetDetailUrl._id}`);
+                await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
+                this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
+                ).show();
             } catch (error) {
-                this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${targetDetailUrl._id}`);
+                this.writeErrorLog(
+                    error,
+                    ScrapeConstant.LOG_ACTION.UPDATE,
+                    `Detail URL ID: ${currentDetailUrlDocument._id}`
+                );
             }
         }
     }
 
     /**
      *
-     * @return RawDataModelInterface
+     * @return RawDataDocumentModel
      * @param detailUrlId
      * @param propertyTypeData
      * @param postDateData
      * @param titleData
+     * @param describeData
      * @param priceData
      * @param acreageData
      * @param addressData
@@ -237,11 +261,12 @@ export default class ScrapeRawData extends ScrapeBase {
         propertyTypeData: string,
         postDateData: string,
         titleData: string,
+        describeData: string,
         priceData: string,
         acreageData: string,
         addressData: string,
         othersData: { name: string; value: string }[]
-    ): RawDataModelInterface {
+    ): RawDataDocumentModel {
         let postDate: Date = DateTime.convertStringToDate(
             postDateData,
             this.pattern.mainLocator.postDate.format,
@@ -261,22 +286,23 @@ export default class ScrapeRawData extends ScrapeBase {
         };
 
         const transactionType: number = ScrapeRawDataConstant.TRANSACTION_PATTERN.test(this.catalog.title)
-            ? RawData.Constant.TYPE_OF_TRANSACTION.RENT
-            : RawData.Constant.TYPE_OF_TRANSACTION.SALE;
+            ? RawDataConstant.TYPE_OF_TRANSACTION.RENT
+            : RawDataConstant.TYPE_OF_TRANSACTION.SALE;
 
-        const propertyType: number = RawDataLogic.getPropertyTypeIndex(propertyTypeData);
+        const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
 
-        return RawData.Logic.createDocument(
+        return ({
             detailUrlId,
             transactionType,
             propertyType,
-            postDate.toISOString(),
-            titleData,
+            postDate: postDate.toISOString(),
+            title: titleData,
+            describe: describeData,
             price,
             acreage,
-            addressData,
-            othersData
-        );
+            address: addressData,
+            others: othersData,
+        } as unknown) as RawDataDocumentModel;
     }
 
     /**
@@ -318,7 +344,7 @@ export default class ScrapeRawData extends ScrapeBase {
     /**
      * Get catalog target
      */
-    public getCatalog(): CatalogModelInterface {
+    public getCatalog(): CatalogDocumentModel {
         return this.catalog;
     }
 }
