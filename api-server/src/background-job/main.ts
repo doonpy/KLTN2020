@@ -7,6 +7,7 @@ import DateTime from '../util/datetime/datetime';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import initEnv from '../util/environment/environment';
 import CatalogLogic from '../service/catalog/catalog.logic';
+import ScrapeRawData from './scrape/raw-data/scrape.raw-data';
 
 let isRunning = false;
 let telegramChatBotInstance: ChatBotTelegram | undefined;
