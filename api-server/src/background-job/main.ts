@@ -7,7 +7,6 @@ import DateTime from '../util/datetime/datetime';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import initEnv from '../util/environment/environment';
 import CatalogLogic from '../service/catalog/catalog.logic';
-import ScrapeRawData from './scrape/raw-data/scrape.raw-data';
 
 let isRunning = false;
 let telegramChatBotInstance: ChatBotTelegram | undefined;
@@ -137,8 +136,7 @@ const start = async (force = false): Promise<void> => {
     telegramChatBotInstance = ChatBotTelegram.getInstance();
     try {
         await DatabaseMongodb.getInstance().connect();
-        // await start(true);
-        await new ScrapeRawData(await CatalogLogic.getInstance().getById(2, true)).start();
+        await start(true);
     } catch (error) {
         await telegramChatBotInstance.sendMessage(
             `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`
