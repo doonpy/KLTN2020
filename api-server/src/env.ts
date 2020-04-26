@@ -52,6 +52,7 @@ export default {
     // Public folder
     PUBLIC_FOLDER_PATH: '../public',
 
-    // Google map API key
+    // Map API key
     HERE_API_KEY: 'R4VlRgnt4NgQnFjoEf108Ay39q-RbANgJAOiXyKwBFM',
+    BING_API_KEY: 'AlOLUHH31tLfAdbM9VYVSkBrv0oJbnFyFAex72REVpB8QNTBDhwO9CLs2wZJj-Tl',
 };

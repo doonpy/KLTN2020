@@ -1,39 +1,35 @@
 import { RequestPromiseOptions } from 'request-promise';
 import Request from '../request/request';
 
-type GeocodeResponse = {
+type HereMapGeocodeResponse = {
     type: string;
     Response: {
-        MetaInfo: { Timestamp: string };
         View: [
             {
-                _type: string;
-                ViewId: number;
                 Result: [
                     {
-                        Relevance: number;
-                        MatchLevel: string;
-                        MatchQuality: { Country: number };
                         Location: {
-                            LocationId: string;
-                            LocationType: string;
                             DisplayPosition: { Latitude: number; Longitude: number };
-                            NavigationPosition: [{ Latitude: number; Longitude: number }];
-                            MapView: {
-                                TopLeft: { Latitude: number; Longitude: number };
-                                BottomRight: { Latitude: number; Longitude: number };
-                            };
-                            Address: {
-                                Label: string;
-                                Country: string;
-                                AdditionalData: [{ value: string; key: string }];
-                            };
                         };
                     }
                 ];
             }
         ];
     };
+};
+
+type BingMapGeocodeResponse = {
+    resourceSets: [
+        {
+            resources: [
+                {
+                    point: {
+                        coordinates: [10.780949592590332, 106.69911193847656];
+                    };
+                }
+            ];
+        }
+    ];
 };
 
 export default class ExternalApi {
@@ -55,7 +51,8 @@ export default class ExternalApi {
      * @return {lat:number; lng:number}
      */
     public async getCoordinateFromAddress(address: string): Promise<{ lat: number; lng: number }> {
-        const apiKey: string = process.env.HERE_API_KEY || '';
+        let apiKey: string = process.env.HERE_API_KEY ?? '';
+        let addressClone: string = address;
         const requestOptions: RequestPromiseOptions = {
             method: 'GET',
             headers: {
@@ -66,24 +63,41 @@ export default class ExternalApi {
             json: true,
         };
         let endPointUrl = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
-            address
+            addressClone
         )}`;
 
-        let response: GeocodeResponse = ((await new Request(
+        let response: HereMapGeocodeResponse | BingMapGeocodeResponse = ((await new Request(
             endPointUrl,
             requestOptions
-        ).send()) as unknown) as GeocodeResponse;
+        ).send()) as unknown) as HereMapGeocodeResponse;
 
         while (response.type === 'ApplicationError' || !response.Response.View.length) {
-            const addressPart: string[] = address.split(/,\s*/);
-            address = addressPart.slice(1).join(', ');
-            if (!address) {
-                return { lat: NaN, lng: NaN };
+            const addressPart: string[] = addressClone.split(/,\s*/);
+            addressClone = addressPart.slice(1).join(', ');
+
+            if (!addressClone) {
+                apiKey = process.env.BING_API_KEY ?? '';
+                endPointUrl = `http://dev.virtualearth.net/REST/v1/Locations/VN/Hochiminh/${encodeURI(
+                    addressClone
+                )}?o=json&maxResults=1&key=${apiKey}`;
+                response = ((await new Request(
+                    endPointUrl,
+                    requestOptions
+                ).send()) as unknown) as BingMapGeocodeResponse;
+
+                return {
+                    lat: response.resourceSets[0].resources[0].point.coordinates[0],
+                    lng: response.resourceSets[0].resources[0].point.coordinates[1],
+                };
             }
+
             endPointUrl = `https://geocoder.ls.hereapi.com/6.2/geocode.json?apiKey=${apiKey}&searchtext=${encodeURI(
-                address
+                addressClone
             )}`;
-            response = await (((await new Request(endPointUrl, requestOptions).send()) as unknown) as GeocodeResponse);
+            response = await (((await new Request(
+                endPointUrl,
+                requestOptions
+            ).send()) as unknown) as HereMapGeocodeResponse);
         }
 
         return {
