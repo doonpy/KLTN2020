@@ -221,39 +221,13 @@ export default class CoordinateLogic extends CommonServiceLogicBase implements C
         { _id, location, lat, lng, cTime, mTime }: CoordinateDocumentModel,
         languageIndex = 0
     ): CoordinateApiModel {
-        const data: CoordinateApiModel = {
-            id: null,
-            location: null,
-            lat: null,
-            lng: null,
-            createAt: null,
-            updateAt: null,
+        return {
+            id: _id ?? null,
+            location: location ?? null,
+            lat: lat ?? null,
+            lng: lng ?? null,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (location) {
-            data.location = location;
-        }
-
-        if (lat) {
-            data.lat = lat;
-        }
-
-        if (lng) {
-            data.lng = lng;
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

@@ -103,6 +103,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             acreage,
             address,
             others,
+            coordinate,
         }: RawDataDocumentModel,
         isPopulate?: boolean
     ): Promise<RawDataDocumentModel> {
@@ -117,7 +118,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             acreage,
             address,
             others,
-            coordinate: null,
+            coordinate: coordinate ?? null,
             isGrouped: false,
         }).save();
         if (isPopulate) {
@@ -384,84 +385,26 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
         }: RawDataDocumentModel,
         languageIndex = 0
     ): RawDataApiModel {
-        const data: RawDataApiModel = {
-            id: null,
-            transactionType: null,
-            propertyType: null,
-            detailUrl: null,
-            postDate: null,
-            title: null,
-            describe: null,
-            price: null,
-            acreage: null,
-            address: null,
-            others: null,
-            coordinate: null,
-            isGrouped: null,
-            createAt: null,
-            updateAt: null,
+        return {
+            id: _id ?? null,
+            transactionType: RawDataConstant.TYPE_OF_TRANSACTION_WORDING[transactionType][languageIndex] ?? null,
+            propertyType: RawDataConstant.TYPE_OF_PROPERTY_WORDING[propertyType][languageIndex] ?? null,
+            detailUrl: detailUrlId
+                ? DetailUrlLogic.getInstance().convertToApiResponse(detailUrlId as DetailUrlDocumentModel)
+                : null,
+            postDate: postDate ?? null,
+            title: title ?? null,
+            describe: describe ?? null,
+            price: price ?? null,
+            acreage: acreage ?? null,
+            address: address ?? null,
+            others: others ?? null,
+            coordinate: coordinate
+                ? CoordinateLogic.getInstance().convertToApiResponse(coordinate as CoordinateDocumentModel)
+                : null,
+            isGrouped: isGrouped ?? null,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (typeof transactionType !== 'undefined') {
-            data.transactionType = RawDataConstant.TYPE_OF_TRANSACTION_WORDING[transactionType][languageIndex];
-        }
-
-        if (typeof propertyType !== 'undefined') {
-            data.propertyType = RawDataConstant.TYPE_OF_PROPERTY_WORDING[propertyType][languageIndex];
-        }
-
-        if (detailUrlId) {
-            data.detailUrl = DetailUrlLogic.getInstance().convertToApiResponse(detailUrlId as DetailUrlDocumentModel);
-        }
-
-        if (postDate) {
-            data.postDate = postDate;
-        }
-
-        if (title) {
-            data.title = title;
-        }
-
-        if (describe) {
-            data.describe = describe;
-        }
-
-        if (Object.keys(price).length > 0) {
-            data.price = price;
-        }
-
-        if (acreage) {
-            data.acreage = acreage;
-        }
-
-        if (address) {
-            data.address = address;
-        }
-
-        if (others.length > 0) {
-            data.others = others;
-        }
-
-        if (Object.keys(coordinate).length > 0) {
-            data.coordinate = CoordinateLogic.getInstance().convertToApiResponse(coordinate as CoordinateDocumentModel);
-        }
-
-        if (typeof isGrouped !== 'undefined') {
-            data.isGrouped = isGrouped;
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

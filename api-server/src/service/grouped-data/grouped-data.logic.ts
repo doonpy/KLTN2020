@@ -244,33 +244,15 @@ export default class GroupedDataLogic extends CommonServiceLogicBase implements 
         { _id, items, cTime, mTime }: GroupedDataDocumentModel,
         languageIndex = 0
     ): GroupedDataApiModel {
-        const data: GroupedDataApiModel = {
-            id: null,
-            items: null,
-            createAt: null,
-            updateAt: null,
+        const itemsConverted: RawDataApiModel[] = items.map(
+            (item): RawDataApiModel => RawDataLogic.getInstance().convertToApiResponse(item as RawDataDocumentModel)
+        );
+
+        return {
+            id: _id ?? null,
+            items: itemsConverted,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (items) {
-            data.items = items.map(
-                (item): RawDataApiModel => {
-                    return RawDataLogic.getInstance().convertToApiResponse(item as RawDataDocumentModel);
-                }
-            );
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

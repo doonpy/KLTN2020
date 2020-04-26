@@ -39,7 +39,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape detail URL - CID: ${this.catalog._id}`).show();
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape detail URL -> CID: ${this.catalog._id}`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -163,10 +163,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [catalog.title, catalog.id])
         );
         this.isRunning = false;
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Scrape detail URL of catalog ${catalog.title} (ID:${catalog._id}) complete.`
-        ).show();
+        new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape detail URL -> CID: ${catalog._id} complete.`).show();
         await new ScrapeRawData(this.catalog).start();
     }
 

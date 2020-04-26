@@ -27,11 +27,21 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
         for (const key of keys) {
             const value: string | number = item[key];
 
-            if (typeof value === 'object') {
-                inputString.push(`'${key}' => {${convertToString(value)}}`);
-            } else {
+            if (!value) {
                 inputString.push(`'${key}' => '${value}'`);
+                continue;
             }
+
+            if (typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    inputString.push(`'${key}' => {${convertToString(value)}}`);
+                } else {
+                    inputString.push(`'${key}' => {${convertToString([value])}}`);
+                }
+                continue;
+            }
+
+            inputString.push(`'${key}' => '${value}'`);
         }
     }
 

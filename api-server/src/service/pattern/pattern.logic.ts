@@ -234,39 +234,13 @@ export default class PatternLogic extends CommonServiceLogicBase implements Patt
         { _id, sourceUrl, mainLocator, subLocator, cTime, mTime }: PatternDocumentModel,
         languageIndex = 0
     ): PatternApiModel {
-        const data: PatternApiModel = {
-            id: null,
-            sourceUrl: null,
-            mainLocator: null,
-            subLocator: null,
-            createAt: null,
-            updateAt: null,
+        return {
+            id: _id ?? null,
+            sourceUrl: sourceUrl ?? null,
+            mainLocator: mainLocator ?? null,
+            subLocator: subLocator ?? null,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (sourceUrl) {
-            data.sourceUrl = sourceUrl;
-        }
-
-        if (Object.keys(mainLocator).length > 0) {
-            data.mainLocator = mainLocator;
-        }
-
-        if (Object.keys(subLocator).length > 0) {
-            data.subLocator = subLocator;
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

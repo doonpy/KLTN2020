@@ -79,15 +79,15 @@ export default class ScrapeBase {
         const elementsSelected = $(locator);
 
         if (elementsSelected.length === 0) {
-            return [ScrapeBase.getDataOfElement(elementsSelected, attribute)];
+            return [''];
         }
 
-        const dataArray: string[] = [];
+        const data: string[] = [];
         elementsSelected.each((index: number, element: CheerioElement): void => {
-            dataArray.push(ScrapeBase.getDataOfElement($(element), attribute));
+            data.push(ScrapeBase.getDataOfElement($(element), attribute));
         });
 
-        return dataArray;
+        return data;
     }
 
     /**
@@ -108,7 +108,10 @@ export default class ScrapeBase {
             });
         }
 
-        return StringHandler.cleanWithPattern(data, new RegExp(/^(\r|\n|\r\n)|(\r|\n|\r\n)$/, 'gm'));
+        return data
+            .replace(/\r|\n|\r\n/gm, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
     }
 
     /**

@@ -5,10 +5,9 @@ export const ScrapeRawDataConstantChatBotMessage = {
 };
 
 export const ScrapeRawDataConstant = {
-    ACREAGE_VALUE_PATTERN: new RegExp(/(([1-9]+)?0?\.?[0-9]+)|((K|k)hông xác định)|((U|u)ndefined)/),
+    VALUE_PATTERN: new RegExp(/(([1-9]+)?0?\.?[0-9]+)/),
     ACREAGE_MEASURE_UNIT_PATTERN: new RegExp(/m²|km²/),
     TRANSACTION_PATTERN: new RegExp(/([tT])huê|([rR])ent/),
-    PRICE_VALUE_PATTERN: new RegExp(/(([1-9]+)?0?\.?[0-9]+)|(([tT])hỏa ([Tt])huận)|(([Nn])egotiated)/),
     PRICE_CURRENCY_PATTERN: new RegExp(
         /(million)|(billion)|(billion vnd\/month)|(million vnd\/month)|(triệu)|(tỷ)|(nghìn\/tháng)|(triệu\/tháng)|(tỷ\/tháng)/
     ),

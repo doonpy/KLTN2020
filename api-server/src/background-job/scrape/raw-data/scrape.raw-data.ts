@@ -55,7 +55,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape raw data - CID: ${this.catalog._id}`).show();
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape raw data -> CID: ${this.catalog._id}`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -154,26 +154,52 @@ export default class ScrapeRawData extends ScrapeBase {
             acreage: string;
             address: string;
         } = this.pattern.mainLocator;
-        const propertyTypeData: string = ScrapeBase.extractData($, propertyType).shift() || '';
-        const postDateData: string = ScrapeBase.extractData($, postDate.locator).shift() || '';
-        const titleData: string = ScrapeBase.extractData($, title).shift() || '';
-        const describeData: string = ScrapeBase.extractData($, describe).shift() || '';
-        const priceData: string = ScrapeBase.extractData($, price).shift() || '';
-        const acreageData: string = ScrapeBase.extractData($, acreage).shift() || '';
-        const addressData: string = ScrapeBase.extractData($, address).shift() || '';
+        const propertyTypeData: string = ScrapeBase.extractData($, propertyType).join('. ');
+        const postDateData: string = ScrapeBase.extractData($, postDate.locator).join('. ');
+        const titleData: string = ScrapeBase.extractData($, title).join('. ');
+        const describeData: string = ScrapeBase.extractData($, describe).join('. ');
+        const priceData: string = ScrapeBase.extractData($, price).join('. ');
+        const acreageData: string = ScrapeBase.extractData($, acreage).join('. ');
+        const addressData: string = ScrapeBase.extractData($, address).join('. ');
 
         const othersData: {
             name: string;
             value: string;
-        }[] = this.pattern.subLocator.map((subLocatorItem: { locator: string; name: string }): {
-            name: string;
-            value: string;
-        } =>
-            Object({
-                name: subLocatorItem.name,
-                value: ScrapeBase.extractData($, subLocatorItem.locator).shift() || '',
-            })
-        );
+        }[] = this.pattern.subLocator
+            .map((subLocatorItem): {
+                name: string;
+                value: string;
+            } =>
+                Object({
+                    name: subLocatorItem.name,
+                    value: ScrapeBase.extractData($, subLocatorItem.locator),
+                })
+            )
+            .filter((item) => !item.value);
+
+        if (
+            !ScrapeRawDataConstant.VALUE_PATTERN.test(priceData) ||
+            !ScrapeRawDataConstant.VALUE_PATTERN.test(acreageData)
+        ) {
+            try {
+                await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
+                this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape raw data - DID: ${currentDetailUrlDocument._id} -> RID: N/A - Error: Invalid value.`
+                ).show();
+            } catch (error) {
+                this.writeErrorLog(
+                    error,
+                    ScrapeConstant.LOG_ACTION.CREATE,
+                    `Raw data from detail URL ID: ${currentDetailUrlDocument._id || -1}`
+                );
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.cause || error.message}`
+                ).show();
+            }
+        }
 
         const rawData: RawDataDocumentModel = this.handleScrapedData(
             currentDetailUrlDocument._id,
@@ -275,13 +301,13 @@ export default class ScrapeRawData extends ScrapeBase {
         if (postDate.toString() === 'Invalid Date') {
             postDate = new Date(0, 0, 0, 0, 0, 0, 0);
         }
-        const price: { value: string; currency: string } = {
-            value: (priceData.match(ScrapeRawDataConstant.PRICE_VALUE_PATTERN) || []).shift() || '',
+        const price: { value: number; currency: string } = {
+            value: Number((priceData.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
             currency: (priceData.match(ScrapeRawDataConstant.PRICE_CURRENCY_PATTERN) || []).shift() || '',
         };
 
-        const acreage: { value: string; measureUnit: string } = {
-            value: (acreageData.match(ScrapeRawDataConstant.ACREAGE_VALUE_PATTERN) || []).shift() || '',
+        const acreage: { value: number; measureUnit: string } = {
+            value: Number((acreageData.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
             measureUnit: (acreageData.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []).shift() || '',
         };
 
@@ -327,10 +353,7 @@ export default class ScrapeRawData extends ScrapeBase {
             ])
         );
         this.isRunning = false;
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Scrape raw data of catalog ${this.catalog.title} (ID:${this.catalog._id}) complete.`
-        ).show();
+        new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape raw data -> CID: ${this.catalog._id} complete.`).show();
         process.exit(0);
     }
 

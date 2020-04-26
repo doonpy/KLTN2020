@@ -37,11 +37,11 @@ const rawDataSchema = new Schema(
         title: { type: Schema.Types.String },
         describe: { type: Schema.Types.String },
         price: {
-            value: { type: Schema.Types.String },
+            value: { type: Schema.Types.Number },
             currency: { type: Schema.Types.String },
         },
         acreage: {
-            value: { type: Schema.Types.String },
+            value: { type: Schema.Types.Number },
             measureUnit: { type: Schema.Types.String },
         },
         address: { type: Schema.Types.String },
