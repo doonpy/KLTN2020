@@ -15,11 +15,11 @@ export interface RawDataApiModel extends CommonApiModel {
     title: string | null;
     describe: string | null;
     price: {
-        value: string | null;
+        value: number | null;
         currency: string | null;
     } | null;
     acreage: {
-        value: string | null;
+        value: number | null;
         measureUnit: string | null;
     } | null;
     address: string | null;
@@ -44,11 +44,11 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     title: string;
     describe: string;
     price: {
-        value: string;
+        value: number;
         currency: string;
     };
     acreage: {
-        value: string;
+        value: number;
         measureUnit: string;
     };
     address: string;

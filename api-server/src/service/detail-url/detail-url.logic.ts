@@ -288,44 +288,16 @@ export default class DetailUrlLogic extends CommonServiceLogicBase implements De
         { _id, catalogId, url, isExtracted, requestRetries, cTime, mTime }: DetailUrlDocumentModel,
         languageIndex = 0
     ): DetailUrlApiModel {
-        const data: DetailUrlApiModel = {
-            id: null,
-            catalog: null,
-            url: null,
-            isExtracted: null,
-            requestRetries: null,
-            createAt: null,
-            updateAt: null,
+        return {
+            id: _id ?? null,
+            catalog: catalogId
+                ? CatalogLogic.getInstance().convertToApiResponse(catalogId as CatalogDocumentModel)
+                : null,
+            url: url ?? null,
+            isExtracted: isExtracted ?? null,
+            requestRetries: requestRetries ?? null,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (catalogId) {
-            data.catalog = CatalogLogic.getInstance().convertToApiResponse(catalogId as CatalogDocumentModel);
-        }
-
-        if (url) {
-            data.url = url;
-        }
-
-        if (isExtracted !== null) {
-            data.isExtracted = isExtracted;
-        }
-
-        if (requestRetries) {
-            data.requestRetries = requestRetries;
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

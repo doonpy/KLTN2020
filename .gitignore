@@ -71,3 +71,6 @@ public/
 
 # archive
 archive/
+
+# dump data
+dump/
