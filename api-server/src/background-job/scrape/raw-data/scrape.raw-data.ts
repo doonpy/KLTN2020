@@ -196,7 +196,7 @@ export default class ScrapeRawData extends ScrapeBase {
                 this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
-                    `Scrape raw data - DID: ${currentDetailUrlDocument._id} -> RID: N/A - Error: Invalid value.`
+                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} -> RID: N/A - Error: Invalid value.`
                 ).show();
             } catch (error) {
                 this.writeErrorLog(
@@ -221,7 +221,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `Raw data ID: ${result[1] ? result[1]._id : 'N/A'}`);
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
-                `Scrape raw data - DID: ${result[0]._id} -> RID: ${result[1] ? result[1]._id : 'N/A'}`
+                `Scrape raw data -> DID: ${result[0]._id} -> RID: ${result[1] ? result[1]._id : 'N/A'}`
             ).show();
         } catch (error) {
             this.writeErrorLog(
