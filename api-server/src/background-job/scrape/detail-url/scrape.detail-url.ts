@@ -1,6 +1,6 @@
 import ScrapeBase from '../scrape.base';
 import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
-import StringHandler from '../../../util/string-handler/string-handler';
+import StringHandler from '../../../util/helper/string-handler';
 import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 import UrlHandler from '../../../util/url-handler/url-handler';
 import ScrapeConstant from '../scrape.constant';

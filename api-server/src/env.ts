@@ -6,6 +6,7 @@ export default {
     DB_USERNAME_DEV: 'alice',
     DB_PASS_DEV: 'alice',
     DB_AUTH_DB_DEV: 'admin',
+    DB_DEBUG_MODE: 0,
 
     SERVER_PROTOCOL_DEV: 'http',
     SERVER_DOMAIN_DEV: 'localhost',

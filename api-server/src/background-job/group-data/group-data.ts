@@ -1,6 +1,6 @@
 import File from '../../util/file/file.index';
 import { convertAcreageValue, convertPriceValue } from './group-data.helper';
-import StringHandler from '../../util/string-handler/string-handler';
+import StringHandler from '../../util/helper/string-handler';
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import GroupedDataLogic from '../../service/grouped-data/grouped-data.logic';

@@ -1,7 +1,7 @@
 import ScrapeBase from '../scrape.base';
 import RawDataLogic from '../../../service/raw-data/raw-data.logic';
 import DateTime from '../../../util/datetime/datetime';
-import StringHandler from '../../../util/string-handler/string-handler';
+import StringHandler from '../../../util/helper/string-handler';
 import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
 import ScrapeConstant from '../scrape.constant';
 import ConsoleLog from '../../../util/console/console.log';
@@ -161,7 +161,6 @@ export default class ScrapeRawData extends ScrapeBase {
         const priceData: string = ScrapeBase.extractData($, price).join('. ');
         const acreageData: string = ScrapeBase.extractData($, acreage).join('. ');
         const addressData: string = ScrapeBase.extractData($, address).join('. ');
-
         const othersData: {
             name: string;
             value: string;
@@ -172,16 +171,27 @@ export default class ScrapeRawData extends ScrapeBase {
             } =>
                 Object({
                     name: subLocatorItem.name,
-                    value: ScrapeBase.extractData($, subLocatorItem.locator),
+                    value: ScrapeBase.extractData($, subLocatorItem.locator).join('. '),
                 })
             )
-            .filter((item) => !item.value);
+            .filter((item) => !!item.value);
 
-        if (
-            !ScrapeRawDataConstant.VALUE_PATTERN.test(priceData) ||
-            !ScrapeRawDataConstant.VALUE_PATTERN.test(acreageData)
-        ) {
+        const rawData: RawDataDocumentModel = this.handleScrapedData(
+            currentDetailUrlDocument._id,
+            propertyTypeData,
+            postDateData,
+            titleData,
+            describeData,
+            priceData,
+            acreageData,
+            addressData,
+            othersData
+        );
+
+        if (this.isHasEmptyProperty(rawData)) {
             try {
+                currentDetailUrlDocument.isExtracted = this.EXTRACTED;
+                currentDetailUrlDocument.requestRetries += 1;
                 await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
                 this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
                 new ConsoleLog(
@@ -199,21 +209,8 @@ export default class ScrapeRawData extends ScrapeBase {
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.cause || error.message}`
                 ).show();
             }
+            return;
         }
-
-        const rawData: RawDataDocumentModel = this.handleScrapedData(
-            currentDetailUrlDocument._id,
-            propertyTypeData,
-            postDateData,
-            titleData,
-            describeData,
-            priceData,
-            acreageData,
-            addressData,
-            othersData
-        );
-        currentDetailUrlDocument.isExtracted = this.EXTRACTED;
-        currentDetailUrlDocument.requestRetries += 1;
 
         try {
             const result: (DetailUrlDocumentModel | RawDataDocumentModel)[] = await Promise.all([
@@ -242,6 +239,54 @@ export default class ScrapeRawData extends ScrapeBase {
                 `Scrape raw data -> DID: ${currentDetailUrlDocument._id}}`
             ).show();
         }
+    }
+
+    /**
+     * @param { [key: string]: any } input
+     *
+     * @return {boolean}
+     */
+    private isHasEmptyProperty(input: { [key: string]: any }): boolean {
+        const propertyList: string[] = [
+            'transactionType',
+            'propertyType',
+            'detailUrlId',
+            'postDate',
+            'title',
+            'describe',
+            'price',
+            'acreage',
+            'address',
+            'others',
+        ];
+        for (const property of propertyList) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const value: any = input[property];
+            switch (typeof value) {
+                case 'string':
+                    if (!value) {
+                        return true;
+                    }
+                    break;
+                case 'number':
+                    if (!value && value !== 0) {
+                        return true;
+                    }
+                    break;
+                case 'object':
+                    if (Object.keys(value).length === 0) {
+                        break;
+                    }
+                    if ((JSON.stringify(value).match(/""|null/g) || []).length > 0) {
+                        return true;
+                    }
+                    break;
+                default:
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     /**

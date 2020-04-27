@@ -1,7 +1,7 @@
 import cherrio from 'cheerio';
 import { Response } from 'request';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import StringHandler from '../../util/string-handler/string-handler';
+import StringHandler from '../../util/helper/string-handler';
 import { CatalogDocumentModel } from '../../service/catalog/catalog.interface';
 import Request from '../../util/request/request';
 import ScrapeConstant from './scrape.constant';
