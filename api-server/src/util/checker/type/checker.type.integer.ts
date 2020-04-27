@@ -9,7 +9,6 @@ export default class CheckerTypeInteger extends CheckerTypeBase {
      * @param paramName
      * @param value
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public checkType(paramName: string, value: any): void {
         if (!NUMERIC_CHARACTER_PATTERN.test(value) || !Number.isInteger(Number(value))) {
             throw {

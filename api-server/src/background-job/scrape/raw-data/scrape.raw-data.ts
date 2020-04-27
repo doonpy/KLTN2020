@@ -260,7 +260,6 @@ export default class ScrapeRawData extends ScrapeBase {
             'others',
         ];
         for (const property of propertyList) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const value: any = input[property];
             switch (typeof value) {
                 case 'string':
