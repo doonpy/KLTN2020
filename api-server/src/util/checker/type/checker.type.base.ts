@@ -19,6 +19,6 @@ export default abstract class CheckerTypeBase extends CheckerBase {
      * @param paramName
      * @param value
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     public abstract checkType(paramName: string, value: any): void;
 }

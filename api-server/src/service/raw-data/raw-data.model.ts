@@ -13,35 +13,21 @@ const rawDataSchema = new Schema(
         },
         transactionType: {
             type: Schema.Types.Number,
-            enum: [RawDataConstant.TYPE_OF_TRANSACTION.SALE, RawDataConstant.TYPE_OF_TRANSACTION.RENT],
+            enum: RawDataConstant.TRANSACTION_TYPE.map((item) => item.id),
         },
         propertyType: {
             type: Schema.Types.Number,
-            enum: [
-                RawDataConstant.TYPE_OF_PROPERTY.APARTMENT,
-                RawDataConstant.TYPE_OF_PROPERTY.OFFICE,
-                RawDataConstant.TYPE_OF_PROPERTY.OTHER,
-                RawDataConstant.TYPE_OF_PROPERTY.ROOM,
-                RawDataConstant.TYPE_OF_PROPERTY.SHOP,
-                RawDataConstant.TYPE_OF_PROPERTY.FARM,
-                RawDataConstant.TYPE_OF_PROPERTY.INDIVIDUAL_HOUSE,
-                RawDataConstant.TYPE_OF_PROPERTY.LAND,
-                RawDataConstant.TYPE_OF_PROPERTY.PROJECT_LAND,
-                RawDataConstant.TYPE_OF_PROPERTY.RESORT,
-                RawDataConstant.TYPE_OF_PROPERTY.TOWNHOUSE,
-                RawDataConstant.TYPE_OF_PROPERTY.VILLA,
-                RawDataConstant.TYPE_OF_PROPERTY.WAREHOUSE,
-            ],
+            enum: RawDataConstant.PROPERTY_TYPE.map((item) => item.id),
         },
         postDate: { type: Schema.Types.Date },
         title: { type: Schema.Types.String },
         describe: { type: Schema.Types.String },
         price: {
-            value: { type: Schema.Types.String },
+            value: { type: Schema.Types.Number },
             currency: { type: Schema.Types.String },
         },
         acreage: {
-            value: { type: Schema.Types.String },
+            value: { type: Schema.Types.Number },
             measureUnit: { type: Schema.Types.String },
         },
         address: { type: Schema.Types.String },
@@ -64,7 +50,11 @@ rawDataSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-rawDataSchema.index({ isGrouped: 1 });
-rawDataSchema.index({ detailUrlId: 1 });
+rawDataSchema.index({ isGrouped: 1 }, { name: 'idx_isGrouped' });
+rawDataSchema.index({ detailUrlId: 1 }, { name: 'idx_detailUrlId' });
+rawDataSchema.index({ transactionType: 1 }, { name: 'idx_transactionType' });
+rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
+rawDataSchema.index({ coordinate: 1 }, { name: 'idx_coordinate' });
+rawDataSchema.index({ propertyType: 1, transactionType: 1 }, { name: 'idx_propertyType_transactionType' });
 
 export default mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);

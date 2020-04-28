@@ -1,44 +1,66 @@
-export default {
-    TYPE_OF_TRANSACTION: {
-        SALE: 0,
-        RENT: 1,
-    },
-    TYPE_OF_PROPERTY: {
-        APARTMENT: 0,
-        INDIVIDUAL_HOUSE: 1,
-        VILLA: 2,
-        TOWNHOUSE: 3,
-        PROJECT_LAND: 4,
-        LAND: 5,
-        FARM: 6,
-        RESORT: 7,
-        WAREHOUSE: 8,
-        ROOM: 9,
-        OFFICE: 10,
-        SHOP: 11,
-        OTHER: 12,
-        FOR_SALE: 13,
-        FOR_RENT: 14,
-    },
-    TYPE_OF_TRANSACTION_WORDING: [
-        ['bán', 'sale'],
-        ['thuê', 'rent'],
+const RawDataConstant = {
+    TRANSACTION_TYPE: [
+        { id: 0, wording: ['bán', 'sale'] },
+        { id: 1, wording: ['thuê', 'rent'] },
+    ],
+    PROPERTY_TYPE: [
+        {
+            id: 0,
+            wording: ['căn hộ chung cư', 'apartments'],
+        },
+        {
+            id: 1,
+            wording: ['nhà riêng', 'individual houses'],
+        },
+        {
+            id: 2,
+            wording: ['biệt thự', 'villas'],
+        },
+        {
+            id: 3,
+            wording: ['nhà mặt phố', 'townhouses'],
+        },
+        {
+            id: 4,
+            wording: ['đất nền dự án', 'project lands'],
+        },
+        {
+            id: 5,
+            wording: ['đất', 'lands'],
+        },
+        {
+            id: 6,
+            wording: ['trang trại', 'farms'],
+        },
+        {
+            id: 7,
+            wording: ['khu nghỉ dưỡng', 'resorts'],
+        },
+        {
+            id: 8,
+            wording: ['nhà kho', 'warehouse'],
+        },
+        {
+            id: 9,
+            wording: ['nhà trọ, phòng trọ', 'rooms'],
+        },
+        {
+            id: 10,
+            wording: ['văn phòng', 'offices'],
+        },
+        {
+            id: 11,
+            wording: ['cửa hàng', 'shops'],
+        },
+        {
+            id: 12,
+            wording: ['loại bất động sản khác', 'others'],
+        },
     ],
     TYPE_OF_PROPERTY_WORDING: [
-        ['căn hộ chung cư', 'apartments'],
-        ['nhà riêng', 'individual houses'],
-        ['biệt thự', 'villas'],
-        ['nhà mặt phố', 'townhouses'],
-        ['đất nền dự án', 'project lands'],
-        ['đất', 'lands'],
-        ['trang trại', 'farms'],
-        ['khu nghỉ dưỡng', 'resorts'],
-        ['nhà kho', 'warehouse'],
-        ['nhà trọ, phòng trọ', 'rooms'],
-        ['văn phòng', 'offices'],
-        ['cửa hàng', 'shops'],
-        ['loại bất động sản khác', 'others'],
         ['nhà đất bán', 'for sale'],
         ['nhà đất cho thuê', 'for rent'],
     ],
 };
+
+export default RawDataConstant;

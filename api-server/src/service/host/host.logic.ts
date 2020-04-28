@@ -206,34 +206,12 @@ export default class HostLogic extends CommonLogicBase implements HostLogicInter
         { _id, name, domain, cTime, mTime }: HostDocumentModel,
         languageIndex = 0
     ): HostApiModel {
-        const data: HostApiModel = {
-            id: null,
-            name: null,
-            domain: null,
-            createAt: null,
-            updateAt: null,
+        return {
+            id: _id ?? null,
+            name: name ?? null,
+            domain: domain ?? null,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (name) {
-            data.name = name;
-        }
-
-        if (domain) {
-            data.domain = domain;
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

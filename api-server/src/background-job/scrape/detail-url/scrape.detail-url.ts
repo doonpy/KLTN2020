@@ -1,6 +1,6 @@
 import ScrapeBase from '../scrape.base';
 import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
-import StringHandler from '../../../util/string-handler/string-handler';
+import StringHandler from '../../../util/helper/string-handler';
 import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 import UrlHandler from '../../../util/url-handler/url-handler';
 import ScrapeConstant from '../scrape.constant';
@@ -10,6 +10,7 @@ import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
 import { HostDocumentModel } from '../../../service/host/host.interface';
 import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
 import ScrapeRawData from '../raw-data/scrape.raw-data';
+import DateTime from '../../../util/datetime/datetime';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
@@ -39,7 +40,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape detail URL - CID: ${this.catalog._id}`).show();
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape detail URL -> CID: ${this.catalog._id} - Start`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -163,9 +164,10 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [catalog.title, catalog.id])
         );
         this.isRunning = false;
+        const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(this.startTime)[0]);
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
-            `Scrape detail URL of catalog ${catalog.title} (ID:${catalog._id}) complete.`
+            `Scrape detail URL -> CID: ${catalog._id} - Execute time: ${executeTime} - Complete`
         ).show();
         await new ScrapeRawData(this.catalog).start();
     }

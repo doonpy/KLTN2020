@@ -1,6 +1,6 @@
 import { DocumentQuery, Query } from 'mongoose';
 import CatalogModel from './catalog.model';
-import { CatalogDocumentModel, CatalogApiModel, CatalogLogicInterface } from './catalog.interface';
+import { CatalogApiModel, CatalogDocumentModel, CatalogLogicInterface } from './catalog.interface';
 import CommonLogicBase from '../../common/service/common.service.logic.base';
 import CatalogWording from './catalog.wording';
 import ResponseStatusCode from '../../common/common.response-status.code';
@@ -285,49 +285,17 @@ export default class CatalogLogic extends CommonLogicBase implements CatalogLogi
         { _id, title, url, locator, hostId, patternId, cTime, mTime }: CatalogDocumentModel,
         languageIndex = 0
     ): CatalogApiModel {
-        const data: CatalogApiModel = {
-            id: null,
-            title: null,
-            url: null,
-            locator: null,
-            host: null,
-            pattern: null,
-            createAt: null,
-            updateAt: null,
+        return {
+            id: _id ?? null,
+            title: title ?? null,
+            url: url ?? null,
+            locator: locator ?? null,
+            host: hostId ? HostLogic.getInstance().convertToApiResponse(hostId as HostDocumentModel) : null,
+            pattern: patternId
+                ? PatternLogic.getInstance().convertToApiResponse(patternId as PatternDocumentModel)
+                : null,
+            createAt: cTime ?? null,
+            updateAt: mTime ?? null,
         };
-
-        if (_id) {
-            data.id = _id;
-        }
-
-        if (title) {
-            data.title = title;
-        }
-
-        if (url) {
-            data.url = url;
-        }
-
-        if (locator) {
-            data.locator = locator;
-        }
-
-        if (hostId && Object.keys(hostId).length > 0) {
-            data.host = HostLogic.getInstance().convertToApiResponse(hostId as HostDocumentModel);
-        }
-
-        if (patternId && Object.keys(patternId).length > 0) {
-            data.pattern = PatternLogic.getInstance().convertToApiResponse(patternId as PatternDocumentModel);
-        }
-
-        if (cTime) {
-            data.createAt = cTime;
-        }
-
-        if (mTime) {
-            data.updateAt = mTime;
-        }
-
-        return data;
     }
 }

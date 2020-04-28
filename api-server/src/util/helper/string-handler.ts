@@ -43,16 +43,6 @@ export default class StringHandler {
     }
 
     /**
-     * @param rawText
-     * @param pattern
-     *
-     * @return string
-     */
-    public static cleanWithPattern(rawText: string, pattern: RegExp): string {
-        return rawText.replace(pattern, '');
-    }
-
-    /**
      * Get similar rate - min: 0 and max: 1
      * @param {string} firstString
      * @param {string} secondString
@@ -64,10 +54,18 @@ export default class StringHandler {
         }
 
         const cleanRegExp = new RegExp(
-            /[^a-z0-9A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+/g
+            /[^a-z0-9A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+/g
         );
-        firstString = StringHandler.cleanWithPattern(firstString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
-        secondString = StringHandler.cleanWithPattern(secondString, cleanRegExp).replace(/\s+/g, ' ').toLowerCase();
+        firstString = firstString
+            .replace(cleanRegExp, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim()
+            .toLowerCase();
+        secondString = secondString
+            .replace(cleanRegExp, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim()
+            .toLowerCase();
 
         return this.calculateSimilarRate(firstString, secondString);
     }

@@ -1,8 +1,6 @@
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
-import ExceptionCustomize from '../exception/exception.customize';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import StringHandler from '../string-handler/string-handler';
 
 export default class CheckerIntegerRange extends CheckerBase {
     private readonly minRange: number;

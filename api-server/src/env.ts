@@ -1,10 +1,12 @@
 export default {
     // For development
-    DB_HOST_DEV: '159.65.0.142',
+    DB_HOST_DEV: '127.0.0.1',
     DB_PORT_DEV: '27017',
-    DB_NAME_DEV: 'kltn2020-v2',
+    DB_NAME_DEV: 'kltn2020-dev',
     DB_USERNAME_DEV: 'alice',
     DB_PASS_DEV: 'alice',
+    DB_AUTH_DB_DEV: 'admin',
+    DB_DEBUG_MODE: 0,
 
     SERVER_PROTOCOL_DEV: 'http',
     SERVER_DOMAIN_DEV: 'localhost',
@@ -16,6 +18,7 @@ export default {
     DB_NAME: 'kltn2020',
     DB_USERNAME: 'alice',
     DB_PASS: 'alice',
+    DB_AUTH_DB: 'kltn2020',
 
     SERVER_PROTOCOL: 'https',
     SERVER_DOMAIN: 'pk2020.tk',
@@ -48,8 +51,9 @@ export default {
     NTBA_FIX_319: 1,
 
     // Public folder
-    PUBLIC_FOLDER_PATH: '../public',
+    PUBLIC_FOLDER_PATH: 'public',
 
-    // Google map API key
+    // Map API key
     HERE_API_KEY: 'R4VlRgnt4NgQnFjoEf108Ay39q-RbANgJAOiXyKwBFM',
+    BING_API_KEY: 'AlOLUHH31tLfAdbM9VYVSkBrv0oJbnFyFAex72REVpB8QNTBDhwO9CLs2wZJj-Tl',
 };

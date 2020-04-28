@@ -65,7 +65,7 @@ export default class DateTime extends Date {
         const minutes: number = Math.floor(totalSeconds / 60);
         const seconds: number = totalSeconds % 60;
 
-        return `${days} days ${hours < 9 ? `0${hours}` : hours}:${minutes < 9 ? `0${minutes}` : minutes}:${
+        return `${days} day(s) - ${hours < 9 ? `0${hours}` : hours}:${minutes < 9 ? `0${minutes}` : minutes}:${
             seconds < 9 ? `0${seconds}` : seconds
         }`;
     }

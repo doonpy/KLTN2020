@@ -1,6 +1,6 @@
 import fs from 'fs';
 import FileErrorResponse from './file.error-response';
-import StringHandler from '../string-handler/string-handler';
+import StringHandler from '../helper/string-handler';
 
 export default class FileBase {
     protected readonly PUBLIC_FOLDER_PATH: string = process.env.PUBLIC_FOLDER_PATH || './public';

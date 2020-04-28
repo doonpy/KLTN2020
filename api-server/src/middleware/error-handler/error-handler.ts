@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import ResponseStatusCode from '../../common/common.response-status.code';
 import ExceptionCustomize from '../../util/exception/exception.customize';
 import ErrorHandlerWording from './error-handler.wording';
-import StringHandler from '../../util/string-handler/string-handler';
+import StringHandler from '../../util/helper/string-handler';
 import CommonLanguage from '../../common/common.language';
 
 /**
@@ -27,11 +27,21 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
         for (const key of keys) {
             const value: string | number = item[key];
 
-            if (typeof value === 'object') {
-                inputString.push(`'${key}' => {${convertToString(value)}}`);
-            } else {
+            if (!value) {
                 inputString.push(`'${key}' => '${value}'`);
+                continue;
             }
+
+            if (typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    inputString.push(`'${key}' => {${convertToString(value)}}`);
+                } else {
+                    inputString.push(`'${key}' => {${convertToString([value])}}`);
+                }
+                continue;
+            }
+
+            inputString.push(`'${key}' => '${value}'`);
         }
     }
 
