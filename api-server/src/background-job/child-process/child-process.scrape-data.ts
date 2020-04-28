@@ -19,10 +19,9 @@ process.on(
             await PatternLogic.getInstance().checkExistsWithId(catalog.patternId);
 
             const scrapeJob = new ScrapeDetailUrl(catalog);
-
             await scrapeJob.start();
         } catch (error) {
-            new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.cause || error.message}`).show();
+            new ConsoleLog(ConsoleConstant.Type.ERROR, `Scrape data - Error: ${error.cause || error.message}`).show();
             process.exit(1);
         }
     }

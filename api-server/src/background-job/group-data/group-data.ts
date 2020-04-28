@@ -9,6 +9,7 @@ import RawDataLogic from '../../service/raw-data/raw-data.logic';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
 import { GroupedDataDocumentModel } from '../../service/grouped-data/grouped-data.interface';
+import RawDataConstant from '../../service/raw-data/raw-data.constant';
 
 interface AggregationGroupDataResult {
     _id: number;
@@ -16,8 +17,6 @@ interface AggregationGroupDataResult {
 }
 
 export default class GroupData {
-    private startTime: [number, number] | undefined;
-
     private logInstance: FileLog = new File.Log();
 
     private isRunning = false;
@@ -26,28 +25,35 @@ export default class GroupData {
 
     private groupedDataLogic: GroupedDataLogic = GroupedDataLogic.getInstance();
 
-    private readonly EXPECTED_POINT: number = 9;
+    private readonly EXPECTED_SCORE: number = 9;
 
-    private readonly ATTR_POINT_TITLE: number = 4;
+    private readonly ATTR_TITLE_SCORE: number = 4;
 
-    private readonly ATTR_POINT_DESCRIBE: number = 1;
+    private readonly ATTR_DESCRIBE_SCORE: number = 1;
 
-    private readonly ATTR_POINT_PRICE: number = 1;
+    private readonly ATTR_PRICE_SCORE: number = 1;
 
-    private readonly ATTR_POINT_ACREAGE: number = 2;
+    private readonly ATTR_ACREAGE_SCORE: number = 2;
 
-    private readonly ATTR_POINT_ADDRESS: number = 2;
+    private readonly ATTR_ADDRESS_SCORE: number = 2;
+
+    private readonly TOTAL_SCORE: number;
 
     constructor() {
         this.logInstance.initLogFolder('group-data');
         this.logInstance.createFileName();
+        this.TOTAL_SCORE =
+            this.ATTR_TITLE_SCORE +
+            this.ATTR_DESCRIBE_SCORE +
+            this.ATTR_ACREAGE_SCORE +
+            this.ATTR_ADDRESS_SCORE +
+            this.ATTR_PRICE_SCORE;
     }
 
     /**
      * Start
      */
-    public async start(transactionType: number): Promise<void> {
-        this.startTime = process.hrtime();
+    public async start(transactionType: number, propertyType: number): Promise<void> {
         this.isRunning = true;
         try {
             const limit = 1000;
@@ -72,14 +78,20 @@ export default class GroupData {
                         },
                         {
                             $project: {
-                                represent: {
-                                    $arrayElemAt: ['$items', 0],
-                                },
+                                represent: { $arrayElemAt: ['$items', 0] },
                             },
                         },
                         {
                             $match: {
-                                'represent.transactionType': document.transactionType,
+                                $and: [
+                                    { 'represent.transactionType': transactionType },
+                                    {
+                                        $or: [
+                                            { 'represent.propertyType': propertyType },
+                                            { 'represent.propertyType': RawDataConstant.PROPERTY_TYPE[12].id },
+                                        ],
+                                    },
+                                ],
                             },
                         },
                     ];
@@ -87,7 +99,18 @@ export default class GroupData {
                         aggregations
                     )) as unknown) as AggregationGroupDataResult[];
                     for (const item of representOfGroupedDataset) {
-                        if (this.isBelongGroupData(document, item.represent)) {
+                        const similarScore: number = this.getSimilarScore(document, item.represent);
+
+                        if (similarScore === this.TOTAL_SCORE) {
+                            await this.rawDataLogic.delete(document._id);
+                            new ConsoleLog(
+                                ConsoleConstant.Type.ERROR,
+                                `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: Over fitting.`
+                            ).show();
+                            continue rawDataLoop;
+                        }
+
+                        if (similarScore >= this.EXPECTED_SCORE) {
                             const groupData: GroupedDataDocumentModel = await this.groupedDataLogic.getById(item._id);
 
                             groupData.items.push(document._id);
@@ -98,7 +121,7 @@ export default class GroupData {
                                 ]);
                                 new ConsoleLog(
                                     ConsoleConstant.Type.INFO,
-                                    `Group data - RID: ${document._id} -> GID: ${item._id}`
+                                    `Group data -> RID: ${document._id} -> GID: ${item._id}`
                                 ).show();
                             } catch (error) {
                                 await ChatBotTelegram.getInstance().sendMessage(
@@ -106,7 +129,7 @@ export default class GroupData {
                                 );
                                 new ConsoleLog(
                                     ConsoleConstant.Type.ERROR,
-                                    `Group data - RID: ${document._id} -> GID: ${item._id} - Error: ${
+                                    `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: ${
                                         error.cause || error.message
                                     }`
                                 ).show();
@@ -118,14 +141,16 @@ export default class GroupData {
 
                     const groupedDataCreated: GroupedDataDocumentModel | undefined = (
                         await Promise.all([
-                            this.groupedDataLogic.create(([document._id] as unknown) as GroupedDataDocumentModel),
+                            this.groupedDataLogic.create(({
+                                items: [document._id],
+                            } as unknown) as GroupedDataDocumentModel),
                             this.rawDataLogic.update(document._id, document),
                         ])
                     )[0];
 
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
-                        `Group data - RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
+                        `Group data -> RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
                     ).show();
                 }
                 offset += limit;
@@ -137,46 +162,35 @@ export default class GroupData {
     }
 
     /**
-     * Check whether raw data belong any group data
-     * @param {RawDataDocumentModel} rawData
-     * @param {RawDataDocumentModel} representGroupedData
+     * Get similar score between two raw data document.
+     *
+     * @param {RawDataDocumentModel} firstRawData
+     * @param {RawDataDocumentModel} secondRawData
+     *
+     * @return {number} totalPoint
      */
-    private isBelongGroupData(rawData: RawDataDocumentModel, representGroupedData: RawDataDocumentModel): boolean {
+    private getSimilarScore(firstRawData: RawDataDocumentModel, secondRawData: RawDataDocumentModel): number {
         let totalPoint = 0;
+        totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'title');
+        totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'address');
+        totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'describe');
+        totalPoint += this.calculatePriceScore(firstRawData, secondRawData);
+        totalPoint += this.calculateAcreageScore(firstRawData, secondRawData);
 
-        totalPoint += this.calculateStringAttributePoint(representGroupedData, rawData, 'title');
-        if (totalPoint > this.EXPECTED_POINT) {
-            return true;
-        }
-
-        totalPoint += this.calculateStringAttributePoint(representGroupedData, rawData, 'address');
-        if (totalPoint > this.EXPECTED_POINT) {
-            return true;
-        }
-
-        totalPoint += this.calculateAcreagePoint(representGroupedData, rawData);
-        if (totalPoint > this.EXPECTED_POINT) {
-            return true;
-        }
-
-        totalPoint += this.calculateStringAttributePoint(representGroupedData, rawData, 'describe');
-        if (totalPoint > this.EXPECTED_POINT) {
-            return true;
-        }
-
-        totalPoint += this.calculatePricePoint(representGroupedData, rawData);
-        return totalPoint > this.EXPECTED_POINT;
+        return totalPoint;
     }
 
     /**
-     * Calculate acreage distance point
+     * Calculate acreage distance score
+     *
      * @param {RawDataDocumentModel} firstTarget
      * @param {RawDataDocumentModel} secondTarget
+     *
      * @return {number} points
      */
-    private calculateAcreagePoint(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
+    private calculateAcreageScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
         if (!Number(firstTarget.acreage.value) && !Number(secondTarget.acreage.value)) {
-            return this.ATTR_POINT_ACREAGE;
+            return this.ATTR_ACREAGE_SCORE;
         }
 
         if (!Number(firstTarget.acreage.value) || !Number(secondTarget.acreage.value)) {
@@ -206,19 +220,21 @@ export default class GroupData {
             (1 -
                 Math.abs(firstAcreageObj.value - secondAcreageObj.value) /
                     ((firstAcreageObj.value + secondAcreageObj.value) / 2)) *
-            this.ATTR_POINT_ACREAGE
+            this.ATTR_ACREAGE_SCORE
         );
     }
 
     /**
-     * Calculate price distance point
+     * Calculate price distance score
+     *
      * @param {RawDataDocumentModel} firstTarget
      * @param {RawDataDocumentModel} secondTarget
+     *
      * @return {number} points
      */
-    private calculatePricePoint(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
+    private calculatePriceScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
         if (!Number(firstTarget.price.value) && !Number(secondTarget.price.value)) {
-            return this.ATTR_POINT_PRICE;
+            return this.ATTR_PRICE_SCORE;
         }
 
         if (!Number(firstTarget.price.value) || !Number(secondTarget.price.value)) {
@@ -243,32 +259,34 @@ export default class GroupData {
             (1 -
                 Math.abs(firstPriceObj.value - secondPriceObj.value) /
                     ((firstPriceObj.value + secondPriceObj.value) / 2)) *
-            this.ATTR_POINT_PRICE
+            this.ATTR_PRICE_SCORE
         );
     }
 
     /**
-     * Calculate string attribute point
+     * Calculate string attribute score
+     *
      * @param {RawDataDocumentModel} firstTarget
      * @param {RawDataDocumentModel} secondTarget
      * @param {'title' | 'address' | 'describe'} type
+     *
      * @return {number} points
      */
-    private calculateStringAttributePoint(
+    private calculateStringAttributeScore(
         firstTarget: RawDataDocumentModel,
         secondTarget: RawDataDocumentModel,
         type: 'title' | 'address' | 'describe'
     ): number {
         switch (type) {
             case 'title':
-                return StringHandler.getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_POINT_TITLE;
+                return StringHandler.getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_TITLE_SCORE;
             case 'describe':
                 return (
-                    StringHandler.getSimilarRate(firstTarget.describe, secondTarget.describe) * this.ATTR_POINT_DESCRIBE
+                    StringHandler.getSimilarRate(firstTarget.describe, secondTarget.describe) * this.ATTR_DESCRIBE_SCORE
                 );
             case 'address':
                 return (
-                    StringHandler.getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_POINT_ADDRESS
+                    StringHandler.getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_ADDRESS_SCORE
                 );
             default:
                 return 0;

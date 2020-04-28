@@ -6,6 +6,7 @@ import RawDataLogic from '../../service/raw-data/raw-data.logic';
 import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
 import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
 import { DetailUrlDocumentModel } from '../../service/detail-url/detail-url.interface';
+import DateTime from '../../util/datetime/datetime';
 
 type AggregationGroupDataResult = {
     _id: string;
@@ -89,24 +90,28 @@ const deleteDuplicateDetailUrl = async (): Promise<void> => {
 process.on(
     'message',
     async (): Promise<void> => {
+        const startTime: [number, number] = process.hrtime();
         const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
         const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
         try {
             await mongoDbInstance.connect();
 
             await telegramChatBotInstance.sendMessage(`<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`);
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Start clean data...`).show();
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Start`).show();
 
             await deleteDuplicateDetailUrl();
 
-            await telegramChatBotInstance.sendMessage(`<b>🤖[Clean data]🤖</b>\n✅ Clean data complete.`);
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data complete.`).show();
+            const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
+            await telegramChatBotInstance.sendMessage(
+                `<b>🤖[Clean data]🤖</b>\n✅ Clean data complete. Execute time: ${executeTime}`
+            );
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Execute time: ${executeTime} - Complete`).show();
             process.exit(0);
         } catch (error) {
             await telegramChatBotInstance.sendMessage(
                 `<b>🤖[Clean data]🤖</b>\n❌ Clean data failed.\nError:<code>${error.message}</code>`
             );
-            new ConsoleLog(ConsoleConstant.Type.ERROR, `Clean data failed. Error: ${error.message}`).show();
+            new ConsoleLog(ConsoleConstant.Type.ERROR, `Clean data - Error: ${error.message}`).show();
             process.exit(1);
         }
     }

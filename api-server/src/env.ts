@@ -51,7 +51,7 @@ export default {
     NTBA_FIX_319: 1,
 
     // Public folder
-    PUBLIC_FOLDER_PATH: '../public',
+    PUBLIC_FOLDER_PATH: 'public',
 
     // Map API key
     HERE_API_KEY: 'R4VlRgnt4NgQnFjoEf108Ay39q-RbANgJAOiXyKwBFM',

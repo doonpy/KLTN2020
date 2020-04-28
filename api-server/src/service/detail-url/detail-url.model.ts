@@ -11,7 +11,7 @@ const detailUrlSchema: Schema = new Schema(
         isExtracted: { type: Schema.Types.Boolean, default: false },
         requestRetries: { type: Schema.Types.Number, default: 0 },
     },
-    { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
+    { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } },
 );
 
 detailUrlSchema.plugin(autoIncrement.plugin, {
@@ -20,6 +20,7 @@ detailUrlSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-detailUrlSchema.index({ url: 1 });
+detailUrlSchema.index({ url: 1 }, { name: 'idx_url' });
+detailUrlSchema.index({ catalogId: 1 }, { name: 'idx_catalogId' });
 
 export default mongoose.model<DetailUrlDocumentModel>('detail_url', detailUrlSchema);

@@ -214,15 +214,16 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
      * @return {number} index
      */
     public getPropertyTypeIndex(propertyTypeData: string): number {
-        const index: number = RawDataConstant.TYPE_OF_PROPERTY_WORDING.findIndex((property: string[]) =>
-            new RegExp(property.join(' ')).test(propertyTypeData.toLowerCase())
+        let propertyType: number = RawDataConstant.PROPERTY_TYPE[12].id;
+        const index: number = RawDataConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
+            new RegExp(wording.join('|')).test(propertyTypeData.toLowerCase()),
         );
 
-        if (index === -1) {
-            return RawDataConstant.TYPE_OF_PROPERTY.OTHER;
+        if (index !== -1) {
+            propertyType = index;
         }
 
-        return index;
+        return propertyType;
     }
 
     /**
@@ -336,7 +337,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             path: 'detailUrlId coordinateId',
             populate: {
                 path: 'catalogId',
-                populate: { path: 'hostId' },
+                populate: { path: 'hostId patternId' },
             },
         });
     }
@@ -352,7 +353,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
                 path: 'detailUrlId coordinateId',
                 populate: {
                     path: 'catalogId',
-                    populate: { path: 'hostId' },
+                    populate: { path: 'hostId patternId' },
                 },
             })
             .execPopulate();
@@ -387,8 +388,8 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
     ): RawDataApiModel {
         return {
             id: _id ?? null,
-            transactionType: RawDataConstant.TYPE_OF_TRANSACTION_WORDING[transactionType][languageIndex] ?? null,
-            propertyType: RawDataConstant.TYPE_OF_PROPERTY_WORDING[propertyType][languageIndex] ?? null,
+            transactionType: RawDataConstant.TRANSACTION_TYPE[transactionType].wording[languageIndex] ?? null,
+            propertyType: RawDataConstant.PROPERTY_TYPE[propertyType].wording[languageIndex] ?? null,
             detailUrl: detailUrlId
                 ? DetailUrlLogic.getInstance().convertToApiResponse(detailUrlId as DetailUrlDocumentModel)
                 : null,

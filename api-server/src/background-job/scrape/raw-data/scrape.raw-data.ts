@@ -55,7 +55,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Start scrape raw data -> CID: ${this.catalog._id}`).show();
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape raw data -> CID: ${this.catalog._id} - Start`).show();
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.START, [
                     this.catalog.title,
@@ -187,16 +187,16 @@ export default class ScrapeRawData extends ScrapeBase {
             addressData,
             othersData
         );
+        currentDetailUrlDocument.isExtracted = this.EXTRACTED;
+        currentDetailUrlDocument.requestRetries += 1;
 
         if (this.isHasEmptyProperty(rawData)) {
             try {
-                currentDetailUrlDocument.isExtracted = this.EXTRACTED;
-                currentDetailUrlDocument.requestRetries += 1;
                 await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
                 this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
-                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} -> RID: N/A - Error: Invalid value.`
+                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: Invalid value.`
                 ).show();
             } catch (error) {
                 this.writeErrorLog(
@@ -309,6 +309,10 @@ export default class ScrapeRawData extends ScrapeBase {
                     ScrapeConstant.LOG_ACTION.UPDATE,
                     `Detail URL ID: ${currentDetailUrlDocument._id}`
                 );
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.message}`
+                ).show();
             }
         }
     }
@@ -355,9 +359,9 @@ export default class ScrapeRawData extends ScrapeBase {
             measureUnit: (acreageData.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []).shift() || '',
         };
 
-        const transactionType: number = ScrapeRawDataConstant.TRANSACTION_PATTERN.test(this.catalog.title)
-            ? RawDataConstant.TYPE_OF_TRANSACTION.RENT
-            : RawDataConstant.TYPE_OF_TRANSACTION.SALE;
+        const transactionType: number = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(this.catalog.title)
+            ? RawDataConstant.TRANSACTION_TYPE[1].id
+            : RawDataConstant.TRANSACTION_TYPE[0].id;
 
         const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
 
@@ -397,7 +401,11 @@ export default class ScrapeRawData extends ScrapeBase {
             ])
         );
         this.isRunning = false;
-        new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape raw data -> CID: ${this.catalog._id} complete.`).show();
+        const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(this.startTime)[0]);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Scrape raw data -> CID: ${this.catalog._id} - Execute time: ${executeTime} - Complete`
+        ).show();
         process.exit(0);
     }
 
