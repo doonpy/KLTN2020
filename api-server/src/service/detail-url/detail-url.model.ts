@@ -11,7 +11,7 @@ const detailUrlSchema: Schema = new Schema(
         isExtracted: { type: Schema.Types.Boolean, default: false },
         requestRetries: { type: Schema.Types.Number, default: 0 },
     },
-    { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } },
+    { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
 
 detailUrlSchema.plugin(autoIncrement.plugin, {
