@@ -5,6 +5,6 @@ export default (): void => {
         if (new RegExp(/_DEV$/).test(key) && process.env.NODE_ENV === 'production') {
             return;
         }
-        process.env[key] = (EnvironmentVariables as { [key: string]: string | number })[key] as string;
+        process.env[key] = (EnvironmentVariables as { [key: string]: string | number | boolean })[key] as string;
     });
 };

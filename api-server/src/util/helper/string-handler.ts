@@ -43,16 +43,6 @@ export default class StringHandler {
     }
 
     /**
-     * @param rawText
-     * @param pattern
-     *
-     * @return string
-     */
-    public static cleanWithPattern(rawText: string, pattern: RegExp): string {
-        return rawText.replace(pattern, '');
-    }
-
-    /**
      * Get similar rate - min: 0 and max: 1
      * @param {string} firstString
      * @param {string} secondString

@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { Model, Schema } from 'mongoose';
+import { Model } from 'mongoose';
 import ResponseStatusCode from '../common.response-status.code';
 import { CommonDocumentModel, CommonServiceControllerBaseInterface } from './common.service.interface';
 import ExceptionCustomize from '../../util/exception/exception.customize';
 import DatabaseWording from '../../service/database/database.wording';
 import Validator from '../../util/validator/validator';
-import StringHandler from '../../util/string-handler/string-handler';
+import StringHandler from '../../util/helper/string-handler';
 import CommonLanguage from '../common.language';
 import Checker from '../../util/checker/checker.index';
 import HostModel from '../../service/host/host.model';

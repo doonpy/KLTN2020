@@ -34,7 +34,7 @@ export default class DatabaseMongodb {
             this.username = process.env.DB_USERNAME_DEV ?? '';
             this.password = process.env.DB_PASS_DEV ?? '';
             this.authDb = process.env.DB_AUTH_DB_DEV ?? '';
-            set('debug', true);
+            set('debug', (process.env.DB_DEBUG_MODE ?? 1) === 1);
         }
     }
 

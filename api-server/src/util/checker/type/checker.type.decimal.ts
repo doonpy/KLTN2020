@@ -9,7 +9,7 @@ export default class CheckerTypeDecimal extends CheckerTypeBase {
      * @param paramName
      * @param value
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     public checkType(paramName: string, value: any): void {
         if (typeof value !== 'number') {
             throw {

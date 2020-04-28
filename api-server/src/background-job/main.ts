@@ -7,6 +7,7 @@ import DateTime from '../util/datetime/datetime';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import initEnv from '../util/environment/environment';
 import CatalogLogic from '../service/catalog/catalog.logic';
+import RawDataConstant from '../service/raw-data/raw-data.constant';
 
 let isRunning = false;
 let telegramChatBotInstance: ChatBotTelegram | undefined;
@@ -15,16 +16,39 @@ let telegramChatBotInstance: ChatBotTelegram | undefined;
  * Execute group data child process
  */
 const executeGroupDataChildProcess = (): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
-    childProcess.on(
-        'exit',
-        async (): Promise<void> => {
-            isRunning = false;
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
-            await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
+    const propertyTypeIdList: number[] = RawDataConstant.PROPERTY_TYPE.map((item) => item.id);
+    const transactionTypeIdList: number[] = RawDataConstant.TRANSACTION_TYPE.map((item) => item.id);
+    let childProcessAmount = 0;
+    let currentTransactionTypeId: number = transactionTypeIdList.shift() as number;
+    const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+        if (propertyTypeIdList.length === 0 && childProcessAmount === 0) {
+            if (transactionTypeIdList.length === 0) {
+                clearInterval(loop);
+                isRunning = false;
+                new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
+                await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
+            } else {
+                currentTransactionTypeId = transactionTypeIdList.shift() as number;
+            }
+            return;
         }
-    );
-    childProcess.send({});
+
+        if (childProcessAmount >= parseInt(process.env.THREAD_AMOUNT || '1', 10)) {
+            return;
+        }
+
+        const currentPropertyTypeId: number = propertyTypeIdList.shift() as number;
+
+        const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
+        childProcess.on(
+            'exit',
+            async (): Promise<void> => {
+                childProcessAmount -= 1;
+            }
+        );
+        childProcess.send({ transactionTypeId: currentTransactionTypeId, propertyTypeId: currentPropertyTypeId });
+        childProcessAmount += 1;
+    }, 0);
 };
 
 /**

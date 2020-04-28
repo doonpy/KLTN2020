@@ -1,5 +1,3 @@
-import StringHandler from '../string-handler/string-handler';
-
 export default class ExceptionCustomize extends Error {
     public readonly statusCode: number;
 

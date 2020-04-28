@@ -159,13 +159,13 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TYPE_OF_TRANSACTION).length - 1)
+                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TRANSACTION_TYPE).length - 1)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TYPE_OF_PROPERTY).length - 1)
+                new Checker.IntegerRange(0, Object.keys(RawDataConstant.PROPERTY_TYPE).length - 1)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.Type.String());
@@ -247,13 +247,13 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TYPE_OF_TRANSACTION).length - 1)
+                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TRANSACTION_TYPE).length - 1)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TYPE_OF_PROPERTY).length - 1)
+                new Checker.IntegerRange(0, Object.keys(RawDataConstant.PROPERTY_TYPE).length - 1)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.Type.String());

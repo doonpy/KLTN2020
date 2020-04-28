@@ -7,7 +7,7 @@ export const ScrapeRawDataConstantChatBotMessage = {
 export const ScrapeRawDataConstant = {
     VALUE_PATTERN: new RegExp(/(([1-9]+)?0?\.?[0-9]+)/),
     ACREAGE_MEASURE_UNIT_PATTERN: new RegExp(/m²|km²/),
-    TRANSACTION_PATTERN: new RegExp(/([tT])huê|([rR])ent/),
+    RENT_TRANSACTION_PATTERN: new RegExp(/([tT])huê|([rR])ent/),
     PRICE_CURRENCY_PATTERN: new RegExp(
         /(million)|(billion)|(billion vnd\/month)|(million vnd\/month)|(triệu)|(tỷ)|(nghìn\/tháng)|(triệu\/tháng)|(tỷ\/tháng)/
     ),
