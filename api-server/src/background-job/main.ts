@@ -1,16 +1,12 @@
-import { ChildProcess, fork } from 'child_process';
+import { ChildProcess, exec, fork } from 'child_process';
 import * as path from 'path';
 import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import ConsoleConstant from '../util/console/console.constant';
-import DateTime from '../util/datetime/datetime';
-import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
-import initEnv from '../util/environment/environment';
 import CatalogLogic from '../service/catalog/catalog.logic';
 import RawDataConstant from '../service/raw-data/raw-data.constant';
 
 let isRunning = false;
-let telegramChatBotInstance: ChatBotTelegram | undefined;
 
 /**
  * Execute group data child process
@@ -24,9 +20,9 @@ const executeGroupDataChildProcess = (): void => {
         if (propertyTypeIdList.length === 0 && childProcessAmount === 0) {
             if (transactionTypeIdList.length === 0) {
                 clearInterval(loop);
-                isRunning = false;
                 new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
-                await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
+                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
+                isRunning = false;
             } else {
                 currentTransactionTypeId = transactionTypeIdList.shift() as number;
             }
@@ -108,64 +104,28 @@ const executeScrapeChildProcess = async (): Promise<void> => {
 };
 
 /**
- * Start of background job.
- *
- * @param {boolean} force
+ * Backup database
  */
-const start = async (force = false): Promise<void> => {
-    if (isRunning) {
-        return;
-    }
-
-    isRunning = true;
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
-    await telegramChatBotInstance?.sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
-
-    if (force) {
-        await executeScrapeChildProcess();
-        return;
-    }
-
-    (function clock(): void {
-        const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
-            const expectTime: Date = new Date();
-            expectTime.setUTCHours(parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10));
-            expectTime.setUTCMinutes(parseInt(process.env.SCHEDULE_TIME_MINUTE || '0', 10));
-            expectTime.setUTCSeconds(parseInt(process.env.SCHEDULE_TIME_SECOND || '0', 10));
-            if (!DateTime.isExactTime(expectTime, true)) {
-                return;
-            }
-
-            clearInterval(checkTimeLoop);
-            await executeScrapeChildProcess();
-
-            const delayTime: number =
-                parseInt(process.env.SCHEDULE_TIME_DELAY_SECOND || '0', 10) *
-                (parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0', 10)
-                    ? parseInt(process.env.SCHEDULE_TIME_DELAY_MINUTE || '0', 10) * 60
-                    : 1) *
-                (parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0', 10)
-                    ? parseInt(process.env.SCHEDULE_TIME_DELAY_HOUR || '0', 10) * 3600
-                    : 1);
-            setTimeout(clock, 1000 * delayTime);
-        }, 1000);
-    })();
+const backupDatabase = (): void => {
+    new ConsoleLog(ConsoleConstant.Type.INFO, 'Clone database - Start').show();
+    exec('sh tools/database/backup-data.sh');
+    new ConsoleLog(ConsoleConstant.Type.INFO, 'Clone database - Complete').show();
 };
 
 /**
- * Main
+ * Start
  */
-(async (): Promise<void> => {
-    initEnv();
-    telegramChatBotInstance = ChatBotTelegram.getInstance();
-    try {
-        await DatabaseMongodb.getInstance().connect();
-        await start(true);
-    } catch (error) {
-        await telegramChatBotInstance.sendMessage(
-            `<b>🤖[Background Job]🤖 ❌ ERROR ❌</b>\nError: <code>${error.message}</code>`
-        );
-        new ConsoleLog(ConsoleConstant.Type.ERROR, `Error: ${error.message}`).show();
-    }
-    isRunning = false;
-})();
+const main = async (): Promise<void> => {
+    isRunning = true;
+    backupDatabase();
+    new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
+    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
+    await executeScrapeChildProcess();
+};
+
+const isBgrJobRunning = (): boolean => isRunning;
+
+export default {
+    main,
+    isBgrJobRunning,
+};

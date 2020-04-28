@@ -10,6 +10,25 @@ import PatternController from './service/pattern/pattern.controller';
 import DetailUrlController from './service/detail-url/detail-url.controller';
 import RawDataController from './service/raw-data/raw-data.controller';
 import GroupedDataController from './service/grouped-data/grouped-data.controller';
+import DateTime from './util/datetime/datetime';
+import BackgroundJob from './background-job/main';
+
+/**
+ * Background job
+ */
+const startBackgroundJob = (): void => {
+    const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+        const expectTime: Date = new Date();
+        expectTime.setUTCHours(parseInt(process.env.SCHEDULE_TIME_HOUR || '0', 10));
+        expectTime.setUTCMinutes(parseInt(process.env.SCHEDULE_TIME_MINUTE || '0', 10));
+        expectTime.setUTCSeconds(parseInt(process.env.SCHEDULE_TIME_SECOND || '0', 10));
+        if (!DateTime.isExactTime(expectTime, true) || BackgroundJob.isBgrJobRunning()) {
+            return;
+        }
+
+        await BackgroundJob.main();
+    }, 1000);
+};
 
 /**
  * Main
@@ -20,6 +39,8 @@ import GroupedDataController from './service/grouped-data/grouped-data.controlle
     const appInstance: App = App.getInstance();
 
     await mongoDbInstance.connect();
+    startBackgroundJob();
+    await BackgroundJob.main();
     await appInstance.start(
         [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
         [

@@ -57,7 +57,7 @@ export default class DatabaseMongodb {
         this.connection = await connect(connString, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            useFindAndModify: false,
+            useFindAndModify: true,
             useCreateIndex: true,
             auth: {
                 user: this.username as string,

@@ -28,9 +28,6 @@ export default {
     // Thread amount
     THREAD_AMOUNT: 2,
     // Schedule
-    SCHEDULE_TIME_DELAY_HOUR: 48,
-    SCHEDULE_TIME_DELAY_MINUTE: 0,
-    SCHEDULE_TIME_DELAY_SECOND: 0,
     SCHEDULE_TIME_HOUR: 18,
     SCHEDULE_TIME_MINUTE: 0,
     SCHEDULE_TIME_SECOND: 0,
@@ -49,9 +46,6 @@ export default {
     // Chat Bot
     CHAT_BOT_TELEGRAM_TOKEN: '1046175359:AAGfHKqnAv0_IFdTEvtLmuanahYW0JWpHKE',
     NTBA_FIX_319: 1,
-
-    // Public folder
-    PUBLIC_FOLDER_PATH: 'public',
 
     // Map API key
     HERE_API_KEY: 'R4VlRgnt4NgQnFjoEf108Ay39q-RbANgJAOiXyKwBFM',
