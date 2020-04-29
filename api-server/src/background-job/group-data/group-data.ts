@@ -51,11 +51,10 @@ export default class GroupData {
         this.isRunning = true;
         try {
             const limit = 1000;
-            let offset = 0;
             let rawDataset: {
                 documents: RawDataDocumentModel[];
                 hasNext: boolean;
-            } = await this.rawDataLogic.getAll(limit, offset, { isGrouped: false, transactionType });
+            } = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false, transactionType });
 
             while (rawDataset.hasNext || rawDataset.documents.length > 0) {
                 const { documents } = rawDataset;
@@ -92,6 +91,7 @@ export default class GroupData {
                     const representOfGroupedDataset: AggregationGroupDataResult[] = ((await this.groupedDataLogic.aggregationQuery(
                         aggregations
                     )) as unknown) as AggregationGroupDataResult[];
+
                     for (const item of representOfGroupedDataset) {
                         const similarScore: number = this.getSimilarScore(document, item.represent);
 
@@ -147,8 +147,7 @@ export default class GroupData {
                         `Group data -> RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
                     ).show();
                 }
-                offset += limit;
-                rawDataset = await this.rawDataLogic.getAll(limit, offset, { isGrouped: false });
+                rawDataset = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false });
             }
         } catch (error) {
             this.isRunning = false;
