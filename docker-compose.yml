@@ -15,25 +15,9 @@ services:
       - NODE_ENV=production
     tty: true
     volumes:
-      - ./public:/usr/src/app/public
+      - ./logs:/usr/src/app/logs
     ports:
       - 3000:3000
-
-  bgr-job:
-    image: pk2020:latest
-    container_name: bgr-job
-    entrypoint:
-      - /bin/sh
-      - bgr-job-command.sh
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    environment:
-      - NODE_ENV=production
-    tty: true
-    depends_on:
-      - api-server
-    volumes:
-      - ./public:/usr/src/app/public
 
   web-server:
     image: pk2020:latest

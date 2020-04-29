@@ -56,7 +56,7 @@ const deleteDuplicateDetailUrl = async (): Promise<void> => {
         for (let i = 1; i < item.docList.length; i++) {
             try {
                 await detailUrlLogic.delete(item.docList[i]._id);
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data -> DID:${item.docList[i]._id})`).show();
+                new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data -> DID:${item.docList[i]._id}`).show();
             } catch (error) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
@@ -74,7 +74,7 @@ const deleteDuplicateDetailUrl = async (): Promise<void> => {
                     );
                     for (const document of documents) {
                         await rawDataLogic.delete(document._id);
-                        new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - RID:${item.docList[i]._id})`).show();
+                        new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - RID:${item.docList[i]._id}`).show();
                     }
                 } catch (error) {
                     new ConsoleLog(

@@ -1,10 +1,8 @@
-import File from '../../util/file/file.index';
 import { convertAcreageValue, convertPriceValue } from './group-data.helper';
 import StringHandler from '../../util/helper/string-handler';
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import GroupedDataLogic from '../../service/grouped-data/grouped-data.logic';
-import FileLog from '../../util/file/file.log';
 import RawDataLogic from '../../service/raw-data/raw-data.logic';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
@@ -17,8 +15,6 @@ interface AggregationGroupDataResult {
 }
 
 export default class GroupData {
-    private logInstance: FileLog = new File.Log();
-
     private isRunning = false;
 
     private rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
@@ -40,8 +36,6 @@ export default class GroupData {
     private readonly TOTAL_SCORE: number;
 
     constructor() {
-        this.logInstance.initLogFolder('group-data');
-        this.logInstance.createFileName();
         this.TOTAL_SCORE =
             this.ATTR_TITLE_SCORE +
             this.ATTR_DESCRIBE_SCORE +
@@ -57,11 +51,10 @@ export default class GroupData {
         this.isRunning = true;
         try {
             const limit = 1000;
-            let offset = 0;
             let rawDataset: {
                 documents: RawDataDocumentModel[];
                 hasNext: boolean;
-            } = await this.rawDataLogic.getAll(limit, offset, { isGrouped: false, transactionType });
+            } = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false, transactionType });
 
             while (rawDataset.hasNext || rawDataset.documents.length > 0) {
                 const { documents } = rawDataset;
@@ -98,6 +91,7 @@ export default class GroupData {
                     const representOfGroupedDataset: AggregationGroupDataResult[] = ((await this.groupedDataLogic.aggregationQuery(
                         aggregations
                     )) as unknown) as AggregationGroupDataResult[];
+
                     for (const item of representOfGroupedDataset) {
                         const similarScore: number = this.getSimilarScore(document, item.represent);
 
@@ -153,8 +147,7 @@ export default class GroupData {
                         `Group data -> RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
                     ).show();
                 }
-                offset += limit;
-                rawDataset = await this.rawDataLogic.getAll(limit, offset, { isGrouped: false });
+                rawDataset = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false });
             }
         } catch (error) {
             this.isRunning = false;

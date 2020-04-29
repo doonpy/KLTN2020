@@ -23,11 +23,10 @@ process.on(
             const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
             const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
             const limit = 1000;
-            let offset = 0;
             let rawDataset: {
                 documents: RawDataDocumentModel[];
                 hasNext: boolean;
-            } = await rawDataLogic.getAll(limit, offset, { coordinate: null });
+            } = await rawDataLogic.getAll(limit, undefined, { coordinate: null });
 
             while (rawDataset.hasNext || rawDataset.documents.length > 0) {
                 for (const document of rawDataset.documents) {
@@ -45,8 +44,7 @@ process.on(
                         `Add coordinate - RID:${document._id} -> CID:${coordinateDoc._id}`
                     ).show();
                 }
-                offset += limit;
-                rawDataset = await rawDataLogic.getAll(limit, offset, { coordinate: null });
+                rawDataset = await rawDataLogic.getAll(limit, undefined, { coordinate: null });
             }
 
             const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);

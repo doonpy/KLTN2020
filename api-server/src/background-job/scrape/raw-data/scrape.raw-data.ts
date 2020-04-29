@@ -3,7 +3,6 @@ import RawDataLogic from '../../../service/raw-data/raw-data.logic';
 import DateTime from '../../../util/datetime/datetime';
 import StringHandler from '../../../util/helper/string-handler';
 import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
-import ScrapeConstant from '../scrape.constant';
 import ConsoleLog from '../../../util/console/console.log';
 import ConsoleConstant from '../../../util/console/console.constant';
 import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
@@ -27,8 +26,6 @@ export default class ScrapeRawData extends ScrapeBase {
 
     private pattern: PatternDocumentModel;
 
-    private saveAmount = 0;
-
     private readonly NOT_EXTRACTED: boolean = false;
 
     private readonly EXTRACTED: boolean = true;
@@ -41,8 +38,6 @@ export default class ScrapeRawData extends ScrapeBase {
         super();
         this.catalog = catalog;
         this.pattern = catalog.patternId as PatternDocumentModel;
-        this.logInstance.initLogFolder('raw-data-scrape');
-        this.logInstance.createFileName(`cid-${catalog._id}_`);
     }
 
     /**
@@ -77,8 +72,6 @@ export default class ScrapeRawData extends ScrapeBase {
 
             this.scrapeAction();
         } catch (error) {
-            this.writeErrorLog(error, ScrapeConstant.LOG_ACTION.FETCH_DATA, `Start failed.`);
-            this.addSummaryErrorLog(ScrapeRawDataConstantChatBotMessage.ERROR, error, this.catalog._id);
             await this.telegramChatBotInstance.sendMessage(
                 StringHandler.replaceString(error.message, [this.catalog._id, error.message])
             );
@@ -193,17 +186,11 @@ export default class ScrapeRawData extends ScrapeBase {
         if (this.isHasEmptyProperty(rawData)) {
             try {
                 await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
-                this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: Invalid value.`
                 ).show();
             } catch (error) {
-                this.writeErrorLog(
-                    error,
-                    ScrapeConstant.LOG_ACTION.CREATE,
-                    `Raw data from detail URL ID: ${currentDetailUrlDocument._id || -1}`
-                );
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.cause || error.message}`
@@ -217,23 +204,11 @@ export default class ScrapeRawData extends ScrapeBase {
                 this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument),
                 this.rawDataLogic.create(rawData),
             ]);
-            this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${result[0]._id}`);
-            this.writeLog(ScrapeConstant.LOG_ACTION.CREATE, `Raw data ID: ${result[1] ? result[1]._id : 'N/A'}`);
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
                 `Scrape raw data -> DID: ${result[0]._id} -> RID: ${result[1] ? result[1]._id : 'N/A'}`
             ).show();
         } catch (error) {
-            this.writeErrorLog(
-                error,
-                ScrapeConstant.LOG_ACTION.UPDATE,
-                `Detail URL ID: ${currentDetailUrlDocument._id}`
-            );
-            this.writeErrorLog(
-                error,
-                ScrapeConstant.LOG_ACTION.CREATE,
-                `Raw data from detail URL ID: ${currentDetailUrlDocument._id || -1}`
-            );
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
                 `Scrape raw data -> DID: ${currentDetailUrlDocument._id}}`
@@ -298,17 +273,11 @@ export default class ScrapeRawData extends ScrapeBase {
         } else {
             try {
                 await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
-                this.writeLog(ScrapeConstant.LOG_ACTION.UPDATE, `Detail URL ID: ${currentDetailUrlDocument._id}`);
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
                 ).show();
             } catch (error) {
-                this.writeErrorLog(
-                    error,
-                    ScrapeConstant.LOG_ACTION.UPDATE,
-                    `Detail URL ID: ${currentDetailUrlDocument._id}`
-                );
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.message}`
@@ -383,17 +352,6 @@ export default class ScrapeRawData extends ScrapeBase {
      * Finish action
      */
     public async finishAction(): Promise<void> {
-        this.exportLog(this.catalog, [
-            { name: 'Save amount', value: this.saveAmount },
-            {
-                name: 'Catalog ID',
-                value: this.catalog._id,
-            },
-            {
-                name: 'Catalog title',
-                value: this.catalog.title,
-            },
-        ]);
         await this.telegramChatBotInstance.sendMessage(
             StringHandler.replaceString(ScrapeRawDataConstantChatBotMessage.FINISH, [
                 this.catalog.title,
