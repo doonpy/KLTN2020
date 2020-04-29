@@ -2,8 +2,6 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-RUN mkdir logs
-
 COPY . .
 COPY tools/docker/api/command.sh api-command.sh
 COPY ./tools/docker/web/command.sh web-command.sh
