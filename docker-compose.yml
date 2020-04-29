@@ -14,8 +14,6 @@ services:
     environment:
       - NODE_ENV=production
     tty: true
-    volumes:
-      - ./db-backup:/usr/src/app/db-backup
     ports:
       - 3000:3000
 

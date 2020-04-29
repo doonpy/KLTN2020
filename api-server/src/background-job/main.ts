@@ -1,4 +1,4 @@
-import { ChildProcess, exec, fork } from 'child_process';
+import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
 import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
@@ -104,20 +104,10 @@ const executeScrapeChildProcess = async (): Promise<void> => {
 };
 
 /**
- * Backup database
- */
-const backupDatabase = (): void => {
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Clone database - Start').show();
-    exec('sh tools/database/backup-data.sh');
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Clone database - Complete').show();
-};
-
-/**
  * Start
  */
 const main = async (): Promise<void> => {
     isRunning = true;
-    backupDatabase();
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
     await executeScrapeChildProcess();

@@ -1,6 +1,10 @@
 #!/bin/bash
 
-source ../config.cfg
+MONGO_DATABASE="kltn2020"
+MONGO_HOST="159.65.0.142"
+MONGO_PORT="27017"
+MONGO_USERNAME="alice"
+MONGO_PASSWORD="alice"
 
 echo "Dumping data from $MONGO_HOST..."
 mongodump --host ${MONGO_HOST} --port ${MONGO_PORT} -d ${MONGO_DATABASE} -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD}
