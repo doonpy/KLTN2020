@@ -55,6 +55,9 @@ rawDataSchema.index({ detailUrlId: 1 }, { name: 'idx_detailUrlId' });
 rawDataSchema.index({ transactionType: 1 }, { name: 'idx_transactionType' });
 rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
 rawDataSchema.index({ coordinate: 1 }, { name: 'idx_coordinate' });
-rawDataSchema.index({ propertyType: 1, transactionType: 1 }, { name: 'idx_propertyType_transactionType' });
+rawDataSchema.index(
+    { isGrouped: 1, propertyType: 1, transactionType: 1 },
+    { name: 'idx_isGrouped_propertyType_transactionType' }
+);
 
 export default mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);

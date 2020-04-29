@@ -54,7 +54,7 @@ export default class GroupData {
             let rawDataset: {
                 documents: RawDataDocumentModel[];
                 hasNext: boolean;
-            } = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false, transactionType });
+            } = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false, transactionType, propertyType });
 
             while (rawDataset.hasNext || rawDataset.documents.length > 0) {
                 const { documents } = rawDataset;
@@ -147,7 +147,11 @@ export default class GroupData {
                         `Group data -> RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
                     ).show();
                 }
-                rawDataset = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false });
+                rawDataset = await this.rawDataLogic.getAll(limit, undefined, {
+                    isGrouped: false,
+                    transactionType,
+                    propertyType,
+                });
             }
         } catch (error) {
             this.isRunning = false;

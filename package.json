@@ -5,13 +5,11 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev:api": "nodemon --watch api-server/src --ext ts --exec ts-node --project api-server/tsconfig.json api-server/src/server.ts",
-    "dev:bgr-job": "nodemon --watch api-server/src --ext ts --exec ts-node --project api-server/tsconfig.json api-server/src/background-job/main.ts",
     "dev:web": "next web-server -p 3001",
     "start:api": "node dist/api-bgr-job/server.js",
-    "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/background-job/main.js",
     "start:web": "next start dist/web -p 3001",
-    "build": "npm run clean && npm-run-all -p build:api-bgr-job build:web --print-label",
-    "build:api-bgr-job": "tsc --build --extendedDiagnostics api-server",
+    "build": "npm run clean && npm-run-all -p build:api build:web --print-label",
+    "build:api": "tsc --build --extendedDiagnostics api-server",
     "build:web": "next build web-server",
     "eslint": "eslint -c .eslintrc 'web-server/**/*.ts' 'api-server/**/*.ts'",
     "eslint:fix": "eslint --fix -c .eslintrc 'web-server/**/*.ts' 'api-server/**/*.ts'"
