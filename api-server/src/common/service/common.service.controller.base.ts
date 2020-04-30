@@ -28,6 +28,8 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
     protected language = 0;
 
+    protected populate = 0;
+
     private schema = '';
 
     protected keyword = '';
@@ -49,6 +51,8 @@ export default abstract class CommonServiceControllerBase implements CommonServi
     protected readonly PARAM_LIMIT: string = 'limit';
 
     protected readonly PARAM_OFFSET: string = 'offset';
+
+    protected readonly PARAM_POPULATE: string = 'populate';
 
     protected readonly PARAM_KEYWORD: string = 'keyword';
 
@@ -192,6 +196,13 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.IntegerRange(0, null));
 
+            this.validator.addParamValidator(this.PARAM_POPULATE, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_POPULATE, new Checker.IntegerRange(0, 1));
+
+            this.validator.addParamValidator(this.PARAM_KEYWORD, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_SCHEMA, new Checker.Type.String());
+
             this.validator.addParamValidator(this.PARAM_LANGUAGE, new Checker.Language());
 
             this.validator.validate(this.requestQuery);
@@ -212,28 +223,18 @@ export default abstract class CommonServiceControllerBase implements CommonServi
     private initInputs(req: Request, res: Response, next: NextFunction): void {
         const limit = Number(req.query[this.PARAM_LIMIT]);
         const offset = Number(req.query[this.PARAM_OFFSET]);
+        const populate = Number(req.query[this.PARAM_POPULATE]);
         const language: string = req.params[this.PARAM_LANGUAGE];
 
-        this.limit = limit || this.limit;
-        this.offset = offset || this.offset;
-        this.language = CommonLanguage[language] !== undefined ? CommonLanguage[language] : this.language;
+        this.limit = limit ?? this.limit;
+        this.offset = offset ?? this.offset;
+        this.populate = populate ?? this.populate;
+        this.language = CommonLanguage[language] ?? this.language;
         this.schema = req.params[this.PARAM_SCHEMA];
-        this.keyword = (req.query.keyword ? decodeURI(req.query.keyword as string) : this.keyword).trim();
-
-        this.requestParams = {};
-        if (Object.keys(req.params).length > 0) {
-            this.requestParams = req.params;
-        }
-
-        this.requestQuery = {};
-        if (Object.keys(req.query).length > 0) {
-            this.requestQuery = req.query as { [key: string]: string };
-        }
-
-        this.requestBody = {};
-        if (Object.keys(req.body).length > 0) {
-            this.requestBody = req.body;
-        }
+        this.keyword = (req.query[this.PARAM_KEYWORD] as string) ?? this.keyword;
+        this.requestParams = req.params ?? {};
+        this.requestQuery = (req.query as { [key: string]: string }) ?? {};
+        this.requestBody = req.body ?? {};
 
         next();
     }

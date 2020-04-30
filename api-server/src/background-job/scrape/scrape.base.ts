@@ -16,7 +16,7 @@ export default class ScrapeBase {
 
     protected telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
 
-    protected readonly REQUEST_DELAY: number = parseInt(process.env.SCRAPE_REQUEST_DELAY || '100', 10);
+    protected readonly REQUEST_DELAY: number = parseInt(process.env.BGR_SCRAPE_REQUEST_DELAY || '100', 10);
 
     /**
      * @param domain

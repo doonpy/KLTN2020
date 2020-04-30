@@ -32,7 +32,7 @@ export default class ScrapeRawData extends ScrapeBase {
 
     private readonly MAX_REQUEST_RETRIES: number = 3;
 
-    private readonly MAX_REQUEST: number = parseInt(process.env.SCRAPE_RAW_DATA_MAX_REQUEST || '1', 10);
+    private readonly MAX_REQUEST: number = parseInt(process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1', 10);
 
     constructor(catalog: CatalogDocumentModel) {
         super();

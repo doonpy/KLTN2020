@@ -1,49 +1,41 @@
 export default {
     // For development
-    DB_HOST_DEV: '127.0.0.1',
-    DB_PORT_DEV: '27017',
-    DB_NAME_DEV: 'kltn2020-dev',
-    DB_USERNAME_DEV: 'alice',
-    DB_PASS_DEV: 'alice',
-    DB_AUTH_DB_DEV: 'admin',
-    DB_DEBUG_MODE: 0,
+    DEV_DB_HOST: '127.0.0.1',
+    DEV_DB_PORT: '27017',
+    DEV_DB_NAME: 'kltn2020-dev',
+    DEV_DB_USERNAME: 'alice',
+    DEV_DB_PASS: 'alice',
+    DEV_DB_AUTH_DB: 'admin',
+    DEV_DB_DEBUG_MODE: 1,
+    DEV_SERVER_PROTOCOL: 'http',
+    DEV_SERVER_DOMAIN: 'localhost',
+    DEV_SERVER_PORT: '3000',
 
-    SERVER_PROTOCOL_DEV: 'http',
-    SERVER_DOMAIN_DEV: 'localhost',
-    SERVER_PORT_DEV: '3000',
+    // For production
+    PROD_DB_HOST: '159.65.0.142',
+    PROD_DB_PORT: '27017',
+    PROD_DB_NAME: 'kltn2020',
+    PROD_DB_USERNAME: 'alice',
+    PROD_DB_PASS: 'alice',
+    PROD_DB_AUTH_DB: 'kltn2020',
+    PROD_SERVER_PROTOCOL: 'https',
+    PROD_SERVER_DOMAIN: 'pk2020.tk',
+    PROD_SERVER_PORT: '3000',
 
-    // For deployment
-    DB_HOST: '159.65.0.142',
-    DB_PORT: '27017',
-    DB_NAME: 'kltn2020',
-    DB_USERNAME: 'alice',
-    DB_PASS: 'alice',
-    DB_AUTH_DB: 'kltn2020',
-
-    SERVER_PROTOCOL: 'https',
-    SERVER_DOMAIN: 'pk2020.tk',
-    SERVER_PORT: '3000',
-
-    // Background Job Config
-    // Thread amount
-    THREAD_AMOUNT: 2,
-    // Schedule
-    SCHEDULE_TIME_HOUR: 18,
-    SCHEDULE_TIME_MINUTE: 0,
-    SCHEDULE_TIME_SECOND: 0,
-    // Scrape
-    SCRAPE_RAW_DATA_MAX_REQUEST: 30,
-    SCRAPE_DETAIL_URL_MAX_REQUEST: 10,
-    SCRAPE_REQUEST_DELAY: 100, // ms
-    // Queue base
-    QUEUE_DELAY_DEFAULT: 100, // ms
-    // Save queue
-    SAVE_QUEUE_AMOUNT_DEFAULT: 500,
+    // Background jon config
+    BGR_START_ON_SERVER_RUN: 0,
+    BGR_THREAD_AMOUNT: 2,
+    BGR_SCHEDULE_TIME_HOUR: 18,
+    BGR_SCHEDULE_TIME_MINUTE: 0,
+    BGR_SCHEDULE_TIME_SECOND: 0,
+    BGR_SCRAPE_RAW_DATA_MAX_REQUEST: 30,
+    BGR_SCRAPE_DETAIL_URL_MAX_REQUEST: 10,
+    BGR_SCRAPE_REQUEST_DELAY: 100, // ms
 
     // Request
     REQUEST_TIMEOUT: 10000, // ms
 
-    // Chat Bot
+    // Chat bot
     CHAT_BOT_TELEGRAM_TOKEN: '1046175359:AAGfHKqnAv0_IFdTEvtLmuanahYW0JWpHKE',
     NTBA_FIX_319: 1,
 

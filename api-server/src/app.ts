@@ -20,13 +20,13 @@ export default class App {
     constructor() {
         this.app = express();
         if (process.env.NODE_ENV === 'production') {
-            this.protocol = process.env.SERVER_PROTOCOL;
-            this.domain = process.env.SERVER_DOMAIN;
-            this.serverPort = process.env.SERVER_PORT;
+            this.protocol = process.env.PROD_SERVER_PROTOCOL;
+            this.domain = process.env.PROD_SERVER_DOMAIN;
+            this.serverPort = process.env.PROD_SERVER_PORT;
         } else {
-            this.protocol = process.env.SERVER_PROTOCOL_DEV;
-            this.domain = process.env.SERVER_DOMAIN_DEV;
-            this.serverPort = process.env.SERVER_PORT_DEV;
+            this.protocol = process.env.DEV_SERVER_PROTOCOL;
+            this.domain = process.env.DEV_SERVER_DOMAIN;
+            this.serverPort = process.env.DEV_SERVER_PORT;
         }
     }
 

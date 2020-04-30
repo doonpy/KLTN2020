@@ -10,7 +10,7 @@ export default {
             'the value of %s smaller than range (min is %i but current is %i).',
         ],
         MSG_CHK_4: [
-            'giá trị của %s nhỏ hơn phạm vi (lớn nhất là %i nhưng hiện tại là %i',
+            'giá trị của %s nhỏ hơn phạm vi (lớn nhất là %i nhưng hiện tại là %i)',
             'the value of %s larger than range (max is %i but current is %i).',
         ],
         MSG_CHK_5: ['%s là một đơn vị đo không hợp lệ (phải là %s).', '%s is the invalid measure unit (must be %s).'],

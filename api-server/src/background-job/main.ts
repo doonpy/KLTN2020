@@ -29,7 +29,7 @@ const executeGroupDataChildProcess = (): void => {
             return;
         }
 
-        if (childProcessAmount >= parseInt(process.env.THREAD_AMOUNT || '1', 10)) {
+        if (childProcessAmount >= parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)) {
             return;
         }
 
@@ -85,7 +85,7 @@ const executeScrapeChildProcess = async (): Promise<void> => {
             return;
         }
 
-        if (childProcessAmount >= parseInt(process.env.THREAD_AMOUNT || '1', 10)) {
+        if (childProcessAmount >= parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)) {
             return;
         }
 
