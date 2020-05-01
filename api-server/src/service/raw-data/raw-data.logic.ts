@@ -2,8 +2,8 @@ import { DocumentQuery, Query } from 'mongoose';
 import RawDataModel from './raw-data.model';
 import RawDataConstant from './raw-data.constant';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import { DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
-import { CoordinateDocumentModel } from '../coordinate/coordinate.interface';
+import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
+import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
 import CoordinateLogic from '../coordinate/coordinate.logic';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 import { RawDataApiModel, RawDataDocumentModel, RawDataLogicInterface } from './raw-data.interface';
@@ -103,7 +103,8 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             acreage,
             address,
             others,
-            coordinate,
+            coordinateId,
+            isGrouped,
         }: RawDataDocumentModel,
         isPopulate?: boolean
     ): Promise<RawDataDocumentModel> {
@@ -118,8 +119,8 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             acreage,
             address,
             others,
-            coordinate: coordinate ?? null,
-            isGrouped: false,
+            coordinateId,
+            isGrouped,
         }).save();
         if (isPopulate) {
             return await this.getPopulateDocument(createdDoc);
@@ -147,7 +148,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             price,
             acreage,
             address,
-            coordinate,
+            coordinateId,
             others,
             isGrouped,
         }: RawDataDocumentModel,
@@ -173,7 +174,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
         }
 
         rawData.address = address || rawData.address;
-        rawData.coordinate = coordinate || rawData.coordinate;
+        rawData.coordinateId = coordinateId || rawData.coordinateId;
 
         if (others && others.length > 0) {
             others.forEach((other: { name: string; value: string }): void => {
@@ -361,38 +362,53 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
 
     /**
      * @param {RawDataDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {RawDataApiModel}
      */
 
-    public convertToApiResponse(
-        {
-            _id,
-            transactionType,
-            propertyType,
-            detailUrlId,
-            postDate,
-            title,
-            describe,
-            price,
-            acreage,
-            address,
-            others,
-            coordinate,
-            isGrouped,
-            cTime,
-            mTime,
-        }: RawDataDocumentModel,
-        languageIndex = 0
-    ): RawDataApiModel {
+    public convertToApiResponse({
+        _id,
+        transactionType,
+        propertyType,
+        detailUrlId,
+        postDate,
+        title,
+        describe,
+        price,
+        acreage,
+        address,
+        others,
+        coordinateId,
+        isGrouped,
+        cTime,
+        mTime,
+    }: RawDataDocumentModel): RawDataApiModel {
+        let detailUrl: DetailUrlApiModel | number | null = null;
+        let coordinate: CoordinateApiModel | number | null = null;
+
+        if (detailUrlId) {
+            if (typeof detailUrlId === 'object') {
+                detailUrl = DetailUrlLogic.getInstance().convertToApiResponse(detailUrlId as DetailUrlDocumentModel);
+            } else {
+                detailUrl = detailUrlId as number;
+            }
+        }
+
+        if (coordinateId) {
+            if (typeof coordinateId === 'object') {
+                coordinate = CoordinateLogic.getInstance().convertToApiResponse(
+                    coordinateId as CoordinateDocumentModel
+                );
+            } else {
+                coordinate = coordinateId as number;
+            }
+        }
+
         return {
             id: _id ?? null,
-            transactionType: RawDataConstant.TRANSACTION_TYPE[transactionType].wording[languageIndex] ?? null,
-            propertyType: RawDataConstant.PROPERTY_TYPE[propertyType].wording[languageIndex] ?? null,
-            detailUrl: detailUrlId
-                ? DetailUrlLogic.getInstance().convertToApiResponse(detailUrlId as DetailUrlDocumentModel)
-                : null,
+            transactionType: RawDataConstant.TRANSACTION_TYPE[transactionType] ?? null,
+            propertyType: RawDataConstant.PROPERTY_TYPE[propertyType] ?? null,
+            detailUrl,
             postDate: postDate ?? null,
             title: title ?? null,
             describe: describe ?? null,
@@ -400,9 +416,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             acreage: acreage ?? null,
             address: address ?? null,
             others: others ?? null,
-            coordinate: coordinate
-                ? CoordinateLogic.getInstance().convertToApiResponse(coordinate as CoordinateDocumentModel)
-                : null,
+            coordinate,
             isGrouped: isGrouped ?? null,
             createAt: cTime ?? null,
             updateAt: mTime ?? null,

@@ -3,7 +3,7 @@ import CommonServiceControllerBase from '../../common/service/common.service.con
 import PatternLogic from './pattern.logic';
 import Validator from '../../util/validator/validator';
 import Checker from '../../util/checker/checker.index';
-import { PatternDocumentModel } from './pattern.interface';
+import { PatternApiModel, PatternDocumentModel } from './pattern.interface';
 import ResponseStatusCode from '../../common/common.response-status.code';
 
 const commonPath = '/patterns';
@@ -14,7 +14,7 @@ export default class PatternController extends CommonServiceControllerBase {
 
     private patternLogic: PatternLogic = PatternLogic.getInstance();
 
-    private readonly PARAM_SOURCE_URL_ID: string = 'sourceUrl';
+    private readonly PARAM_SOURCE_URL: string = 'sourceUrl';
 
     private readonly PARAM_MAIN_LOCATOR: string = 'mainLocator';
 
@@ -70,11 +70,13 @@ export default class PatternController extends CommonServiceControllerBase {
                 hasNext,
             }: { documents: PatternDocumentModel[]; hasNext: boolean } = await this.patternLogic.getAll(
                 this.limit,
-                this.offset
+                this.offset,
+                this.keyword ? { $text: { $search: this.keyword } } : {},
+                this.populate
             );
-            const patterns: object[] = documents.map((pattern: PatternDocumentModel): object => {
-                return this.patternLogic.convertToApiResponse(pattern);
-            });
+            const patterns: object[] = documents.map(
+                (pattern): PatternApiModel => this.patternLogic.convertToApiResponse(pattern)
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -105,7 +107,7 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.patternLogic.checkExistsWithId(idBody);
             const pattern: PatternDocumentModel = await this.patternLogic.getById(idBody);
             const responseBody: object = {
@@ -129,8 +131,8 @@ export default class PatternController extends CommonServiceControllerBase {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Url());
+            this.validator.addParamValidator(this.PARAM_SOURCE_URL, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_SOURCE_URL, new Checker.Url());
 
             this.validator.addParamValidator(this.PARAM_MAIN_LOCATOR, new Checker.Type.Object());
 
@@ -164,7 +166,7 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const patternBody: PatternDocumentModel = (this.requestBody as unknown) as PatternDocumentModel;
-            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl);
+            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
             const createdPattern: PatternDocumentModel = await this.patternLogic.create(patternBody);
 
             CommonServiceControllerBase.sendResponse(
@@ -191,8 +193,8 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
 
-            this.validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_SOURCE_URL_ID, new Checker.Url());
+            this.validator.addParamValidator(this.PARAM_SOURCE_URL, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_SOURCE_URL, new Checker.Url());
 
             this.validator.addParamValidator(this.PARAM_MAIN_LOCATOR, new Checker.Type.Object());
 
@@ -226,9 +228,10 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             const patternBody: PatternDocumentModel = (this.requestBody as unknown) as PatternDocumentModel;
-            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl);
+            await this.patternLogic.checkExistsWithId(idBody);
+            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
             const editedPattern: PatternDocumentModel = await this.patternLogic.update(idBody, patternBody);
 
             CommonServiceControllerBase.sendResponse(
@@ -257,7 +260,7 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.patternLogic.checkExistsWithId(idBody);
             await this.patternLogic.delete(idBody);
 

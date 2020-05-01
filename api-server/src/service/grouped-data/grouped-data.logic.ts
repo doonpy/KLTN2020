@@ -236,17 +236,24 @@ export default class GroupedDataLogic extends CommonServiceLogicBase implements 
 
     /**
      * @param {GroupedDataDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {GroupedDataApiModel}
      */
-    public convertToApiResponse(
-        { _id, items, cTime, mTime }: GroupedDataDocumentModel,
-        languageIndex = 0
-    ): GroupedDataApiModel {
-        const itemsConverted: RawDataApiModel[] = items.map(
-            (item): RawDataApiModel => RawDataLogic.getInstance().convertToApiResponse(item as RawDataDocumentModel)
-        );
+    public convertToApiResponse({ _id, items, cTime, mTime }: GroupedDataDocumentModel): GroupedDataApiModel {
+        const itemsConverted: (RawDataApiModel | number | null)[] = items.map((item):
+            | RawDataApiModel
+            | number
+            | null => {
+            if (item) {
+                if (typeof item === 'object') {
+                    return RawDataLogic.getInstance().convertToApiResponse(item as RawDataDocumentModel);
+                } else {
+                    return item as number;
+                }
+            }
+
+            return null;
+        });
 
         return {
             id: _id ?? null,

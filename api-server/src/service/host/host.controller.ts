@@ -4,7 +4,7 @@ import HostLogic from './host.logic';
 import Validator from '../../util/validator/validator';
 import Checker from '../../util/checker/checker.index';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import { HostDocumentModel } from './host.interface';
+import { HostApiModel, HostDocumentModel } from './host.interface';
 
 const commonPath = '/hosts';
 const specifyIdPath = '/hosts/:id';
@@ -49,23 +49,19 @@ export default class HostController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestQuery);
 
-            const conditions: object = {
-                $or: [
-                    { name: { $regex: this.keyword, $options: 'i' } },
-                    { domain: { $regex: this.keyword, $options: 'i' } },
-                ],
-            };
             const {
                 documents,
                 hasNext,
             }: { documents: HostDocumentModel[]; hasNext: boolean } = await this.hostLogic.getAll(
                 this.limit,
                 this.offset,
-                conditions
+                this.keyword
+                    ? {
+                          $text: { $search: this.keyword },
+                      }
+                    : {}
             );
-            const hosts: object[] = documents.map((host: HostDocumentModel): object => {
-                return this.hostLogic.convertToApiResponse(host);
-            });
+            const hosts: object[] = documents.map((host): HostApiModel => this.hostLogic.convertToApiResponse(host));
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -96,7 +92,7 @@ export default class HostController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.hostLogic.checkExistsWithId(idBody);
             const host: HostDocumentModel = await this.hostLogic.getById(idBody);
             const responseBody: object = {
@@ -167,8 +163,9 @@ export default class HostController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             const hostBody: HostDocumentModel = (this.requestBody as unknown) as HostDocumentModel;
+            await this.hostLogic.checkExistsWithId(idBody);
             await this.hostLogic.checkExistsWithDomain(hostBody.domain, true);
             const editedHost: HostDocumentModel = await this.hostLogic.update(idBody, hostBody);
 
@@ -198,7 +195,7 @@ export default class HostController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.hostLogic.checkExistsWithId(idBody);
             await this.hostLogic.delete(idBody);
 

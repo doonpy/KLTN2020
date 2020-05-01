@@ -4,7 +4,7 @@ import Validator from '../../util/validator/validator';
 import Checker from '../../util/checker/checker.index';
 import DetailUrlLogic from './detail-url.logic';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import { DetailUrlDocumentModel } from './detail-url.interface';
+import { DetailUrlApiModel, DetailUrlDocumentModel } from './detail-url.interface';
 import CatalogLogic from '../catalog/catalog.logic';
 
 const commonPath = '/detail-urls';
@@ -63,12 +63,18 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             }: { documents: DetailUrlDocumentModel[]; hasNext: boolean } = await this.detailUrlLogic.getAll(
                 this.limit,
                 this.offset,
-                { [this.PARAM_CATALOG_ID]: this.requestQuery[this.PARAM_CATALOG_ID] },
-                true
+                this.keyword
+                    ? {
+                          $text: { $search: this.keyword },
+                          [this.PARAM_CATALOG_ID]: this.requestQuery[this.PARAM_CATALOG_ID],
+                      }
+                    : { [this.PARAM_CATALOG_ID]: this.requestQuery[this.PARAM_CATALOG_ID] },
+                this.populate
             );
-            const detailUrlList: object[] = documents.map((detailUrl: DetailUrlDocumentModel): object => {
-                return this.detailUrlLogic.convertToApiResponse(detailUrl);
-            });
+            const detailUrlList: object[] = documents.map(
+                (detailUrl: DetailUrlDocumentModel): DetailUrlApiModel =>
+                    this.detailUrlLogic.convertToApiResponse(detailUrl)
+            );
 
             const responseBody: object = {
                 detailUrls: detailUrlList,
@@ -97,7 +103,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.detailUrlLogic.checkExistsWithId(idBody);
             const detailUrl: DetailUrlDocumentModel = await this.detailUrlLogic.getById(idBody, true);
             const responseBody: object = {
@@ -173,8 +179,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             const detailUrlBody: DetailUrlDocumentModel = (this.requestBody as unknown) as DetailUrlDocumentModel;
+            await this.detailUrlLogic.checkExistsWithId(idBody);
             await CatalogLogic.getInstance().checkExistsWithId(detailUrlBody.catalogId);
             await this.detailUrlLogic.checkExistsWithUrl(detailUrlBody.url, true);
             const editedDetailUrl: DetailUrlDocumentModel = await this.detailUrlLogic.update(
@@ -209,7 +216,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.detailUrlLogic.checkExistsWithId(idBody);
             await this.detailUrlLogic.delete(idBody);
 

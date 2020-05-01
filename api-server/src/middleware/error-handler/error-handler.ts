@@ -61,10 +61,10 @@ export const notFoundRoute = (req: Request, res: Response, next: NextFunction): 
     next(
         new ExceptionCustomize(
             ResponseStatusCode.NOT_FOUND,
-            StringHandler.replaceString(ErrorHandlerWording.CAUSE.R_1[CommonLanguage[req.params.language] || 0], [
+            StringHandler.replaceString(ErrorHandlerWording.CAUSE.CAU_ERR_1[CommonLanguage[req.params.language] || 0], [
                 req.path,
             ]),
-            ErrorHandlerWording.MESSAGE.MSG_1[CommonLanguage[req.params.language] || 0]
+            ErrorHandlerWording.MESSAGE.MSG_ERR_1[CommonLanguage[req.params.language] || 0]
         )
     );
 };

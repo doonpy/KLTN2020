@@ -198,14 +198,10 @@ export default class HostLogic extends CommonLogicBase implements HostLogicInter
 
     /**
      * @param {HostDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {HostApiModel}
      */
-    public convertToApiResponse(
-        { _id, name, domain, cTime, mTime }: HostDocumentModel,
-        languageIndex = 0
-    ): HostApiModel {
+    public convertToApiResponse({ _id, name, domain, cTime, mTime }: HostDocumentModel): HostApiModel {
         return {
             id: _id ?? null,
             name: name ?? null,

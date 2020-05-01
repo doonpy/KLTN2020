@@ -15,7 +15,7 @@ export default class ValidatorParam {
      *
      * @return boolean
      */
-    public validate(input: { [key: string]: string } | null | string): void {
+    public validate(input: object): void {
         this.checker.check(this.paramName, input);
     }
 }

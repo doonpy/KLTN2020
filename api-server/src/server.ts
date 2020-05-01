@@ -43,6 +43,7 @@ const startBackgroundJob = async (): Promise<void> => {
     const appInstance: App = App.getInstance();
 
     await mongoDbInstance.connect();
+    await startBackgroundJob();
     await appInstance.start(
         [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
         [
@@ -54,5 +55,4 @@ const startBackgroundJob = async (): Promise<void> => {
             GroupedDataController.getInstance(),
         ]
     );
-    await startBackgroundJob();
 })();

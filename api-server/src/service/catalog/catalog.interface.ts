@@ -1,4 +1,4 @@
-import { DocumentQuery, Query } from 'mongoose';
+import { DocumentQuery } from 'mongoose';
 import {
     CommonApiModel,
     CommonDocumentModel,
@@ -14,8 +14,8 @@ export interface CatalogApiModel extends CommonApiModel {
         detailUrl: string;
         pageNumber: string;
     } | null;
-    host: HostApiModel | null;
-    pattern: PatternApiModel | null;
+    host: HostApiModel | number | null;
+    pattern: PatternApiModel | number | null;
 }
 
 export interface CatalogDocumentModel extends CommonDocumentModel {

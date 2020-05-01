@@ -69,9 +69,8 @@ export default abstract class CommonServiceLogicBase implements CommonLogicBaseI
 
     /**
      * @param {CommonDocumentModel} input
-     * @param {number} languageIndex
      *
      * @return {CommonApiModel}
      */
-    public abstract convertToApiResponse(input: CommonDocumentModel, languageIndex: number): CommonApiModel;
+    public abstract convertToApiResponse(input: CommonDocumentModel): CommonApiModel;
 }

@@ -34,8 +34,10 @@ export default class PatternLogic extends CommonServiceLogicBase implements Patt
         conditions?: object,
         isPopulate?: boolean
     ): Promise<{ documents: PatternDocumentModel[]; hasNext: boolean }> {
-        const documentQuery: DocumentQuery<PatternDocumentModel[], PatternDocumentModel, {}> = PatternModel.find();
-        const remainQuery: Query<number> = PatternModel.countDocuments();
+        const documentQuery: DocumentQuery<PatternDocumentModel[], PatternDocumentModel, {}> = PatternModel.find(
+            conditions || {}
+        );
+        const remainQuery: Query<number> = PatternModel.countDocuments(conditions || {});
 
         if (offset) {
             documentQuery.skip(offset);
@@ -226,14 +228,17 @@ export default class PatternLogic extends CommonServiceLogicBase implements Patt
 
     /**
      * @param {PatternDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {PatternApiModel}
      */
-    public convertToApiResponse(
-        { _id, sourceUrl, mainLocator, subLocator, cTime, mTime }: PatternDocumentModel,
-        languageIndex = 0
-    ): PatternApiModel {
+    public convertToApiResponse({
+        _id,
+        sourceUrl,
+        mainLocator,
+        subLocator,
+        cTime,
+        mTime,
+    }: PatternDocumentModel): PatternApiModel {
         return {
             id: _id ?? null,
             sourceUrl: sourceUrl ?? null,

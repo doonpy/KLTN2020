@@ -5,7 +5,7 @@ import Checker from '../../util/checker/checker.index';
 import RawDataLogic from './raw-data.logic';
 import RawDataConstant from './raw-data.constant';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import { RawDataDocumentModel } from './raw-data.interface';
+import { RawDataApiModel, RawDataDocumentModel } from './raw-data.interface';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 
 const commonPath = '/raw-dataset';
@@ -93,11 +93,12 @@ export default class RawDataController extends CommonServiceControllerBase {
                 {
                     detailUrlId: this.requestQuery[this.PARAM_DETAIL_URL_ID] || { $gt: 0 },
                 },
-                true
+                this.populate
             );
-            const rawDataList: object[] = documents.map((rawDataItem: RawDataDocumentModel): object => {
-                return this.rawDataLogic.convertToApiResponse(rawDataItem, this.language);
-            });
+            const rawDataList: object[] = documents.map(
+                (rawDataItem: RawDataDocumentModel): RawDataApiModel =>
+                    this.rawDataLogic.convertToApiResponse(rawDataItem)
+            );
             const responseBody: object = {
                 rawDataset: rawDataList,
                 hasNext,
@@ -125,11 +126,11 @@ export default class RawDataController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.rawDataLogic.checkExistsWithId(idBody);
             const rawData: RawDataDocumentModel = await this.rawDataLogic.getById(idBody, true);
             const responseBody: object = {
-                rawData: this.rawDataLogic.convertToApiResponse(rawData, this.language),
+                rawData: this.rawDataLogic.convertToApiResponse(rawData),
             };
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
@@ -205,17 +206,18 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
 
             this.bodyValidator.validate(this.requestBody);
-            this.priceValidator.validate(this.requestBody[this.PARAM_PRICE]);
-            this.acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE]);
-            this.othersValidator.validate(this.requestBody[this.PARAM_OTHERS]);
+            this.priceValidator.validate((this.requestBody[this.PARAM_PRICE] as object) ?? {});
+            this.acreageValidator.validate((this.requestBody[this.PARAM_ACREAGE] as object) ?? {});
+            this.othersValidator.validate((this.requestBody[this.PARAM_OTHERS] as object) ?? {});
 
             const rawDataBody: RawDataDocumentModel = (this.requestBody as unknown) as RawDataDocumentModel;
             await DetailUrlLogic.getInstance().checkExistsWithId(rawDataBody.detailUrlId);
+            await this.rawDataLogic.checkExistsWithDetailUrlId(rawDataBody.detailUrlId, true);
             const createdRawData: RawDataDocumentModel = await this.rawDataLogic.create(rawDataBody, true);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
-                this.rawDataLogic.convertToApiResponse(createdRawData, this.language),
+                this.rawDataLogic.convertToApiResponse(createdRawData),
                 res
             );
         } catch (error) {
@@ -293,20 +295,23 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
 
             this.bodyValidator.validate(this.requestBody);
-            this.priceValidator.validate(this.requestBody[this.PARAM_PRICE]);
-            this.acreageValidator.validate(this.requestBody[this.PARAM_ACREAGE]);
-            this.othersValidator.validate(this.requestBody[this.PARAM_OTHERS]);
+            this.priceValidator.validate((this.requestBody[this.PARAM_PRICE] as object) ?? {});
+            this.acreageValidator.validate((this.requestBody[this.PARAM_ACREAGE] as object) ?? {});
+            this.othersValidator.validate((this.requestBody[this.PARAM_OTHERS] as object) ?? {});
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             const rawDataBody: RawDataDocumentModel = (this.requestBody as unknown) as RawDataDocumentModel;
-
+            const currentRawData: RawDataDocumentModel = await this.rawDataLogic.getById(idBody);
+            await this.rawDataLogic.checkExistsWithId(idBody);
             await DetailUrlLogic.getInstance().checkExistsWithId(idBody);
-            await this.rawDataLogic.checkExistsWithDetailUrlId(rawDataBody.detailUrlId, true);
+            if (currentRawData.detailUrlId !== rawDataBody.detailUrlId) {
+                await this.rawDataLogic.checkExistsWithDetailUrlId(rawDataBody.detailUrlId, true);
+            }
             const editedRawData: RawDataDocumentModel = await this.rawDataLogic.update(idBody, rawDataBody, true);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
-                this.rawDataLogic.convertToApiResponse(editedRawData, this.language),
+                this.rawDataLogic.convertToApiResponse(editedRawData),
                 res
             );
         } catch (error) {
@@ -330,7 +335,7 @@ export default class RawDataController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.rawDataLogic.checkExistsWithId(idBody);
             await this.rawDataLogic.delete(idBody);
 

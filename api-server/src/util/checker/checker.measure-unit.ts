@@ -15,7 +15,7 @@ export default class CheckerMeasureUnit extends CheckerBase {
      * @param paramName
      * @param input
      */
-    public check(paramName: string, input: { [key: string]: string } | null | string): void {
+    public check(paramName: string, input: object): void {
         const value: string | null = this.getValue(paramName, input);
 
         if (!value) {

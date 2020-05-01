@@ -3,13 +3,13 @@ import CheckerWording from './checker.wording';
 import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerUrl extends CheckerBase {
-    private VALID_URL = new RegExp(/^(((https?:\/\/)(?:www\.)?([\d\w-]+)(\.[\d\w-]+)\/+)|\/)(([\d\w-]+)+\/?)+/);
+    private VALID_URL = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/);
 
     /**
      * @param paramName
      * @param input
      */
-    public check(paramName: string, input: { [key: string]: string } | null | string): void {
+    public check(paramName: string, input: object): void {
         const value: string | null = this.getValue(paramName, input);
 
         if (!value) {

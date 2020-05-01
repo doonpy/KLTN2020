@@ -3,7 +3,6 @@ import { Model } from 'mongoose';
 import ResponseStatusCode from '../common.response-status.code';
 import { CommonDocumentModel, CommonServiceControllerBaseInterface } from './common.service.interface';
 import ExceptionCustomize from '../../util/exception/exception.customize';
-import DatabaseWording from '../../service/database/database.wording';
 import Validator from '../../util/validator/validator';
 import StringHandler from '../../util/helper/string-handler';
 import CommonLanguage from '../common.language';
@@ -14,6 +13,7 @@ import PatternModel from '../../service/pattern/pattern.model';
 import RawDataModel from '../../service/raw-data/raw-data.model';
 import DetailUrlModel from '../../service/detail-url/detail-url.model';
 import GroupedDataModel from '../../service/grouped-data/grouped-data.model';
+import CommonServiceWording from './common.service.wording';
 
 export default abstract class CommonServiceControllerBase implements CommonServiceControllerBaseInterface {
     protected commonPath = '/:language';
@@ -28,7 +28,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
     protected language = 0;
 
-    protected populate = 0;
+    protected populate = false;
 
     private schema = '';
 
@@ -36,7 +36,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
     protected hasNext = false;
 
-    protected requestBody: { [key: string]: string } = {};
+    protected requestBody: { [key: string]: string | number | object } = {};
 
     protected requestParams: { [key: string]: string } = {};
 
@@ -101,18 +101,18 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      */
     protected initRoutes(): void {
         this.router
-            .all(this.commonPath, [this.initInputs.bind(this), this.validateCommonParams.bind(this)])
+            .all(this.commonPath, [this.initCommonInputs.bind(this), this.validateCommonInputs.bind(this)])
             .get(this.commonPath, this.getAllRoute.bind(this))
             .post(this.commonPath, this.createRoute.bind(this));
 
         this.router
-            .all(this.specifyIdPath, [this.initInputs.bind(this), this.validateCommonParams.bind(this)])
+            .all(this.specifyIdPath, [this.initCommonInputs.bind(this), this.validateCommonInputs.bind(this)])
             .get(this.specifyIdPath, this.getWithIdRoute.bind(this))
             .put(this.specifyIdPath, this.updateRoute.bind(this))
             .delete(this.specifyIdPath, this.deleteRoute.bind(this));
 
         this.router
-            .all(this.documentAmountPath, this.initInputs.bind(this))
+            .all(this.documentAmountPath, this.initCommonInputs.bind(this))
             .get(this.documentAmountPath, this.getDocumentAmount.bind(this));
     }
 
@@ -186,12 +186,12 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      *
      * @return void
      */
-    private validateCommonParams(req: Request, res: Response, next: NextFunction): void {
+    private validateCommonInputs(req: Request, res: Response, next: NextFunction): void {
         try {
             this.validator = new Validator();
 
             this.validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_LIMIT, new Checker.IntegerRange(1, 1000));
+            this.validator.addParamValidator(this.PARAM_LIMIT, new Checker.IntegerRange(1, null));
 
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.IntegerRange(0, null));
@@ -207,10 +207,10 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
             this.validator.validate(this.requestQuery);
             this.validator.validate(this.requestParams);
+            next();
         } catch (error) {
             next(this.createError(error, this.language));
         }
-        next();
     }
 
     /**
@@ -220,23 +220,22 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      *
      * @return {Promise<void>}
      */
-    private initInputs(req: Request, res: Response, next: NextFunction): void {
-        const limit = Number(req.query[this.PARAM_LIMIT]);
-        const offset = Number(req.query[this.PARAM_OFFSET]);
-        const populate = Number(req.query[this.PARAM_POPULATE]);
-        const language: string = req.params[this.PARAM_LANGUAGE];
+    private initCommonInputs(req: Request, res: Response, next: NextFunction): void {
+        try {
+            this.limit = Number(req.query[this.PARAM_LIMIT]) || this.limit;
+            this.offset = Number(req.query[this.PARAM_OFFSET]) || this.offset;
+            this.populate = Number(req.query[this.PARAM_POPULATE]) === 1;
+            this.language = CommonLanguage[req.params[this.PARAM_LANGUAGE]] ?? this.language;
+            this.schema = req.params[this.PARAM_SCHEMA];
+            this.keyword = (req.query[this.PARAM_KEYWORD] as string) ?? this.keyword;
+            this.requestParams = req.params ?? {};
+            this.requestQuery = (req.query as { [key: string]: string }) ?? {};
+            this.requestBody = req.body ?? {};
 
-        this.limit = limit ?? this.limit;
-        this.offset = offset ?? this.offset;
-        this.populate = populate ?? this.populate;
-        this.language = CommonLanguage[language] ?? this.language;
-        this.schema = req.params[this.PARAM_SCHEMA];
-        this.keyword = (req.query[this.PARAM_KEYWORD] as string) ?? this.keyword;
-        this.requestParams = req.params ?? {};
-        this.requestQuery = (req.query as { [key: string]: string }) ?? {};
-        this.requestBody = req.body ?? {};
-
-        next();
+            next();
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 
     /**
@@ -268,30 +267,48 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             cause,
             message,
         }: {
-            statusCode: number;
-            cause: { wording: string[]; value: (string[] | number)[] };
-            message: { wording: string[]; value: (string[] | number)[] };
+            statusCode?: number;
+            cause?: { wording: string[]; value: (string[] | number)[] } | string;
+            message: { wording: string[]; value: (string[] | number)[] } | string;
         },
         languageIndex: number
     ): ExceptionCustomize {
-        const causeValueByLanguage: (string | number)[] = cause.value.map((item): string | number => {
-            if (typeof item === 'number') {
-                return item;
+        let finalCause = CommonServiceWording.CAUSE.CAU_CM_SER_3[languageIndex];
+        let finalMessage = '';
+        if (cause) {
+            if (typeof cause === 'string') {
+                finalCause = cause;
+            } else {
+                const causeValueByLanguage: (string | number)[] = cause.value.map((item): string | number => {
+                    if (typeof item === 'number') {
+                        return item;
+                    }
+                    return Array.isArray(item) ? item[languageIndex] : item;
+                });
+                finalCause = StringHandler.replaceString(cause.wording[languageIndex], causeValueByLanguage);
             }
-            return Array.isArray(item) ? item[languageIndex] : item;
-        });
-        const messageValueByLanguage: (string | number)[] = message.value.map((item): string | number => {
-            if (typeof item === 'number') {
-                return item;
+        }
+
+        if (message) {
+            if (typeof message === 'string') {
+                finalMessage = message;
+            } else {
+                const messageValueByLanguage: (string | number)[] | string = message.value.map((item):
+                    | string
+                    | number => {
+                    if (typeof item === 'number') {
+                        return item;
+                    }
+                    return Array.isArray(item) ? item[languageIndex] : item;
+                });
+                finalMessage = StringHandler.replaceString(message.wording[languageIndex], messageValueByLanguage);
             }
-            return Array.isArray(item) ? item[languageIndex] : item;
-        });
+        }
 
         return new ExceptionCustomize(
             statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            StringHandler.replaceString(message.wording[languageIndex], messageValueByLanguage),
-            StringHandler.replaceString(cause.wording[languageIndex], causeValueByLanguage) ||
-                DatabaseWording.CAUSE.C_2[languageIndex],
+            finalCause,
+            finalMessage,
             [this.requestParams, this.requestQuery, this.requestBody]
         );
     }

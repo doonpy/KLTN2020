@@ -8,9 +8,9 @@ import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-
 import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
 
 export interface RawDataApiModel extends CommonApiModel {
-    detailUrl: DetailUrlApiModel | null | number;
-    transactionType: string | null;
-    propertyType: string | null;
+    detailUrl: DetailUrlApiModel | number | null;
+    transactionType: { id: number; wording: string[] } | null;
+    propertyType: { id: number; wording: string[] } | null;
     postDate: string | null;
     title: string | null;
     describe: string | null;
@@ -32,7 +32,7 @@ export interface RawDataApiModel extends CommonApiModel {
           ]
         | []
         | null;
-    coordinate: CoordinateApiModel | null;
+    coordinate: CoordinateApiModel | number | null;
     isGrouped: boolean | null;
 }
 
@@ -58,7 +58,7 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
             value: string;
         }
     ];
-    coordinate: CoordinateDocumentModel | number;
+    coordinateId: CoordinateDocumentModel | number;
     isGrouped: boolean;
 }
 

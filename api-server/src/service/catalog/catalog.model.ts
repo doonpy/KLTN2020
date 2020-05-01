@@ -30,6 +30,8 @@ catalogSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-catalogSchema.index({ url: 1 });
+catalogSchema.index({ url: 'text', title: 'text' }, { name: 'idx_url_title' });
+catalogSchema.index({ hostId: 1 }, { name: 'idx_hostId' });
+catalogSchema.index({ patternId: 1 }, { name: 'idx_patternId' });
 
 export default mongoose.model<CatalogDocumentModel>('catalog', catalogSchema);

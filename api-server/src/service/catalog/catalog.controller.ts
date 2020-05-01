@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import CatalogLogic from './catalog.logic';
 import Validator from '../../util/validator/validator';
 import Checker from '../../util/checker/checker.index';
-import { CatalogDocumentModel } from './catalog.interface';
+import { CatalogApiModel, CatalogDocumentModel } from './catalog.interface';
 import ResponseStatusCode from '../../common/common.response-status.code';
 import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
 import HostLogic from '../host/host.logic';
@@ -64,19 +64,24 @@ export default class CatalogController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestQuery);
 
-            const conditions: object = {
-                $or: [
-                    { title: { $regex: this.keyword || '', $options: 'i' } },
-                    { url: { $regex: this.keyword || '', $options: 'i' } },
-                ],
-                hostId: ((this.requestQuery[this.PARAM_HOST_ID] as unknown) as number) || { $gt: 0 },
-            };
-
-            const { documents, hasNext } = await this.catalogLogic.getAll(this.limit, this.offset, conditions, true);
+            const {
+                documents,
+                hasNext,
+            }: { documents: CatalogDocumentModel[]; hasNext: boolean } = await this.catalogLogic.getAll(
+                this.limit,
+                this.offset,
+                this.keyword
+                    ? {
+                          $text: { $search: this.keyword },
+                          hostId: this.requestQuery[this.PARAM_HOST_ID] || { $gt: 0 },
+                      }
+                    : {
+                          hostId: this.requestQuery[this.PARAM_HOST_ID] || { $gt: 0 },
+                      },
+                this.populate
+            );
             const responseBody: object = {
-                catalogs: documents.map((catalog: CatalogDocumentModel): object => {
-                    return this.catalogLogic.convertToApiResponse(catalog);
-                }),
+                catalogs: documents.map((catalog): CatalogApiModel => this.catalogLogic.convertToApiResponse(catalog)),
                 hasNext,
             };
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
@@ -101,7 +106,7 @@ export default class CatalogController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.catalogLogic.checkExistsWithId(idBody);
             const catalog: CatalogDocumentModel = await this.catalogLogic.getById(idBody, true);
             const responseBody: object = {
@@ -133,17 +138,20 @@ export default class CatalogController extends CommonServiceControllerBase {
 
             this.validator.addParamValidator(this.PARAM_LOCATOR, new Checker.Type.Object());
 
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_PAGE_NUMBER, new Checker.Type.String());
-
             this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
 
             this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
 
-            this.validator.validate((this.requestBody as unknown) as string);
-            this.validator.validate((this.requestBody.locator as unknown) as { [key: string]: string });
+            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+
+            this.validator.addParamValidator(this.PARAM_PAGE_NUMBER, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+
+            this.validator.validate(this.requestBody);
+            this.validator.validate((this.requestBody[this.PARAM_LOCATOR] as object) ?? {});
 
             const catalogBody: CatalogDocumentModel = (this.requestBody as unknown) as CatalogDocumentModel;
             await this.catalogLogic.checkExistsWithUrl(catalogBody.url, true);
@@ -185,7 +193,10 @@ export default class CatalogController extends CommonServiceControllerBase {
             this.validator.addParamValidator(this.PARAM_LOCATOR, new Checker.Type.Object());
 
             this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+
             this.validator.addParamValidator(this.PARAM_PAGE_NUMBER, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
 
             this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
@@ -194,12 +205,12 @@ export default class CatalogController extends CommonServiceControllerBase {
             this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
 
             this.validator.validate(this.requestParams);
-            this.validator.validate((this.requestBody as unknown) as string);
-            this.validator.validate((this.requestBody.locator as unknown) as { [key: string]: string });
+            this.validator.validate(this.requestBody);
+            this.validator.validate((this.requestBody[this.PARAM_LOCATOR] as object) ?? {});
 
-            const idBody: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
             const catalogBody: CatalogDocumentModel = (this.requestBody as unknown) as CatalogDocumentModel;
-            await this.catalogLogic.checkExistsWithId(catalogBody._id);
+            await this.catalogLogic.checkExistsWithId(idBody);
             await this.catalogLogic.checkExistsWithUrl(catalogBody.url, true);
             await HostLogic.getInstance().checkExistsWithId(catalogBody.hostId);
             await PatternLogic.getInstance().checkExistsWithId(catalogBody.patternId);
@@ -232,9 +243,9 @@ export default class CatalogController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestParams);
 
-            const id: number = (this.requestParams[this.PARAM_ID] as unknown) as number;
-            await this.catalogLogic.checkExistsWithId(id);
-            await this.catalogLogic.delete(id);
+            const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.catalogLogic.checkExistsWithId(idBody);
+            await this.catalogLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
         } catch (error) {

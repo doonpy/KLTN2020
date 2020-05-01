@@ -1,7 +1,7 @@
 import { DocumentQuery, Query } from 'mongoose';
 import DetailUrlModel from './detail-url.model';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import { CatalogDocumentModel } from '../catalog/catalog.interface';
+import { CatalogApiModel, CatalogDocumentModel } from '../catalog/catalog.interface';
 import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
 import { DetailUrlApiModel, DetailUrlDocumentModel, DetailUrlLogicInterface } from './detail-url.interface';
 import CommonServiceWording from '../../common/service/common.service.wording';
@@ -280,19 +280,31 @@ export default class DetailUrlLogic extends CommonServiceLogicBase implements De
 
     /**
      * @param {DetailUrlDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {DetailUrlApiModel}
      */
-    public convertToApiResponse(
-        { _id, catalogId, url, isExtracted, requestRetries, cTime, mTime }: DetailUrlDocumentModel,
-        languageIndex = 0
-    ): DetailUrlApiModel {
+    public convertToApiResponse({
+        _id,
+        catalogId,
+        url,
+        isExtracted,
+        requestRetries,
+        cTime,
+        mTime,
+    }: DetailUrlDocumentModel): DetailUrlApiModel {
+        let catalog: CatalogApiModel | number | null = null;
+
+        if (catalogId) {
+            if (typeof catalogId === 'object') {
+                catalog = CatalogLogic.getInstance().convertToApiResponse(catalogId as CatalogDocumentModel);
+            } else {
+                catalog = catalogId as number;
+            }
+        }
+
         return {
             id: _id ?? null,
-            catalog: catalogId
-                ? CatalogLogic.getInstance().convertToApiResponse(catalogId as CatalogDocumentModel)
-                : null,
+            catalog,
             url: url ?? null,
             isExtracted: isExtracted ?? null,
             requestRetries: requestRetries ?? null,

@@ -26,7 +26,7 @@ process.on(
             let rawDataset: {
                 documents: RawDataDocumentModel[];
                 hasNext: boolean;
-            } = await rawDataLogic.getAll(limit, undefined, { coordinate: null });
+            } = await rawDataLogic.getAll(limit, undefined, { coordinateId: null });
 
             while (rawDataset.hasNext || rawDataset.documents.length > 0) {
                 for (const document of rawDataset.documents) {
@@ -37,14 +37,14 @@ process.on(
                         } as unknown) as CoordinateDocumentModel);
                     }
 
-                    document.coordinate = coordinateDoc._id;
+                    document.coordinateId = coordinateDoc._id;
                     await rawDataLogic.update(document._id, document);
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
                         `Add coordinate - RID:${document._id} -> CID:${coordinateDoc._id}`
                     ).show();
                 }
-                rawDataset = await rawDataLogic.getAll(limit, undefined, { coordinate: null });
+                rawDataset = await rawDataLogic.getAll(limit, undefined, { coordinateId: null });
             }
 
             const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);

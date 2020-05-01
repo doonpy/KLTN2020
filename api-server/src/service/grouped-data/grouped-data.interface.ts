@@ -7,7 +7,7 @@ import {
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/raw-data.interface';
 
 export interface GroupedDataApiModel extends CommonApiModel {
-    items: RawDataApiModel[] | null | number[];
+    items: (RawDataApiModel | number | null)[];
 }
 
 export interface GroupedDataDocumentModel extends CommonDocumentModel {

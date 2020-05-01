@@ -213,14 +213,17 @@ export default class CoordinateLogic extends CommonServiceLogicBase implements C
 
     /**
      * @param {CoordinateDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {CoordinateApiModel}
      */
-    public convertToApiResponse(
-        { _id, location, lat, lng, cTime, mTime }: CoordinateDocumentModel,
-        languageIndex = 0
-    ): CoordinateApiModel {
+    public convertToApiResponse({
+        _id,
+        location,
+        lat,
+        lng,
+        cTime,
+        mTime,
+    }: CoordinateDocumentModel): CoordinateApiModel {
         return {
             id: _id ?? null,
             location: location ?? null,

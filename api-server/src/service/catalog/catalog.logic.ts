@@ -4,8 +4,8 @@ import { CatalogApiModel, CatalogDocumentModel, CatalogLogicInterface } from './
 import CommonLogicBase from '../../common/service/common.service.logic.base';
 import CatalogWording from './catalog.wording';
 import ResponseStatusCode from '../../common/common.response-status.code';
-import { HostDocumentModel } from '../host/host.interface';
-import { PatternDocumentModel } from '../pattern/pattern.interface';
+import { HostApiModel, HostDocumentModel } from '../host/host.interface';
+import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
 import CommonServiceWording from '../../common/service/common.service.wording';
 import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
@@ -277,23 +277,45 @@ export default class CatalogLogic extends CommonLogicBase implements CatalogLogi
 
     /**
      * @param {CatalogDocumentModel}
-     * @param {number} languageIndex
      *
      * @return {CatalogApiModel}
      */
-    public convertToApiResponse(
-        { _id, title, url, locator, hostId, patternId, cTime, mTime }: CatalogDocumentModel,
-        languageIndex = 0
-    ): CatalogApiModel {
+    public convertToApiResponse({
+        _id,
+        title,
+        url,
+        locator,
+        hostId,
+        patternId,
+        cTime,
+        mTime,
+    }: CatalogDocumentModel): CatalogApiModel {
+        let host: HostApiModel | number | null = null;
+        let pattern: PatternApiModel | number | null = null;
+
+        if (hostId) {
+            if (typeof hostId === 'object') {
+                host = HostLogic.getInstance().convertToApiResponse(hostId as HostDocumentModel);
+            } else {
+                host = hostId as number;
+            }
+        }
+
+        if (patternId) {
+            if (typeof patternId === 'object') {
+                pattern = PatternLogic.getInstance().convertToApiResponse(patternId as PatternDocumentModel);
+            } else {
+                pattern = patternId as number;
+            }
+        }
+
         return {
             id: _id ?? null,
             title: title ?? null,
             url: url ?? null,
             locator: locator ?? null,
-            host: hostId ? HostLogic.getInstance().convertToApiResponse(hostId as HostDocumentModel) : null,
-            pattern: patternId
-                ? PatternLogic.getInstance().convertToApiResponse(patternId as PatternDocumentModel)
-                : null,
+            host,
+            pattern,
             createAt: cTime ?? null,
             updateAt: mTime ?? null,
         };

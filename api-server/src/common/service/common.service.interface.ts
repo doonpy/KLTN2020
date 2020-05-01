@@ -78,11 +78,10 @@ export interface CommonLogicBaseInterface {
 
     /**
      * @param {CommonDocumentModel} input
-     * @param {number} languageIndex
      *
      * @return {CommonApiModel}
      */
-    convertToApiResponse(input: CommonDocumentModel, languageIndex: number): CommonApiModel;
+    convertToApiResponse(input: CommonDocumentModel): CommonApiModel;
 }
 
 export interface CommonServiceControllerBaseInterface {

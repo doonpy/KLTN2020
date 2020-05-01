@@ -38,7 +38,7 @@ const rawDataSchema = new Schema(
                 _id: false,
             },
         ],
-        coordinate: { type: Schema.Types.Number, ref: 'coordinate' },
+        coordinateId: { type: Schema.Types.Number, ref: 'coordinate', default: null },
         isGrouped: { type: Schema.Types.Boolean, default: false },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
@@ -54,7 +54,8 @@ rawDataSchema.index({ isGrouped: 1 }, { name: 'idx_isGrouped' });
 rawDataSchema.index({ detailUrlId: 1 }, { name: 'idx_detailUrlId' });
 rawDataSchema.index({ transactionType: 1 }, { name: 'idx_transactionType' });
 rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
-rawDataSchema.index({ coordinate: 1 }, { name: 'idx_coordinate' });
+rawDataSchema.index({ coordinateId: 1 }, { name: 'idx_coordinateId' });
+rawDataSchema.index({ transactionType: 1, propertyType: 1 }, { name: 'idx_transactionType_propertyType' });
 rawDataSchema.index(
     { isGrouped: 1, propertyType: 1, transactionType: 1 },
     { name: 'idx_isGrouped_propertyType_transactionType' }

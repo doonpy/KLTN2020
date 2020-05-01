@@ -7,7 +7,7 @@ import {
 } from '../../common/service/common.service.interface';
 
 export interface DetailUrlApiModel extends CommonApiModel {
-    catalog: CatalogApiModel | null | number;
+    catalog: CatalogApiModel | number | null;
     url: string | null;
     isExtracted: boolean | null;
     requestRetries: number | null;
