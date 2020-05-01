@@ -24,8 +24,6 @@ Reference to [here](https://documenter.getpostman.com/view/6309569/SzmZbeww?vers
 
 - To run REST API server: 
 `npm run dev:api`
-- To run Background job: 
-`npm run dev:bgr-job`
 - To run Web server: 
 `npm run dev:web`
 
