@@ -247,9 +247,8 @@ export default class GroupedDataLogic extends CommonServiceLogicBase implements 
             if (item) {
                 if (typeof item === 'object') {
                     return RawDataLogic.getInstance().convertToApiResponse(item as RawDataDocumentModel);
-                } else {
-                    return item as number;
                 }
+                return item as number;
             }
 
             return null;
