@@ -23,7 +23,7 @@ export default {
     PROD_SERVER_PORT: '3000',
 
     // Background jon config
-    BGR_START_ON_SERVER_RUN: 0,
+    BGR_START_ON_SERVER_RUN: 1,
     BGR_THREAD_AMOUNT: 2,
     BGR_SCHEDULE_TIME_HOUR: 18,
     BGR_SCHEDULE_TIME_MINUTE: 0,

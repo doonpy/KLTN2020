@@ -26,19 +26,24 @@ export default class ScrapeBase {
      */
     protected async getStaticBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
         const url: string = path.includes(domain) ? path : domain + (/(^\/)?/.test(path) ? path : `/${path}`);
-        const response: Response = await new Request(url).send();
-        const { statusCode } = response;
+        try {
+            const response: Response = await new Request(url).send();
+            const { statusCode } = response;
 
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Send request -> ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
-        ).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Send request -> ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
+            ).show();
 
-        if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
+            if (response.statusCode !== ResponseStatusCode.OK || response.request.uri.href !== url) {
+                return undefined;
+            }
+
+            return cherrio.load(response.body);
+        } catch (error) {
+            new ConsoleLog(ConsoleConstant.Type.ERROR, `Send request -> ${url} - Error: ${error.message}`).show();
             return undefined;
         }
-
-        return cherrio.load(response.body);
     }
 
     /**
