@@ -15,6 +15,9 @@ Updating
 ## Technical stacks
 Updating
 
+## API endpoints document
+Reference to [here](https://documenter.getpostman.com/view/6309569/SzmZbeww?version=latest)
+
 ## How to run
 ### For development
 ❗**IMPORTANT:** Install dependencies with `npm install` before run any command following.
