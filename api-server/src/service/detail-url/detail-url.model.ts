@@ -21,8 +21,6 @@ detailUrlSchema.plugin(autoIncrement.plugin, {
 });
 
 detailUrlSchema.index({ url: 1 }, { name: 'idx_url' });
-detailUrlSchema.index({ url: 'text' }, { name: 'idx_url_text' });
-detailUrlSchema.index({ catalogId: 1 }, { name: 'idx_catalogId' });
 detailUrlSchema.index({ isExtracted: 1 }, { name: 'idx_isExtracted' });
 detailUrlSchema.index({ requestRetries: 1 }, { name: 'idx_requestRetries' });
 detailUrlSchema.index(

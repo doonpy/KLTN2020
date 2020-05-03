@@ -12,19 +12,22 @@ let isRunning = false;
  * Execute group data child process
  */
 const executeGroupDataChildProcess = (): void => {
-    const propertyTypeIdList: number[] = RawDataConstant.PROPERTY_TYPE.map((item) => item.id);
+    let propertyTypeIdList: number[] = RawDataConstant.PROPERTY_TYPE.map((item) => item.id);
     const transactionTypeIdList: number[] = RawDataConstant.TRANSACTION_TYPE.map((item) => item.id);
     let childProcessAmount = 0;
     let currentTransactionTypeId: number = transactionTypeIdList.shift() as number;
+    let propertyTypeCloneList: number[] = [];
     const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
-        if (propertyTypeIdList.length === 0 && childProcessAmount === 0) {
-            if (transactionTypeIdList.length === 0) {
+        if (propertyTypeIdList.length === 0) {
+            if (transactionTypeIdList.length === 0 && childProcessAmount === 0) {
                 clearInterval(loop);
                 new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
                 await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
                 isRunning = false;
             } else {
                 currentTransactionTypeId = transactionTypeIdList.shift() as number;
+                propertyTypeIdList = [...propertyTypeCloneList];
+                propertyTypeCloneList = [];
             }
             return;
         }
@@ -34,6 +37,7 @@ const executeGroupDataChildProcess = (): void => {
         }
 
         const currentPropertyTypeId: number = propertyTypeIdList.shift() as number;
+        propertyTypeCloneList.push(currentPropertyTypeId);
 
         const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
         childProcess.on(

@@ -18,6 +18,7 @@ hostSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-hostSchema.index({ name: 'text', domain: 'text' }, { name: 'idx_name_domain' });
+hostSchema.index({ domain: 1 }, { name: 'idx_domain' });
+hostSchema.index({ name: 1 }, { name: 'idx_name' });
 
 export default mongoose.model<HostDocumentModel>('host', hostSchema);

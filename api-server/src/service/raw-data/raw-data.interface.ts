@@ -100,4 +100,11 @@ export interface RawDataLogicInterface extends CommonLogicBaseInterface {
      * @return {Promise<RawDataDocumentModel>}
      */
     getPopulateDocument(document: RawDataDocumentModel): Promise<RawDataDocumentModel>;
+
+    /**
+     * @param {object[]} aggregations
+     *
+     * @return {Promise<any[]>}
+     */
+    queryWithAggregation(aggregations: object[]): Promise<any[]>;
 }

@@ -29,7 +29,7 @@ const patternSchema: Schema = new Schema(
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
 
-patternSchema.index({ sourceUrl: 'text' }, { name: 'idx_sourceUrl' });
+patternSchema.index({ sourceUrl: 1 }, { name: 'idx_sourceUrl' });
 
 patternSchema.plugin(autoIncrement.plugin, {
     model: 'pattern',

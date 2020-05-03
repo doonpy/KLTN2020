@@ -55,6 +55,14 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
 
+            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_IS_EXTRACTED, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_IS_EXTRACTED, new Checker.IntegerRange(0, 1));
+
+            this.validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.IntegerRange(0, null));
+
             this.validator.validate(this.requestQuery);
 
             const {
@@ -63,12 +71,12 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             }: { documents: DetailUrlDocumentModel[]; hasNext: boolean } = await this.detailUrlLogic.getAll(
                 this.limit,
                 this.offset,
-                this.keyword
-                    ? {
-                          $text: { $search: this.keyword },
-                          [this.PARAM_CATALOG_ID]: this.requestQuery[this.PARAM_CATALOG_ID],
-                      }
-                    : { [this.PARAM_CATALOG_ID]: this.requestQuery[this.PARAM_CATALOG_ID] },
+                this.buildQueryConditions([
+                    { paramName: this.PARAM_CATALOG_ID, isString: false },
+                    { paramName: this.PARAM_URL, isString: true },
+                    { paramName: this.PARAM_IS_EXTRACTED, isString: false },
+                    { paramName: this.PARAM_REQUEST_RETRIES, isString: false },
+                ]),
                 this.populate
             );
             const detailUrlList: object[] = documents.map(

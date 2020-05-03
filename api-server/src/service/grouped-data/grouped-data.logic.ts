@@ -43,8 +43,8 @@ export default class GroupedDataLogic extends CommonServiceLogicBase implements 
             GroupedDataDocumentModel[],
             GroupedDataDocumentModel,
             {}
-        > = GroupedDataModel.find();
-        const remainQuery: Query<number> = GroupedDataModel.countDocuments();
+        > = GroupedDataModel.find(conditions || {});
+        const remainQuery: Query<number> = GroupedDataModel.countDocuments(conditions || {});
 
         if (isPopulate) {
             documentQuery = this.addPopulateQuery(documentQuery) as DocumentQuery<
@@ -211,7 +211,7 @@ export default class GroupedDataLogic extends CommonServiceLogicBase implements 
         return query.populate({
             path: 'items',
             populate: {
-                path: 'detailUrlId coordinate',
+                path: 'detailUrlId coordinateId',
                 populate: { path: 'catalogId', populate: { path: 'hostId patternId' } },
             },
         });
@@ -227,7 +227,7 @@ export default class GroupedDataLogic extends CommonServiceLogicBase implements 
             .populate({
                 path: 'items',
                 populate: {
-                    path: 'detailUrlId coordinate',
+                    path: 'detailUrlId coordinateId',
                     populate: { path: 'catalogId', populate: { path: 'hostId patternId' } },
                 },
             })

@@ -40,7 +40,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
     protected requestParams: { [key: string]: string } = {};
 
-    protected requestQuery: { [key: string]: string } = {};
+    protected requestQuery: { [key: string]: string | string[] } = {};
 
     protected validator: Validator = new Validator();
 
@@ -191,7 +191,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             this.validator = new Validator();
 
             this.validator.addParamValidator(this.PARAM_LIMIT, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_LIMIT, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(this.PARAM_LIMIT, new Checker.IntegerRange(1, 1000));
 
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.IntegerRange(0, null));
@@ -228,9 +228,17 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             this.language = CommonLanguage[req.params[this.PARAM_LANGUAGE]] ?? this.language;
             this.schema = req.params[this.PARAM_SCHEMA];
             this.keyword = (req.query[this.PARAM_KEYWORD] as string) ?? this.keyword;
+
             this.requestParams = req.params ?? {};
+            Object.keys(this.requestParams).forEach(
+                (key) => !this.requestParams[key] && delete this.requestParams[key]
+            );
+
             this.requestQuery = (req.query as { [key: string]: string }) ?? {};
+            Object.keys(this.requestQuery).forEach((key) => !this.requestQuery[key] && delete this.requestQuery[key]);
+
             this.requestBody = req.body ?? {};
+            Object.keys(this.requestBody).forEach((key) => !this.requestBody[key] && delete this.requestBody[key]);
 
             next();
         } catch (error) {
@@ -311,5 +319,29 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             finalMessage,
             [this.requestParams, this.requestQuery, this.requestBody]
         );
+    }
+
+    /**
+     * @param {string[]} queryParams
+     *
+     * @return {object}
+     */
+    protected buildQueryConditions(queryParams: { paramName: string; isString: boolean }[]): object {
+        const conditions: { [key: string]: any } = {};
+
+        Object.entries(this.requestQuery).forEach(([key, value]: [string, string | string[]]): void => {
+            const param: { paramName: string; isString: boolean } | undefined = queryParams.find(
+                (item) => item.paramName === key
+            );
+            if (param) {
+                if (param.isString) {
+                    conditions[key] = { $regex: new RegExp(typeof value === 'string' ? value : value.join('|'), 'i') };
+                } else {
+                    conditions[key] = value;
+                }
+            }
+        });
+
+        return conditions;
     }
 }

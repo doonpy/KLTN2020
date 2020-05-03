@@ -361,11 +361,19 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
     }
 
     /**
+     * @param {object[]} aggregations
+     *
+     * @return {Promise<any[]>}
+     */
+    public async queryWithAggregation(aggregations: object[]): Promise<any[]> {
+        return RawDataModel.aggregate(aggregations).exec();
+    }
+
+    /**
      * @param {RawDataDocumentModel}
      *
      * @return {RawDataApiModel}
      */
-
     public convertToApiResponse({
         _id,
         transactionType,

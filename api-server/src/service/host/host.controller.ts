@@ -45,7 +45,11 @@ export default class HostController extends CommonServiceControllerBase {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            this.validator.addParamValidator(this.PARAM_KEYWORD, new Checker.Type.String());
+            this.validator = new Validator();
+
+            this.validator.addParamValidator(this.PARAM_NAME, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_DOMAIN, new Checker.Type.String());
 
             this.validator.validate(this.requestQuery);
 
@@ -55,11 +59,11 @@ export default class HostController extends CommonServiceControllerBase {
             }: { documents: HostDocumentModel[]; hasNext: boolean } = await this.hostLogic.getAll(
                 this.limit,
                 this.offset,
-                this.keyword
-                    ? {
-                          $text: { $search: this.keyword },
-                      }
-                    : {}
+                this.buildQueryConditions([
+                    { paramName: this.PARAM_DOMAIN, isString: true },
+                    { paramName: this.PARAM_NAME, isString: true },
+                ]),
+                this.populate
             );
             const hosts: object[] = documents.map((host): HostApiModel => this.hostLogic.convertToApiResponse(host));
 

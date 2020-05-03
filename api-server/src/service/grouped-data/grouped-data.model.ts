@@ -17,4 +17,6 @@ GroupedDataSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
+GroupedDataSchema.index({ items: 1 }, { name: 'idx_items' });
+
 export default mongoose.model<GroupedDataDocumentModel>('grouped_data', GroupedDataSchema);

@@ -52,6 +52,8 @@ export default class RawDataController extends CommonServiceControllerBase {
 
     private readonly PARAM_VALUE: string = 'value';
 
+    private readonly PRAM_IS_GROUPED: string = 'isGrouped';
+
     constructor() {
         super();
         this.commonPath += commonPath;
@@ -79,8 +81,25 @@ export default class RawDataController extends CommonServiceControllerBase {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            this.validator = new Validator();
+
             this.validator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.IntegerRange(1, null));
+
+            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.IntegerRange(0, null));
+
+            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.IntegerRange(0, null));
+
+            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_DESCRIBE, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_ADDRESS, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PRAM_IS_GROUPED, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PRAM_IS_GROUPED, new Checker.IntegerRange(0, 1));
 
             this.validator.validate(this.requestParams);
 
@@ -90,9 +109,15 @@ export default class RawDataController extends CommonServiceControllerBase {
             }: { documents: RawDataDocumentModel[]; hasNext: boolean } = await this.rawDataLogic.getAll(
                 this.limit,
                 this.offset,
-                {
-                    detailUrlId: this.requestQuery[this.PARAM_DETAIL_URL_ID] || { $gt: 0 },
-                },
+                this.buildQueryConditions([
+                    { paramName: this.PARAM_DETAIL_URL_ID, isString: false },
+                    { paramName: this.PARAM_TRANSACTION_TYPE, isString: false },
+                    { paramName: this.PARAM_PROPERTY_TYPE, isString: false },
+                    { paramName: this.PARAM_TITLE, isString: true },
+                    { paramName: this.PARAM_DESCRIBE, isString: true },
+                    { paramName: this.PARAM_ADDRESS, isString: true },
+                    { paramName: this.PRAM_IS_GROUPED, isString: false },
+                ]),
                 this.populate
             );
             const rawDataList: object[] = documents.map(
