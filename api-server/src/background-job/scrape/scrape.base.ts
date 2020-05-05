@@ -2,7 +2,6 @@ import cherrio from 'cheerio';
 import { Response } from 'request';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import Request from '../../util/request/request';
-import ScrapeConstant from './scrape.constant';
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
 import ResponseStatusCode from '../../common/common.response-status.code';
@@ -25,7 +24,10 @@ export default class ScrapeBase {
      * @return Promise<CheerioStatic | undefined>
      */
     protected async getStaticBody(domain: string, path: string): Promise<CheerioStatic | undefined> {
-        const url: string = path.includes(domain) ? path : domain + (/(^\/)?/.test(path) ? path : `/${path}`);
+        const DOMAIN_PATTERN = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/);
+        domain = domain.replace(/\/{2,}$/, '');
+        const url: string = DOMAIN_PATTERN.test(path) ? path : domain + (/^\//.test(path) ? path : `/${path}`);
+
         try {
             const response: Response = await new Request(url).send();
             const { statusCode } = response;
@@ -79,17 +81,10 @@ export default class ScrapeBase {
         if (attribute) {
             data = element.attr(attribute) || '';
         } else {
-            element.contents().each((index, item): void => {
-                if (item.type === ScrapeConstant.NODE_TYPE.TEXT) {
-                    data += item.data;
-                }
-            });
+            data += `${element.text()}`;
         }
 
-        return data
-            .replace(/\r|\n|\r\n/gm, ' ')
-            .replace(/\s{2,}/g, ' ')
-            .trim();
+        return data.trim();
     }
 
     /**

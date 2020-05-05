@@ -1,4 +1,4 @@
-import { convertAcreageValue, convertPriceValue } from './group-data.helper';
+import { convertAcreageValue } from './group-data.helper';
 import StringHandler from '../../util/helper/string-handler';
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
@@ -186,14 +186,6 @@ export default class GroupData {
      * @return {number} points
      */
     private calculateAcreageScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
-        if (!Number(firstTarget.acreage.value) && !Number(secondTarget.acreage.value)) {
-            return this.ATTR_ACREAGE_SCORE;
-        }
-
-        if (!Number(firstTarget.acreage.value) || !Number(secondTarget.acreage.value)) {
-            return 0;
-        }
-
         const firstAcreageObj: { value: number; measureUnit: string } = {
             value: Number(firstTarget.acreage.value),
             measureUnit: firstTarget.acreage.measureUnit,
@@ -202,6 +194,10 @@ export default class GroupData {
             value: Number(secondTarget.acreage.value),
             measureUnit: secondTarget.acreage.measureUnit,
         };
+
+        if (firstAcreageObj.value || secondAcreageObj.value) {
+            return 0;
+        }
 
         if (firstAcreageObj.measureUnit !== secondAcreageObj.measureUnit) {
             if (firstAcreageObj.measureUnit === 'km²') {
@@ -230,26 +226,15 @@ export default class GroupData {
      * @return {number} points
      */
     private calculatePriceScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
-        if (!Number(firstTarget.price.value) && !Number(secondTarget.price.value)) {
-            return this.ATTR_PRICE_SCORE;
-        }
+        const firstPriceObj: { value: number; currency: string } = firstTarget.price;
+        const secondPriceObj: { value: number; currency: string } = secondTarget.price;
 
-        if (!Number(firstTarget.price.value) || !Number(secondTarget.price.value)) {
+        if (!firstPriceObj.value || secondPriceObj.value) {
             return 0;
         }
 
-        const firstPriceObj: { value: number; currency: string } = {
-            value: Number(firstTarget.price.value),
-            currency: firstTarget.price.currency,
-        };
-        const secondPriceObj: { value: number; currency: string } = {
-            value: Number(secondTarget.price.value),
-            currency: secondTarget.price.currency,
-        };
-
         if (firstPriceObj.currency !== secondPriceObj.currency) {
-            firstPriceObj.value = convertPriceValue(firstPriceObj.value, firstPriceObj.currency, 'nghìn');
-            secondPriceObj.value = convertPriceValue(secondPriceObj.value, secondPriceObj.currency, 'nghìn');
+            return 0;
         }
 
         return (

@@ -10,6 +10,7 @@ import DetailUrlLogic from '../detail-url/detail-url.logic';
 
 const commonPath = '/raw-dataset';
 const specifyIdPath = '/raw-dataset/:id';
+const countDocumentPath = '/count-document';
 
 export default class RawDataController extends CommonServiceControllerBase {
     private static instance: RawDataController;
@@ -40,6 +41,8 @@ export default class RawDataController extends CommonServiceControllerBase {
 
     private readonly PARAM_PRICE_CURRENCY: string = 'currency';
 
+    private readonly PARAM_PRICE_TIME_UNIT: string = 'timeUnit';
+
     private readonly PARAM_ACREAGE: string = 'acreage';
 
     private readonly PARAM_ACREAGE_MEASURE_UNIT: string = 'measureUnit';
@@ -58,6 +61,12 @@ export default class RawDataController extends CommonServiceControllerBase {
         super();
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
+        this.router
+            .all(this.commonPath + countDocumentPath, [
+                this.initCommonInputs.bind(this),
+                this.validateCommonInputs.bind(this),
+            ])
+            .get(this.commonPath + countDocumentPath, this.countDocumentRoute.bind(this));
         this.initRoutes();
     }
 
@@ -215,6 +224,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             // Validate price object
             this.priceValidator.addParamValidator(this.PARAM_PRICE_CURRENCY, new Checker.Type.String());
 
+            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.Type.Integer());
+            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.IntegerRange(0, 2));
+
             this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.Decimal());
             this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.DecimalRange(0, null));
 
@@ -304,6 +316,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             // Validate price object
             this.priceValidator.addParamValidator(this.PARAM_PRICE_CURRENCY, new Checker.Type.String());
 
+            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.Type.Integer());
+            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.IntegerRange(0, 2));
+
             this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.Decimal());
             this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.DecimalRange(0, null));
 
@@ -365,6 +380,38 @@ export default class RawDataController extends CommonServiceControllerBase {
             await this.rawDataLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    private async countDocumentRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            this.validator = new Validator();
+
+            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.IntegerRange(0, null));
+
+            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.IntegerRange(0, null));
+
+            this.validator.validate(this.requestQuery);
+
+            const documentAmount: number = await this.rawDataLogic.countDocumentsWithConditions(
+                this.buildQueryConditions([
+                    { paramName: this.PARAM_TRANSACTION_TYPE, isString: false },
+                    { paramName: this.PARAM_PROPERTY_TYPE, isString: false },
+                ])
+            );
+
+            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, { documentAmount }, res);
         } catch (error) {
             next(this.createError(error, this.language));
         }

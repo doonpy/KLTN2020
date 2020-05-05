@@ -240,7 +240,10 @@ export default class PatternController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const patternBody: PatternDocumentModel = (this.requestBody as unknown) as PatternDocumentModel;
             await this.patternLogic.checkExistsWithId(idBody);
-            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
+            const currentPattern: PatternDocumentModel = await this.patternLogic.getById(idBody);
+            if (patternBody.sourceUrl !== currentPattern.sourceUrl) {
+                await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
+            }
             const editedPattern: PatternDocumentModel = await this.patternLogic.update(idBody, patternBody);
 
             CommonServiceControllerBase.sendResponse(

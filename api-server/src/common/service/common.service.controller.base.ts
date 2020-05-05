@@ -186,7 +186,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      *
      * @return void
      */
-    private validateCommonInputs(req: Request, res: Response, next: NextFunction): void {
+    protected validateCommonInputs(req: Request, res: Response, next: NextFunction): void {
         try {
             this.validator = new Validator();
 
@@ -220,7 +220,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      *
      * @return {Promise<void>}
      */
-    private initCommonInputs(req: Request, res: Response, next: NextFunction): void {
+    protected initCommonInputs(req: Request, res: Response, next: NextFunction): void {
         try {
             this.limit = Number(req.query[this.PARAM_LIMIT]) || this.limit;
             this.offset = Number(req.query[this.PARAM_OFFSET]) || this.offset;

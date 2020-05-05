@@ -12,6 +12,7 @@ import { PatternDocumentModel } from '../../../service/pattern/pattern.interface
 import { HostDocumentModel } from '../../../service/host/host.interface';
 import { RawDataDocumentModel } from '../../../service/raw-data/raw-data.interface';
 import RawDataConstant from '../../../service/raw-data/raw-data.constant';
+import { convertAcreageValue, convertPriceValue } from '../../group-data/group-data.helper';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
@@ -147,13 +148,19 @@ export default class ScrapeRawData extends ScrapeBase {
             acreage: string;
             address: string;
         } = this.pattern.mainLocator;
-        const propertyTypeData: string = ScrapeBase.extractData($, propertyType).join('. ');
-        const postDateData: string = ScrapeBase.extractData($, postDate.locator).join('. ');
-        const titleData: string = ScrapeBase.extractData($, title).join('. ');
-        const describeData: string = ScrapeBase.extractData($, describe).join('. ');
-        const priceData: string = ScrapeBase.extractData($, price).join('. ');
-        const acreageData: string = ScrapeBase.extractData($, acreage).join('. ');
-        const addressData: string = ScrapeBase.extractData($, address).join('. ');
+        const propertyTypeData: string = StringHandler.removeBreakLineAndTrim(
+            ScrapeBase.extractData($, propertyType).join('. ')
+        );
+        const postDateData: string = StringHandler.removeBreakLineAndTrim(
+            ScrapeBase.extractData($, postDate.locator).join('. ')
+        );
+        const titleData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, title).join('. '));
+        const describeData: string = StringHandler.removeBreakLineAndTrim(
+            ScrapeBase.extractData($, describe).join('. ')
+        );
+        const priceData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, price).join('. '));
+        const acreageData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, acreage).join('. '));
+        const addressData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, address).join('. '));
         const othersData: {
             name: string;
             value: string;
@@ -164,7 +171,9 @@ export default class ScrapeRawData extends ScrapeBase {
             } =>
                 Object({
                     name: subLocatorItem.name,
-                    value: ScrapeBase.extractData($, subLocatorItem.locator).join('. '),
+                    value: StringHandler.removeBreakLineAndTrim(
+                        ScrapeBase.extractData($, subLocatorItem.locator).join('. ')
+                    ),
                 })
             )
             .filter((item) => !!item.value);
@@ -310,29 +319,67 @@ export default class ScrapeRawData extends ScrapeBase {
         addressData: string,
         othersData: { name: string; value: string }[]
     ): RawDataDocumentModel {
+        const transactionType: number = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(propertyTypeData)
+            ? RawDataConstant.TRANSACTION_TYPE[1].id
+            : RawDataConstant.TRANSACTION_TYPE[0].id;
+
+        const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
+
         let postDate: Date = DateTime.convertStringToDate(
             postDateData,
             this.pattern.mainLocator.postDate.format,
             this.pattern.mainLocator.postDate.delimiter
         );
         if (postDate.toString() === 'Invalid Date') {
-            postDate = new Date(0, 0, 0, 0, 0, 0, 0);
+            postDate = new Date();
         }
-        const price: { value: number; currency: string } = {
-            value: Number((priceData.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
-            currency: (priceData.match(ScrapeRawDataConstant.PRICE_CURRENCY_PATTERN) || []).shift() || '',
-        };
 
+        let priceString = '';
+        let priceTimeUnit = '';
+        if (transactionType === RawDataConstant.TRANSACTION_TYPE[0].id) {
+            priceString = (priceData.match(ScrapeRawDataConstant.SALE_PRICE_PATTERN) || []).shift() || '';
+        } else {
+            priceString = (priceData.match(ScrapeRawDataConstant.RENT_PRICE_PATTERN) || []).shift() || '';
+            priceTimeUnit = (priceData.match(ScrapeRawDataConstant.PRICE_TIME_UNIT_PATTERN) || []).shift() || '';
+        }
+        const priceUnit: string =
+            (priceString.match(ScrapeRawDataConstant.PRICE_VALUE_UNIT_PATTERN) || []).shift() || '';
+        const priceValue: number = convertPriceValue(
+            Number((priceString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
+            priceUnit,
+            'nghìn'
+        );
+        const priceCurrency: string = (priceString.match(/$/) || []).shift() ? 'usd' : 'vnd';
+        const price: { value: number; currency: string; timeUnit: number } = {
+            value: priceValue,
+            currency: priceCurrency,
+            timeUnit:
+                RawDataConstant.PRICE_TIME_UNIT.find((item): boolean => item.wording.indexOf(priceTimeUnit) !== -1)
+                    ?.id || -1,
+        };
+        if (price.timeUnit === -1) {
+            if (transactionType === RawDataConstant.TRANSACTION_TYPE[0].id) {
+                delete price.timeUnit;
+            } else {
+                price.timeUnit = RawDataConstant.PRICE_TIME_UNIT[1].id;
+            }
+        }
+
+        const acreageString: string = (acreageData.match(ScrapeRawDataConstant.ACREAGE_PATTERN) || []).shift() || '';
+        const acreageMeasureUnit: string =
+            (acreageString.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []).shift() || '';
+        const acreageValue: number =
+            acreageMeasureUnit === 'km²' || acreageMeasureUnit === 'km2'
+                ? convertAcreageValue(
+                      Number((acreageString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
+                      'km²',
+                      'm²'
+                  )
+                : Number((acreageString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift());
         const acreage: { value: number; measureUnit: string } = {
-            value: Number((acreageData.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
-            measureUnit: (acreageData.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []).shift() || '',
+            value: acreageValue,
+            measureUnit: 'm²',
         };
-
-        const transactionType: number = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(this.catalog.title)
-            ? RawDataConstant.TRANSACTION_TYPE[1].id
-            : RawDataConstant.TRANSACTION_TYPE[0].id;
-
-        const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
 
         return ({
             detailUrlId,

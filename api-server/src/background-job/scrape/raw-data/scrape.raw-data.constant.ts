@@ -6,9 +6,14 @@ export const ScrapeRawDataConstantChatBotMessage = {
 
 export const ScrapeRawDataConstant = {
     VALUE_PATTERN: new RegExp(/(([1-9]+)?0?\.?[0-9]+)/),
-    ACREAGE_MEASURE_UNIT_PATTERN: new RegExp(/m²|km²/),
-    RENT_TRANSACTION_PATTERN: new RegExp(/([tT])huê|([rR])ent/),
-    PRICE_CURRENCY_PATTERN: new RegExp(
-        /(million)|(billion)|(billion vnd\/month)|(million vnd\/month)|(triệu)|(tỷ)|(nghìn\/tháng)|(triệu\/tháng)|(tỷ\/tháng)/
+    ACREAGE_PATTERN: new RegExp(/(([1-9]+)?,?0?\.?[0-9]+)(\s?(m²|m2|km²|km2))/, 'i'),
+    ACREAGE_MEASURE_UNIT_PATTERN: new RegExp(/m²|m2|km²|km2/),
+    RENT_TRANSACTION_PATTERN: new RegExp(/thuê|rent/, 'i'),
+    PRICE_VALUE_UNIT_PATTERN: new RegExp(/(million)|(billion)|(triệu)|(tỷ)|(nghìn)|(ngàn)/, 'i'),
+    PRICE_TIME_UNIT_PATTERN: new RegExp(/(ngày)|(day)|(tháng)|(month)|(năm)|(year)/, 'i'),
+    SALE_PRICE_PATTERN: new RegExp(/\$?(([1-9]+)?,?0?\.?[0-9]+)(\s?((billion)|(million)|(nghìn)|(triệu)|(tỷ)))/, 'i'),
+    RENT_PRICE_PATTERN: new RegExp(
+        /\$?(([1-9]+)?,?0?\.?[0-9]+)(\s?((billion(\/month)?)|(million(\/month)?)|(nghìn(\/tháng)?)|(triệu(\/tháng)?)|(tỷ(\/tháng)?)))/,
+        'i'
     ),
 };

@@ -17,6 +17,7 @@ export interface RawDataApiModel extends CommonApiModel {
     price: {
         value: number | null;
         currency: string | null;
+        timeUnit: { id: number; wording: string[] } | null;
     } | null;
     acreage: {
         value: number | null;
@@ -46,6 +47,7 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     price: {
         value: number;
         currency: string;
+        timeUnit: number;
     };
     acreage: {
         value: number;
@@ -107,4 +109,11 @@ export interface RawDataLogicInterface extends CommonLogicBaseInterface {
      * @return {Promise<any[]>}
      */
     queryWithAggregation(aggregations: object[]): Promise<any[]>;
+
+    /**
+     * @param {object | undefined} conditions
+     *
+     * @return {number}
+     */
+    countDocumentsWithConditions(conditions?: object): Promise<number>;
 }
