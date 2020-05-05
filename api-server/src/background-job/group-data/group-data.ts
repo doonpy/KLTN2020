@@ -25,9 +25,7 @@ export default class GroupData {
 
     private readonly ATTR_TITLE_SCORE: number = 4;
 
-    private readonly ATTR_DESCRIBE_SCORE: number = 1;
-
-    private readonly ATTR_PRICE_SCORE: number = 1;
+    private readonly ATTR_PRICE_SCORE: number = 2;
 
     private readonly ATTR_ACREAGE_SCORE: number = 2;
 
@@ -37,11 +35,7 @@ export default class GroupData {
 
     constructor() {
         this.TOTAL_SCORE =
-            this.ATTR_TITLE_SCORE +
-            this.ATTR_DESCRIBE_SCORE +
-            this.ATTR_ACREAGE_SCORE +
-            this.ATTR_ADDRESS_SCORE +
-            this.ATTR_PRICE_SCORE;
+            this.ATTR_TITLE_SCORE + this.ATTR_ACREAGE_SCORE + this.ATTR_ADDRESS_SCORE + this.ATTR_PRICE_SCORE;
     }
 
     /**
@@ -170,7 +164,6 @@ export default class GroupData {
         let totalPoint = 0;
         totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'title');
         totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'address');
-        totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'describe');
         totalPoint += this.calculatePriceScore(firstRawData, secondRawData);
         totalPoint += this.calculateAcreageScore(firstRawData, secondRawData);
 
@@ -262,10 +255,6 @@ export default class GroupData {
         switch (type) {
             case 'title':
                 return StringHandler.getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_TITLE_SCORE;
-            case 'describe':
-                return (
-                    StringHandler.getSimilarRate(firstTarget.describe, secondTarget.describe) * this.ATTR_DESCRIBE_SCORE
-                );
             case 'address':
                 return (
                     StringHandler.getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_ADDRESS_SCORE

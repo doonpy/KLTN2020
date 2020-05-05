@@ -29,7 +29,7 @@ const rawDataSchema = new Schema(
         },
         acreage: {
             value: { type: Schema.Types.Number },
-            measureUnit: { type: Schema.Types.Number },
+            measureUnit: { type: Schema.Types.String },
         },
         address: { type: Schema.Types.String },
         others: [

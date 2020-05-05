@@ -220,7 +220,7 @@ export default class ScrapeRawData extends ScrapeBase {
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
-                `Scrape raw data -> DID: ${currentDetailUrlDocument._id}}`
+                `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.cause || error.message}`
             ).show();
         }
     }

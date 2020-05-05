@@ -10,41 +10,14 @@ import PatternController from './service/pattern/pattern.controller';
 import DetailUrlController from './service/detail-url/detail-url.controller';
 import RawDataController from './service/raw-data/raw-data.controller';
 import GroupedDataController from './service/grouped-data/grouped-data.controller';
-import DateTime from './util/datetime/datetime';
-import BackgroundJob from './background-job/main';
-
-/**
- * Background job
- */
-const startBackgroundJob = async (): Promise<void> => {
-    const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
-        const expectTime: Date = new Date();
-        expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));
-        expectTime.setUTCMinutes(parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10));
-        expectTime.setUTCSeconds(parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10));
-        if (!DateTime.isExactTime(expectTime, true) || BackgroundJob.isBgrJobRunning()) {
-            return;
-        }
-
-        await BackgroundJob.main();
-    }, 1000);
-
-    if (Number(process.env.BGR_START_ON_SERVER_RUN)) {
-        await BackgroundJob.main();
-    }
-};
 
 /**
  * Main
  */
 (async (): Promise<void> => {
     initEnv();
-    const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
-    const appInstance: App = App.getInstance();
-
-    await mongoDbInstance.connect();
-    await startBackgroundJob();
-    await appInstance.start(
+    await DatabaseMongodb.getInstance().connect();
+    await App.getInstance().start(
         [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
         [
             HostController.getInstance(),

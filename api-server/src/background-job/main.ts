@@ -5,6 +5,9 @@ import ConsoleLog from '../util/console/console.log';
 import ConsoleConstant from '../util/console/console.constant';
 import CatalogLogic from '../service/catalog/catalog.logic';
 import RawDataConstant from '../service/raw-data/raw-data.constant';
+import DateTime from '../util/datetime/datetime';
+import initEnv from '../util/environment/environment';
+import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 
 let isRunning = false;
 
@@ -110,16 +113,37 @@ const executeScrapeChildProcess = async (): Promise<void> => {
 /**
  * Start
  */
-const main = async (): Promise<void> => {
+export const main = async (): Promise<void> => {
     isRunning = true;
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
     await executeScrapeChildProcess();
 };
 
-const isBgrJobRunning = (): boolean => isRunning;
+/**
+ * Timer
+ */
+(async (): Promise<void> => {
+    try {
+        initEnv();
+        await DatabaseMongodb.getInstance().connect();
+        const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+            const expectTime: Date = new Date();
+            expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));
+            expectTime.setUTCMinutes(parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10));
+            expectTime.setUTCSeconds(parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10));
+            if (!DateTime.isExactTime(expectTime, true) || isRunning) {
+                return;
+            }
 
-export default {
-    main,
-    isBgrJobRunning,
-};
+            await main();
+        }, 1000);
+
+        if (Number(process.env.BGR_START_ON_SERVER_RUN)) {
+            await main();
+        }
+    } catch (error) {
+        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nError: ${error.message}`);
+        throw error;
+    }
+})();
