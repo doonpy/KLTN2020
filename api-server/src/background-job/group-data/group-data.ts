@@ -21,6 +21,8 @@ export default class GroupData {
 
     private groupedDataLogic: GroupedDataLogic = GroupedDataLogic.getInstance();
 
+    private readonly OTHERS_PROPERTY_TYPE_ID: number = 11;
+
     private readonly EXPECTED_SCORE: number = 9;
 
     private readonly ATTR_TITLE_SCORE: number = 4;
@@ -75,7 +77,10 @@ export default class GroupData {
                                     {
                                         $or: [
                                             { 'represent.propertyType': propertyType },
-                                            { 'represent.propertyType': RawDataConstant.PROPERTY_TYPE[12].id },
+                                            {
+                                                'represent.propertyType':
+                                                    RawDataConstant.PROPERTY_TYPE[this.OTHERS_PROPERTY_TYPE_ID].id,
+                                            },
                                         ],
                                     },
                                 ],

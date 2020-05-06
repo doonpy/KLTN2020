@@ -10,6 +10,7 @@ import initEnv from '../util/environment/environment';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 
 let isRunning = false;
+let script: AsyncGenerator;
 
 /**
  * Execute group data child process
@@ -22,15 +23,13 @@ const executeGroupDataChildProcess = (): void => {
     let propertyTypeCloneList: number[] = [];
     const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
         if (propertyTypeIdList.length === 0) {
-            if (transactionTypeIdList.length === 0 && childProcessAmount === 0) {
-                clearInterval(loop);
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
-                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
-                isRunning = false;
-            } else {
+            if (transactionTypeIdList.length !== 0) {
                 currentTransactionTypeId = transactionTypeIdList.shift() as number;
                 propertyTypeIdList = [...propertyTypeCloneList];
                 propertyTypeCloneList = [];
+            } else if (childProcessAmount === 0) {
+                clearInterval(loop);
+                script.next();
             }
             return;
         }
@@ -60,7 +59,7 @@ const executeGroupDataChildProcess = (): void => {
 const executeAddCoordinateChildProcess = (): void => {
     const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
     childProcess.on('exit', (): void => {
-        executeGroupDataChildProcess();
+        script.next();
     });
     childProcess.send({});
 };
@@ -73,7 +72,7 @@ const executeCleanDataChildProcess = (): void => {
     childProcess.on(
         'exit',
         async (): Promise<void> => {
-            executeAddCoordinateChildProcess();
+            script.next();
         }
     );
     childProcess.send({});
@@ -88,7 +87,7 @@ const executeScrapeChildProcess = async (): Promise<void> => {
     const loop: NodeJS.Timeout = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
             clearInterval(loop);
-            executeCleanDataChildProcess();
+            script.next();
             return;
         }
 
@@ -111,13 +110,36 @@ const executeScrapeChildProcess = async (): Promise<void> => {
 };
 
 /**
- * Start
+ * Script of background job
  */
-export const main = async (): Promise<void> => {
+async function* generateScript() {
     isRunning = true;
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
     await executeScrapeChildProcess();
+    yield 'Step 1: Execute scrape child process...';
+
+    executeCleanDataChildProcess();
+    yield 'Step 2: Execute clean data child process...';
+
+    executeAddCoordinateChildProcess();
+    yield 'Step 3: Execute add coordinate child process...';
+
+    executeGroupDataChildProcess();
+    yield 'Step 4: Execute group data child process...';
+
+    new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
+    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
+    isRunning = false;
+    return 'Done';
+}
+
+/**
+ * Start
+ */
+export const main = async (): Promise<void> => {
+    script = generateScript();
+    script.next();
 };
 
 /**
@@ -139,7 +161,7 @@ export const main = async (): Promise<void> => {
             await main();
         }, 1000);
 
-        if (Number(process.env.BGR_START_ON_SERVER_RUN)) {
+        if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isRunning) {
             await main();
         }
     } catch (error) {
