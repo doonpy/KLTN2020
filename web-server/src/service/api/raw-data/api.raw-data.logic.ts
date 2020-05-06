@@ -26,6 +26,14 @@ const getAll = async (
     return data;
 };
 
+/**
+ * @param {number | undefined} transactionType
+ * @param {number | undefined} propertyType
+ * @param {string} version
+ * @param {string} language
+ *
+ * @return {number}
+ */
 const countDocumentsWithConditions = async (
     transactionType?: number,
     propertyType?: number,

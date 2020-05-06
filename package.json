@@ -45,6 +45,7 @@
     "react-dom": "^16.13.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
+    "swr": "^0.2.0",
     "ts-node": "^8.10.1"
   },
   "devDependencies": {

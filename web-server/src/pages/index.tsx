@@ -26,7 +26,7 @@ export async function getServerSideProps() {
 const Home = ({ documentAmountArray }: { documentAmountArray: { [key: string]: number }[][] }): JSX.Element => {
     const saleSummaryAmount: number = documentAmountArray[0].reduce((sum, item, index): number => sum + item[index], 0);
     const rentSummaryAmount: number = documentAmountArray[1].reduce((sum, item, index): number => sum + item[index], 0);
-    console.log(documentAmountArray);
+    console.log(saleSummaryAmount, rentSummaryAmount);
     const PROPERTY_TYPE = [
         ['căn hộ chung cư', 'apartments'],
         ['nhà riêng', 'individual houses'],
@@ -43,39 +43,41 @@ const Home = ({ documentAmountArray }: { documentAmountArray: { [key: string]: n
     ];
 
     return (
-        <TransactionTypeChart
-            name={'test'}
-            data={[
-                {
-                    name: 'Sale',
-                    y: (saleSummaryAmount / (saleSummaryAmount + rentSummaryAmount)) * 100,
-                    drilldown: 'Sale',
-                },
-                {
-                    name: 'Rent',
-                    y: (rentSummaryAmount / (saleSummaryAmount + rentSummaryAmount)) * 100,
-                    drilldown: 'Sale',
-                },
-            ]}
-            drilldown={[
-                {
-                    name: 'Sale',
-                    id: 'Sale',
-                    data: documentAmountArray[0].map((item, index) => [
-                        PROPERTY_TYPE[index][0],
-                        (item[index] / saleSummaryAmount) * 100,
-                    ]),
-                },
-                {
-                    name: 'Rent',
-                    id: 'Rent',
-                    data: documentAmountArray[1].map((item, index) => [
-                        PROPERTY_TYPE[index][0],
-                        (item[index] / rentSummaryAmount) * 100,
-                    ]),
-                },
-            ]}
-        />
+        <div style={{ width: 100, height: 100 }}>
+            <TransactionTypeChart
+                name={'test'}
+                data={[
+                    {
+                        name: 'Sale',
+                        y: (saleSummaryAmount / (saleSummaryAmount + rentSummaryAmount)) * 100,
+                        drilldown: 'Sale',
+                    },
+                    {
+                        name: 'Rent',
+                        y: (rentSummaryAmount / (saleSummaryAmount + rentSummaryAmount)) * 100,
+                        drilldown: 'Sale',
+                    },
+                ]}
+                drilldown={[
+                    {
+                        name: 'Sale',
+                        id: 'Sale',
+                        data: documentAmountArray[0].map((item, index) => [
+                            PROPERTY_TYPE[index][0],
+                            (item[index] / saleSummaryAmount) * 100,
+                        ]),
+                    },
+                    {
+                        name: 'Rent',
+                        id: 'Rent',
+                        data: documentAmountArray[1].map((item, index) => [
+                            PROPERTY_TYPE[index][0],
+                            (item[index] / rentSummaryAmount) * 100,
+                        ]),
+                    },
+                ]}
+            />
+        </div>
     );
 };
 
