@@ -3,48 +3,61 @@ import ConsoleConstant from '../../util/console/console.constant';
 import GroupData from '../group-data/group-data';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
-import DateTime from '../../util/datetime/datetime';
+import { GroupedDataConstant } from './child-process.constant';
+
+const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
+const groupDataInstance: GroupData = new GroupData();
+const { MESSAGE_TYPE } = GroupedDataConstant;
 
 process.on(
     'message',
     async ({
+        messageType,
         transactionTypeId,
         propertyTypeId,
     }: {
+        messageType: number;
         transactionTypeId: number;
         propertyTypeId: number;
     }): Promise<void> => {
-        const startTime: [number, number] = process.hrtime();
-        const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-        const groupDataInstance: GroupData = new GroupData();
-        try {
-            await DatabaseMongodb.getInstance().connect();
+        switch (messageType) {
+            case MESSAGE_TYPE.START:
+                try {
+                    await DatabaseMongodb.getInstance().connect();
 
-            await telegramChatBotInstance.sendMessage(
-                `<b>🤖[Group data]🤖</b>\n📝 Start group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId}`
-            );
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Start`
-            ).show();
+                    await telegramChatBotInstance.sendMessage(
+                        `<b>🤖[Group data]🤖</b>\n📝 Start group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId}`
+                    );
+                    new ConsoleLog(
+                        ConsoleConstant.Type.INFO,
+                        `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Start`
+                    ).show();
 
-            await groupDataInstance.start(transactionTypeId, propertyTypeId);
-
-            const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
-            await telegramChatBotInstance.sendMessage(
-                `<b>🤖[Group data]🤖</b>\n✅ Group data complete -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Execute time: ${executeTime}`
-            );
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Execute time: ${executeTime} - Complete`
-            ).show();
-            process.exit(0);
-        } catch (error) {
-            await telegramChatBotInstance.sendMessage(
-                `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
-            );
-            new ConsoleLog(ConsoleConstant.Type.ERROR, `Group data - Error: ${error.cause || error.message}`).show();
-            process.exit(1);
+                    await groupDataInstance.start(transactionTypeId, propertyTypeId);
+                } catch (error) {
+                    await telegramChatBotInstance.sendMessage(
+                        `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
+                    );
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Group data - Error: ${error.cause || error.message}`
+                    ).show();
+                    process.exit(1);
+                }
+                break;
+            case MESSAGE_TYPE.SUSPENSE:
+                groupDataInstance.suspense();
+                break;
+            case MESSAGE_TYPE.CONTINUE:
+                groupDataInstance.continue();
+                break;
+            case MESSAGE_TYPE.IS_SUSPENSE:
+                (process as any).send({ isSuspense: groupDataInstance.isProcessSuspense() });
+                break;
+            default:
+                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Group data]🤖</b>\nGroup data - Force stop...`);
+                new ConsoleLog(ConsoleConstant.Type.INFO, `Group data - Force stop...`).show();
+                process.exit(0);
         }
     }
 );
