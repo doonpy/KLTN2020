@@ -166,6 +166,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
         if (price && Object.keys(price).length > 0) {
             rawData.price.value = price.value || rawData.price.value;
             rawData.price.currency = price.currency || rawData.price.currency;
+            rawData.price.timeUnit = price.timeUnit || rawData.price.timeUnit;
         }
 
         if (acreage && Object.keys(acreage).length > 0) {
@@ -187,6 +188,8 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
                 });
                 if (otherSimilarIndex >= 0) {
                     rawData.others[otherSimilarIndex] = other;
+                } else {
+                    rawData.others.push(other);
                 }
             });
         }
@@ -215,9 +218,9 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
      * @return {number} index
      */
     public getPropertyTypeIndex(propertyTypeData: string): number {
-        let propertyType: number = RawDataConstant.PROPERTY_TYPE[12].id;
+        let propertyType: number = RawDataConstant.PROPERTY_TYPE[RawDataConstant.PROPERTY_TYPE.length - 1].id;
         const index: number = RawDataConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
-            new RegExp(wording.join('|')).test(propertyTypeData.toLowerCase())
+            new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData.toLowerCase())
         );
 
         if (index !== -1) {
@@ -361,11 +364,28 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
     }
 
     /**
+     * @param {object[]} aggregations
+     *
+     * @return {Promise<any[]>}
+     */
+    public async queryWithAggregation(aggregations: object[]): Promise<any[]> {
+        return RawDataModel.aggregate(aggregations).exec();
+    }
+
+    /**
+     * @param {object | undefined} conditions
+     *
+     * @return {number}
+     */
+    public async countDocumentsWithConditions(conditions?: object): Promise<number> {
+        return RawDataModel.countDocuments(conditions || {}).exec();
+    }
+
+    /**
      * @param {RawDataDocumentModel}
      *
      * @return {RawDataApiModel}
      */
-
     public convertToApiResponse({
         _id,
         transactionType,
@@ -404,6 +424,12 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             }
         }
 
+        const priceClone: { value: number; currency: string; timeUnit: { id: number; wording: string[] } } = {
+            value: price.value,
+            currency: price.currency,
+            timeUnit: RawDataConstant.PRICE_TIME_UNIT[price.timeUnit],
+        };
+
         return {
             id: _id ?? null,
             transactionType: RawDataConstant.TRANSACTION_TYPE[transactionType] ?? null,
@@ -412,7 +438,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             postDate: postDate ?? null,
             title: title ?? null,
             describe: describe ?? null,
-            price: price ?? null,
+            price: priceClone ?? null,
             acreage: acreage ?? null,
             address: address ?? null,
             others: others ?? null,

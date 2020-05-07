@@ -142,4 +142,16 @@ export default class StringHandler {
             (character): string => character.toUpperCase()
         );
     }
+
+    /**
+     * @param {string} str
+     *
+     * @return {string}
+     */
+    public static removeBreakLineAndTrim(str: string): string {
+        return str
+            .replace(/\r|\n|\r\n/gm, ' ')
+            .replace(/\s{2,}/g, ' ')
+            .trim();
+    }
 }

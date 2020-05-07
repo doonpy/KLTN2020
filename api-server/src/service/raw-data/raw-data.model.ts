@@ -25,6 +25,7 @@ const rawDataSchema = new Schema(
         price: {
             value: { type: Schema.Types.Number },
             currency: { type: Schema.Types.String },
+            timeUnit: { type: Schema.Types.String },
         },
         acreage: {
             value: { type: Schema.Types.Number },
@@ -50,15 +51,15 @@ rawDataSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-rawDataSchema.index({ isGrouped: 1 }, { name: 'idx_isGrouped' });
 rawDataSchema.index({ detailUrlId: 1 }, { name: 'idx_detailUrlId' });
-rawDataSchema.index({ transactionType: 1 }, { name: 'idx_transactionType' });
 rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
-rawDataSchema.index({ coordinateId: 1 }, { name: 'idx_coordinateId' });
-rawDataSchema.index({ transactionType: 1, propertyType: 1 }, { name: 'idx_transactionType_propertyType' });
+rawDataSchema.index({ title: 1 }, { name: 'idx_title' });
+rawDataSchema.index({ describe: 1 }, { name: 'idx_describe' });
+rawDataSchema.index({ address: 1 }, { name: 'idx_address' });
+rawDataSchema.index({ isGrouped: 1 }, { name: 'idx_isGrouped' });
 rawDataSchema.index(
-    { isGrouped: 1, propertyType: 1, transactionType: 1 },
-    { name: 'idx_isGrouped_propertyType_transactionType' }
+    { transactionType: 1, propertyType: 1, isGrouped: 1 },
+    { name: 'idx_transactionType_propertyType_isGrouped' }
 );
 
 export default mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);

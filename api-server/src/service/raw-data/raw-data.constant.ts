@@ -6,60 +6,66 @@ const RawDataConstant = {
     PROPERTY_TYPE: [
         {
             id: 0,
-            wording: ['căn hộ chung cư', 'apartments'],
+            wording: ['căn hộ, chung cư', 'apartment'],
         },
         {
             id: 1,
-            wording: ['nhà riêng', 'individual houses'],
+            wording: ['nhà riêng', 'individual house'],
         },
         {
             id: 2,
-            wording: ['biệt thự', 'villas'],
+            wording: ['biệt thự', 'villa'],
         },
         {
             id: 3,
-            wording: ['nhà mặt phố', 'townhouses'],
+            wording: ['nhà mặt phố, nhà phố', 'townhouse'],
         },
         {
             id: 4,
-            wording: ['đất nền dự án', 'project lands'],
+            wording: ['đất nền dự án', 'project land'],
         },
         {
             id: 5,
-            wording: ['đất', 'lands'],
+            wording: ['đất', 'land'],
         },
         {
             id: 6,
-            wording: ['trang trại', 'farms'],
+            wording: ['trang trại, khu nghỉ dưỡng', 'farm, resort'],
         },
         {
             id: 7,
-            wording: ['khu nghỉ dưỡng', 'resorts'],
+            wording: ['kho, nhà xưởng', 'warehouse, factory'],
         },
         {
             id: 8,
-            wording: ['nhà kho', 'warehouse'],
+            wording: ['nhà trọ, phòng trọ', 'room'],
         },
         {
             id: 9,
-            wording: ['nhà trọ, phòng trọ', 'rooms'],
+            wording: ['văn phòng', 'office'],
         },
         {
             id: 10,
-            wording: ['văn phòng', 'offices'],
+            wording: ['cửa hàng, bán lẻ', 'shop'],
         },
         {
             id: 11,
-            wording: ['cửa hàng', 'shops'],
-        },
-        {
-            id: 12,
-            wording: ['loại bất động sản khác', 'others'],
+            wording: ['các loại bất động sản khác', 'others'],
         },
     ],
-    TYPE_OF_PROPERTY_WORDING: [
-        ['nhà đất bán', 'for sale'],
-        ['nhà đất cho thuê', 'for rent'],
+    PRICE_TIME_UNIT: [
+        {
+            id: 0,
+            wording: ['ngày', 'day'],
+        },
+        {
+            id: 1,
+            wording: ['tháng', 'month'],
+        },
+        {
+            id: 2,
+            wording: ['năm', 'year'],
+        },
     ],
 };
 

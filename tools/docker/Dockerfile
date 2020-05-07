@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 COPY . .
 COPY tools/docker/api/command.sh api-command.sh
-COPY ./tools/docker/web/command.sh web-command.sh
+COPY tools/docker/background-job/command.sh background-job-command.sh
+COPY tools/docker/web/command.sh web-command.sh
 
 RUN chmod +x *.sh
 RUN npm install && npx next telemetry disable && npm run build

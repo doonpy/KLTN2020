@@ -65,13 +65,22 @@ export default class PatternController extends CommonServiceControllerBase {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            this.validator = new Validator();
+
+            this.validator.addParamValidator(
+                this.requestQuery[this.PARAM_SOURCE_URL] as string,
+                new Checker.Type.String()
+            );
+
+            this.validator.validate(this.requestQuery);
+
             const {
                 documents,
                 hasNext,
             }: { documents: PatternDocumentModel[]; hasNext: boolean } = await this.patternLogic.getAll(
                 this.limit,
                 this.offset,
-                this.keyword ? { $text: { $search: this.keyword } } : {},
+                this.buildQueryConditions([{ paramName: this.PARAM_SOURCE_URL, isString: true }]),
                 this.populate
             );
             const patterns: object[] = documents.map(
@@ -231,7 +240,10 @@ export default class PatternController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const patternBody: PatternDocumentModel = (this.requestBody as unknown) as PatternDocumentModel;
             await this.patternLogic.checkExistsWithId(idBody);
-            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
+            const currentPattern: PatternDocumentModel = await this.patternLogic.getById(idBody);
+            if (patternBody.sourceUrl !== currentPattern.sourceUrl) {
+                await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
+            }
             const editedPattern: PatternDocumentModel = await this.patternLogic.update(idBody, patternBody);
 
             CommonServiceControllerBase.sendResponse(

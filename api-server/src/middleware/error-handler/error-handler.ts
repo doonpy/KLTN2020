@@ -17,6 +17,7 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
         return '';
     }
 
+    let index = 0;
     for (const item of input) {
         const keys: string[] = Object.keys(item);
 
@@ -24,25 +25,30 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
             continue;
         }
 
-        for (const key of keys) {
-            const value: string | number = item[key];
+        if (typeof item !== 'object') {
+            inputString.push(`'${index}' => '${item}'`);
+        } else {
+            for (const key of keys) {
+                const value: string | number = item[key];
 
-            if (!value) {
-                inputString.push(`'${key}' => '${value}'`);
-                continue;
-            }
-
-            if (typeof value === 'object') {
-                if (Array.isArray(value)) {
-                    inputString.push(`'${key}' => {${convertToString(value)}}`);
-                } else {
-                    inputString.push(`'${key}' => {${convertToString([value])}}`);
+                if (!value) {
+                    inputString.push(`'${key}' => '${value}'`);
+                    continue;
                 }
-                continue;
-            }
 
-            inputString.push(`'${key}' => '${value}'`);
+                if (typeof value === 'object') {
+                    if (Array.isArray(value)) {
+                        inputString.push(`'${key}' => {${convertToString(value)}}`);
+                    } else {
+                        inputString.push(`'${key}' => {${convertToString([value])}}`);
+                    }
+                    continue;
+                }
+
+                inputString.push(`'${key}' => '${value}'`);
+            }
         }
+        index += 1;
     }
 
     return inputString.join(', ');

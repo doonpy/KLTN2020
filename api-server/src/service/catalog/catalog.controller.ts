@@ -60,7 +60,12 @@ export default class CatalogController extends CommonServiceControllerBase {
             this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
 
-            this.validator.addParamValidator(this.PARAM_KEYWORD, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
+
+            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
+            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
 
             this.validator.validate(this.requestQuery);
 
@@ -70,14 +75,12 @@ export default class CatalogController extends CommonServiceControllerBase {
             }: { documents: CatalogDocumentModel[]; hasNext: boolean } = await this.catalogLogic.getAll(
                 this.limit,
                 this.offset,
-                this.keyword
-                    ? {
-                          $text: { $search: this.keyword },
-                          hostId: this.requestQuery[this.PARAM_HOST_ID] || { $gt: 0 },
-                      }
-                    : {
-                          hostId: this.requestQuery[this.PARAM_HOST_ID] || { $gt: 0 },
-                      },
+                this.buildQueryConditions([
+                    { paramName: this.PARAM_HOST_ID, isString: false },
+                    { paramName: this.PARAM_PATTERN_ID, isString: false },
+                    { paramName: this.PARAM_TITLE, isString: true },
+                    { paramName: this.PARAM_URL, isString: true },
+                ]),
                 this.populate
             );
             const responseBody: object = {

@@ -17,6 +17,20 @@ services:
     ports:
       - 3000:3000
 
+  background-job:
+    image: pk2020:latest
+    container_name: background-job
+    entrypoint:
+      - /bin/sh
+      - background-job-command.sh
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=production
+    tty: true
+    depends_on:
+      - api-server
+
   web-server:
     image: pk2020:latest
     container_name: web-server
@@ -27,8 +41,8 @@ services:
     working_dir: /usr/src/app
     environment:
       - NODE_ENV=production
+    tty: true
     depends_on:
       - api-server
-    tty: true
     ports:
       - 3001:3001

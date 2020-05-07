@@ -44,13 +44,28 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            this.validator = new Validator();
+
+            let items: string[];
+            if (!Array.isArray(this.requestQuery[this.PARAM_ITEMS])) {
+                items = [this.requestQuery[this.PARAM_ITEMS] as string];
+            } else {
+                items = this.requestQuery[this.PARAM_ITEMS] as string[];
+                items.forEach((item, index): void => {
+                    this.validator.addParamValidator(index.toString(), new Checker.Type.Integer());
+                    this.validator.addParamValidator(index.toString(), new Checker.IntegerRange(1, null));
+                });
+            }
+
+            this.validator.validate(items as string[]);
+
             const {
                 documents,
                 hasNext,
             }: { documents: GroupedDataDocumentModel[]; hasNext: boolean } = await this.groupedDataLogic.getAll(
                 this.limit,
                 this.offset,
-                undefined,
+                this.buildQueryConditions([{ paramName: this.PARAM_ITEMS, isString: false }]),
                 this.populate
             );
             const groupedDataList: GroupedDataApiModel[] = documents.map(
