@@ -66,9 +66,6 @@ yarn.lock
 # build
 dist/
 
-# log
-public/
-
 # archive
 archive/
 
