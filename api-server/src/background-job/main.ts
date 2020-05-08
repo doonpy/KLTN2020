@@ -148,6 +148,7 @@ async function* generateScript() {
     yield 'Step 3: Execute add coordinate child process...';
 
     if (isGrouperRunning) {
+        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nContinue group child process.`);
         childProcessSet.forEach((childProcess): void => {
             childProcess.on('message', ({ isSuspense }: { isSuspense: boolean }): void => {
                 if (isSuspense) {
@@ -162,7 +163,7 @@ async function* generateScript() {
         });
     }
     new ConsoleLog(ConsoleConstant.Type.INFO, `Crawler complete`).show();
-    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nCrawler complete`);
+    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nCrawler complete`);
     isCrawlerRunning = false;
     return 'Done';
 }
