@@ -8,14 +8,22 @@ import RawDataConstant from '../service/raw-data/raw-data.constant';
 import DateTime from '../util/datetime/datetime';
 import initEnv from '../util/environment/environment';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
+import { GroupedDataConstant } from './child-process/child-process.constant';
 
-let isRunning = false;
+let isCrawlerRunning = false;
+let isGrouperRunning = false;
 let script: AsyncGenerator;
+const childProcessSet: Set<ChildProcess> = new Set();
+const { MESSAGE_TYPE } = GroupedDataConstant;
 
 /**
  * Execute group data child process
  */
-const executeGroupDataChildProcess = (): void => {
+export const executeGroupDataChildProcess = async (): Promise<void> => {
+    isGrouperRunning = true;
+    new ConsoleLog(ConsoleConstant.Type.INFO, `Start group data child process...`).show();
+    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart group data child process...`);
+
     let propertyTypeIdList: number[] = RawDataConstant.PROPERTY_TYPE.map((item) => item.id);
     const transactionTypeIdList: number[] = RawDataConstant.TRANSACTION_TYPE.map((item) => item.id);
     let childProcessAmount = 0;
@@ -29,7 +37,9 @@ const executeGroupDataChildProcess = (): void => {
                 propertyTypeCloneList = [];
             } else if (childProcessAmount === 0) {
                 clearInterval(loop);
-                script.next();
+                isGrouperRunning = false;
+                new ConsoleLog(ConsoleConstant.Type.INFO, `Group data complete`).show();
+                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nGroup data complete`);
             }
             return;
         }
@@ -42,13 +52,19 @@ const executeGroupDataChildProcess = (): void => {
         propertyTypeCloneList.push(currentPropertyTypeId);
 
         const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
+        childProcessSet.add(childProcess);
         childProcess.on(
             'exit',
             async (): Promise<void> => {
                 childProcessAmount -= 1;
+                childProcessSet.delete(childProcess);
             }
         );
-        childProcess.send({ transactionTypeId: currentTransactionTypeId, propertyTypeId: currentPropertyTypeId });
+        childProcess.send({
+            messageType: MESSAGE_TYPE.START,
+            transactionTypeId: currentTransactionTypeId,
+            propertyTypeId: currentPropertyTypeId,
+        });
         childProcessAmount += 1;
     }, 0);
 };
@@ -113,9 +129,15 @@ const executeScrapeChildProcess = async (): Promise<void> => {
  * Script of background job
  */
 async function* generateScript() {
-    isRunning = true;
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Start background job...`).show();
-    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart background job...`);
+    isCrawlerRunning = true;
+    new ConsoleLog(ConsoleConstant.Type.INFO, `Start crawler child process...`).show();
+    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart crawler child process...`);
+    if (isGrouperRunning) {
+        childProcessSet.forEach((childProcess): void => {
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Suspense group child process - PID: ${childProcess.pid}`).show();
+            childProcess.send({ messageType: GroupedDataConstant.MESSAGE_TYPE.SUSPENSE });
+        });
+    }
     await executeScrapeChildProcess();
     yield 'Step 1: Execute scrape child process...';
 
@@ -125,25 +147,36 @@ async function* generateScript() {
     executeAddCoordinateChildProcess();
     yield 'Step 3: Execute add coordinate child process...';
 
-    executeGroupDataChildProcess();
-    yield 'Step 4: Execute group data child process...';
-
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Background job running complete.`).show();
-    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nStart background job...`);
-    isRunning = false;
+    if (isGrouperRunning) {
+        childProcessSet.forEach((childProcess): void => {
+            childProcess.on('message', ({ isSuspense }: { isSuspense: boolean }): void => {
+                if (isSuspense) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.INFO,
+                        `Continue group child process - PID: ${childProcess.pid}`
+                    ).show();
+                    childProcess.send({ messageType: MESSAGE_TYPE.CONTINUE });
+                }
+            });
+            childProcess.send({ messageType: MESSAGE_TYPE.IS_SUSPENSE });
+        });
+    }
+    new ConsoleLog(ConsoleConstant.Type.INFO, `Crawler complete`).show();
+    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nCrawler complete`);
+    isCrawlerRunning = false;
     return 'Done';
 }
 
 /**
- * Start
+ * Execute crawler child process
  */
-export const main = async (): Promise<void> => {
+export const executeCrawlerChildProcess = async (): Promise<void> => {
     script = generateScript();
     script.next();
 };
 
 /**
- * Timer
+ * Scheduler
  */
 (async (): Promise<void> => {
     try {
@@ -154,15 +187,22 @@ export const main = async (): Promise<void> => {
             expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));
             expectTime.setUTCMinutes(parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10));
             expectTime.setUTCSeconds(parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10));
-            if (!DateTime.isExactTime(expectTime, true) || isRunning) {
+            if (!DateTime.isExactTime(expectTime, true)) {
                 return;
             }
 
-            await main();
+            if (!isGrouperRunning) {
+                await executeGroupDataChildProcess();
+            }
+
+            if (!isCrawlerRunning) {
+                await executeCrawlerChildProcess();
+            }
         }, 1000);
 
-        if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isRunning) {
-            await main();
+        if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
+            await executeGroupDataChildProcess();
+            await executeCrawlerChildProcess();
         }
     } catch (error) {
         await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nError: ${error.message}`);
