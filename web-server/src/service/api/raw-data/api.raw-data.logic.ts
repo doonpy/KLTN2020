@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { RawDataApiModel, RawDataQueryParams } from './api.raw-data.interface';
-import { convertQueryParamsToString } from '../../../util/request-helper';
+import { convertQueryParamsToString } from '../../../util/request';
 
 /**
  * @param {RawDataQueryParams | undefined} queryParams
