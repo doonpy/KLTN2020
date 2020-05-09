@@ -62,7 +62,7 @@ export default class GroupData {
                 clearInterval(loop);
                 const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
                 await ChatBotTelegram.getInstance().sendMessage(
-                    `<b>🤖[Add coordinate]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
+                    `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
                 );
                 new ConsoleLog(
                     ConsoleConstant.Type.INFO,
