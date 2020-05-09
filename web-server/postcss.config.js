@@ -1,5 +1,14 @@
-/* eslint-disable global-require */
 module.exports = {
-    // eslint-disable-next-line import/no-extraneous-dependencies
-    plugins: [require('tailwindcss'), require('postcss-preset-env'), require('autoprefixer')],
+    plugins: {
+        tailwindcss: {},
+        ...(process.env.NODE_ENV === `production`
+            ? {
+                  '@fullhuman/postcss-purgecss': {
+                      content: [`./src/**/*.js`],
+                      defaultExtractor: (content) => content.match(/[\w-/:]+(?<!:)/g) || [],
+                  },
+                  autoprefixer: {},
+              }
+            : {}),
+    },
 };
