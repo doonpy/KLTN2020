@@ -133,6 +133,7 @@ async function* generateScript() {
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start crawler child process...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart crawler child process...`);
     if (isGrouperRunning) {
+        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nSuspense group child process.`);
         childProcessSet.forEach((childProcess): void => {
             new ConsoleLog(ConsoleConstant.Type.INFO, `Suspense group child process - PID: ${childProcess.pid}`).show();
             childProcess.send({ messageType: GroupedDataConstant.MESSAGE_TYPE.SUSPENSE });
