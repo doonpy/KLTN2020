@@ -8,13 +8,11 @@ const Home = () => {
     // dispatch data redux
     const dispatch = useDispatch();
 
-    // get state in redux
-
-    // const getRawDataExample = () => {};
     useEffect(() => {
         dispatch(action.getRawRequest());
     }, []);
     const rawdatas = useSelector((state) => state.rawDatas);
+    // get state in redux
     const { loading, rawDatas } = rawdatas;
     console.log('[raws]: ', rawDatas);
     return (

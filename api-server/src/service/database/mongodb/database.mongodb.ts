@@ -59,10 +59,10 @@ export default class DatabaseMongodb {
             useUnifiedTopology: true,
             useFindAndModify: false,
             useCreateIndex: true,
-            // auth: {
-            //     user: this.username as string,
-            //     password: this.password as string,
-            // },
+            auth: {
+                user: this.username as string,
+                password: this.password as string,
+            },
             authSource: this.authDb,
             dbName: this.dbName,
         });
