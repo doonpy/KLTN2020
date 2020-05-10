@@ -1,24 +1,28 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Layout from '../components/layout';
-import * as action from '../store/raw-data/actions';
+import PageLayout from '../components/page-layout';
+import PageMap from '../components/page-map';
+import PageLeft from '../components/page-left';
+import PageRight from '../components/page-right';
 
 const Home = () => {
-    // dispatch data redux
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(action.getRawRequest());
-    }, []);
-    const rawdatas = useSelector((state) => state.rawDatas);
-    // get state in redux
-    const { loading, rawDatas } = rawdatas;
-
     return (
-        <Layout>
-            <div>Example</div>
-        </Layout>
+        <PageLayout>
+            <main className="text-white" style={{ height: '90%' }}>
+                <div className="w-full flex h-full">
+                    <PageLeft />
+                    <div className="w-8/12">
+                        <div className="h-full flex flex-col">
+                            <PageMap />
+                            {/* <div className="bg-gray-900 border border-solid border-primay" style={{ height: '25%' }}>
+                                2
+                            </div> */}
+                        </div>
+                    </div>
+                    <PageRight />
+                </div>
+            </main>
+        </PageLayout>
     );
 };
 
