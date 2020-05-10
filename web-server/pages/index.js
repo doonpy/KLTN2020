@@ -14,7 +14,7 @@ const Home = () => {
     const rawdatas = useSelector((state) => state.rawDatas);
     // get state in redux
     const { loading, rawDatas } = rawdatas;
-    console.log('[raws]: ', rawDatas);
+
     return (
         <Layout>
             <div>Example</div>
