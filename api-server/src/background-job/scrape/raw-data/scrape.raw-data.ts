@@ -170,7 +170,9 @@ export default class ScrapeRawData extends ScrapeBase {
                 value: string;
             } =>
                 Object({
-                    name: subLocatorItem.name,
+                    name: StringHandler.removeBreakLineAndTrim(
+                        ScrapeBase.extractData($, subLocatorItem.name).join('. ')
+                    ),
                     value: StringHandler.removeBreakLineAndTrim(
                         ScrapeBase.extractData($, subLocatorItem.locator).join('. ')
                     ),

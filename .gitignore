@@ -54,9 +54,6 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
-# data
-data/
-
 #.idea
 ../.idea/
 
@@ -66,11 +63,5 @@ yarn.lock
 # build
 dist/
 
-# log
-public/
-
 # archive
 archive/
-
-# dump data
-db-backup/
