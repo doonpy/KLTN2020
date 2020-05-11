@@ -23,7 +23,7 @@ export interface PatternApiModel extends CommonApiModel {
         | [
               {
                   name: string | null;
-                  locator: string | null;
+                  value: string | null;
               }
           ]
         | []
@@ -48,7 +48,7 @@ export interface PatternDocumentModel extends CommonDocumentModel {
     subLocator: [
         {
             name: string;
-            locator: string;
+            value: string;
         }
     ];
 }

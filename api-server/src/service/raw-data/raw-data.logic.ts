@@ -222,7 +222,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
             new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData.toLowerCase())
         );
 
-        if (propertyType !== -1) {
+        if (propertyType === -1) {
             propertyType = 11; // Property ID of 'others'
         }
 

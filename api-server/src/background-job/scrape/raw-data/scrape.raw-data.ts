@@ -174,7 +174,7 @@ export default class ScrapeRawData extends ScrapeBase {
                         ScrapeBase.extractData($, subLocatorItem.name).join('. ')
                     ),
                     value: StringHandler.removeBreakLineAndTrim(
-                        ScrapeBase.extractData($, subLocatorItem.locator).join('. ')
+                        ScrapeBase.extractData($, subLocatorItem.value).join('. ')
                     ),
                 })
             )

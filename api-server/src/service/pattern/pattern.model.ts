@@ -21,7 +21,7 @@ const patternSchema: Schema = new Schema(
         subLocator: [
             {
                 name: Schema.Types.String,
-                locator: { type: Schema.Types.String },
+                value: { type: Schema.Types.String },
                 _id: false,
             },
         ],
