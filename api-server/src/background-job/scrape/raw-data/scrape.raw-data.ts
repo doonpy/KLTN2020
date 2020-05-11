@@ -327,8 +327,10 @@ export default class ScrapeRawData extends ScrapeBase {
 
         const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
 
+        const postDateString: string =
+            (postDateData.match(ScrapeRawDataConstant.POST_DATE_PATTERN) || []).shift() || '';
         let postDate: Date = DateTime.convertStringToDate(
-            postDateData,
+            postDateString,
             this.pattern.mainLocator.postDate.format,
             this.pattern.mainLocator.postDate.delimiter
         );
