@@ -1,4 +1,3 @@
-import { convertAcreageValue } from './group-data.helper';
 import StringHandler from '../../util/helper/string-handler';
 import ConsoleLog from '../../util/console/console.log';
 import ConsoleConstant from '../../util/console/console.constant';
@@ -24,22 +23,15 @@ export default class GroupData {
 
     private readonly OTHERS_PROPERTY_TYPE_ID: number = 11;
 
-    private readonly EXPECTED_SCORE: number = 9;
+    private readonly EXPECTED_SCORE: number = 8;
 
     private readonly ATTR_TITLE_SCORE: number = 4;
 
-    private readonly ATTR_PRICE_SCORE: number = 2;
+    private readonly ATTR_PRICE_SCORE: number = 3;
 
-    private readonly ATTR_ACREAGE_SCORE: number = 2;
+    private readonly ATTR_ADDRESS_SCORE: number = 3;
 
-    private readonly ATTR_ADDRESS_SCORE: number = 2;
-
-    private readonly TOTAL_SCORE: number;
-
-    constructor() {
-        this.TOTAL_SCORE =
-            this.ATTR_TITLE_SCORE + this.ATTR_ACREAGE_SCORE + this.ATTR_ADDRESS_SCORE + this.ATTR_PRICE_SCORE;
-    }
+    private readonly OVER_FITTING_SCORE: number = 9;
 
     /**
      * Start
@@ -113,7 +105,7 @@ export default class GroupData {
                 for (const item of representOfGroupedDataset) {
                     const similarScore: number = this.getSimilarScore(document, item.represent);
 
-                    if (similarScore === this.TOTAL_SCORE) {
+                    if (similarScore >= this.OVER_FITTING_SCORE) {
                         await this.rawDataLogic.delete(document._id);
                         new ConsoleLog(
                             ConsoleConstant.Type.ERROR,
@@ -204,53 +196,16 @@ export default class GroupData {
      * @return {number} totalPoint
      */
     private getSimilarScore(firstRawData: RawDataDocumentModel, secondRawData: RawDataDocumentModel): number {
+        if (firstRawData.acreage.value !== secondRawData.acreage.value) {
+            return 0;
+        }
+
         let totalPoint = 0;
         totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'title');
         totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'address');
         totalPoint += this.calculatePriceScore(firstRawData, secondRawData);
-        totalPoint += this.calculateAcreageScore(firstRawData, secondRawData);
 
         return totalPoint;
-    }
-
-    /**
-     * Calculate acreage distance score
-     *
-     * @param {RawDataDocumentModel} firstTarget
-     * @param {RawDataDocumentModel} secondTarget
-     *
-     * @return {number} points
-     */
-    private calculateAcreageScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
-        const firstAcreageObj: { value: number; measureUnit: string } = {
-            value: Number(firstTarget.acreage.value),
-            measureUnit: firstTarget.acreage.measureUnit,
-        };
-        const secondAcreageObj: { value: number; measureUnit: string } = {
-            value: Number(secondTarget.acreage.value),
-            measureUnit: secondTarget.acreage.measureUnit,
-        };
-
-        if (firstAcreageObj.value || secondAcreageObj.value) {
-            return 0;
-        }
-
-        if (firstAcreageObj.measureUnit !== secondAcreageObj.measureUnit) {
-            if (firstAcreageObj.measureUnit === 'km²') {
-                firstAcreageObj.value = convertAcreageValue(firstAcreageObj.value, 'km²', 'm²');
-            }
-
-            if (secondAcreageObj.measureUnit === 'km²') {
-                secondAcreageObj.value = convertAcreageValue(secondAcreageObj.value, 'km²', 'm²');
-            }
-        }
-
-        return (
-            (1 -
-                Math.abs(firstAcreageObj.value - secondAcreageObj.value) /
-                    ((firstAcreageObj.value + secondAcreageObj.value) / 2)) *
-            this.ATTR_ACREAGE_SCORE
-        );
     }
 
     /**
@@ -265,7 +220,7 @@ export default class GroupData {
         const firstPriceObj: { value: number; currency: string } = firstTarget.price;
         const secondPriceObj: { value: number; currency: string } = secondTarget.price;
 
-        if (!firstPriceObj.value || secondPriceObj.value) {
+        if (!firstPriceObj.value || !secondPriceObj.value) {
             return 0;
         }
 
@@ -273,12 +228,13 @@ export default class GroupData {
             return 0;
         }
 
-        return (
-            (1 -
-                Math.abs(firstPriceObj.value - secondPriceObj.value) /
-                    ((firstPriceObj.value + secondPriceObj.value) / 2)) *
-            this.ATTR_PRICE_SCORE
-        );
+        const differenceRate: number =
+            Math.abs(firstPriceObj.value - secondPriceObj.value) / ((firstPriceObj.value + secondPriceObj.value) / 2);
+        if (differenceRate >= 1) {
+            return 0;
+        }
+
+        return (1 - differenceRate) * this.ATTR_PRICE_SCORE;
     }
 
     /**

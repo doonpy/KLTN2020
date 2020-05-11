@@ -12,7 +12,7 @@ import { PatternDocumentModel } from '../../../service/pattern/pattern.interface
 import { HostDocumentModel } from '../../../service/host/host.interface';
 import { RawDataDocumentModel } from '../../../service/raw-data/raw-data.interface';
 import RawDataConstant from '../../../service/raw-data/raw-data.constant';
-import { convertAcreageValue, convertPriceValue } from '../../group-data/group-data.helper';
+import { convertAcreageValue, convertPriceValue } from './scrape.raw-data.helper';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();

@@ -218,13 +218,12 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
      * @return {number} index
      */
     public getPropertyTypeIndex(propertyTypeData: string): number {
-        let propertyType: number = RawDataConstant.PROPERTY_TYPE[RawDataConstant.PROPERTY_TYPE.length - 1].id;
-        const index: number = RawDataConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
+        let propertyType: number = RawDataConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
             new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData.toLowerCase())
         );
 
-        if (index !== -1) {
-            propertyType = index;
+        if (propertyType !== -1) {
+            propertyType = 11; // Property ID of 'others'
         }
 
         return propertyType;

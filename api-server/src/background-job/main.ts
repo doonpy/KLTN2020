@@ -204,7 +204,7 @@ export const executeCrawlerChildProcess = async (): Promise<void> => {
 
         if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
             await executeGroupDataChildProcess();
-            await executeCrawlerChildProcess();
+            // await executeCrawlerChildProcess();
         }
     } catch (error) {
         await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nError: ${error.message}`);
