@@ -9,6 +9,7 @@ import DateTime from '../util/datetime/datetime';
 import initEnv from '../util/environment/environment';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import { GroupedDataConstant } from './child-process/child-process.constant';
+import ScrapeRawData from './scrape/raw-data/scrape.raw-data';
 
 let isCrawlerRunning = false;
 let isGrouperRunning = false;
@@ -203,8 +204,10 @@ export const executeCrawlerChildProcess = async (): Promise<void> => {
         }, 1000);
 
         if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
-            await executeGroupDataChildProcess();
-            await executeCrawlerChildProcess();
+            // await executeGroupDataChildProcess();
+            // await executeCrawlerChildProcess();
+            // await new ScrapeDetailUrl(await CatalogLogic.getInstance().getById(1, true)).start();
+            await new ScrapeRawData(await CatalogLogic.getInstance().getById(1, true)).start();
         }
     } catch (error) {
         await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nError: ${error.message}`);
