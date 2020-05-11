@@ -10,7 +10,7 @@ const RawDataConstant = {
         },
         {
             id: 1,
-            wording: ['nhà riêng', 'individual house'],
+            wording: ['nhà, nhà riêng, nhà nguyên căn', 'individual house'],
         },
         {
             id: 2,
@@ -46,7 +46,7 @@ const RawDataConstant = {
         },
         {
             id: 10,
-            wording: ['cửa hàng, bán lẻ', 'shop'],
+            wording: ['cửa hàng, bán lẻ, ki ốt', 'shop'],
         },
         {
             id: 11,

@@ -5,6 +5,7 @@ export const ScrapeRawDataConstantChatBotMessage = {
 };
 
 export const ScrapeRawDataConstant = {
+    POST_DATE_PATTERN: new RegExp(/\d{1,2}(\/|-|.)\d{1,2}(\/|-|.)\d{4}/),
     VALUE_PATTERN: new RegExp(/(([1-9]+)?0?\.?[0-9]+)/),
     ACREAGE_PATTERN: new RegExp(/(([1-9]+)?,?0?\.?[0-9]+)(\s?(m²|m2|km²|km2))/, 'i'),
     ACREAGE_MEASURE_UNIT_PATTERN: new RegExp(/m²|m2|km²|km2/),
