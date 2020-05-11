@@ -14,11 +14,11 @@ const RawDataConstant = {
         },
         {
             id: 2,
-            wording: ['biệt thự', 'villa'],
+            wording: ['biệt thự, nhà liền kề', 'villa'],
         },
         {
             id: 3,
-            wording: ['nhà mặt phố, nhà phố', 'townhouse'],
+            wording: ['nhà mặt tiền, nhà mặt phố, nhà phố', 'townhouse'],
         },
         {
             id: 4,
@@ -42,7 +42,7 @@ const RawDataConstant = {
         },
         {
             id: 9,
-            wording: ['văn phòng', 'office'],
+            wording: ['văn phòng, mặt bằng', 'office, ground'],
         },
         {
             id: 10,
@@ -50,7 +50,7 @@ const RawDataConstant = {
         },
         {
             id: 11,
-            wording: ['các loại bất động sản khác', 'others'],
+            wording: ['nhà hàng, khách sạn, nhà nghỉ', 'restaurant, hotel'],
         },
     ],
     PRICE_TIME_UNIT: [
