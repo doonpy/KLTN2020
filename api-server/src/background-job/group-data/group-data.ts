@@ -6,7 +6,6 @@ import RawDataLogic from '../../service/raw-data/raw-data.logic';
 import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
 import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
 import { GroupedDataDocumentModel } from '../../service/grouped-data/grouped-data.interface';
-import RawDataConstant from '../../service/raw-data/raw-data.constant';
 import DateTime from '../../util/datetime/datetime';
 
 interface AggregationGroupDataResult {
@@ -20,8 +19,6 @@ export default class GroupData {
     private rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
 
     private groupedDataLogic: GroupedDataLogic = GroupedDataLogic.getInstance();
-
-    private readonly OTHERS_PROPERTY_TYPE_ID: number = 11;
 
     private readonly EXPECTED_SCORE: number = 8;
 
@@ -85,15 +82,7 @@ export default class GroupData {
                         $match: {
                             $and: [
                                 { 'represent.transactionType': transactionType },
-                                {
-                                    $or: [
-                                        { 'represent.propertyType': propertyType },
-                                        {
-                                            'represent.propertyType':
-                                                RawDataConstant.PROPERTY_TYPE[this.OTHERS_PROPERTY_TYPE_ID].id,
-                                        },
-                                    ],
-                                },
+                                { 'represent.propertyType': propertyType },
                             ],
                         },
                     },
