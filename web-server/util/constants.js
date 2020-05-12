@@ -12,3 +12,9 @@ export const PROPERTY_TYPE = [
     ['cửa hàng', 'shops'],
     ['các loại bất động sản khác', 'others'],
 ];
+export const MODEL_URL = {
+    RAWDATA: 'raw-dataset',
+    HOSTS: 'hosts',
+    CATALOGS: 'catalogs',
+    GROUPED_DATA: 'grouped-dataset',
+};

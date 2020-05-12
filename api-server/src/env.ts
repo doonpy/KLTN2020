@@ -2,7 +2,7 @@ export default {
     // For development
     DEV_DB_HOST: '127.0.0.1',
     DEV_DB_PORT: '27017',
-    DEV_DB_NAME: 'kltn2020-dev',
+    DEV_DB_NAME: 'kltn2020_v2',
     DEV_DB_USERNAME: 'alice',
     DEV_DB_PASS: 'alice',
     DEV_DB_AUTH_DB: 'admin',

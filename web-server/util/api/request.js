@@ -1,3 +1,5 @@
+import fetch from 'isomorphic-unfetch';
+
 const METHOD = {
     GET: 'GET',
     HEAD: 'HEAD',
