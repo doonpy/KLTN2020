@@ -6,14 +6,6 @@ import * as action from '../store/raw-data/actions';
 
 const Home = () => {
     // dispatch data redux
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(action.getRawRequest());
-    }, []);
-    const rawdatas = useSelector((state) => state.rawDatas);
-    // get state in redux
-    const { loading, rawDatas } = rawdatas;
 
     return (
         <Layout>

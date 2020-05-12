@@ -1,4 +1,5 @@
 import React from 'react';
+import Highcharts from 'highcharts';
 import Highmaps from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
@@ -65,13 +66,14 @@ const getOptions = () => {
         },
         series: [
             {
-                data: data,
-                mapData: mapData,
+                data,
+                mapData,
                 joinBy: ['hc-key', 'key'],
                 name: 'Random data',
                 states: {
                     hover: {
-                        color: Highmaps.getOptions().colors[2],
+                        // color: Highmaps.getOptions().colors[2],
+                        //
                     },
                 },
                 dataLabels: {
@@ -86,8 +88,8 @@ const getOptions = () => {
                 point: {
                     events: {
                         // On click, look for a detailed map
-                        click: function() {
-                            const key = this.key;
+                        click() {
+                            const { key } = this;
                             console.log(key);
                         },
                     },
@@ -99,7 +101,7 @@ const getOptions = () => {
 
 const ClusterMap = () => {
     const mapOptions = getOptions();
-    return <HighchartsReact constructorType="mapChart" highcharts={Highmaps} options={mapOptions}/>;
+    return <HighchartsReact constructorType="mapChart" highcharts={Highmaps} options={mapOptions} />;
 };
 
 export default ClusterMap;
