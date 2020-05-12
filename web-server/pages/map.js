@@ -1,8 +1,8 @@
 import React from 'react';
-import TempChart from '../components/map-chart/temp';
+import ClusterMap from '../components/map-chart/cluster-map';
 
 const Page = () => {
-    return <TempChart />;
+    return <ClusterMap />;
 };
 
 export default Page;

@@ -13,19 +13,13 @@ if (typeof Highmaps === 'object') {
 const getOptions = () => {
     const data = [...mapData.features];
     data.forEach((feature, index) => {
-        feature.drilldown = feature['osm-relation-id'];
+        feature.key = feature['hc-key'];
         feature.value = index;
     });
 
     return {
         chart: {
-            map: mapData,
             height: '50%',
-            events: {
-                drilldown: function (e) {
-                    console.log(e);
-                },
-            },
         },
         title: {
             text: 'Highcharts Map Drilldown',
@@ -71,34 +65,41 @@ const getOptions = () => {
         },
         series: [
             {
-                data,
-                name: 'HCM',
+                data: data,
+                mapData: mapData,
+                joinBy: ['hc-key', 'key'],
+                name: 'Random data',
+                states: {
+                    hover: {
+                        color: Highmaps.getOptions().colors[2],
+                    },
+                },
                 dataLabels: {
                     enabled: true,
-                    format: '{point.properties.name}',
+                    // formatter: function() {
+                    //     return mapKey === 'custom/world' || mapKey === 'countries/us/us-all' ?
+                    //         (this.point.properties && this.point.properties['hc-a2']) :
+                    // :
+                    //     this.point.name;
+                    // },
+                },
+                point: {
+                    events: {
+                        // On click, look for a detailed map
+                        click: function() {
+                            const key = this.key;
+                            console.log(key);
+                        },
+                    },
                 },
             },
         ],
-        drilldown: {
-            activeDataLabelStyle: {
-                color: '#FFFFFF',
-                textDecoration: 'none',
-                textOutline: '1px #000000',
-            },
-            drillUpButton: {
-                relativeTo: 'spacingBox',
-                position: {
-                    x: 0,
-                    y: 60,
-                },
-            },
-        },
     };
 };
 
 const ClusterMap = () => {
     const mapOptions = getOptions();
-    return <HighchartsReact constructorType="mapChart" highcharts={Highmaps} options={mapOptions} />;
+    return <HighchartsReact constructorType="mapChart" highcharts={Highmaps} options={mapOptions}/>;
 };
 
 export default ClusterMap;
