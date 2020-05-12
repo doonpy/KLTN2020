@@ -42,4 +42,7 @@ export default {
     // Map API key
     HERE_API_KEY: 'Lj44tuIaHUz_3SNs7x53jT4vgZeihyAZI2wapXD_-fU',
     BING_API_KEY: 'AlOLUHH31tLfAdbM9VYVSkBrv0oJbnFyFAex72REVpB8QNTBDhwO9CLs2wZJj-Tl',
+
+    // Static folder
+    PUBLIC_FOLDER_PATH: 'public',
 };
