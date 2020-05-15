@@ -31,5 +31,25 @@ module.exports = (phase) => {
     return {
         distDir,
         env,
+        webpack(config, { dev }) {
+            config.module.rules.push({
+                test: /\.(txt|png|svg|gif|bmp|jpe?g|ttf)$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            context: '',
+                            outputPath: 'static',
+                            publicPath: '/_next/static',
+                            name: 'assets/[name].[hash:8].[ext]',
+                            limit: 1024 * 30, // 20kb
+                            esModule: false,
+                        },
+                    },
+                ],
+            });
+
+            return config;
+        },
     };
 };

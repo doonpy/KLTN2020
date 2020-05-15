@@ -12,7 +12,7 @@ import { PatternDocumentModel } from '../../../service/pattern/pattern.interface
 import { HostDocumentModel } from '../../../service/host/host.interface';
 import { RawDataDocumentModel } from '../../../service/raw-data/raw-data.interface';
 import RawDataConstant from '../../../service/raw-data/raw-data.constant';
-import { convertAcreageValue, convertPriceValue } from '../../group-data/group-data.helper';
+import { convertAcreageValue, convertPriceValue } from './scrape.raw-data.helper';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
@@ -170,9 +170,11 @@ export default class ScrapeRawData extends ScrapeBase {
                 value: string;
             } =>
                 Object({
-                    name: subLocatorItem.name,
+                    name: StringHandler.removeBreakLineAndTrim(
+                        ScrapeBase.extractData($, subLocatorItem.name).join('. ')
+                    ),
                     value: StringHandler.removeBreakLineAndTrim(
-                        ScrapeBase.extractData($, subLocatorItem.locator).join('. ')
+                        ScrapeBase.extractData($, subLocatorItem.value).join('. ')
                     ),
                 })
             )
@@ -325,8 +327,10 @@ export default class ScrapeRawData extends ScrapeBase {
 
         const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
 
+        const postDateString: string =
+            (postDateData.match(ScrapeRawDataConstant.POST_DATE_PATTERN) || []).shift() || '';
         let postDate: Date = DateTime.convertStringToDate(
-            postDateData,
+            postDateString,
             this.pattern.mainLocator.postDate.format,
             this.pattern.mainLocator.postDate.delimiter
         );

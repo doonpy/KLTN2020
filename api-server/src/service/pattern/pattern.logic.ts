@@ -106,12 +106,12 @@ export default class PatternLogic extends CommonServiceLogicBase implements Patt
             }
         }
         if (subLocator.length > 0) {
-            subLocator.forEach((subLocatorItem: { name: string; locator: string }): void => {
+            subLocator.forEach((subLocatorItem: { name: string; value: string }): void => {
                 if (!pattern) {
                     return;
                 }
                 const subLocatorSimilarIndex = pattern.subLocator.findIndex(
-                    (s: { name: string; locator: string }): boolean => {
+                    (s: { name: string; value: string }): boolean => {
                         return s.name === subLocatorItem.name;
                     }
                 );

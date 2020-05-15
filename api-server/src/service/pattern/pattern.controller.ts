@@ -36,7 +36,7 @@ export default class PatternController extends CommonServiceControllerBase {
 
     private readonly PARAM_NAME_SUB_LOCATOR: string = 'name';
 
-    private readonly PARAM_LOCATOR_SUB_LOCATOR: string = 'locator';
+    private readonly PARAM_VALUE_SUB_LOCATOR: string = 'value';
 
     constructor() {
         super();
@@ -168,7 +168,7 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.addParamValidator(this.PARAM_SUB_LOCATOR, new Checker.Type.Object());
 
-            this.validator.addParamValidator(this.PARAM_LOCATOR_SUB_LOCATOR, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_VALUE_SUB_LOCATOR, new Checker.Type.String());
 
             this.validator.addParamValidator(this.PARAM_NAME_SUB_LOCATOR, new Checker.Type.String());
 
@@ -230,7 +230,7 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.addParamValidator(this.PARAM_SUB_LOCATOR, new Checker.Type.Object());
 
-            this.validator.addParamValidator(this.PARAM_LOCATOR_SUB_LOCATOR, new Checker.Type.String());
+            this.validator.addParamValidator(this.PARAM_VALUE_SUB_LOCATOR, new Checker.Type.String());
 
             this.validator.addParamValidator(this.PARAM_NAME_SUB_LOCATOR, new Checker.Type.String());
 
