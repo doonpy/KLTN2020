@@ -1,24 +1,25 @@
+import { HYDRATE } from 'next-redux-wrapper';
 import { GET_TOTAL_DOCUMENT, LOADING_TOTAL_DOCUMENT } from './actions';
 
 const initialState = {
     total: null,
-    fetching: false,
-    error: false,
+    saleAmount: null,
+    rentAmount: null,
 };
 
-export const catalogReducer = (state = initialState, action) => {
+export const countDocumentReducer = (state = initialState, action) => {
     switch (action.type) {
-        case LOADING_TOTAL_DOCUMENT:
-            return {
-                ...state,
-                loading: true,
-                error: false,
-            };
+        case HYDRATE:
+            return action.payload.countDocuments;
         case GET_TOTAL_DOCUMENT: {
+            const saleAmount = action.total[0].reduce((sum, item, index) => sum + item[index], 0);
+            const rentAmount = action.total[1].reduce((sum, item, index) => sum + item[index], 0);
+
             return {
                 ...state,
                 total: action.total,
-                loading: false,
+                saleAmount,
+                rentAmount,
             };
         }
         default:

@@ -1,0 +1,42 @@
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import TypePropertyPieChart from './charts/TypePropertyPieChart';
+import { PROPERTY_TYPE } from '../util/constants';
+
+const TabButton = ({ title, onClick }) => {
+    return (
+        <>
+            <button
+                type="button"
+                className="border border-solid border-primay w-full hover:bg-gray-800"
+                onClick={onClick}
+            >
+                {title}
+            </button>
+        </>
+    );
+};
+const TypeTransactionBox = () => {
+    // 0: Bán, 1 : Thuê
+    const [tabs, setTabs] = useState(0);
+    const data = useSelector((state) => state.countDocuments);
+    const typeTransationAmount = data.total[tabs].reduce((sum, item, index) => sum + item[index], 0);
+    const dataProperty = data.total[tabs].map((item, index) => [
+        PROPERTY_TYPE[index][0],
+        (item[index] / typeTransationAmount) * 100,
+    ]);
+
+    return (
+        <div className="m-0 m-auto  mt-4" style={{ maxWidth: '90%' }}>
+            <div className="bg-gray-900 border border-primay border-solid">
+                <TypePropertyPieChart type={tabs} data={dataProperty} />
+            </div>
+            <div className="text-xs w-full flex justify-around">
+                <TabButton title="Sale" onClick={() => setTabs(0)} />
+                <TabButton title="Rent" onClick={() => setTabs(1)} />
+            </div>
+        </div>
+    );
+};
+
+export default TypeTransactionBox;
