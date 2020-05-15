@@ -51,6 +51,7 @@
     "next-images": "^1.4.0",
     "next-redux-wrapper": "^6.0.0",
     "node-telegram-bot-api": "^0.40.0",
+    "nprogress": "^0.2.0",
     "path": "^0.12.7",
     "proj4": "^2.6.1",
     "prop-types": "^15.7.2",

@@ -3,12 +3,15 @@ import { useSelector } from 'react-redux';
 import TypePropertyPieChart from './charts/TypePropertyPieChart';
 import { PROPERTY_TYPE } from '../util/constants';
 
-const TabButton = ({ title, onClick }) => {
+const TabButton = ({ title, onClick, isActive }) => {
+    console.log(isActive);
     return (
         <>
             <button
                 type="button"
-                className="border border-solid border-primay w-full hover:bg-gray-800"
+                className={`border border-solid border-primay w-full hover:bg-gray-800 ${
+                    isActive ? 'border-b-2 border-blue-800' : ''
+                }`}
                 onClick={onClick}
             >
                 {title}
@@ -32,8 +35,8 @@ const TypeTransactionBox = () => {
                 <TypePropertyPieChart type={tabs} data={dataProperty} />
             </div>
             <div className="text-xs w-full flex justify-around">
-                <TabButton title="Sale" onClick={() => setTabs(0)} />
-                <TabButton title="Rent" onClick={() => setTabs(1)} />
+                <TabButton title="Bán" onClick={() => setTabs(0)} isActive={tabs === 0} />
+                <TabButton title="Thuê" onClick={() => setTabs(1)} isActive={tabs === 1} />
             </div>
         </div>
     );
