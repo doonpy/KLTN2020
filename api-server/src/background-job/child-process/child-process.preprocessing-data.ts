@@ -201,22 +201,22 @@ const handleVisualizationSummaryDistrictWardData = async (
  * @param {number} districtId
  * @param {number} wardId
  * @param {number} lat
- * @param {number} lon
+ * @param {number} lng
  * @param {number} rawDataId
  */
 const handleVisualizationMapPoint = async (
     districtId: number,
     wardId: number,
     lat: number,
-    lon: number,
+    lng: number,
     rawDataId: number
 ): Promise<void> => {
     const visualizationMapPointDocument: VisualizationMapPointDocumentModel | null = await VisualizationMapPointModel.findOne(
-        { lat, lon }
+        { lat, lng }
     );
 
     if (!visualizationMapPointDocument) {
-        await VisualizationMapPointModel.create({ districtId, wardId, lat, lon, rawDataIdList: [rawDataId] });
+        await VisualizationMapPointModel.create({ districtId, wardId, lat, lng, rawDataIdList: [rawDataId] });
         return;
     }
 

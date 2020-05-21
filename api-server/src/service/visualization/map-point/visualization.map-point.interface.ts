@@ -4,6 +4,6 @@ export interface VisualizationMapPointDocumentModel extends CommonDocumentModel 
     districtId: number;
     wardId: number;
     lat: number;
-    lon: number;
+    lng: number;
     rawDataIdList: number[];
 }
