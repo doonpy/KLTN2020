@@ -1,9 +1,9 @@
 #!/bin/bash
 
 MONGO_DATABASE="kltn2020"
-MONGO_HOST="Cluster0-shard-0/cluster0-shard-00-00-zktjf.gcp.mongodb.net:27017,cluster0-shard-00-01-zktjf.gcp.mongodb.net:27017,cluster0-shard-00-02-zktjf.gcp.mongodb.net:27017"
+MONGO_HOST="113.172.130.249"
 MONGO_USERNAME="alice"
-MONGO_PASSWORD="alice"
+MONGO_PASSWORD="pkroot"
 
 echo "Dumping data from $MONGO_HOST..."
 mongodump -h ${MONGO_HOST} --ssl -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase admin -d ${MONGO_DATABASE}
