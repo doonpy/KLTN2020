@@ -9,12 +9,12 @@ export default {
     DEV_SERVER_PORT: '3000',
 
     // For production
-    PROD_DB_HOST: 'cluster0-zktjf.gcp.mongodb.net',
+    PROD_DB_HOST: 'kltn2020-db',
     PROD_DB_PORT: '27017',
     PROD_DB_NAME: 'kltn2020',
     PROD_DB_USERNAME: 'alice',
-    PROD_DB_PASS: 'alice',
-    PROD_DB_AUTH_DB: 'kltn2020',
+    PROD_DB_PASS: '',
+    PROD_DB_AUTH_DB: 'admin',
     PROD_SERVER_PROTOCOL: 'https',
     PROD_SERVER_DOMAIN: 'pk2020.tk',
     PROD_SERVER_PORT: '3000',

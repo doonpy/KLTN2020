@@ -31,9 +31,6 @@ export default class DatabaseMongodb {
             this.dbHost = process.env.DEV_DB_HOST ?? '';
             this.dbPort = process.env.DEV_DB_PORT ?? '';
             this.dbName = process.env.DEV_DB_NAME ?? '';
-            // this.username = process.env.DEV_DB_USERNAME ?? '';
-            // this.password = process.env.DEV_DB_PASS ?? '';
-            // this.authDb = process.env.DEV_DB_AUTH_DB ?? '';
             set('debug', (Number(process.env.DEV_DB_DEBUG_MODE) ?? 0) === 1);
         }
     }
@@ -53,7 +50,7 @@ export default class DatabaseMongodb {
      * Open connection to database
      */
     public async connect(): Promise<void> {
-        let connString = '';
+        const connString = `mongodb://${this.dbHost}:${this.dbPort}/${this.dbName}`;
         const options: { [key: string]: any } = {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -62,10 +59,10 @@ export default class DatabaseMongodb {
         };
 
         if (process.env.NODE_ENV === 'production') {
-            connString += `mongodb+srv://${this.username}:${this.password}@${this.dbHost}/${this.dbName}?retryWrites=true&w=majority`;
-        } else {
-            connString += `mongodb://${this.dbHost}:${this.dbPort}/${this.dbName}`;
+            options.auth = { user: this.username, password: this.password };
+            options.authSource = this.authDb;
         }
+
         this.connection = await connect(connString, options);
         new ConsoleLog(ConsoleConstant.Type.INFO, `Successful connection to (DB: ${this.dbName}).`).show();
     }
