@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PieChart from './PieChart';
+import PieChart from '../charts/PieChart';
 
 const TypePropertyPieChart = ({ type, data }) => {
     return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import TypePropertyPieChart from './charts/TypePropertyPieChart';
+import TypePropertyPieChart from './ChartWrapper/TypePropertyPieChart';
 import { PROPERTY_TYPE } from '../util/constants';
 
 const TabButton = ({ title, onClick, isActive }) => {

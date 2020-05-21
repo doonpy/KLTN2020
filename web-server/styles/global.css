@@ -15,7 +15,3 @@
 .border-primay {
     border-color: #707070;
 }
-.leaflet-container {
-    width: 100%;
-    /* height: 'cal(100vh-150px)'; */
-}
