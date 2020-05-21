@@ -1,7 +1,6 @@
 import { DocumentQuery, Query } from 'mongoose';
 import CoordinateModel from './coordinate.model';
 import { CoordinateApiModel, CoordinateDocumentModel, CoordinateLogicInterface } from './coordinate.interface';
-import ExternalApi from '../../util/external-api/external-api';
 import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
 import ResponseStatusCode from '../../common/common.response-status.code';
 import CommonServiceWording from '../../common/service/common.service.wording';
@@ -75,19 +74,11 @@ export default class CoordinateLogic extends CommonServiceLogicBase implements C
     }
 
     /**
-     * @param {CoordinateDocumentModel} location
+     * @param {CoordinateDocumentModel} input
      *
      * @return Promise<CoordinateDocumentModel>
      */
-    public async create({ location }: CoordinateDocumentModel): Promise<CoordinateDocumentModel> {
-        const {
-            lat,
-            lng,
-        }: {
-            lat: number;
-            lng: number;
-        } = await ExternalApi.getInstance().getCoordinateFromAddress(location);
-
+    public async create({ location, lat, lng }: CoordinateDocumentModel): Promise<CoordinateDocumentModel> {
         return await new CoordinateModel({ location: location.trim(), lat, lng }).save();
     }
 

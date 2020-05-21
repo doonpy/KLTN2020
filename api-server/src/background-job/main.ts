@@ -70,10 +70,10 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
 };
 
 /**
- * Execute add coordinate process
+ * Execute preprocessing data process
  */
-const executeAddCoordinateChildProcess = (): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
+const executePreprocessingDataChildProcess = (): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.preprocessing-data'));
     childProcess.on('exit', (): void => {
         script.next();
     });
@@ -145,8 +145,8 @@ async function* generateScript() {
     executeCleanDataChildProcess();
     yield 'Step 2: Execute clean data child process...';
 
-    executeAddCoordinateChildProcess();
-    yield 'Step 3: Execute add coordinate child process...';
+    executePreprocessingDataChildProcess();
+    yield 'Step 3: Execute preprocessing data child process...';
 
     if (isGrouperRunning) {
         await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nContinue group child process.`);
@@ -207,7 +207,7 @@ export const executeCrawlerChildProcess = async (): Promise<void> => {
             await executeCrawlerChildProcess();
         }
     } catch (error) {
-        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nError: ${error.message}`);
+        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nError: ${error.message}`);
         throw error;
     }
 })();

@@ -95,7 +95,6 @@ export default class GroupData {
                     const similarScore: number = this.getSimilarScore(document, item.represent);
 
                     if (similarScore >= this.OVER_FITTING_SCORE) {
-                        await this.rawDataLogic.delete(document._id);
                         new ConsoleLog(
                             ConsoleConstant.Type.ERROR,
                             `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: Over fitting.`
@@ -185,7 +184,19 @@ export default class GroupData {
      * @return {number} totalPoint
      */
     private getSimilarScore(firstRawData: RawDataDocumentModel, secondRawData: RawDataDocumentModel): number {
-        if (firstRawData.acreage.value !== secondRawData.acreage.value) {
+        if (
+            firstRawData.acreage.value !== secondRawData.acreage.value &&
+            firstRawData.acreage.measureUnit === secondRawData.acreage.measureUnit
+        ) {
+            return 0;
+        }
+
+        if (
+            firstRawData.postDate === secondRawData.postDate &&
+            firstRawData.price.value === secondRawData.price.value &&
+            firstRawData.price.currency === secondRawData.price.currency &&
+            firstRawData.price.timeUnit === secondRawData.price.timeUnit
+        ) {
             return 0;
         }
 

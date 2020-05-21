@@ -10,6 +10,7 @@ import PatternController from './service/pattern/pattern.controller';
 import DetailUrlController from './service/detail-url/detail-url.controller';
 import RawDataController from './service/raw-data/raw-data.controller';
 import GroupedDataController from './service/grouped-data/grouped-data.controller';
+import VisualizationController from './service/visualization/visualization.controller';
 
 /**
  * Main
@@ -26,6 +27,7 @@ import GroupedDataController from './service/grouped-data/grouped-data.controlle
             DetailUrlController.getInstance(),
             RawDataController.getInstance(),
             GroupedDataController.getInstance(),
+            VisualizationController.getInstance(),
         ]
     );
 })();

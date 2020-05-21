@@ -54,7 +54,7 @@ rawDataSchema.plugin(autoIncrement.plugin, {
 rawDataSchema.index({ detailUrlId: 1 }, { name: 'idx_detailUrlId' });
 rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
 rawDataSchema.index({ title: 1 }, { name: 'idx_title' });
-rawDataSchema.index({ describe: 1 }, { name: 'idx_describe' });
+rawDataSchema.index({ coordinateId: 1 }, { name: 'idx_coordinateId' });
 rawDataSchema.index({ address: 1 }, { name: 'idx_address' });
 rawDataSchema.index({ isGrouped: 1 }, { name: 'idx_isGrouped' });
 rawDataSchema.index(
