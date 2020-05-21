@@ -64,6 +64,7 @@
         "import/prefer-default-export": 0,
         "react/jsx-indent-props": 0,
         "react/destructuring-assignment": 0,
+        "react/react-in-jsx-scope": 0,
         "no-return-await": "off",
         "no-throw-literal": "off"
     },

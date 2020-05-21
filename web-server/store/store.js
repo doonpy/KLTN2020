@@ -11,8 +11,8 @@ export const rootReducer = combineReducers({
 });
 
 const makeStore = () => {
-    const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunkMiddleware, logger)));
+    const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunkMiddleware)));
     return store;
 };
 
-export const wrapper = createWrapper(makeStore);
+export const wrapper = createWrapper(makeStore, { debug: false });

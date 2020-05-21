@@ -4,7 +4,7 @@ import PageHeader from './page-header';
 
 const PageLayout = (props) => {
     return (
-        <div className="h-screen flex flex-col bg-black-alt">
+        <div className="bg-black-alt max-h-screen">
             <PageHeader />
             {props.children}
         </div>

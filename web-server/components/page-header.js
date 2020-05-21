@@ -22,8 +22,8 @@ const PageHeader = () => {
 
     return (
         <nav
-            className="w-full bg-gray-900 border-b border-solid border-primay shadow-md"
-            style={{ maxHeight: '150px' }}
+            className="w-full bg-gray-900 border-b border-solid border-primay shadow-md block"
+            style={{ height: '100px', minHeight: '100px' }}
         >
             <div className="w-full container mx-auto flex flex-wrap items-center">
                 <div className="w-1/2 pl-2 md:pl-0">

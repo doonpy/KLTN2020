@@ -3,7 +3,10 @@ import { MdBuild } from 'react-icons/md';
 
 const PageLeft = () => {
     return (
-        <div className="w-1/12   bg-gray-900 border-r border-solid border-primay flex items-center flex-col">
+        <div
+            className="bg-gray-900 border-r border-solid border-primay flex items-center flex-col"
+            style={{ width: '64px' }}
+        >
             {/* <MdBuild size={32} />
             <MdBuild size={32} />
             <MdBuild size={32} /> */}

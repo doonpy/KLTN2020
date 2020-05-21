@@ -4,7 +4,6 @@ import TypePropertyPieChart from './charts/TypePropertyPieChart';
 import { PROPERTY_TYPE } from '../util/constants';
 
 const TabButton = ({ title, onClick, isActive }) => {
-    console.log(isActive);
     return (
         <>
             <button
@@ -30,7 +29,7 @@ const TypeTransactionBox = () => {
     ]);
 
     return (
-        <div className="m-0 m-auto  mt-4" style={{ maxWidth: '90%' }}>
+        <div className="m-0 m-auto h-full mt-4" style={{ maxWidth: '90%' }}>
             <div className="bg-gray-900 border border-primay border-solid">
                 <TypePropertyPieChart type={tabs} data={dataProperty} />
             </div>

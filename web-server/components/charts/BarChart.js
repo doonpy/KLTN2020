@@ -16,9 +16,11 @@ const BarChart = () => {
         chart: {
             type: 'column',
             backgroundColor: 'rgba(0,0,0,0)',
-            height: '110%',
+            height: '70%',
         },
-
+        title: {
+            text: 'Tổng bất động sản theo quận',
+        },
         xAxis: {
             type: 'category',
             labels: {
@@ -30,40 +32,52 @@ const BarChart = () => {
         },
         yAxis: {
             min: 0,
-            title: {
-                text: 'Population (millions)',
-            },
         },
         legend: {
             enabled: false,
+        },
+        responsive: {
+            rules: [
+                {
+                    condition: {
+                        maxWidth: 500,
+                    },
+                    // chartOptions: {
+                    //     legend: {
+                    //         align: 'center',
+                    //         verticalAlign: 'bottom',
+                    //         layout: 'horizontal',
+                    //     },
+                    // },
+                },
+            ],
         },
         tooltip: {
             pointFormat: 'Population in 2008: <b>{point.y:.1f} millions</b>',
         },
         series: [
             {
-                name: 'Population',
+                name: 'Nghìn (BĐS)',
                 data: [
-                    ['Shanghai', 23.7],
-                    ['Lagos', 16.1],
-                    ['Istanbul', 14.2],
-                    ['Karachi', 14.0],
-                    ['Mumbai', 12.5],
-                    ['Moscow', 12.1],
-                    ['São Paulo', 11.8],
-                    ['Beijing', 11.7],
-                    ['Guangzhou', 11.1],
-                    ['Delhi', 11.1],
-                    ['Shenzhen', 10.5],
-                    ['Seoul', 10.4],
-                    ['Jakarta', 10.0],
-                    ['Kinshasa', 9.3],
-                    ['Tianjin', 9.3],
-                    ['Tokyo', 9.0],
-                    ['Cairo', 8.9],
-                    ['Dhaka', 8.9],
-                    ['Mexico City', 8.9],
-                    ['Lima', 8.9],
+                    ['Quận 1', 23.7],
+                    ['Quận 2', 16.1],
+                    ['Quận 3', 14.2],
+                    ['Quận 4', 14.0],
+                    ['Quận 5', 12.5],
+                    ['Quận 6', 12.1],
+                    ['Quận 7', 11.8],
+                    ['Quận 8', 11.7],
+                    ['Quận 9', 11.1],
+                    ['Quận 10', 11.1],
+                    ['Quận 11', 10.5],
+                    ['Quận 12', 10.4],
+                    ['Huyện Bình Chánh', 10.0],
+                    ['Huyện Hóc Môn', 1.3],
+                    ['Quận Phú Nhuận', 9.3],
+                    ['Quận Thủ Đức', 9.0],
+                    ['Quận Tân Phú', 7.9],
+                    ['Quận Tân Bình', 9.9],
+                    ['Quận Gò Vấp', 8.9],
                 ],
             },
         ],

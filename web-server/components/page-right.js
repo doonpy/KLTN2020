@@ -4,11 +4,13 @@ import TotalByDistrictBarChart from './ChartWrapper/TotalByDistrictBarChart';
 
 const PageRight = () => {
     return (
-        <div className="w-3/12 bg-gray-900 border-l border-solid border-primay">
-            <TypeTransactionBox />
-            <TotalByDistrictBarChart />
-            {/* <TotalRealEstate /> */}
-            {/* <TypePieChart /> */}
+        <div className="w-3/12 bg-gray-900 border-l border-solid border-primay h-full flex flex-col">
+            <div>
+                <TypeTransactionBox />
+            </div>
+            {/* <div style={{ height: '50%' }}>
+                <TotalByDistrictBarChart />
+            </div> */}
         </div>
     );
 };

@@ -31,7 +31,7 @@ module.exports = (phase) => {
     return {
         distDir,
         env,
-        webpack(config, { dev }) {
+        webpack(config, { isServer }) {
             config.module.rules.push({
                 test: /\.(txt|png|svg|gif|bmp|jpe?g|ttf)$/,
                 use: [
@@ -48,7 +48,11 @@ module.exports = (phase) => {
                     },
                 ],
             });
-
+            if (!isServer) {
+                config.node = {
+                    fs: 'empty',
+                };
+            }
             return config;
         },
     };

@@ -18,6 +18,13 @@ const PieChart = ({ data }) => {
             backgroundColor: 'rgba(0,0,0,0)',
             height: '100%',
         },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            itemMarginLeft: 10,
+            // itemMarginBottom: 10,
+        },
         tooltip: {
             pointFormat: ' <b>{series.name}:</b><b>{point.percentage:.1f}%</b>',
         },
@@ -34,6 +41,7 @@ const PieChart = ({ data }) => {
                     enabled: false,
                 },
                 // showInLegend: true,
+                // size: '70%',
             },
             series: {
                 cursor: 'pointer',
@@ -47,7 +55,7 @@ const PieChart = ({ data }) => {
                 name: 'Tỷ lệ',
                 colorByPoint: true,
                 // data in props
-                data,
+                // data,
             },
         ],
     });
@@ -65,7 +73,7 @@ const PieChart = ({ data }) => {
         });
     }, [data]);
     return (
-        <div>
+        <div className="relative z-1000">
             <HighchartsReact highcharts={Highcharts} options={chartOptions} />
         </div>
     );
