@@ -251,7 +251,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      * @param {object} body
      * @param {Response} res
      */
-    protected static sendResponse(
+    static sendResponse(
         statusCode: number = ResponseStatusCode.INTERNAL_SERVER_ERROR,
         body: object = {},
         res: Response
@@ -335,7 +335,15 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             );
             if (param) {
                 if (param.isString) {
-                    conditions[key] = { $regex: new RegExp(typeof value === 'string' ? value : value.join('|'), 'i') };
+                    let pattern = '';
+                    if (typeof value !== 'string') {
+                        value.forEach((v): void => {
+                            pattern += `(?=.*${v}.*)`;
+                        });
+                    } else {
+                        pattern = value;
+                    }
+                    conditions[key] = { $regex: new RegExp(pattern, 'i') };
                 } else {
                     conditions[key] = value;
                 }

@@ -2,17 +2,14 @@ export default {
     // For development
     DEV_DB_HOST: '127.0.0.1',
     DEV_DB_PORT: '27017',
-    DEV_DB_NAME: 'kltn2020_v2',
-    DEV_DB_USERNAME: 'alice',
-    DEV_DB_PASS: 'alice',
-    DEV_DB_AUTH_DB: 'admin',
-    DEV_DB_DEBUG_MODE: 1,
+    DEV_DB_NAME: 'kltn2020-dev',
+    DEV_DB_DEBUG_MODE: 0,
     DEV_SERVER_PROTOCOL: 'http',
     DEV_SERVER_DOMAIN: 'localhost',
     DEV_SERVER_PORT: '3000',
 
     // For production
-    PROD_DB_HOST: '159.65.0.142',
+    PROD_DB_HOST: 'cluster0-zktjf.gcp.mongodb.net',
     PROD_DB_PORT: '27017',
     PROD_DB_NAME: 'kltn2020',
     PROD_DB_USERNAME: 'alice',
@@ -24,7 +21,7 @@ export default {
 
     // Background jon config
     BGR_START_ON_SERVER_RUN: 1,
-    BGR_THREAD_AMOUNT: 2,
+    BGR_THREAD_AMOUNT: 3,
     BGR_SCHEDULE_TIME_HOUR: 17,
     BGR_SCHEDULE_TIME_MINUTE: 0,
     BGR_SCHEDULE_TIME_SECOND: 0,

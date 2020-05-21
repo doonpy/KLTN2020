@@ -4,5 +4,6 @@ export default {
     },
     CAUSE: {
         CAU_ERR_1: ['%s không tồn tại', '%s does not exits'],
+        CAU_ERR_2: ['lỗi không xác định', 'unknown error'],
     },
 };
