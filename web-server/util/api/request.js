@@ -1,4 +1,4 @@
-import fetch from 'unfetch';
+import fetch from 'isomorphic-unfetch';
 
 const METHOD = {
     GET: 'GET',
@@ -9,7 +9,8 @@ const METHOD = {
     POST: 'POST',
 };
 
-const API_URI = `${process.env.API_SERVER_PROTOCOL}://${process.env.API_SERVER_IP}:${process.env.API_SERVER_PORT}`;
+const { API_URI } = process.env;
+
 const request = {
     call: async (url, parameters) => {
         const baseURL = url.indexOf(API_URI) === 0 ? url : `${API_URI}${url}`;

@@ -4,6 +4,7 @@ import NProgress from 'nprogress';
 import { wrapper } from '../store/store';
 import * as action from '../store/count-document/actions';
 import '../styles/global.css';
+import 'nprogress/nprogress.css';
 
 NProgress.configure({
     minimum: 0.3,

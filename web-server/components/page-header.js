@@ -1,22 +1,9 @@
 import React from 'react';
+import { FaChartBar, FaHome, FaChartArea } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { numberWithCommas, calculatePercentage } from '../util/services/helper';
+import MenuItemHeader from './MenuItemHeader';
 
-const HambugerButton = () => {
-    return (
-        <div className="block">
-            <button
-                type="button"
-                className="flex items-center px-3 py-2 border rounded text-white border-text-white hover:text-white hover:border-white"
-            >
-                <svg className="fill-current h-3 w-3" viewBox="0 0 20 20" xmlsns="http://www.w3.org/2000/svg">
-                    <title>Menu</title>
-                    <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-                </svg>
-            </button>
-        </div>
-    );
-};
 const PageHeader = () => {
     const { saleAmount, rentAmount } = useSelector((state) => state.countDocuments);
 
@@ -27,12 +14,23 @@ const PageHeader = () => {
         >
             <div className="w-full container mx-auto flex flex-wrap items-center">
                 <div className="w-1/2 pl-2 md:pl-0">
-                    <a
-                        className="text-gray-100 text-base xl:text-xl no-underline hover:no-underline font-bold"
-                        href="/#"
-                    >
-                        Real Estate Data Visualization
-                    </a>
+                    <div className="flex flex-col">
+                        <div className="text-gray-100 text-base xl:text-xl no-underline hover:no-underline font-bold flex items-center">
+                            <FaChartArea className="mr-2" size={32} />
+                            Analysis of Real Estate data HoChiMinh City
+                        </div>
+
+                        <ul className="list-reset lg:flex flex-1 items-center px-4 md:px-0">
+                            <MenuItemHeader href="/">
+                                <FaHome />
+                                <span className="pb-1 md:pb-0 text-sm ml-2">Home</span>
+                            </MenuItemHeader>
+                            <MenuItemHeader href="/analytics">
+                                <FaChartBar />
+                                <span className="pb-1 md:pb-0 text-sm ml-2">Analytics</span>
+                            </MenuItemHeader>
+                        </ul>
+                    </div>
                 </div>
                 <div className="w-1/2">
                     <div className="w-full flex justify-end py-2 ">

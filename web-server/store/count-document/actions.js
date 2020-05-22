@@ -1,4 +1,4 @@
-import { request } from '../../functions/request';
+import { request } from '../../util/api/request-ssr';
 
 export const GET_TOTAL_DOCUMENT = 'GET_TOTAL_DOCUMENT';
 export const LOADING_TOTAL_DOCUMENT = 'LOADING_TOTAL_DOCUMENT';
@@ -19,7 +19,7 @@ export const getTotalRequest = (type) => {
             for (const transactionType of transactionTypes) {
                 for (const propertyType of propertyTypes) {
                     const res = await request(
-                        `http://localhost:3000/api/v1/vi/${type}/count-document?transactionType=${transactionType}&propertyType=${propertyType}`
+                        `${process.env.API_URI}/api/v1/vi/${type}/count-document?transactionType=${transactionType}&propertyType=${propertyType}`
                     );
                     if (!documentAmountArray[transactionType]) {
                         documentAmountArray[transactionType] = [];

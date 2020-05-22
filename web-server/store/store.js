@@ -5,9 +5,12 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { MakeStore, createWrapper, Context } from 'next-redux-wrapper';
 import logger from 'redux-logger';
 import { countDocumentReducer } from './count-document/reducers';
+import { mapKeyReducer } from './map-key/reducers';
 
 export const rootReducer = combineReducers({
     countDocuments: countDocumentReducer,
+    mapKey: mapKeyReducer,
+    // districtSummary: districtSummaryReducer,
 });
 
 const makeStore = () => {

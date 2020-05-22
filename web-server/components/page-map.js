@@ -7,7 +7,7 @@ const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
 });
 
-const PageMap = ({ mapCollection }) => {
+const PageMap = ({ mapCollection, dataSummary }) => {
     const mapData = mapCollection[0].content;
     const data = mapData.features.map((feature, index) => {
         feature.drilldown = feature.properties['hc-key'];
@@ -23,7 +23,14 @@ const PageMap = ({ mapCollection }) => {
                 <div className="overflow-auto w-full">{isMounted && <MapLeaf mapData={mapData} />}</div>
             </div>
             <div className="w-5/12 h-full">
-                <MapOverview mapData={mapData} data={data} mapCollection={mapCollection} />
+                {dataSummary && (
+                    <MapOverview
+                        mapData={mapData}
+                        data={data}
+                        mapCollection={mapCollection}
+                        dataSummary={dataSummary}
+                    />
+                )}
             </div>
         </div>
     );
