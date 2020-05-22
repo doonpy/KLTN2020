@@ -25,7 +25,7 @@ export default class VisualizationController {
 
     constructor() {
         this.initSchema();
-        this.router.get(`${commonPath}/map`, this.getDataForVisualizeMap.bind(this));
+        this.router.get(`${commonPath}/map`, this.getDataForMap.bind(this));
     }
 
     /**
@@ -55,7 +55,7 @@ export default class VisualizationController {
      *
      * @return {Promise<void>}
      */
-    public async getDataForVisualizeMap(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async getDataForMap(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const summaryByDistrict: VisualizationSummaryDistrictDocumentModel[] = await VisualizationSummaryDistrictModel.find().populate(
                 'districtId'

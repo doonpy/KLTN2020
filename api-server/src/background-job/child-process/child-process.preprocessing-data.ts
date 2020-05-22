@@ -85,6 +85,7 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel> 
         )) as unknown) as HereMapGeocodeResponse;
         let lat: number;
         let lng: number;
+
         if (apiResponse.items?.length > 0) {
             ({ lat, lng } = apiResponse.items[0].position);
         } else {
