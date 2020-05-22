@@ -29,11 +29,13 @@ export const getGeocode = async (
 
     switch (serviceType) {
         case 'here':
-            params += `apiKey=${process.env.HERE_API_KEY ?? ''}&lang=vi-VN&q=${queryAddress}`;
+            params += `apiKey=${process.env.HERE_API_KEY}&lang=vi-VN&q=${queryAddress}`;
             endPoint = `https://geocode.search.hereapi.com/v1/geocode?${encodeURI(params)}`;
             break;
         case 'bing':
-            params += `key=${process.env.BING_API_KEY ?? ''}&query=${queryAddress}`;
+            params += `key=${
+                process.env.NODE_ENV === 'production' ? process.env.PROD_BING_API_KEY : process.env.DEV_BING_API_KEY
+            }&query=${queryAddress}`;
             endPoint = `https://dev.virtualearth.net/REST/v1/Locations?${encodeURI(params)}`;
             break;
         default:

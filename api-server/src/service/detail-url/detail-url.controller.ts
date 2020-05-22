@@ -8,7 +8,7 @@ import { DetailUrlApiModel, DetailUrlDocumentModel } from './detail-url.interfac
 import CatalogLogic from '../catalog/catalog.logic';
 
 const commonPath = '/detail-urls';
-const specifyIdPath = '/detail-urls/:id';
+const specifyIdPath = '/detail-url/:id';
 
 export default class DetailUrlController extends CommonServiceControllerBase {
     private static instance: DetailUrlController;

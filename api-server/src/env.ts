@@ -9,12 +9,12 @@ export default {
     DEV_SERVER_PORT: '3000',
 
     // For production
-    PROD_DB_HOST: 'cluster0-zktjf.gcp.mongodb.net',
+    PROD_DB_HOST: 'kltn2020-db',
     PROD_DB_PORT: '27017',
     PROD_DB_NAME: 'kltn2020',
     PROD_DB_USERNAME: 'alice',
-    PROD_DB_PASS: 'alice',
-    PROD_DB_AUTH_DB: 'kltn2020',
+    PROD_DB_PASS: '',
+    PROD_DB_AUTH_DB: 'admin',
     PROD_SERVER_PROTOCOL: 'https',
     PROD_SERVER_DOMAIN: 'pk2020.tk',
     PROD_SERVER_PORT: '3000',
@@ -38,7 +38,8 @@ export default {
 
     // Map API key
     HERE_API_KEY: 'Lj44tuIaHUz_3SNs7x53jT4vgZeihyAZI2wapXD_-fU',
-    BING_API_KEY: 'AlOLUHH31tLfAdbM9VYVSkBrv0oJbnFyFAex72REVpB8QNTBDhwO9CLs2wZJj-Tl',
+    DEV_BING_API_KEY: 'AlOLUHH31tLfAdbM9VYVSkBrv0oJbnFyFAex72REVpB8QNTBDhwO9CLs2wZJj-Tl',
+    PROD_BING_API_KEY: 'ApMeVn2de85sCgrhbvSG99dRStsusJyOmUePGowvPzJdEWjsIkEWP0Y1Jz__FZ_h',
 
     // Static folder
     PUBLIC_FOLDER_PATH: 'public',

@@ -1,14 +1,18 @@
 import { CommonApiModel, CommonDocumentModel } from '../../../../common/service/common.service.interface';
-import { VisualizationSummaryDistrictWardApiModel } from '../district-ward/visualization.summary.district-ward.interface';
+import { VisualizationCommonLogicInterface } from '../../visualization.common.interface';
+import {
+    VisualizationDistrictApiModel,
+    VisualizationDistrictDocumentModel,
+} from '../../district/visualization.district.interface';
 
 export interface VisualizationSummaryDistrictDocumentModel extends CommonDocumentModel {
-    districtId: number;
+    districtId: number | VisualizationDistrictDocumentModel;
     summaryAmount: number;
     summary: { transactionType: number; propertyType: number; amount: number }[];
 }
 
 export interface VisualizationSummaryDistrictApiModel extends CommonApiModel {
-    district: VisualizationSummaryDistrictWardApiModel | number | null;
+    district: VisualizationDistrictApiModel | number | null;
     summaryAmount: number | null;
     summary:
         | {
@@ -17,4 +21,15 @@ export interface VisualizationSummaryDistrictApiModel extends CommonApiModel {
               amount: number;
           }[]
         | null;
+}
+
+export interface VisualizationSummaryDistrictLogicInterface extends VisualizationCommonLogicInterface {
+    /**
+     * @param {VisualizationSummaryDistrictDocumentModel} document
+     *
+     * @return {VisualizationSummaryDistrictDocumentModel}
+     */
+    populateDocument(
+        document: VisualizationSummaryDistrictDocumentModel
+    ): Promise<VisualizationSummaryDistrictDocumentModel>;
 }

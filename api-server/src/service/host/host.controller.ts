@@ -7,7 +7,7 @@ import ResponseStatusCode from '../../common/common.response-status.code';
 import { HostApiModel, HostDocumentModel } from './host.interface';
 
 const commonPath = '/hosts';
-const specifyIdPath = '/hosts/:id';
+const specifyIdPath = '/host/:id';
 
 export default class HostController extends CommonServiceControllerBase {
     private static instance: HostController;

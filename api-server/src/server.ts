@@ -10,7 +10,12 @@ import PatternController from './service/pattern/pattern.controller';
 import DetailUrlController from './service/detail-url/detail-url.controller';
 import RawDataController from './service/raw-data/raw-data.controller';
 import GroupedDataController from './service/grouped-data/grouped-data.controller';
-import VisualizationController from './service/visualization/visualization.controller';
+import VisualizationSummaryDistrictController from './service/visualization/summary/district/visualization.summary.district.controller';
+import VisualizationProvinceController from './service/visualization/province/visualization.province.controller';
+import VisualizationDistrictController from './service/visualization/district/visualization.district.controller';
+import VisualizationWardController from './service/visualization/ward/visualization.ward.controller';
+import VisualizationSummaryDistrictWardController from './service/visualization/summary/district-ward/visualization.summary.district-ward.controller';
+import VisualizationMapPointController from './service/visualization/map-point/visualization.map-point.controller';
 
 /**
  * Main
@@ -27,7 +32,12 @@ import VisualizationController from './service/visualization/visualization.contr
             DetailUrlController.getInstance(),
             RawDataController.getInstance(),
             GroupedDataController.getInstance(),
-            VisualizationController.getInstance(),
+            VisualizationProvinceController.getInstance(),
+            VisualizationDistrictController.getInstance(),
+            VisualizationWardController.getInstance(),
+            VisualizationSummaryDistrictController.getInstance(),
+            VisualizationSummaryDistrictWardController.getInstance(),
+            VisualizationMapPointController.getInstance(),
         ]
     );
 })();

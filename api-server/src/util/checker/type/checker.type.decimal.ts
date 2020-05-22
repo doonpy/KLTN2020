@@ -11,7 +11,7 @@ export default class CheckerTypeDecimal extends CheckerTypeBase {
      */
 
     public checkType(paramName: string, value: any): void {
-        if (typeof value !== 'number') {
+        if (!Number(value)) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },

@@ -73,9 +73,9 @@ const getAddressProperties = (address: string): AddressProperties => {
  *
  * @param {string} address
  *
- * @return {Promise<CoordinateDocumentModel>}
+ * @return {Promise<CoordinateDocumentModel | undefined>}
  */
-const getCoordinate = async (address: string): Promise<CoordinateDocumentModel> => {
+const getCoordinate = async (address: string): Promise<CoordinateDocumentModel | undefined> => {
     let coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(address);
 
     if (!coordinateDoc) {
@@ -85,10 +85,15 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel> 
         )) as unknown) as HereMapGeocodeResponse;
         let lat: number;
         let lng: number;
+
         if (apiResponse.items?.length > 0) {
             ({ lat, lng } = apiResponse.items[0].position);
         } else {
             apiResponse = ((await getGeocode(address, 'bing')) as unknown) as BingMapGeocodeResponse;
+            if (apiResponse.resourceSets.length === 0) {
+                return undefined;
+            }
+
             [lat, lng] = apiResponse.resourceSets[0].resources[0].point.coordinates;
         }
 
@@ -201,26 +206,37 @@ const handleVisualizationSummaryDistrictWardData = async (
  * @param {number} districtId
  * @param {number} wardId
  * @param {number} lat
- * @param {number} lon
- * @param {number} rawDataId
+ * @param {number} lng
+ * @param {RawDataDocumentModel} rawData
  */
 const handleVisualizationMapPoint = async (
     districtId: number,
     wardId: number,
     lat: number,
-    lon: number,
-    rawDataId: number
+    lng: number,
+    rawData: RawDataDocumentModel
 ): Promise<void> => {
     const visualizationMapPointDocument: VisualizationMapPointDocumentModel | null = await VisualizationMapPointModel.findOne(
-        { lat, lon }
+        { lat, lng }
     );
 
     if (!visualizationMapPointDocument) {
-        await VisualizationMapPointModel.create({ districtId, wardId, lat, lon, rawDataIdList: [rawDataId] });
+        await VisualizationMapPointModel.create({
+            districtId,
+            wardId,
+            lat,
+            lng,
+            rawDataIdList: [
+                {
+                    rawDataId: rawData._id,
+                    acreage: rawData.acreage.value,
+                },
+            ],
+        });
         return;
     }
 
-    visualizationMapPointDocument.rawDataIdList.push(rawDataId);
+    visualizationMapPointDocument.rawDataList.push({ rawDataId: rawData._id, acreage: rawData.acreage.value });
     await VisualizationMapPointModel.findByIdAndUpdate(
         visualizationMapPointDocument._id,
         visualizationMapPointDocument
@@ -299,7 +315,17 @@ process.on(
                     return;
                 }
 
-                const coordinate: CoordinateDocumentModel = await getCoordinate(rawData.address);
+                const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
+                if (!coordinate) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Preprocessing data - Can't get coordinate of this address - ${rawData.address}`
+                    ).show();
+                    await rawDataLogic.delete(rawData._id);
+                    processCount -= 1;
+                    return;
+                }
+
                 rawData.coordinateId = coordinate._id;
                 await rawData.save();
 
@@ -310,7 +336,7 @@ process.on(
                     rawData.transactionType,
                     rawData.propertyType
                 );
-                await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData._id);
+                await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
                 processCount -= 1;
             }, 10);
         } catch (error) {

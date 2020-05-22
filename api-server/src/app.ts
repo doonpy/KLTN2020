@@ -5,7 +5,6 @@ import ConsoleLog from './util/console/console.log';
 import ConsoleConstant from './util/console/console.constant';
 import { errorHandler, notFoundRoute } from './middleware/error-handler/error-handler';
 import CommonServiceControllerBase from './common/service/common.service.controller.base';
-import VisualizationController from './service/visualization/visualization.controller';
 
 export default class App {
     private static instance: App | undefined;
@@ -48,10 +47,7 @@ export default class App {
      * @param middlewareArray
      * @param controllerArray
      */
-    public start(
-        middlewareArray: Array<any>,
-        controllerArray: (CommonServiceControllerBase | VisualizationController)[]
-    ): void {
+    public start(middlewareArray: Array<any>, controllerArray: CommonServiceControllerBase[]): void {
         this.setAssets();
         this.bindMiddleware(middlewareArray);
         this.bindRoutes(controllerArray);
@@ -74,8 +70,8 @@ export default class App {
      *
      * @param routes
      */
-    private bindRoutes(routes: (CommonServiceControllerBase | VisualizationController)[]): void {
-        routes.forEach((controller: CommonServiceControllerBase | VisualizationController): void => {
+    private bindRoutes(routes: CommonServiceControllerBase[]): void {
+        routes.forEach((controller: CommonServiceControllerBase): void => {
             this.app.use('/api/v1', controller.router);
         });
 
