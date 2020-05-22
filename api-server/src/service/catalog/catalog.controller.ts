@@ -9,7 +9,7 @@ import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
 
 const commonPath = '/catalogs';
-const specifyIdPath = '/catalogs/:id';
+const specifyIdPath = '/catalog/:id';
 
 export default class CatalogController extends CommonServiceControllerBase {
     private static instance: CatalogController;
@@ -52,6 +52,7 @@ export default class CatalogController extends CommonServiceControllerBase {
      * @param {Response} res
      * @param {NextFunction} next
      *
+     * @return {Promise<void>}
      */
     protected getAllRoute = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {

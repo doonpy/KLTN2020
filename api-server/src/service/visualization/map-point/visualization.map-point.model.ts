@@ -10,7 +10,13 @@ const VisualizationMapPointSchema: Schema = new Schema(
         wardId: { type: Schema.Types.Number, ref: 'visualization_ward' },
         lat: { type: Schema.Types.Number },
         lng: { type: Schema.Types.Number },
-        rawDataIdList: [{ type: Schema.Types.Number, ref: 'raw_data' }],
+        rawDataList: [
+            {
+                _id: false,
+                rawDataId: { type: Schema.Types.Number, ref: 'raw_data' },
+                acreage: { type: Schema.Types.Number },
+            },
+        ],
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );

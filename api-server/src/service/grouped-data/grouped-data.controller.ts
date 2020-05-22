@@ -8,7 +8,7 @@ import ResponseStatusCode from '../../common/common.response-status.code';
 import RawDataLogic from '../raw-data/raw-data.logic';
 
 const commonPath = '/grouped-dataset';
-const specifyIdPath = '/grouped-dataset/:id';
+const specifyIdPath = '/grouped-data/:id';
 
 export default class GroupedDataController extends CommonServiceControllerBase {
     private static instance: GroupedDataController;

@@ -9,7 +9,7 @@ import { RawDataApiModel, RawDataDocumentModel } from './raw-data.interface';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 
 const commonPath = '/raw-dataset';
-const specifyIdPath = '/raw-dataset/:id';
+const specifyIdPath = '/raw-data/:id';
 const countDocumentPath = '/count-document';
 
 export default class RawDataController extends CommonServiceControllerBase {

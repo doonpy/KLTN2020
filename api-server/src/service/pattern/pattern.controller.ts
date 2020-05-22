@@ -7,7 +7,7 @@ import { PatternApiModel, PatternDocumentModel } from './pattern.interface';
 import ResponseStatusCode from '../../common/common.response-status.code';
 
 const commonPath = '/patterns';
-const specifyIdPath = '/patterns/:id';
+const specifyIdPath = '/pattern/:id';
 
 export default class PatternController extends CommonServiceControllerBase {
     private static instance: PatternController;

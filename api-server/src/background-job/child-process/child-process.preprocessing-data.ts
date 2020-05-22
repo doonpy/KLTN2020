@@ -203,25 +203,36 @@ const handleVisualizationSummaryDistrictWardData = async (
  * @param {number} wardId
  * @param {number} lat
  * @param {number} lng
- * @param {number} rawDataId
+ * @param {RawDataDocumentModel} rawData
  */
 const handleVisualizationMapPoint = async (
     districtId: number,
     wardId: number,
     lat: number,
     lng: number,
-    rawDataId: number
+    rawData: RawDataDocumentModel
 ): Promise<void> => {
     const visualizationMapPointDocument: VisualizationMapPointDocumentModel | null = await VisualizationMapPointModel.findOne(
         { lat, lng }
     );
 
     if (!visualizationMapPointDocument) {
-        await VisualizationMapPointModel.create({ districtId, wardId, lat, lng, rawDataIdList: [rawDataId] });
+        await VisualizationMapPointModel.create({
+            districtId,
+            wardId,
+            lat,
+            lng,
+            rawDataIdList: [
+                {
+                    rawDataId: rawData._id,
+                    acreage: rawData.acreage.value,
+                },
+            ],
+        });
         return;
     }
 
-    visualizationMapPointDocument.rawDataIdList.push(rawDataId);
+    visualizationMapPointDocument.rawDataList.push({ rawDataId: rawData._id, acreage: rawData.acreage.value });
     await VisualizationMapPointModel.findByIdAndUpdate(
         visualizationMapPointDocument._id,
         visualizationMapPointDocument
@@ -311,7 +322,7 @@ process.on(
                     rawData.transactionType,
                     rawData.propertyType
                 );
-                await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData._id);
+                await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
                 processCount -= 1;
             }, 10);
         } catch (error) {
