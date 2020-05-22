@@ -73,9 +73,9 @@ const getAddressProperties = (address: string): AddressProperties => {
  *
  * @param {string} address
  *
- * @return {Promise<CoordinateDocumentModel>}
+ * @return {Promise<CoordinateDocumentModel | undefined>}
  */
-const getCoordinate = async (address: string): Promise<CoordinateDocumentModel> => {
+const getCoordinate = async (address: string): Promise<CoordinateDocumentModel | undefined> => {
     let coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(address);
 
     if (!coordinateDoc) {
@@ -90,6 +90,10 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel> 
             ({ lat, lng } = apiResponse.items[0].position);
         } else {
             apiResponse = ((await getGeocode(address, 'bing')) as unknown) as BingMapGeocodeResponse;
+            if (apiResponse.resourceSets.length === 0) {
+                return undefined;
+            }
+
             [lat, lng] = apiResponse.resourceSets[0].resources[0].point.coordinates;
         }
 
@@ -311,7 +315,17 @@ process.on(
                     return;
                 }
 
-                const coordinate: CoordinateDocumentModel = await getCoordinate(rawData.address);
+                const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
+                if (!coordinate) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Preprocessing data - Can't get coordinate of this address - ${rawData.address}`
+                    ).show();
+                    await rawDataLogic.delete(rawData._id);
+                    processCount -= 1;
+                    return;
+                }
+
                 rawData.coordinateId = coordinate._id;
                 await rawData.save();
 
