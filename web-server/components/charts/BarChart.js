@@ -90,4 +90,4 @@ const BarChart = ({ data, mapKey }) => {
     );
 };
 
-export default BarChart;
+export default React.memo(BarChart);

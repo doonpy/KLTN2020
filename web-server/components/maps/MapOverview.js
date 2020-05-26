@@ -1,10 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Highcharts, { DrilldownEventObject, DrillupAllEventObject } from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
-import { fetchMapData } from '../../lib/map-chart/helper';
 import { BINDING_OPTIONS } from '../../util/bindingOptions';
 import * as action from '../../store/map-key/actions';
 
@@ -13,78 +12,19 @@ if (typeof Highcharts === 'object') {
     HighchartsDrilldown(Highcharts);
 }
 
-const MapOverview = ({ mapData, dataSummary }) => {
+const MapOverview = ({ mapData, dataMap, setStage }) => {
     const dispatch = useDispatch();
-    const dataMap = dataSummary.districtSummary.map((district) => {
-        const realEstateDensity = Number(district.summaryAmount) / Number(district.district.acreage);
-        return {
-            value: realEstateDensity,
-            drilldown: district.district.code,
-            'hc-key': district.district.code,
-            name: district.district.name,
-        };
-    });
-
     const chartRef = useRef();
 
-    const handleDrillUp = async (event) => {
-        const { chart } = chartRef.current;
-        chart.setTitle(null, { text: '' });
-    };
     const handleDrilldownMap = async (event) => {
-        const { chart } = chartRef.current;
         event.preventDefault();
         if (!event.seriesOptions) {
-            try {
-                const mapKey = event.point.drilldown;
-                await dispatch(action.fetchMapKey(mapKey));
-                let failChecking = setTimeout(() => {
-                    chart.showLoading(`Failed to loading ${event.point.name}`);
-                    failChecking = setTimeout(() => chart.hideLoading(), 3000);
-                }, 5000);
-                chart.showLoading('liadn');
-
-                const mapDataDistrict = await fetchMapData(mapKey);
-                const dataWardFilter = dataSummary.districtWardSummary.filter((data) => data.district.code === mapKey);
-
-                const dataWard = dataWardFilter.map((ward) => {
-                    const realEstateDensity = Number(ward.summaryAmount) / Number(ward.district.acreage);
-                    return {
-                        value: realEstateDensity,
-                        drilldown: ward.ward.code,
-                        'hc-key': ward.ward.code,
-                        name: ward.ward.name,
-                    };
-                });
-
-                chart.hideLoading();
-                clearTimeout(failChecking);
-                await chart.setTitle(null, { text: event.point.name });
-                await chart.addSeriesAsDrilldown(event.point, {
-                    name: event.point.name,
-                    mapData: mapDataDistrict,
-                    data: dataWard,
-                    joinBy: ['hc-key', 'hc-key'],
-                    dataLabels: {
-                        enabled: true,
-                        color: '#FFFFFF',
-                        format: '{point.properties.name}',
-                        event,
-                    },
-                    showInLegend: false,
-                    tooltip: {
-                        headerFormat: '',
-                        pointFormat: '{point.properties.name}',
-                    },
-                    mapNavigation: {
-                        enabled: true,
-                    },
-                });
-            } catch (err) {
-                //
-            }
+            const mapKey = event.point.drilldown;
+            await dispatch(action.fetchMapKey(mapKey));
+            setStage(1);
         }
     };
+
     const mapOptions = {
         ...BINDING_OPTIONS,
         chart: {
@@ -92,7 +32,6 @@ const MapOverview = ({ mapData, dataSummary }) => {
             backgroundColor: 'rgba(0,0,0,0)',
             events: {
                 drilldown: handleDrilldownMap,
-                drillup: handleDrillUp,
             },
         },
         credits: {

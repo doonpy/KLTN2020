@@ -1,21 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import RenderCompleted from '../hooks/use-mounted';
 import MapOverview from './maps/MapOverview';
+import MapWard from './maps/MapWard';
 
 const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
 });
 
-const PageMap = ({ mapCollection, dataSummary }) => {
-    const mapData = mapCollection[0].content;
-    const data = mapData.features.map((feature, index) => {
-        feature.drilldown = feature.properties['hc-key'];
-        feature.value = index;
-        feature.code = feature.properties['osm-relation-id'];
-        return feature;
-    });
+const PageMap = ({ mapStaticJSON, dataSummary }) => {
+    const [stage, setStage] = useState(0);
+    const mapData = mapStaticJSON[0].content;
     const isMounted = RenderCompleted();
+    const dataMap = dataSummary
+        .map((w) => {
+            const realEstateDensity = w.summaryAmount / w.acreage;
+            return {
+                name: w.name,
+                value: realEstateDensity,
+                drilldown: w.drilldown,
+                'hc-key': w.code,
+            };
+        })
+        .filter((item) => item.value > 0);
 
     return (
         <div className="flex-1 flex">
@@ -23,14 +30,12 @@ const PageMap = ({ mapCollection, dataSummary }) => {
                 <div className="overflow-auto w-full">{isMounted && <MapLeaf mapData={mapData} />}</div>
             </div>
             <div className="w-5/12 h-full">
-                {dataSummary && (
-                    <MapOverview
-                        mapData={mapData}
-                        data={data}
-                        mapCollection={mapCollection}
-                        dataSummary={dataSummary}
-                    />
-                )}
+                {dataSummary &&
+                    (stage === 0 ? (
+                        <MapOverview mapData={mapData} dataMap={dataMap} setStage={(number) => setStage(number)} />
+                    ) : (
+                        <MapWard dataWard={dataMap} setStage={(number) => setStage(number)} />
+                    ))}
             </div>
         </div>
     );

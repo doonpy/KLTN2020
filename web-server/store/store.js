@@ -10,7 +10,6 @@ import { mapKeyReducer } from './map-key/reducers';
 export const rootReducer = combineReducers({
     countDocuments: countDocumentReducer,
     mapKey: mapKeyReducer,
-    // districtSummary: districtSummaryReducer,
 });
 
 const makeStore = () => {

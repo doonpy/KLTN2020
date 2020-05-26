@@ -1,5 +1,6 @@
 @tailwind base;
 @tailwind components;
+@import 'spinner.css';
 /* Style Color Global */
 .bg-black-alt {
     background: #191919;
@@ -14,4 +15,5 @@
 .border-primay {
     border-color: #707070;
 }
+
 @tailwind utilities;
