@@ -7,6 +7,7 @@ import Checker from '../../../util/checker/checker.index';
 import VisualizationMapPointLogic from './visualization.map-point.logic';
 import { VisualizationMapPointApiModel, VisualizationMapPointDocumentModel } from './visualization.map-point.interface';
 import VisualizationMapPointModel from './visualization.map-point.model';
+import CommonConstant from '../../../common/common.constant';
 
 const commonPath = '/map-points';
 const specifyIdPath = '/map-points/:id';
@@ -33,6 +34,10 @@ export default class VisualizationMapPointController extends VisualizationCommon
     private readonly PARAM_MIN_ACREAGE: string = 'minAcreage';
 
     private readonly PARAM_MAX_ACREAGE: string = 'maxAcreage';
+
+    private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
+
+    private readonly PARAM_PROPERTY_TYPE: string = 'propertyType';
 
     constructor() {
         super();
@@ -102,6 +107,18 @@ export default class VisualizationMapPointController extends VisualizationCommon
                 new Checker.DecimalRange(MIN_ACREAGE, MAX_ACREAGE)
             );
 
+            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.DecimalRange(0, CommonConstant.TRANSACTION_TYPE.length - 1)
+            );
+
+            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.DecimalRange(0, CommonConstant.PROPERTY_TYPE.length - 1)
+            );
+
             this.validator.validate(this.requestQuery);
 
             const conditions: object = {
@@ -115,12 +132,29 @@ export default class VisualizationMapPointController extends VisualizationCommon
             let documents: VisualizationMapPointDocumentModel[] = await VisualizationMapPointModel.find(conditions);
             const minAcreage: number = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_ACREAGE;
             const maxAcreage: number = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_ACREAGE;
-            documents.forEach((document) => {
-                document.rawDataList = document.rawDataList.filter(
-                    ({ acreage }): boolean => acreage >= minAcreage && acreage <= maxAcreage
-                );
+            const transactionType: number | undefined =
+                Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
+            const propertyType: number | undefined = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+
+            documents = documents.filter((document): boolean => {
+                document.points = document.points.filter((point): boolean => {
+                    if (transactionType !== undefined && point.transactionType !== transactionType) {
+                        return false;
+                    }
+
+                    if (propertyType !== undefined && point.propertyType !== propertyType) {
+                        return false;
+                    }
+
+                    point.rawDataset = point.rawDataset.filter(
+                        ({ acreage }): boolean => acreage >= minAcreage && acreage <= maxAcreage
+                    );
+
+                    return point.rawDataset.length > 0;
+                });
+
+                return document.points.length > 0;
             });
-            documents = documents.filter((document): boolean => document.rawDataList.length > 0);
 
             if (this.populate) {
                 for (const document of documents) {

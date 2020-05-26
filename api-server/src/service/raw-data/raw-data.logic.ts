@@ -10,6 +10,7 @@ import { RawDataApiModel, RawDataDocumentModel, RawDataLogicInterface } from './
 import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
 import RawDataWording from './raw-data.wording';
 import CommonServiceWording from '../../common/service/common.service.wording';
+import CommonConstant from '../../common/common.constant';
 
 export default class RawDataLogic extends CommonServiceLogicBase implements RawDataLogicInterface {
     private static instance: RawDataLogic;
@@ -218,7 +219,7 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
      * @return {number} index
      */
     public getPropertyTypeIndex(propertyTypeData: string): number {
-        const propertyType: number = RawDataConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
+        const propertyType: number = CommonConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
             new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData.toLowerCase())
         );
 
@@ -431,8 +432,8 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
 
         return {
             id: _id ?? null,
-            transactionType: RawDataConstant.TRANSACTION_TYPE[transactionType] ?? null,
-            propertyType: RawDataConstant.PROPERTY_TYPE[propertyType] ?? null,
+            transactionType: CommonConstant.TRANSACTION_TYPE[transactionType] ?? null,
+            propertyType: CommonConstant.PROPERTY_TYPE[propertyType] ?? null,
             detailUrl,
             postDate: postDate ?? null,
             title: title ?? null,

@@ -76,6 +76,10 @@ const getOptions = (mapData) => {
         feature.code = feature.properties['osm-relation-id'];
         return feature;
     });
+    // console.log(data);
+    const mockData = [...data].map((item) => {
+        return { value: Math.random() * 100, code: item.properties['hc-key'] };
+    });
 
     return {
         chart: {
@@ -85,6 +89,7 @@ const getOptions = (mapData) => {
                 drilldown: drilldownHandler,
                 drillup: drillupHandler,
             },
+            map: mapData,
         },
         title: {
             text: 'Overview',
@@ -110,38 +115,65 @@ const getOptions = (mapData) => {
                 },
             },
         },
+        colorAxis: {
+            min: 1,
+            type: 'logarithmic',
+            minColor: '#EEEEFF',
+            maxColor: '#000022',
+            stops: [
+                [0, '#EFEFFF'],
+                [0.67, '#4444FF'],
+                [1, '#000022'],
+            ],
+        },
         series: [
+            // {
+            //     mapData,
+            // data,
+            // name: 'HCM',
+            // joinBy: ['osm-relation-id', 'code'],
+            // dataLabels: {
+            //     enabled: true,
+            //     color: '#FFFFFF',
+            //     format: '{point.properties.name}',
+            // },
+            // showInLegend: false,
+            // tooltip: {
+            //     headerFormat: '',
+            //     pointFormat: '{point.properties.name}',
+            // },
+            // },
             {
-                mapData,
-                data,
-                name: 'HCM',
-                joinBy: ['osm-relation-id', 'code'],
+                animation: {
+                    duration: 1000,
+                },
+                data: mockData,
+                joinBy: ['hc-key', 'code'],
                 dataLabels: {
                     enabled: true,
                     color: '#FFFFFF',
-                    format: '{point.properties.name}',
+                    format: '{point.code}',
                 },
-                showInLegend: false,
-                tooltip: {
-                    headerFormat: '',
-                    pointFormat: '{point.properties.name}',
-                },
+                name: 'Population density',
+                // tooltip: {
+                //     pointFormat: '{point.code}: {point.value}/km²',
+                // },
             },
         ],
-        drilldown: {
-            activeDataLabelStyle: {
-                color: '#FFFFFF',
-                textDecoration: 'none',
-                textOutline: '1px #000000',
-            },
-            drillUpButton: {
-                relativeTo: 'spacingBox',
-                position: {
-                    x: 0,
-                    y: 60,
-                },
-            },
-        },
+        // drilldown: {
+        //     activeDataLabelStyle: {
+        //         color: '#FFFFFF',
+        //         textDecoration: 'none',
+        //         textOutline: '1px #000000',
+        //     },
+        //     drillUpButton: {
+        //         relativeTo: 'spacingBox',
+        //         position: {
+        //             x: 0,
+        //             y: 60,
+        //         },
+        //     },
+        // },
     };
 };
 

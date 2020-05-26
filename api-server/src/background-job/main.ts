@@ -4,11 +4,11 @@ import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
 import ConsoleLog from '../util/console/console.log';
 import ConsoleConstant from '../util/console/console.constant';
 import CatalogLogic from '../service/catalog/catalog.logic';
-import RawDataConstant from '../service/raw-data/raw-data.constant';
 import DateTime from '../util/datetime/datetime';
 import initEnv from '../util/environment/environment';
 import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
 import { GroupedDataConstant } from './child-process/child-process.constant';
+import CommonConstant from '../common/common.constant';
 
 let isCrawlerRunning = false;
 let isGrouperRunning = false;
@@ -24,8 +24,8 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start group data child process...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart group data child process...`);
 
-    let propertyTypeIdList: number[] = RawDataConstant.PROPERTY_TYPE.map((item) => item.id);
-    const transactionTypeIdList: number[] = RawDataConstant.TRANSACTION_TYPE.map((item) => item.id);
+    let propertyTypeIdList: number[] = CommonConstant.PROPERTY_TYPE.map((item) => item.id);
+    const transactionTypeIdList: number[] = CommonConstant.TRANSACTION_TYPE.map((item) => item.id);
     let childProcessAmount = 0;
     let currentTransactionTypeId: number = transactionTypeIdList.shift() as number;
     let propertyTypeCloneList: number[] = [];

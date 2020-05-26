@@ -4,17 +4,18 @@ import { VisualizationProvinceDocumentModel } from './visualization.province.int
 
 autoIncrement.initialize(mongoose.connection);
 
-export const VisualizationProvinceSchema: Schema = new Schema(
+const VisualizationProvinceSchema: Schema = new Schema(
     {
         name: { type: Schema.Types.String },
         code: { type: Schema.Types.String },
+        countryId: { type: Schema.Types.Number, ref: 'visual_administrative_country' },
         acreage: { type: Schema.Types.Number },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
 
 VisualizationProvinceSchema.plugin(autoIncrement.plugin, {
-    model: 'visualization_province',
+    model: 'visual_administrative_province',
     startAt: 1,
     incrementBy: 1,
 });
@@ -22,6 +23,6 @@ VisualizationProvinceSchema.plugin(autoIncrement.plugin, {
 VisualizationProvinceSchema.index({ name: 1 }, { name: 'idx_name' });
 
 export default mongoose.model<VisualizationProvinceDocumentModel>(
-    'visualization_province',
+    'visual_administrative_province',
     VisualizationProvinceSchema
 );

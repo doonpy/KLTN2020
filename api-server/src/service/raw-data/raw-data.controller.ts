@@ -3,10 +3,10 @@ import CommonServiceControllerBase from '../../common/service/common.service.con
 import Validator from '../../util/validator/validator';
 import Checker from '../../util/checker/checker.index';
 import RawDataLogic from './raw-data.logic';
-import RawDataConstant from './raw-data.constant';
 import ResponseStatusCode from '../../common/common.response-status.code';
 import { RawDataApiModel, RawDataDocumentModel } from './raw-data.interface';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
+import CommonConstant from '../../common/common.constant';
 
 const commonPath = '/raw-dataset';
 const specifyIdPath = '/raw-data/:id';
@@ -194,13 +194,13 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TRANSACTION_TYPE).length - 1)
+                new Checker.IntegerRange(1, Object.keys(CommonConstant.TRANSACTION_TYPE).length)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.PROPERTY_TYPE).length - 1)
+                new Checker.IntegerRange(1, Object.keys(CommonConstant.PROPERTY_TYPE).length)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.Type.String());
@@ -286,13 +286,13 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.TRANSACTION_TYPE).length - 1)
+                new Checker.IntegerRange(1, Object.keys(CommonConstant.PROPERTY_TYPE).length)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(0, Object.keys(RawDataConstant.PROPERTY_TYPE).length - 1)
+                new Checker.IntegerRange(1, Object.keys(CommonConstant.PROPERTY_TYPE).length)
             );
 
             this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.Type.String());

@@ -140,14 +140,14 @@ const getOptions = (mapData, rawDataset) => {
                 nullColor: 'rgba(177, 244, 177, 0.5)',
                 showInLegend: false,
             },
-            // {
-            //     type: 'mappoint',
-            //     enableMouseTracking: true,
-            //     colorKey: 'clusterPointsAmount',
-            //     name: 'Cities',
-            //     dataLabels: false,
-            //     data: rawDataset,
-            // },
+            {
+                type: 'mappoint',
+                enableMouseTracking: true,
+                colorKey: 'clusterPointsAmount',
+                name: 'Cities',
+                dataLabels: false,
+                data: rawDataset,
+            },
         ],
     };
 };

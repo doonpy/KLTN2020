@@ -84,7 +84,7 @@ export default class ScrapeBase {
             data += `${element.text()}`;
         }
 
-        return data.trim();
+        return data;
     }
 
     /**

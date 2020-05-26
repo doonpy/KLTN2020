@@ -3,10 +3,10 @@ import {
     VisualizationSummaryDistrictWardDocumentModel,
     VisualizationSummaryDistrictWardLogicInterface,
 } from './visualization.summary.district-ward.interface';
-import { VisualizationDistrictApiModel } from '../../district/visualization.district.interface';
-import VisualizationDistrictLogic from '../../district/visualization.district.logic';
-import { VisualizationWardApiModel } from '../../ward/visualization.ward.interface';
-import VisualizationWardLogic from '../../ward/visualization.ward.logic';
+import { VisualizationDistrictApiModel } from '../../administrative/district/visualization.district.interface';
+import VisualizationDistrictLogic from '../../administrative/district/visualization.district.logic';
+import { VisualizationWardApiModel } from '../../administrative/ward/visualization.ward.interface';
+import VisualizationWardLogic from '../../administrative/ward/visualization.ward.logic';
 
 export default class VisualizationSummaryDistrictWardLogic implements VisualizationSummaryDistrictWardLogicInterface {
     public static instance: VisualizationSummaryDistrictWardLogic;

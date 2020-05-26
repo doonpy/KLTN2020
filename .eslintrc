@@ -1,77 +1,92 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 2018,
-        "sourceType": "module"
-    },
-    "plugins": ["react", "@typescript-eslint", "prettier"],
-    "extends": [
-        "plugin:react/recommended",
-        "airbnb",
-        "plugin:prettier/recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended"
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "extends": [
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
     ],
-    "rules": {
-        "import/extensions": [
-            "error",
-            "ignorePackages",
-            {
-                "js": "never",
-                "jsx": "never",
-                "ts": "never",
-                "tsx": "never"
-            }
-        ],
-        "prettier/prettier": "error",
-        "react/jsx-filename-extension": [
-            1,
-            {
-                "extensions": [".js", ".jsx", ".ts", ".tsx"]
-            }
-        ],
-        "no-underscore-dangle": "off",
-        "no-await-in-loop": "off",
-        "no-restricted-syntax": "off",
-        "no-plusplus": [
-            "error",
-            {
-                "allowForLoopAfterthoughts": true
-            }
-        ],
-        "no-continue": "off",
-        "no-labels": "off",
-        "class-methods-use-this": "off",
-        "no-param-reassign": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "react/jsx-indent": 0,
-        "@typescript-eslint/no-explicit-any": 0,
-        "@typescript-eslint/explicit-function-return-type": 0,
-        "@typescript-eslint/explicit-member-accessibility": 0,
-        "react/prop-types": 0,
-        "react/display-name": 0,
-        "import/prefer-default-export": 0,
-        "react/jsx-indent-props": 0,
-        "react/destructuring-assignment": 0,
-        "no-return-await": "off",
-        "no-throw-literal": "off"
-    },
-    "settings": {
-        "import/resolver": {
-            "node": {
-                "extensions": [".js", ".jsx", ".ts", ".tsx"]
-            }
-        }
+    "prettier/prettier": "error",
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    ],
+    "no-underscore-dangle": "off",
+    "no-await-in-loop": "off",
+    "no-restricted-syntax": "off",
+    "no-plusplus": [
+      "error",
+      {
+        "allowForLoopAfterthoughts": true
+      }
+    ],
+    "no-continue": "off",
+    "no-labels": "off",
+    "class-methods-use-this": "off",
+    "no-param-reassign": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "react/jsx-indent": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/explicit-member-accessibility": 0,
+    "react/prop-types": 0,
+    "react/display-name": 0,
+    "import/prefer-default-export": 0,
+    "react/jsx-indent-props": 0,
+    "react/destructuring-assignment": 0,
+    "no-return-await": "off",
+    "no-throw-literal": "off",
+    "no-console": "error"
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
     }
+  }
 }

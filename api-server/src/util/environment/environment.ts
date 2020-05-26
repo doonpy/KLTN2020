@@ -12,6 +12,6 @@ export default (): void => {
             return;
         }
 
-        process.env[key] = (EnvironmentVariables as { [key: string]: string | number | boolean })[key] as string;
+        process.env[key] = (EnvironmentVariables as { [key: string]: any })[key] as string;
     });
 };

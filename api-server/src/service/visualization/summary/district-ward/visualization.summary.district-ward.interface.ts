@@ -1,10 +1,13 @@
 import { CommonApiModel, CommonDocumentModel } from '../../../../common/service/common.service.interface';
-import { VisualizationWardApiModel, VisualizationWardDocumentModel } from '../../ward/visualization.ward.interface';
+import {
+    VisualizationWardApiModel,
+    VisualizationWardDocumentModel,
+} from '../../administrative/ward/visualization.ward.interface';
 import { VisualizationCommonLogicInterface } from '../../visualization.common.interface';
 import {
     VisualizationDistrictApiModel,
     VisualizationDistrictDocumentModel,
-} from '../../district/visualization.district.interface';
+} from '../../administrative/district/visualization.district.interface';
 
 export interface VisualizationSummaryDistrictWardDocumentModel extends CommonDocumentModel {
     districtId: number | VisualizationDistrictDocumentModel;

@@ -1,18 +1,22 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { VisualizationSummaryDistrictDocumentModel } from './visualization.summary.district.interface';
+import CommonConstant from '../../../../common/common.constant';
 
 autoIncrement.initialize(mongoose.connection);
 
 const VisualizationSummaryDistrictSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visualization_district' },
+        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district' },
         summaryAmount: { type: Schema.Types.Number },
         summary: [
             {
                 _id: false,
-                transactionType: { type: Schema.Types.Number },
-                propertyType: { type: Schema.Types.Number },
+                transactionType: {
+                    type: Schema.Types.Number,
+                    enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                },
+                propertyType: { type: Schema.Types.Number, enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id) },
                 amount: { type: Schema.Types.Number },
             },
         ],
@@ -21,7 +25,7 @@ const VisualizationSummaryDistrictSchema: Schema = new Schema(
 );
 
 VisualizationSummaryDistrictSchema.plugin(autoIncrement.plugin, {
-    model: 'visualization_summary_district',
+    model: 'visual_summary_district',
     startAt: 1,
     incrementBy: 1,
 });
@@ -29,6 +33,6 @@ VisualizationSummaryDistrictSchema.plugin(autoIncrement.plugin, {
 VisualizationSummaryDistrictSchema.index({ districtId: 1 }, { name: 'idx_districtId', unique: true });
 
 export default mongoose.model<VisualizationSummaryDistrictDocumentModel>(
-    'visualization_summary_district',
+    'visual_summary_district',
     VisualizationSummaryDistrictSchema
 );

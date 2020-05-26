@@ -3,7 +3,7 @@ export default {
     DEV_DB_HOST: '127.0.0.1',
     DEV_DB_PORT: '27017',
     DEV_DB_NAME: 'kltn2020-dev',
-    DEV_DB_DEBUG_MODE: 0,
+    DEV_DB_DEBUG_MODE: 1,
     DEV_SERVER_PROTOCOL: 'http',
     DEV_SERVER_DOMAIN: 'localhost',
     DEV_SERVER_PORT: '3000',
@@ -22,7 +22,7 @@ export default {
     // Background jon config
     BGR_START_ON_SERVER_RUN: 1,
     BGR_THREAD_AMOUNT: 3,
-    BGR_SCHEDULE_TIME_HOUR: 17,
+    BGR_SCHEDULE_TIME_HOUR: 0,
     BGR_SCHEDULE_TIME_MINUTE: 0,
     BGR_SCHEDULE_TIME_SECOND: 0,
     BGR_SCRAPE_RAW_DATA_MAX_REQUEST: 20,
@@ -35,11 +35,6 @@ export default {
     // Chat bot
     CHAT_BOT_TELEGRAM_TOKEN: '1046175359:AAGfHKqnAv0_IFdTEvtLmuanahYW0JWpHKE',
     NTBA_FIX_319: 1,
-
-    // Map API key
-    HERE_API_KEY: 'Lj44tuIaHUz_3SNs7x53jT4vgZeihyAZI2wapXD_-fU',
-    DEV_BING_API_KEY: 'AlOLUHH31tLfAdbM9VYVSkBrv0oJbnFyFAex72REVpB8QNTBDhwO9CLs2wZJj-Tl',
-    PROD_BING_API_KEY: 'ApMeVn2de85sCgrhbvSG99dRStsusJyOmUePGowvPzJdEWjsIkEWP0Y1Jz__FZ_h',
 
     // Static folder
     PUBLIC_FOLDER_PATH: 'public',

@@ -7,31 +7,28 @@ import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
 import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
 import { CoordinateDocumentModel } from '../../service/coordinate/coordinate.interface';
 import DateTime from '../../util/datetime/datetime';
-import VisualizationDistrictModel from '../../service/visualization/district/visualization.district.model';
-import { VisualizationDistrictDocumentModel } from '../../service/visualization/district/visualization.district.interface';
-import VisualizationWardModel from '../../service/visualization/ward/visualization.ward.model';
-import { VisualizationWardDocumentModel } from '../../service/visualization/ward/visualization.ward.interface';
+import VisualizationDistrictModel from '../../service/visualization/administrative/district/visualization.district.model';
+import { VisualizationDistrictDocumentModel } from '../../service/visualization/administrative/district/visualization.district.interface';
+import VisualizationWardModel from '../../service/visualization/administrative/ward/visualization.ward.model';
+import { VisualizationWardDocumentModel } from '../../service/visualization/administrative/ward/visualization.ward.interface';
 import { getGeocode } from '../../util/external-api/external-api.map';
 import { VisualizationMapPointDocumentModel } from '../../service/visualization/map-point/visualization.map-point.interface';
 import VisualizationMapPointModel from '../../service/visualization/map-point/visualization.map-point.model';
 import VisualizationSummaryDistrictWardModel from '../../service/visualization/summary/district-ward/visualization.summary.district-ward.model';
 import VisualizationSummaryDistrictModel from '../../service/visualization/summary/district/visualization.summary.district.model';
 import { VisualizationSummaryDistrictWardDocumentModel } from '../../service/visualization/summary/district-ward/visualization.summary.district-ward.interface';
-import { BingMapGeocodeResponse, HereMapGeocodeResponse } from '../../util/external-api/external-api.map.interface';
-import { VisualizationProvinceDocumentModel } from '../../service/visualization/province/visualization.province.interface';
-import VisualizationProvinceModel from '../../service/visualization/province/visualization.province.model';
+import { BingMapGeocodeResponse } from '../../util/external-api/external-api.map.interface';
 import { VisualizationSummaryDistrictDocumentModel } from '../../service/visualization/summary/district/visualization.summary.district.interface';
 
 const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
 const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
-const processLimitAmount = 1;
-const recordLimitAmount = 1000;
+const PROCESSES_LIMIT = 20;
+const DOCUMENTS_LIMIT = 1000;
 let rawDataset: {
     documents: RawDataDocumentModel[];
     hasNext: boolean;
 };
 let processCount = 0;
-let provincePattern = '';
 let districtPattern = '';
 let wardPattern = '';
 
@@ -57,12 +54,16 @@ type SummaryElement = {
  * @return {AddressProperties}
  */
 const getAddressProperties = (address: string): AddressProperties => {
-    const city: string = address.match(RegExp(provincePattern))?.shift() || '';
-    const district: string = address.match(RegExp(districtPattern))?.shift() || '';
-    const ward: string = address.match(RegExp(wardPattern))?.shift() || '';
+    const FILTER_PATTERN = new RegExp(
+        `^[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+|[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+$`,
+        'ig'
+    );
+    const ward: string = (address.match(RegExp(wardPattern))?.shift() || '').replace(FILTER_PATTERN, '');
+    address = address.replace(ward, '');
+
+    const district: string = (address.match(RegExp(districtPattern))?.shift() || '').replace(FILTER_PATTERN, '');
 
     return {
-        city,
         district,
         ward,
     };
@@ -76,26 +77,28 @@ const getAddressProperties = (address: string): AddressProperties => {
  * @return {Promise<CoordinateDocumentModel | undefined>}
  */
 const getCoordinate = async (address: string): Promise<CoordinateDocumentModel | undefined> => {
+    const [addressFiltered] = address.match(/(đường|phố).*/i) || [''];
+    if (!addressFiltered) {
+        return undefined;
+    }
+
     let coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(address);
-
     if (!coordinateDoc) {
-        let apiResponse: HereMapGeocodeResponse | BingMapGeocodeResponse = ((await getGeocode(
-            address,
-            'here'
-        )) as unknown) as HereMapGeocodeResponse;
-        let lat: number;
-        let lng: number;
+        const apiResponse: BingMapGeocodeResponse | undefined = await getGeocode(address);
 
-        if (apiResponse.items?.length > 0) {
-            ({ lat, lng } = apiResponse.items[0].position);
-        } else {
-            apiResponse = ((await getGeocode(address, 'bing')) as unknown) as BingMapGeocodeResponse;
-            if (apiResponse.resourceSets.length === 0) {
-                return undefined;
-            }
-
-            [lat, lng] = apiResponse.resourceSets[0].resources[0].point.coordinates;
+        if (!apiResponse) {
+            return undefined;
         }
+
+        if (!apiResponse.resourceSets || apiResponse.resourceSets.length === 0) {
+            return undefined;
+        }
+
+        if (!apiResponse.resourceSets[0] || apiResponse.resourceSets[0].resources.length === 0) {
+            return undefined;
+        }
+
+        const [lat, lng]: [number, number] = apiResponse.resourceSets[0].resources[0].point.coordinates;
 
         coordinateDoc = await coordinateLogic.create({
             location: address,
@@ -226,17 +229,36 @@ const handleVisualizationMapPoint = async (
             wardId,
             lat,
             lng,
-            rawDataIdList: [
+            points: [
                 {
-                    rawDataId: rawData._id,
-                    acreage: rawData.acreage.value,
+                    rawDataset: [{ rawDataId: rawData._id, acreage: rawData.acreage.value }],
+                    transactionType: rawData.transactionType,
+                    propertyType: rawData.propertyType,
                 },
             ],
         });
         return;
     }
 
-    visualizationMapPointDocument.rawDataList.push({ rawDataId: rawData._id, acreage: rawData.acreage.value });
+    let point:
+        | {
+              rawDataset: { rawDataId: number; acreage: number }[];
+              transactionType: number;
+              propertyType: number;
+          }
+        | undefined = visualizationMapPointDocument.points.find(
+        ({ transactionType, propertyType }) =>
+            transactionType === rawData.transactionType && propertyType === rawData.propertyType
+    );
+    if (!point) {
+        point = {
+            rawDataset: [{ rawDataId: rawData._id, acreage: rawData.acreage.value }],
+            transactionType: rawData.transactionType,
+            propertyType: rawData.propertyType,
+        };
+    }
+
+    visualizationMapPointDocument.points.push(point);
     await VisualizationMapPointModel.findByIdAndUpdate(
         visualizationMapPointDocument._id,
         visualizationMapPointDocument
@@ -255,13 +277,11 @@ process.on(
             await telegramChatBotInstance.sendMessage(`<b>🤖[Add coordinate]🤖</b>\n📝 Start add coordinate...`);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data - Start`).show();
 
-            const provinceList: VisualizationProvinceDocumentModel[] = await VisualizationProvinceModel.find();
             const districtList: VisualizationDistrictDocumentModel[] = await VisualizationDistrictModel.find();
             const wardList: VisualizationWardDocumentModel[] = await VisualizationWardModel.find();
-            provincePattern = provinceList.map(({ name }) => name).join('|');
-            districtPattern = districtList.map(({ name }): string => name).join('|');
-            wardPattern = wardList.map(({ name }): string => name).join('|');
-            rawDataset = await rawDataLogic.getAll(recordLimitAmount, undefined, {
+            districtPattern = districtList.map(({ name }): string => name).join(',|');
+            wardPattern = wardList.map(({ name }): string => name).join(',|');
+            rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, undefined, {
                 coordinateId: null,
             });
             const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
@@ -278,7 +298,7 @@ process.on(
                     process.exit(0);
                 }
 
-                if (processCount >= processLimitAmount) {
+                if (processCount >= PROCESSES_LIMIT) {
                     return;
                 }
 
@@ -286,57 +306,75 @@ process.on(
                 if (!rawData) {
                     return;
                 }
-                if (rawDataset.documents.length === 0) {
-                    rawDataset = await rawDataLogic.getAll(recordLimitAmount, undefined, { coordinateId: null });
-                }
 
-                processCount += 1;
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data -> RID: ${rawData._id}`).show();
-                const addressProperties: AddressProperties = getAddressProperties(rawData.address);
-                const districtId: number | undefined = districtList.find((item) =>
-                    addressProperties?.district?.toLowerCase().includes(item.name.toLowerCase())
-                )?._id;
-                if (!districtId) {
-                    new ConsoleLog(ConsoleConstant.Type.ERROR, `Preprocessing data - District ID is invalid`).show();
-                    await rawDataLogic.delete(rawData._id);
-                    processCount -= 1;
-                    return;
-                }
+                try {
+                    if (rawDataset.documents.length === 0) {
+                        rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, undefined, { coordinateId: null });
+                    }
 
-                const wardId: number | undefined = wardList.find(
-                    (item) =>
-                        item.districtId === districtId &&
-                        addressProperties?.ward?.toLowerCase().includes(item.name.toLowerCase())
-                )?._id;
-                if (!wardId) {
-                    new ConsoleLog(ConsoleConstant.Type.ERROR, `Preprocessing data - Ward ID is invalid`).show();
-                    await rawDataLogic.delete(rawData._id);
-                    processCount -= 1;
-                    return;
-                }
+                    processCount += 1;
+                    new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data -> RID: ${rawData._id}`).show();
+                    const addressProperties: AddressProperties = getAddressProperties(rawData.address);
+                    const districtId: number | undefined = districtList.find((item) =>
+                        new RegExp(`${item.name}$`, 'i').test(addressProperties?.district || '')
+                    )?._id;
+                    if (!districtId) {
+                        new ConsoleLog(
+                            ConsoleConstant.Type.ERROR,
+                            `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
+                        ).show();
+                        await rawDataLogic.delete(rawData._id);
+                        processCount -= 1;
+                        return;
+                    }
 
-                const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
-                if (!coordinate) {
+                    const wardId: number | undefined = wardList.find(
+                        (item) =>
+                            item.districtId === districtId &&
+                            new RegExp(`${item.name}$`).test(addressProperties?.ward || '')
+                    )?._id;
+                    if (!wardId) {
+                        new ConsoleLog(
+                            ConsoleConstant.Type.ERROR,
+                            `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
+                        ).show();
+                        await rawDataLogic.delete(rawData._id);
+                        processCount -= 1;
+                        return;
+                    }
+
+                    const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
+                    if (!coordinate) {
+                        new ConsoleLog(
+                            ConsoleConstant.Type.ERROR,
+                            `Preprocessing data - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
+                        ).show();
+                        await rawDataLogic.delete(rawData._id);
+                        processCount -= 1;
+                        return;
+                    }
+
+                    rawData.coordinateId = coordinate._id;
+                    await rawData.save();
+
+                    await handleVisualizationSummaryDistrictData(
+                        districtId,
+                        rawData.transactionType,
+                        rawData.propertyType
+                    );
+                    await handleVisualizationSummaryDistrictWardData(
+                        districtId,
+                        wardId,
+                        rawData.transactionType,
+                        rawData.propertyType
+                    );
+                    await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
+                } catch (error) {
                     new ConsoleLog(
                         ConsoleConstant.Type.ERROR,
-                        `Preprocessing data - Can't get coordinate of this address - ${rawData.address}`
+                        `Preprocessing data - RID: ${rawData._id} - Error: ${error.message}`
                     ).show();
-                    await rawDataLogic.delete(rawData._id);
-                    processCount -= 1;
-                    return;
                 }
-
-                rawData.coordinateId = coordinate._id;
-                await rawData.save();
-
-                await handleVisualizationSummaryDistrictData(districtId, rawData.transactionType, rawData.propertyType);
-                await handleVisualizationSummaryDistrictWardData(
-                    districtId,
-                    wardId,
-                    rawData.transactionType,
-                    rawData.propertyType
-                );
-                await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
                 processCount -= 1;
             }, 10);
         } catch (error) {
@@ -352,3 +390,6 @@ process.on(
         }
     }
 );
+
+// TODO: Add transactionType and propertyType to map point record.
+// TODO: Setup data for visualize following price (day by day)

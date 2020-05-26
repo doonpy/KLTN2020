@@ -2,9 +2,11 @@ import { CommonApiModel, CommonDocumentModel } from '../../../common/service/com
 import {
     VisualizationDistrictApiModel,
     VisualizationDistrictDocumentModel,
-} from '../district/visualization.district.interface';
-import { VisualizationWardApiModel, VisualizationWardDocumentModel } from '../ward/visualization.ward.interface';
-import { RawDataApiModel, RawDataDocumentModel } from '../../raw-data/raw-data.interface';
+} from '../administrative/district/visualization.district.interface';
+import {
+    VisualizationWardApiModel,
+    VisualizationWardDocumentModel,
+} from '../administrative/ward/visualization.ward.interface';
 import { VisualizationCommonLogicInterface } from '../visualization.common.interface';
 
 export interface VisualizationMapPointDocumentModel extends CommonDocumentModel {
@@ -12,7 +14,11 @@ export interface VisualizationMapPointDocumentModel extends CommonDocumentModel 
     wardId: number | VisualizationWardDocumentModel;
     lat: number;
     lng: number;
-    rawDataList: { rawDataId: number | RawDataDocumentModel; acreage: number }[];
+    points: {
+        rawDataset: { rawDataId: number; acreage: number }[];
+        transactionType: number;
+        propertyType: number;
+    }[];
 }
 
 export interface VisualizationMapPointApiModel extends CommonApiModel {
@@ -20,7 +26,13 @@ export interface VisualizationMapPointApiModel extends CommonApiModel {
     ward: number | VisualizationWardApiModel | null;
     lat: number | null;
     lng: number | null;
-    rawDataList: { rawDataId: number | RawDataApiModel; acreage: number }[] | null;
+    points:
+        | {
+              rawDataset: { rawDataId: number; acreage: number }[];
+              transactionType: number;
+              propertyType: number;
+          }[]
+        | null;
 }
 
 export interface VisualizationMapPointLogicInterface extends VisualizationCommonLogicInterface {

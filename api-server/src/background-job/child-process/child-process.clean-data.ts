@@ -7,8 +7,10 @@ import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
 import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
 import { DetailUrlDocumentModel } from '../../service/detail-url/detail-url.interface';
 import DateTime from '../../util/datetime/datetime';
-import VisualizationDistrictModel from '../../service/visualization/district/visualization.district.model';
-import VisualizationWardModel from '../../service/visualization/ward/visualization.ward.model';
+import VisualizationCountryModel from '../../service/visualization/administrative/country/visualization.country.model';
+import VisualizationProvinceModel from '../../service/visualization/administrative/province/visualization.province.model';
+import VisualizationDistrictModel from '../../service/visualization/administrative/district/visualization.district.model';
+import VisualizationWardModel from '../../service/visualization/administrative/ward/visualization.ward.model';
 import { CleanDataConstant } from './child-process.constant';
 
 type AggregationGroupDataResult = {
@@ -17,18 +19,32 @@ type AggregationGroupDataResult = {
     docSize: number;
 };
 
-const PROCESS_LIMIT = 10;
+const detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
+const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
+const PROCESSES_LIMIT = 30;
+
 let script: AsyncGenerator;
+
+/**
+ * Delete raw data have invalid address
+ *
+ * @param {RawDataDocumentModel} rawData
+ */
+const deleteAction = async (rawData: RawDataDocumentModel): Promise<void> => {
+    await rawDataLogic.delete(rawData._id);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
+    ).show();
+};
 
 /**
  * Delete duplicate detail URL and raw data which scraped from that.
  */
 const deleteDuplicateData = async (): Promise<void> => {
-    const detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
     const aggregationResult: AggregationGroupDataResult[] = ((await detailUrlLogic.aggregationQuery(
         CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS
     )) as unknown) as AggregationGroupDataResult[];
-    const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
     let processCount = 0;
 
     const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
@@ -39,7 +55,7 @@ const deleteDuplicateData = async (): Promise<void> => {
             return;
         }
 
-        if (processCount > PROCESS_LIMIT) {
+        if (processCount > PROCESSES_LIMIT) {
             return;
         }
 
@@ -94,17 +110,22 @@ const deleteDuplicateData = async (): Promise<void> => {
  * Delete data which have address not contain district or ward
  */
 const deleteInvalidAddressData = async (): Promise<void> => {
-    const rawDataLogic = RawDataLogic.getInstance();
-    const limit = 1000;
+    const countryPattern: string = (await VisualizationCountryModel.find()).map((country) => country.name).join('|');
+    const provincePattern: string = (await VisualizationProvinceModel.find())
+        .map((province) => province.name)
+        .join('|');
     const districtPattern: string = (await VisualizationDistrictModel.find())
         .map((district) => district.name)
         .join('|');
     const wards: string[] = (await VisualizationWardModel.find()).map((ward) => ward.name);
     const wardPattern: string = wards.filter((ward, index) => wards.lastIndexOf(ward) === index).join('|');
-    const addressPattern = new RegExp(`(?:${wardPattern}).*(?:${districtPattern})`, 'i');
+    const validDistrictAndWardPattern = new RegExp(`(${wardPattern}).*(${districtPattern})`, 'i');
+    const validProvincePattern = new RegExp(`(${provincePattern})`, 'i');
+    const validCountryPattern = new RegExp(`(${countryPattern})$`, 'i');
+    const DOCUMENTS_LIMIT = 1000;
     let processCount = 0;
     let offset = 0;
-    let rawDataset = await rawDataLogic.getAll(limit, offset);
+    let rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, offset, { coordinateId: null });
     const loop = setInterval(async () => {
         if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
             clearInterval(loop);
@@ -113,37 +134,48 @@ const deleteInvalidAddressData = async (): Promise<void> => {
             return;
         }
 
-        if (processCount > PROCESS_LIMIT) {
+        if (processCount > PROCESSES_LIMIT) {
             return;
         }
 
-        const rawData = rawDataset.documents.shift();
+        const rawData: RawDataDocumentModel | undefined = rawDataset.documents.shift();
         if (!rawData) {
             return;
         }
         processCount += 1;
 
         if (rawDataset.documents.length === 0) {
-            offset += limit;
-            rawDataset = await rawDataLogic.getAll(limit, offset);
+            offset += DOCUMENTS_LIMIT;
+            rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, offset, { coordinateId: null });
         }
 
-        if (!addressPattern.test(rawData.address)) {
-            try {
-                await rawDataLogic.delete(rawData._id);
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Clean data - Invalid address -> RID: ${rawData._id} - Error: ${error.message}`
-                ).show();
+        let { address } = rawData;
+        try {
+            if (!validDistrictAndWardPattern.test(address)) {
+                await deleteAction(rawData);
+                processCount -= 1;
+
+                return;
             }
-        }
 
-        processCount -= 1;
+            if (validProvincePattern.test(address)) {
+                address = address.replace(RegExp(`.*(${provincePattern})`, 'i'), '');
+                if (address.length > 0 && !validCountryPattern.test(address)) {
+                    await deleteAction(rawData);
+                    processCount -= 1;
+
+                    return;
+                }
+
+                processCount -= 1;
+            }
+        } catch (error) {
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Clean data - Invalid address -> RID: ${rawData._id} - Error: ${error.message}`
+            ).show();
+            processCount -= 1;
+        }
     }, 0);
 };
 

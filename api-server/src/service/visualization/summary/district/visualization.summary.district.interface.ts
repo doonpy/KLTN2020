@@ -3,7 +3,7 @@ import { VisualizationCommonLogicInterface } from '../../visualization.common.in
 import {
     VisualizationDistrictApiModel,
     VisualizationDistrictDocumentModel,
-} from '../../district/visualization.district.interface';
+} from '../../administrative/district/visualization.district.interface';
 
 export interface VisualizationSummaryDistrictDocumentModel extends CommonDocumentModel {
     districtId: number | VisualizationDistrictDocumentModel;

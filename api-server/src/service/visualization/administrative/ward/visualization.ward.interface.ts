@@ -1,9 +1,9 @@
-import { CommonApiModel, CommonDocumentModel } from '../../../common/service/common.service.interface';
+import { CommonApiModel, CommonDocumentModel } from '../../../../common/service/common.service.interface';
 import {
     VisualizationDistrictApiModel,
     VisualizationDistrictDocumentModel,
 } from '../district/visualization.district.interface';
-import { VisualizationCommonLogicInterface } from '../visualization.common.interface';
+import { VisualizationCommonLogicInterface } from '../../visualization.common.interface';
 
 export interface VisualizationWardDocumentModel extends CommonDocumentModel {
     name: string;

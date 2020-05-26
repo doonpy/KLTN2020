@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import VisualizationCommonController from '../visualization.common.controller';
-import VisualizationProvinceLogic from './visualization.province.logic';
-import VisualizationProvinceModel from './visualization.province.model';
-import { VisualizationProvinceApiModel, VisualizationProvinceDocumentModel } from './visualization.province.interface';
-import CommonServiceControllerBase from '../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../common/common.response-status.code';
+import VisualizationCommonController from '../../visualization.common.controller';
+import CommonServiceControllerBase from '../../../../common/service/common.service.controller.base';
+import ResponseStatusCode from '../../../../common/common.response-status.code';
+import { VisualizationDistrictApiModel, VisualizationDistrictDocumentModel } from './visualization.district.interface';
+import VisualizationDistrictModel from './visualization.district.model';
+import VisualizationDistrictLogic from './visualization.district.logic';
 
-const commonPath = '/provinces';
-const specifyIdPath = '/province/:id';
+const commonPath = '/districts';
+const specifyIdPath = '/district/:id';
 
-export default class VisualizationProvinceController extends VisualizationCommonController {
-    private static instance: VisualizationProvinceController;
+export default class VisualizationDistrictController extends VisualizationCommonController {
+    private static instance: VisualizationDistrictController;
 
-    private visualizationProvinceLogic: VisualizationProvinceLogic = VisualizationProvinceLogic.getInstance();
+    private visualizationDistrictLogic: VisualizationDistrictLogic = VisualizationDistrictLogic.getInstance();
 
     constructor() {
         super();
@@ -24,9 +24,9 @@ export default class VisualizationProvinceController extends VisualizationCommon
     /**
      * Get instance
      */
-    public static getInstance(): VisualizationProvinceController {
+    public static getInstance(): VisualizationDistrictController {
         if (!this.instance) {
-            this.instance = new VisualizationProvinceController();
+            this.instance = new VisualizationDistrictController();
         }
         return this.instance;
     }
@@ -62,13 +62,20 @@ export default class VisualizationProvinceController extends VisualizationCommon
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const documents: VisualizationProvinceDocumentModel[] = await VisualizationProvinceModel.find();
+            const documents: VisualizationDistrictDocumentModel[] = await VisualizationDistrictModel.find();
+            if (this.populate) {
+                for (const document of documents) {
+                    await this.visualizationDistrictLogic.populateDocument(document);
+                }
+            }
+
             const responseBody: object = {
-                provinces: documents.map(
-                    (document): VisualizationProvinceApiModel =>
-                        this.visualizationProvinceLogic.convertToApiResponse(document)
+                districts: documents.map(
+                    (document): VisualizationDistrictApiModel =>
+                        this.visualizationDistrictLogic.convertToApiResponse(document)
                 ),
             };
+
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
         } catch (error) {
             next(this.createError(error, this.language));

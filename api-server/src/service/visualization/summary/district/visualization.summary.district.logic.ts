@@ -3,8 +3,8 @@ import {
     VisualizationSummaryDistrictDocumentModel,
     VisualizationSummaryDistrictLogicInterface,
 } from './visualization.summary.district.interface';
-import { VisualizationDistrictApiModel } from '../../district/visualization.district.interface';
-import VisualizationDistrictLogic from '../../district/visualization.district.logic';
+import { VisualizationDistrictApiModel } from '../../administrative/district/visualization.district.interface';
+import VisualizationDistrictLogic from '../../administrative/district/visualization.district.logic';
 
 export default class VisualizationSummaryDistrictLogic implements VisualizationSummaryDistrictLogicInterface {
     public static instance: VisualizationSummaryDistrictLogic;

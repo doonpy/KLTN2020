@@ -11,9 +11,9 @@ import DetailUrlController from './service/detail-url/detail-url.controller';
 import RawDataController from './service/raw-data/raw-data.controller';
 import GroupedDataController from './service/grouped-data/grouped-data.controller';
 import VisualizationSummaryDistrictController from './service/visualization/summary/district/visualization.summary.district.controller';
-import VisualizationProvinceController from './service/visualization/province/visualization.province.controller';
-import VisualizationDistrictController from './service/visualization/district/visualization.district.controller';
-import VisualizationWardController from './service/visualization/ward/visualization.ward.controller';
+import VisualizationProvinceController from './service/visualization/administrative/province/visualization.province.controller';
+import VisualizationDistrictController from './service/visualization/administrative/district/visualization.district.controller';
+import VisualizationWardController from './service/visualization/administrative/ward/visualization.ward.controller';
 import VisualizationSummaryDistrictWardController from './service/visualization/summary/district-ward/visualization.summary.district-ward.controller';
 import VisualizationMapPointController from './service/visualization/map-point/visualization.map-point.controller';
 

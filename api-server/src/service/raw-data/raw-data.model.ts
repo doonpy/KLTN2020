@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { RawDataDocumentModel } from './raw-data.interface';
-import RawDataConstant from './raw-data.constant';
+import CommonConstant from '../../common/common.constant';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -13,11 +13,11 @@ const rawDataSchema = new Schema(
         },
         transactionType: {
             type: Schema.Types.Number,
-            enum: RawDataConstant.TRANSACTION_TYPE.map((item) => item.id),
+            enum: CommonConstant.TRANSACTION_TYPE.map((item) => item.id),
         },
         propertyType: {
             type: Schema.Types.Number,
-            enum: RawDataConstant.PROPERTY_TYPE.map((item) => item.id),
+            enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
         },
         postDate: { type: Schema.Types.Date },
         title: { type: Schema.Types.String },

@@ -13,6 +13,7 @@ import { HostDocumentModel } from '../../../service/host/host.interface';
 import { RawDataDocumentModel } from '../../../service/raw-data/raw-data.interface';
 import RawDataConstant from '../../../service/raw-data/raw-data.constant';
 import { convertAcreageValue, convertPriceValue } from './scrape.raw-data.helper';
+import CommonConstant from '../../../common/common.constant';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
@@ -160,7 +161,11 @@ export default class ScrapeRawData extends ScrapeBase {
         );
         const priceData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, price).join('. '));
         const acreageData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, acreage).join('. '));
-        const addressData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, address).join('. '));
+        const addressData: string = StringHandler.removeBreakLineAndTrim(
+            ScrapeBase.extractData($, address)
+                .map((item) => item.replace(/^[^\d\w]+|[^\d\w]+$/g, ' '))
+                .join('. ')
+        );
         const othersData: {
             name: string;
             value: string;
@@ -322,8 +327,8 @@ export default class ScrapeRawData extends ScrapeBase {
         othersData: { name: string; value: string }[]
     ): RawDataDocumentModel {
         const transactionType: number = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(propertyTypeData)
-            ? RawDataConstant.TRANSACTION_TYPE[1].id
-            : RawDataConstant.TRANSACTION_TYPE[0].id;
+            ? CommonConstant.TRANSACTION_TYPE[1].id
+            : CommonConstant.TRANSACTION_TYPE[0].id;
 
         const propertyType: number = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
 
@@ -340,7 +345,7 @@ export default class ScrapeRawData extends ScrapeBase {
 
         let priceString = '';
         let priceTimeUnit = '';
-        if (transactionType === RawDataConstant.TRANSACTION_TYPE[0].id) {
+        if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
             priceString = (priceData.match(ScrapeRawDataConstant.SALE_PRICE_PATTERN) || []).shift() || '';
         } else {
             priceString = (priceData.match(ScrapeRawDataConstant.RENT_PRICE_PATTERN) || []).shift() || '';
@@ -362,7 +367,7 @@ export default class ScrapeRawData extends ScrapeBase {
                     ?.id || -1,
         };
         if (price.timeUnit === -1) {
-            if (transactionType === RawDataConstant.TRANSACTION_TYPE[0].id) {
+            if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
                 delete price.timeUnit;
             } else {
                 price.timeUnit = RawDataConstant.PRICE_TIME_UNIT[1].id;

@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import VisualizationCommonController from '../visualization.common.controller';
-import CommonServiceControllerBase from '../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../common/common.response-status.code';
-import { VisualizationWardApiModel, VisualizationWardDocumentModel } from './visualization.ward.interface';
-import VisualizationWardModel from './visualization.ward.model';
-import VisualizationWardLogic from './visualization.ward.logic';
+import VisualizationCommonController from '../../visualization.common.controller';
+import VisualizationCountryLogic from './visualization.country.logic';
+import VisualizationCountryModel from './visualization.country.model';
+import { VisualizationCountryApiModel, VisualizationCountryDocumentModel } from './visualization.country.interface';
+import CommonServiceControllerBase from '../../../../common/service/common.service.controller.base';
+import ResponseStatusCode from '../../../../common/common.response-status.code';
 
-const commonPath = '/wards';
-const specifyIdPath = '/ward/:id';
+const commonPath = '/countries';
+const specifyIdPath = '/country/:id';
 
-export default class VisualizationWardController extends VisualizationCommonController {
-    private static instance: VisualizationWardController;
+export default class VisualizationCountryController extends VisualizationCommonController {
+    private static instance: VisualizationCountryController;
 
-    private visualizationWardLogic: VisualizationWardLogic = VisualizationWardLogic.getInstance();
+    private visualizationCountryLogic: VisualizationCountryLogic = VisualizationCountryLogic.getInstance();
 
     constructor() {
         super();
@@ -24,9 +24,9 @@ export default class VisualizationWardController extends VisualizationCommonCont
     /**
      * Get instance
      */
-    public static getInstance(): VisualizationWardController {
+    public static getInstance(): VisualizationCountryController {
         if (!this.instance) {
-            this.instance = new VisualizationWardController();
+            this.instance = new VisualizationCountryController();
         }
         return this.instance;
     }
@@ -62,19 +62,13 @@ export default class VisualizationWardController extends VisualizationCommonCont
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const documents: VisualizationWardDocumentModel[] = await VisualizationWardModel.find();
-            if (this.populate) {
-                for (const document of documents) {
-                    await this.visualizationWardLogic.populateDocument(document);
-                }
-            }
-
+            const documents: VisualizationCountryDocumentModel[] = await VisualizationCountryModel.find();
             const responseBody: object = {
-                wards: documents.map(
-                    (document): VisualizationWardApiModel => this.visualizationWardLogic.convertToApiResponse(document)
+                provinces: documents.map(
+                    (document): VisualizationCountryApiModel =>
+                        this.visualizationCountryLogic.convertToApiResponse(document)
                 ),
             };
-
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
         } catch (error) {
             next(this.createError(error, this.language));
