@@ -166,9 +166,9 @@ const deleteInvalidAddressData = async (): Promise<void> => {
 
                     return;
                 }
-
-                processCount -= 1;
             }
+
+            processCount -= 1;
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
