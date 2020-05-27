@@ -1,14 +1,14 @@
+import 'module-alias/register';
+import '@root/prepend';
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
-import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
-import ConsoleLog from '../util/console/console.log';
-import ConsoleConstant from '../util/console/console.constant';
-import CatalogLogic from '../service/catalog/catalog.logic';
-import DateTime from '../util/datetime/datetime';
-import initEnv from '../util/environment/environment';
-import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import CatalogLogic from '@service/catalog/catalog.logic';
+import DateTime from '@util/datetime/datetime';
+import CommonConstant from '@common/common.constant';
 import { GroupedDataConstant } from './child-process/child-process.constant';
-import CommonConstant from '../common/common.constant';
 
 let isCrawlerRunning = false;
 let isGrouperRunning = false;
@@ -182,8 +182,6 @@ export const executeCrawlerChildProcess = async (): Promise<void> => {
  */
 (async (): Promise<void> => {
     try {
-        initEnv();
-        await DatabaseMongodb.getInstance().connect();
         const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
             const expectTime: Date = new Date();
             expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));

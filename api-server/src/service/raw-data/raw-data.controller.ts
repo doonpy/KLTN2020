@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
 import RawDataLogic from './raw-data.logic';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { RawDataApiModel, RawDataDocumentModel } from './raw-data.interface';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
-import CommonConstant from '../../common/common.constant';
+import CommonConstant from '@common/common.constant';
 
 const commonPath = '/raw-dataset';
 const specifyIdPath = '/raw-data/:id';

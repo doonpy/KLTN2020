@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { RawDataDocumentModel } from './raw-data.interface';
-import CommonConstant from '../../common/common.constant';
+import CommonConstant from '@common/common.constant';
 
 autoIncrement.initialize(mongoose.connection);
 

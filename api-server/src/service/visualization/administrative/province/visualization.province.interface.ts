@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '../../../../common/service/common.service.interface';
+import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
 import {
     VisualizationCountryApiModel,
     VisualizationCountryDocumentModel,

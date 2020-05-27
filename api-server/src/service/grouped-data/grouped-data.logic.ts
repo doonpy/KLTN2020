@@ -1,11 +1,11 @@
 import { DocumentQuery, Query } from 'mongoose';
 import GroupedDataModel from './grouped-data.model';
 import { GroupedDataApiModel, GroupedDataDocumentModel, GroupedDataLogicInterface } from './grouped-data.interface';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 import RawDataLogic from '../raw-data/raw-data.logic';
-import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/raw-data.interface';
-import CommonServiceWording from '../../common/service/common.service.wording';
+import CommonServiceWording from '@common/service/common.service.wording';
 import GroupedDataWording from './grouped-data.wording';
 
 export default class GroupedDataLogic extends CommonServiceLogicBase implements GroupedDataLogicInterface {

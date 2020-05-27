@@ -1,25 +1,26 @@
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import RawDataLogic from '../../service/raw-data/raw-data.logic';
-import CoordinateLogic from '../../service/coordinate/coordinate.logic';
-import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
-import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
-import { CoordinateDocumentModel } from '../../service/coordinate/coordinate.interface';
-import DateTime from '../../util/datetime/datetime';
-import VisualizationDistrictModel from '../../service/visualization/administrative/district/visualization.district.model';
-import { VisualizationDistrictDocumentModel } from '../../service/visualization/administrative/district/visualization.district.interface';
-import VisualizationWardModel from '../../service/visualization/administrative/ward/visualization.ward.model';
-import { VisualizationWardDocumentModel } from '../../service/visualization/administrative/ward/visualization.ward.interface';
-import { getGeocode } from '../../util/external-api/external-api.map';
-import { VisualizationMapPointDocumentModel } from '../../service/visualization/map-point/visualization.map-point.interface';
-import VisualizationMapPointModel from '../../service/visualization/map-point/visualization.map-point.model';
-import VisualizationSummaryDistrictWardModel from '../../service/visualization/summary/district-ward/visualization.summary.district-ward.model';
-import VisualizationSummaryDistrictModel from '../../service/visualization/summary/district/visualization.summary.district.model';
-import { VisualizationSummaryDistrictWardDocumentModel } from '../../service/visualization/summary/district-ward/visualization.summary.district-ward.interface';
-import { BingMapGeocodeResponse } from '../../util/external-api/external-api.map.interface';
-import { VisualizationSummaryDistrictDocumentModel } from '../../service/visualization/summary/district/visualization.summary.district.interface';
-import StringHandler from '../../util/helper/string-handler';
+import 'module-alias/register';
+import '@root/prepend';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import RawDataLogic from '@service/raw-data/raw-data.logic';
+import CoordinateLogic from '@service/coordinate/coordinate.logic';
+import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
+import { CoordinateDocumentModel } from '@service/coordinate/coordinate.interface';
+import DateTime from '@util/datetime/datetime';
+import VisualizationDistrictModel from '@service/visualization/administrative/district/visualization.district.model';
+import { VisualizationDistrictDocumentModel } from '@service/visualization/administrative/district/visualization.district.interface';
+import VisualizationWardModel from '@service/visualization/administrative/ward/visualization.ward.model';
+import { VisualizationWardDocumentModel } from '@service/visualization/administrative/ward/visualization.ward.interface';
+import { getGeocode } from '@util/external-api/external-api.map';
+import { VisualizationMapPointDocumentModel } from '@service/visualization/map-point/visualization.map-point.interface';
+import VisualizationMapPointModel from '@service/visualization/map-point/visualization.map-point.model';
+import VisualizationSummaryDistrictWardModel from '@service/visualization/summary/district-ward/visualization.summary.district-ward.model';
+import VisualizationSummaryDistrictModel from '@service/visualization/summary/district/visualization.summary.district.model';
+import { VisualizationSummaryDistrictWardDocumentModel } from '@service/visualization/summary/district-ward/visualization.summary.district-ward.interface';
+import { BingMapGeocodeResponse } from '@util/external-api/external-api.map.interface';
+import { VisualizationSummaryDistrictDocumentModel } from '@service/visualization/summary/district/visualization.summary.district.interface';
+import StringHandler from '@util/helper/string-handler';
 
 const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
 const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
@@ -271,10 +272,7 @@ process.on(
     async (): Promise<void> => {
         const startTime: [number, number] = process.hrtime();
         const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-        const mongoDbInstance: DatabaseMongodb = DatabaseMongodb.getInstance();
         try {
-            await mongoDbInstance.connect();
-
             await telegramChatBotInstance.sendMessage(`<b>🤖[Add coordinate]🤖</b>\n📝 Start add coordinate...`);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data - Start`).show();
 
@@ -391,6 +389,3 @@ process.on(
         }
     }
 );
-
-// TODO: Add transactionType and propertyType to map point record.
-// TODO: Setup data for visualize following price (day by day)

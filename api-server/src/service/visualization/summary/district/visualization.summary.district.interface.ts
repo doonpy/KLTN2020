@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '../../../../common/service/common.service.interface';
+import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
 import { VisualizationCommonLogicInterface } from '../../visualization.common.interface';
 import {
     VisualizationDistrictApiModel,

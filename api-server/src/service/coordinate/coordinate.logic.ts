@@ -1,9 +1,9 @@
 import { DocumentQuery, Query } from 'mongoose';
 import CoordinateModel from './coordinate.model';
 import { CoordinateApiModel, CoordinateDocumentModel, CoordinateLogicInterface } from './coordinate.interface';
-import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import CommonServiceWording from '../../common/service/common.service.wording';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
+import ResponseStatusCode from '@common/common.response-status.code';
+import CommonServiceWording from '@common/service/common.service.wording';
 import CoordinateWording from './coordinate.wording';
 
 export default class CoordinateLogic extends CommonServiceLogicBase implements CoordinateLogicInterface {

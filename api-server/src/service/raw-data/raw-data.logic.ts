@@ -1,16 +1,16 @@
 import { DocumentQuery, Query } from 'mongoose';
 import RawDataModel from './raw-data.model';
 import RawDataConstant from './raw-data.constant';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
 import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
 import CoordinateLogic from '../coordinate/coordinate.logic';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 import { RawDataApiModel, RawDataDocumentModel, RawDataLogicInterface } from './raw-data.interface';
-import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import RawDataWording from './raw-data.wording';
-import CommonServiceWording from '../../common/service/common.service.wording';
-import CommonConstant from '../../common/common.constant';
+import CommonServiceWording from '@common/service/common.service.wording';
+import CommonConstant from '@common/common.constant';
 
 export default class RawDataLogic extends CommonServiceLogicBase implements RawDataLogicInterface {
     private static instance: RawDataLogic;

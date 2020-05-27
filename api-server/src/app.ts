@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Application } from 'express';
 import path from 'path';
-import ConsoleLog from './util/console/console.log';
-import ConsoleConstant from './util/console/console.constant';
-import { errorHandler, notFoundRoute } from './middleware/error-handler/error-handler';
-import CommonServiceControllerBase from './common/service/common.service.controller.base';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import { errorHandler, notFoundRoute } from '@middleware/error-handler/error-handler';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 
 export default class App {
     private static instance: App | undefined;

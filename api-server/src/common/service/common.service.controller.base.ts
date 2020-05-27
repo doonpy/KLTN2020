@@ -1,19 +1,19 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { Model } from 'mongoose';
-import ResponseStatusCode from '../common.response-status.code';
-import { CommonDocumentModel, CommonServiceControllerBaseInterface } from './common.service.interface';
-import ExceptionCustomize from '../../util/exception/exception.customize';
-import Validator from '../../util/validator/validator';
-import StringHandler from '../../util/helper/string-handler';
-import CommonLanguage from '../common.language';
-import Checker from '../../util/checker/checker.index';
-import HostModel from '../../service/host/host.model';
-import CatalogModel from '../../service/catalog/catalog.model';
-import PatternModel from '../../service/pattern/pattern.model';
-import RawDataModel from '../../service/raw-data/raw-data.model';
-import DetailUrlModel from '../../service/detail-url/detail-url.model';
-import GroupedDataModel from '../../service/grouped-data/grouped-data.model';
-import CommonServiceWording from './common.service.wording';
+import ResponseStatusCode from '@common/common.response-status.code';
+import { CommonDocumentModel, CommonServiceControllerBaseInterface } from '@common/service/common.service.interface';
+import ExceptionCustomize from '@util/exception/exception.customize';
+import Validator from '@util/validator/validator';
+import StringHandler from '@util/helper/string-handler';
+import CommonLanguage from '@common/common.language';
+import Checker from '@util/checker/checker.index';
+import HostModel from '@service/host/host.model';
+import CatalogModel from '@service/catalog/catalog.model';
+import PatternModel from '@service/pattern/pattern.model';
+import RawDataModel from '@service/raw-data/raw-data.model';
+import DetailUrlModel from '@service/detail-url/detail-url.model';
+import GroupedDataModel from '@service/grouped-data/grouped-data.model';
+import CommonServiceWording from '@common/service/common.service.wording';
 
 export default abstract class CommonServiceControllerBase implements CommonServiceControllerBaseInterface {
     protected commonPath = '/:language';

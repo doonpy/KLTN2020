@@ -1,4 +1,4 @@
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 
 const resourcePath = '/visualization';
 

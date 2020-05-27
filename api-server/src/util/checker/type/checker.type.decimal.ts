@@ -1,6 +1,6 @@
 import CheckerTypeBase from './checker.type.base';
 import CheckerWording from '../checker.wording';
-import ResponseStatusCode from '../../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 // const DECIMAL_NUMERIC_CHARACTER_PATTERN = new RegExp(/(^([1-9]+)?0?\.[0-9]+$)|\d/);
 

@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 import { VisualizationMapPointDocumentModel } from './visualization.map-point.interface';
-import CommonConstant from '../../../common/common.constant';
+import CommonConstant from '@common/common.constant';
 
 autoIncrement.initialize(mongoose.connection);
 

@@ -1,6 +1,6 @@
 import { connect, Mongoose, set } from 'mongoose';
-import ConsoleLog from '../../../util/console/console.log';
-import ConsoleConstant from '../../../util/console/console.constant';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
 
 export default class DatabaseMongodb {
     private static instance: DatabaseMongodb | undefined;

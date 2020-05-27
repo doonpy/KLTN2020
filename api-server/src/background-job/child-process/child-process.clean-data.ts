@@ -1,16 +1,17 @@
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import DetailUrlLogic from '../../service/detail-url/detail-url.logic';
-import RawDataLogic from '../../service/raw-data/raw-data.logic';
-import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
-import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
-import { DetailUrlDocumentModel } from '../../service/detail-url/detail-url.interface';
-import DateTime from '../../util/datetime/datetime';
-import VisualizationCountryModel from '../../service/visualization/administrative/country/visualization.country.model';
-import VisualizationProvinceModel from '../../service/visualization/administrative/province/visualization.province.model';
-import VisualizationDistrictModel from '../../service/visualization/administrative/district/visualization.district.model';
-import VisualizationWardModel from '../../service/visualization/administrative/ward/visualization.ward.model';
+import 'module-alias/register';
+import '@root/prepend';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import DetailUrlLogic from '@service/detail-url/detail-url.logic';
+import RawDataLogic from '@service/raw-data/raw-data.logic';
+import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
+import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
+import DateTime from '@util/datetime/datetime';
+import VisualizationCountryModel from '@service/visualization/administrative/country/visualization.country.model';
+import VisualizationProvinceModel from '@service/visualization/administrative/province/visualization.province.model';
+import VisualizationDistrictModel from '@service/visualization/administrative/district/visualization.district.model';
+import VisualizationWardModel from '@service/visualization/administrative/ward/visualization.ward.model';
 import { CleanDataConstant } from './child-process.constant';
 
 type AggregationGroupDataResult = {
@@ -185,7 +186,6 @@ const deleteInvalidAddressData = async (): Promise<void> => {
 async function* generateScript() {
     const startTime: [number, number] = process.hrtime();
     const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-    await DatabaseMongodb.getInstance().connect();
     await telegramChatBotInstance.sendMessage(`<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`);
 
     new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete duplicate - Start`).show();

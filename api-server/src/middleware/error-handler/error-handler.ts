@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import ExceptionCustomize from '../../util/exception/exception.customize';
+import ResponseStatusCode from '@common/common.response-status.code';
+import ExceptionCustomize from '@util/exception/exception.customize';
 import ErrorHandlerWording from './error-handler.wording';
-import StringHandler from '../../util/helper/string-handler';
-import CommonLanguage from '../../common/common.language';
+import StringHandler from '@util/helper/string-handler';
+import CommonLanguage from '@common/common.language';
 
 /**
  * @param input

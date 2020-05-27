@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import PatternLogic from './pattern.logic';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
 import { PatternApiModel, PatternDocumentModel } from './pattern.interface';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 const commonPath = '/patterns';
 const specifyIdPath = '/pattern/:id';

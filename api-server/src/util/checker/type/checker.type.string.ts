@@ -1,6 +1,6 @@
 import CheckerTypeBase from './checker.type.base';
 import CheckerWording from '../checker.wording';
-import ResponseStatusCode from '../../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 export default class CheckerTypeString extends CheckerTypeBase {
     /**

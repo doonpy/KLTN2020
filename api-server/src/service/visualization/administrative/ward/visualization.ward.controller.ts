@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import VisualizationCommonController from '../../visualization.common.controller';
-import CommonServiceControllerBase from '../../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../../common/common.response-status.code';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { VisualizationWardApiModel, VisualizationWardDocumentModel } from './visualization.ward.interface';
 import VisualizationWardModel from './visualization.ward.model';
 import VisualizationWardLogic from './visualization.ward.logic';

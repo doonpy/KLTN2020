@@ -3,8 +3,8 @@ import VisualizationCommonController from '../../visualization.common.controller
 import VisualizationCountryLogic from './visualization.country.logic';
 import VisualizationCountryModel from './visualization.country.model';
 import { VisualizationCountryApiModel, VisualizationCountryDocumentModel } from './visualization.country.interface';
-import CommonServiceControllerBase from '../../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../../common/common.response-status.code';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 const commonPath = '/countries';
 const specifyIdPath = '/country/:id';

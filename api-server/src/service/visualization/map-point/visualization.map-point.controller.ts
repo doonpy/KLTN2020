@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import VisualizationCommonController from '../visualization.common.controller';
-import CommonServiceControllerBase from '../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../common/common.response-status.code';
-import Validator from '../../../util/validator/validator';
-import Checker from '../../../util/checker/checker.index';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
 import VisualizationMapPointLogic from './visualization.map-point.logic';
 import { VisualizationMapPointApiModel, VisualizationMapPointDocumentModel } from './visualization.map-point.interface';
 import VisualizationMapPointModel from './visualization.map-point.model';
-import CommonConstant from '../../../common/common.constant';
+import CommonConstant from '@common/common.constant';
 
 const commonPath = '/map-points';
 const specifyIdPath = '/map-points/:id';

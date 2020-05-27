@@ -1,9 +1,9 @@
 import { DocumentQuery, Query } from 'mongoose';
 import HostModel from './host.model';
 import { HostApiModel, HostDocumentModel, HostLogicInterface } from './host.interface';
-import CommonLogicBase from '../../common/service/common.service.logic.base';
-import CommonServiceWording from '../../common/service/common.service.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import CommonLogicBase from '@common/service/common.service.logic.base';
+import CommonServiceWording from '@common/service/common.service.wording';
+import ResponseStatusCode from '@common/common.response-status.code';
 import HostWording from './host.wording';
 
 export default class HostLogic extends CommonLogicBase implements HostLogicInterface {

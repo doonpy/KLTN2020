@@ -1,12 +1,12 @@
-import StringHandler from '../../util/helper/string-handler';
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
-import GroupedDataLogic from '../../service/grouped-data/grouped-data.logic';
-import RawDataLogic from '../../service/raw-data/raw-data.logic';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
-import { GroupedDataDocumentModel } from '../../service/grouped-data/grouped-data.interface';
-import DateTime from '../../util/datetime/datetime';
+import StringHandler from '@util/helper/string-handler';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import GroupedDataLogic from '@service/grouped-data/grouped-data.logic';
+import RawDataLogic from '@service/raw-data/raw-data.logic';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
+import { GroupedDataDocumentModel } from '@service/grouped-data/grouped-data.interface';
+import DateTime from '@util/datetime/datetime';
 
 interface AggregationGroupDataResult {
     _id: number;

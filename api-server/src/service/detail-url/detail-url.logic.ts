@@ -1,10 +1,10 @@
 import { DocumentQuery, Query } from 'mongoose';
 import DetailUrlModel from './detail-url.model';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { CatalogApiModel, CatalogDocumentModel } from '../catalog/catalog.interface';
-import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import { DetailUrlApiModel, DetailUrlDocumentModel, DetailUrlLogicInterface } from './detail-url.interface';
-import CommonServiceWording from '../../common/service/common.service.wording';
+import CommonServiceWording from '@common/service/common.service.wording';
 import DetailUrlWording from './detail-url.wording';
 import CatalogLogic from '../catalog/catalog.logic';
 

@@ -1,12 +1,12 @@
 import { DocumentQuery, Query } from 'mongoose';
 import CatalogModel from './catalog.model';
 import { CatalogApiModel, CatalogDocumentModel, CatalogLogicInterface } from './catalog.interface';
-import CommonLogicBase from '../../common/service/common.service.logic.base';
+import CommonLogicBase from '@common/service/common.service.logic.base';
 import CatalogWording from './catalog.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { HostApiModel, HostDocumentModel } from '../host/host.interface';
 import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
-import CommonServiceWording from '../../common/service/common.service.wording';
+import CommonServiceWording from '@common/service/common.service.wording';
 import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
 

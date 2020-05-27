@@ -1,4 +1,8 @@
-import { CommonApiModel, CommonDocumentModel, CommonLogicBaseInterface } from './common.service.interface';
+import {
+    CommonApiModel,
+    CommonDocumentModel,
+    CommonLogicBaseInterface,
+} from '@common/service/common.service.interface';
 
 export default abstract class CommonServiceLogicBase implements CommonLogicBaseInterface {
     /**

@@ -1,10 +1,10 @@
 import cherrio from 'cheerio';
 import { Response } from 'request';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import Request from '../../util/request/request';
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import Request from '@util/request/request';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 export default class ScrapeBase {
     protected startTime: [number, number] | undefined;

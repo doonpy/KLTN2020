@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import VisualizationCommonController from '../../visualization.common.controller';
-import CommonServiceControllerBase from '../../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../../common/common.response-status.code';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { VisualizationDistrictApiModel, VisualizationDistrictDocumentModel } from './visualization.district.interface';
 import VisualizationDistrictModel from './visualization.district.model';
 import VisualizationDistrictLogic from './visualization.district.logic';

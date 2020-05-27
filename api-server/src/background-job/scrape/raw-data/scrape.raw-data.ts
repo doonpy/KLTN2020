@@ -1,19 +1,19 @@
 import ScrapeBase from '../scrape.base';
-import RawDataLogic from '../../../service/raw-data/raw-data.logic';
-import DateTime from '../../../util/datetime/datetime';
-import StringHandler from '../../../util/helper/string-handler';
-import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
-import ConsoleLog from '../../../util/console/console.log';
-import ConsoleConstant from '../../../util/console/console.constant';
-import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
-import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
-import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
-import { PatternDocumentModel } from '../../../service/pattern/pattern.interface';
-import { HostDocumentModel } from '../../../service/host/host.interface';
-import { RawDataDocumentModel } from '../../../service/raw-data/raw-data.interface';
-import RawDataConstant from '../../../service/raw-data/raw-data.constant';
+import RawDataLogic from '@service/raw-data/raw-data.logic';
+import DateTime from '@util/datetime/datetime';
+import StringHandler from '@util/helper/string-handler';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import DetailUrlLogic from '@service/detail-url/detail-url.logic';
+import { CatalogDocumentModel } from '@service/catalog/catalog.interface';
+import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
+import { PatternDocumentModel } from '@service/pattern/pattern.interface';
+import { HostDocumentModel } from '@service/host/host.interface';
+import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
+import RawDataConstant from '@service/raw-data/raw-data.constant';
+import CommonConstant from '@common/common.constant';
 import { convertAcreageValue, convertPriceValue } from './scrape.raw-data.helper';
-import CommonConstant from '../../../common/common.constant';
+import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();

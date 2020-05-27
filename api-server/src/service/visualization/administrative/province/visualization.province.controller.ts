@@ -3,8 +3,8 @@ import VisualizationCommonController from '../../visualization.common.controller
 import VisualizationProvinceLogic from './visualization.province.logic';
 import VisualizationProvinceModel from './visualization.province.model';
 import { VisualizationProvinceApiModel, VisualizationProvinceDocumentModel } from './visualization.province.interface';
-import CommonServiceControllerBase from '../../../../common/service/common.service.controller.base';
-import ResponseStatusCode from '../../../../common/common.response-status.code';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 const commonPath = '/provinces';
 const specifyIdPath = '/province/:id';

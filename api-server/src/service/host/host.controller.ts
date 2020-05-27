@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import HostLogic from './host.logic';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
+import ResponseStatusCode from '@common/common.response-status.code';
 import { HostApiModel, HostDocumentModel } from './host.interface';
 
 const commonPath = '/hosts';

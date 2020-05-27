@@ -1,10 +1,10 @@
 import { DocumentQuery, Query } from 'mongoose';
 import PatternModel from './pattern.model';
 import PatternWording from './pattern.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
+import ResponseStatusCode from '@common/common.response-status.code';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import { PatternApiModel, PatternDocumentModel, PatternLogicInterface } from './pattern.interface';
-import CommonServiceWording from '../../common/service/common.service.wording';
+import CommonServiceWording from '@common/service/common.service.wording';
 
 export default class PatternLogic extends CommonServiceLogicBase implements PatternLogicInterface {
     public static instance: PatternLogic;

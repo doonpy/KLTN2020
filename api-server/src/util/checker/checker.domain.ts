@@ -1,6 +1,6 @@
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 export default class CheckerDomain extends CheckerBase {
     private VALID_DOMAIN = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+$/);

@@ -1,7 +1,7 @@
 import fs from 'fs';
-import EnvironmentVariables from '../../env';
+import EnvironmentVariables from '@root/env';
 
-export default (): void => {
+const initEnvironmentVariables = (): void => {
     Object.keys(EnvironmentVariables).forEach((key): void => {
         if (new RegExp(/^DEV_/).test(key) && process.env.NODE_ENV === 'production') {
             return;
@@ -15,3 +15,5 @@ export default (): void => {
         process.env[key] = (EnvironmentVariables as { [key: string]: any })[key] as string;
     });
 };
+
+export default initEnvironmentVariables;

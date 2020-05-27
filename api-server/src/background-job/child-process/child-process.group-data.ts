@@ -1,8 +1,9 @@
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
+import 'module-alias/register';
+import '@root/prepend';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
 import GroupData from '../group-data/group-data';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
 import { GroupedDataConstant } from './child-process.constant';
 
 const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
@@ -23,8 +24,6 @@ process.on(
         switch (messageType) {
             case MESSAGE_TYPE.START:
                 try {
-                    await DatabaseMongodb.getInstance().connect();
-
                     await telegramChatBotInstance.sendMessage(
                         `<b>🤖[Group data]🤖</b>\n📝 Start group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId}`
                     );

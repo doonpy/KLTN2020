@@ -3,7 +3,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
 import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
 

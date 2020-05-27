@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import CatalogLogic from './catalog.logic';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
 import { CatalogApiModel, CatalogDocumentModel } from './catalog.interface';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
 
