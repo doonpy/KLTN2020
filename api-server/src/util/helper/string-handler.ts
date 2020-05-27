@@ -154,4 +154,19 @@ export default class StringHandler {
             .replace(/\s{2,}/g, ' ')
             .trim();
     }
+
+    /**
+     * Remove special character at head and tail of string.
+     * @param {string} str
+     *
+     * @return {string}
+     */
+    public static removeSpecialCharacterAtHeadAndTail(str: string): string {
+        const STANDARD_ADDRESS_PATTERN = new RegExp(
+            `^[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+|[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+$`,
+            'ig'
+        );
+
+        return str.replace(STANDARD_ADDRESS_PATTERN, '');
+    }
 }

@@ -19,6 +19,7 @@ import VisualizationSummaryDistrictModel from '../../service/visualization/summa
 import { VisualizationSummaryDistrictWardDocumentModel } from '../../service/visualization/summary/district-ward/visualization.summary.district-ward.interface';
 import { BingMapGeocodeResponse } from '../../util/external-api/external-api.map.interface';
 import { VisualizationSummaryDistrictDocumentModel } from '../../service/visualization/summary/district/visualization.summary.district.interface';
+import StringHandler from '../../util/helper/string-handler';
 
 const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
 const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
@@ -54,14 +55,14 @@ type SummaryElement = {
  * @return {AddressProperties}
  */
 const getAddressProperties = (address: string): AddressProperties => {
-    const FILTER_PATTERN = new RegExp(
-        `^[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+|[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+$`,
-        'ig'
+    const ward: string = StringHandler.removeSpecialCharacterAtHeadAndTail(
+        address.match(RegExp(wardPattern))?.shift() || ''
     );
-    const ward: string = (address.match(RegExp(wardPattern))?.shift() || '').replace(FILTER_PATTERN, '');
     address = address.replace(ward, '');
 
-    const district: string = (address.match(RegExp(districtPattern))?.shift() || '').replace(FILTER_PATTERN, '');
+    const district: string = StringHandler.removeSpecialCharacterAtHeadAndTail(
+        address.match(RegExp(districtPattern))?.shift() || ''
+    );
 
     return {
         district,

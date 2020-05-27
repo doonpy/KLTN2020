@@ -163,7 +163,7 @@ export default class ScrapeRawData extends ScrapeBase {
         const acreageData: string = StringHandler.removeBreakLineAndTrim(ScrapeBase.extractData($, acreage).join('. '));
         const addressData: string = StringHandler.removeBreakLineAndTrim(
             ScrapeBase.extractData($, address)
-                .map((item) => item.replace(/^[^\d\w]+|[^\d\w]+$/g, ' '))
+                .map((item): string => StringHandler.removeSpecialCharacterAtHeadAndTail(item))
                 .join('. ')
         );
         const othersData: {
