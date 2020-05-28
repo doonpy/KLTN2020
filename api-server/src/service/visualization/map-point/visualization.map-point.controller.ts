@@ -15,8 +15,8 @@ const MIN_LAT = -85;
 const MAX_LAT = 85;
 const MIN_LNG = -180;
 const MAX_LNG = 180;
-const MIN_ACREAGE = 0;
-const MAX_ACREAGE = Number.MAX_SAFE_INTEGER;
+const MIN_NUMBER_VALUE = 0;
+const MAX_NUMBER_VALUE = Number.MAX_SAFE_INTEGER;
 
 export default class VisualizationMapPointController extends VisualizationCommonController {
     private static instance: VisualizationMapPointController;
@@ -34,6 +34,10 @@ export default class VisualizationMapPointController extends VisualizationCommon
     private readonly PARAM_MIN_ACREAGE: string = 'minAcreage';
 
     private readonly PARAM_MAX_ACREAGE: string = 'maxAcreage';
+
+    private readonly PARAM_MIN_PRICE: string = 'minPrice';
+
+    private readonly PARAM_MAX_PRICE: string = 'maxPrice';
 
     private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
 
@@ -98,25 +102,37 @@ export default class VisualizationMapPointController extends VisualizationCommon
             this.validator.addParamValidator(this.PARAM_MIN_ACREAGE, new Checker.Type.Decimal());
             this.validator.addParamValidator(
                 this.PARAM_MIN_ACREAGE,
-                new Checker.DecimalRange(MIN_ACREAGE, MAX_ACREAGE)
+                new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
             );
 
             this.validator.addParamValidator(this.PARAM_MAX_ACREAGE, new Checker.Type.Decimal());
             this.validator.addParamValidator(
                 this.PARAM_MAX_ACREAGE,
-                new Checker.DecimalRange(MIN_ACREAGE, MAX_ACREAGE)
+                new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
+            );
+
+            this.validator.addParamValidator(this.PARAM_MIN_PRICE, new Checker.Type.Decimal());
+            this.validator.addParamValidator(
+                this.PARAM_MIN_PRICE,
+                new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
+            );
+
+            this.validator.addParamValidator(this.PARAM_MAX_PRICE, new Checker.Type.Decimal());
+            this.validator.addParamValidator(
+                this.PARAM_MAX_PRICE,
+                new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
             );
 
             this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.validator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.DecimalRange(0, CommonConstant.TRANSACTION_TYPE.length - 1)
+                new Checker.DecimalRange(1, CommonConstant.TRANSACTION_TYPE.length)
             );
 
             this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.validator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.DecimalRange(0, CommonConstant.PROPERTY_TYPE.length - 1)
+                new Checker.DecimalRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
             this.validator.validate(this.requestQuery);
@@ -130,8 +146,10 @@ export default class VisualizationMapPointController extends VisualizationCommon
                 ],
             };
             let documents: VisualizationMapPointDocumentModel[] = await VisualizationMapPointModel.find(conditions);
-            const minAcreage: number = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_ACREAGE;
-            const maxAcreage: number = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_ACREAGE;
+            const minAcreage: number = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_NUMBER_VALUE;
+            const maxAcreage: number = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_NUMBER_VALUE;
+            const minPrice: number = Number(this.requestQuery[this.PARAM_MIN_PRICE]) || MIN_NUMBER_VALUE;
+            const maxPrice: number = Number(this.requestQuery[this.PARAM_MAX_PRICE]) || MAX_NUMBER_VALUE;
             const transactionType: number | undefined =
                 Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
             const propertyType: number | undefined = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
@@ -147,7 +165,8 @@ export default class VisualizationMapPointController extends VisualizationCommon
                     }
 
                     point.rawDataset = point.rawDataset.filter(
-                        ({ acreage }): boolean => acreage >= minAcreage && acreage <= maxAcreage
+                        ({ acreage, price }): boolean =>
+                            acreage >= minAcreage && acreage <= maxAcreage && price >= minPrice && price <= maxPrice
                     );
 
                     return point.rawDataset.length > 0;

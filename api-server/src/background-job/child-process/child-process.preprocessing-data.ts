@@ -21,6 +21,7 @@ import { VisualizationSummaryDistrictWardDocumentModel } from '@service/visualiz
 import { BingMapGeocodeResponse } from '@util/external-api/external-api.map.interface';
 import { VisualizationSummaryDistrictDocumentModel } from '@service/visualization/summary/district/visualization.summary.district.interface';
 import StringHandler from '@util/helper/string-handler';
+import CommonConstant from '@common/common.constant';
 
 const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
 const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
@@ -219,11 +220,21 @@ const handleVisualizationMapPoint = async (
     wardId: number,
     lat: number,
     lng: number,
-    rawData: RawDataDocumentModel
+    { _id, acreage, price, transactionType, propertyType }: RawDataDocumentModel
 ): Promise<void> => {
     const visualizationMapPointDocument: VisualizationMapPointDocumentModel | null = await VisualizationMapPointModel.findOne(
         { lat, lng }
     );
+
+    const newPoint: { rawDataId: number; acreage: number; price: number; currency: string; timeUnit?: string[] } = {
+        rawDataId: _id,
+        acreage: acreage.value,
+        price: price.value,
+        currency: price.currency,
+    };
+    if (transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
+        newPoint.timeUnit = CommonConstant.PRICE_TIME_UNIT[price.timeUnit].wording;
+    }
 
     if (!visualizationMapPointDocument) {
         await VisualizationMapPointModel.create({
@@ -233,34 +244,41 @@ const handleVisualizationMapPoint = async (
             lng,
             points: [
                 {
-                    rawDataset: [{ rawDataId: rawData._id, acreage: rawData.acreage.value }],
-                    transactionType: rawData.transactionType,
-                    propertyType: rawData.propertyType,
+                    rawDataset: [newPoint],
+                    transactionType,
+                    propertyType,
                 },
             ],
         });
         return;
     }
 
-    let point:
+    const point:
         | {
-              rawDataset: { rawDataId: number; acreage: number }[];
+              rawDataset: {
+                  rawDataId: number;
+                  acreage: number;
+                  price: number;
+                  currency: string;
+                  timeUnit?: string[];
+              }[];
               transactionType: number;
               propertyType: number;
           }
         | undefined = visualizationMapPointDocument.points.find(
-        ({ transactionType, propertyType }) =>
-            transactionType === rawData.transactionType && propertyType === rawData.propertyType
+        ({ transactionType: pointTransactionType, propertyType: pointPropertyType }) =>
+            transactionType === pointTransactionType && propertyType === pointPropertyType
     );
     if (!point) {
-        point = {
-            rawDataset: [{ rawDataId: rawData._id, acreage: rawData.acreage.value }],
-            transactionType: rawData.transactionType,
-            propertyType: rawData.propertyType,
-        };
+        visualizationMapPointDocument.points.push({
+            rawDataset: [newPoint],
+            transactionType,
+            propertyType,
+        });
+    } else {
+        point.rawDataset.push(newPoint);
     }
 
-    visualizationMapPointDocument.points.push(point);
     await VisualizationMapPointModel.findByIdAndUpdate(
         visualizationMapPointDocument._id,
         visualizationMapPointDocument

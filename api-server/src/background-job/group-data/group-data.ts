@@ -99,6 +99,7 @@ export default class GroupData {
                             ConsoleConstant.Type.ERROR,
                             `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: Over fitting.`
                         ).show();
+                        await this.rawDataLogic.update(document._id, document);
                         continue rawDataLoop;
                     }
 
@@ -197,7 +198,7 @@ export default class GroupData {
             firstRawData.price.currency === secondRawData.price.currency &&
             firstRawData.price.timeUnit === secondRawData.price.timeUnit
         ) {
-            return 0;
+            return this.OVER_FITTING_SCORE;
         }
 
         let totalPoint = 0;

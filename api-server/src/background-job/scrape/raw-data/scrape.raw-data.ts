@@ -10,7 +10,6 @@ import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface
 import { PatternDocumentModel } from '@service/pattern/pattern.interface';
 import { HostDocumentModel } from '@service/host/host.interface';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
-import RawDataConstant from '@service/raw-data/raw-data.constant';
 import CommonConstant from '@common/common.constant';
 import { convertAcreageValue, convertPriceValue } from './scrape.raw-data.helper';
 import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
@@ -363,14 +362,14 @@ export default class ScrapeRawData extends ScrapeBase {
             value: priceValue,
             currency: priceCurrency,
             timeUnit:
-                RawDataConstant.PRICE_TIME_UNIT.find((item): boolean => item.wording.indexOf(priceTimeUnit) !== -1)
+                CommonConstant.PRICE_TIME_UNIT.find((item): boolean => item.wording.indexOf(priceTimeUnit) !== -1)
                     ?.id || -1,
         };
         if (price.timeUnit === -1) {
             if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
                 delete price.timeUnit;
             } else {
-                price.timeUnit = RawDataConstant.PRICE_TIME_UNIT[1].id;
+                price.timeUnit = CommonConstant.PRICE_TIME_UNIT[1].id;
             }
         }
 

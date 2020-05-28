@@ -15,7 +15,13 @@ export interface VisualizationMapPointDocumentModel extends CommonDocumentModel 
     lat: number;
     lng: number;
     points: {
-        rawDataset: { rawDataId: number; acreage: number }[];
+        rawDataset: {
+            rawDataId: number;
+            acreage: number;
+            price: number;
+            currency: string;
+            timeUnit?: string[];
+        }[];
         transactionType: number;
         propertyType: number;
     }[];
@@ -28,7 +34,13 @@ export interface VisualizationMapPointApiModel extends CommonApiModel {
     lng: number | null;
     points:
         | {
-              rawDataset: { rawDataId: number; acreage: number }[];
+              rawDataset: {
+                  rawDataId: number;
+                  acreage: number;
+                  price: number;
+                  currency: string;
+                  timeUnit?: string[];
+              }[];
               transactionType: number;
               propertyType: number;
           }[]
