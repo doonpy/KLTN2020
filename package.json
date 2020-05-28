@@ -5,8 +5,11 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev:initialize-data": "cd api-server/src && ts-node data-initialization.ts",
-    "dev:api": "nodemon --watch api-server/src --ext ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/server.ts'",
-    "dev:bgr-job": "nodemon --watch api-server/src --ext ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/background-job/main.ts'",
+    "tsc:api": "tsc -w -p api-server",
+    "watcher:api": "nodemon -w api-server/src -e ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/server.ts'",
+    "watcher:bgr-job": "nodemon -w api-server/src -e ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/background-job/main.ts'",
+    "dev:api": "npm-run-all -p tsc:api watcher:api --print-label",
+    "dev:bgr-job": "npm-run-all -p tsc:api watcher:bgr-job --print-label",
     "dev:web": "next web-server -p 3001",
     "start:initialize-data": "NODE_ENV=production node dist/api-bgr-job/data-initialization.js",
     "start:api": "node dist/api-bgr-job/server.js",

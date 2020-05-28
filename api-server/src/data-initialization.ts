@@ -1,21 +1,21 @@
 import initEnv from '@util/environment/environment';
 import DatabaseMongodb from '@service/database/mongodb/database.mongodb';
-import { VisualizationMapPointDocumentModel } from '@service/visualization/map-point/visualization.map-point.interface';
-import { VisualizationDistrictDocumentModel } from '@service/visualization/administrative/district/visualization.district.interface';
+import { VisualMapPointDocumentModel } from '@service/visual/map-point/visual.map-point.interface';
+import { VisualDistrictDocumentModel } from '@service/visual/administrative/district/visual.district.interface';
 import countryData from '@util/data-initialization/countries.json';
 import provinceData from '@util/data-initialization/provinces.json';
 import districtData from '@util/data-initialization/districts.json';
 import wardData from '@util/data-initialization/wards.json';
 import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
-import VisualizationCountryModel from '@service/visualization/administrative/country/visualization.country.model';
-import VisualizationProvinceModel from '@service/visualization/administrative/province/visualization.province.model';
-import VisualizationDistrictModel from '@service/visualization/administrative/district/visualization.district.model';
-import VisualizationWardModel from '@service/visualization/administrative/ward/visualization.ward.model';
-import VisualizationSummaryDistrictModel from '@service/visualization/summary/district/visualization.summary.district.model';
-import VisualizationSummaryDistrictWardModel from '@service/visualization/summary/district-ward/visualization.summary.district-ward.model';
-import { VisualizationWardDocumentModel } from '@service/visualization/administrative/ward/visualization.ward.interface';
-import { VisualizationCountryDocumentModel } from '@service/visualization/administrative/country/visualization.country.interface';
+import VisualizationCountryModel from '@service/visual/administrative/country/visual.country.model';
+import VisualizationProvinceModel from '@service/visual/administrative/province/visual.province.model';
+import VisualizationDistrictModel from '@service/visual/administrative/district/visual.district.model';
+import VisualizationWardModel from '@service/visual/administrative/ward/visual.ward.model';
+import VisualizationSummaryDistrictModel from '@service/visual/summary/district/visual.summary.district.model';
+import VisualizationSummaryDistrictWardModel from '@service/visual/summary/district-ward/visual.summary.district-ward.model';
+import { VisualWardDocumentModel } from '@service/visual/administrative/ward/visual.ward.interface';
+import { VisualCountryDocumentModel } from '@service/visual/administrative/country/visual.country.interface';
 
 let script: AsyncGenerator;
 const PROPERTY_TYPE_AMOUNT = 12;
@@ -41,7 +41,7 @@ const importData = async (): Promise<void> => {
         const countryCode: string = item.code.split('_')[0];
         const countryId: number = (((await VisualizationCountryModel.findOne({
             code: countryCode,
-        })) as unknown) as VisualizationCountryDocumentModel)._id;
+        })) as unknown) as VisualCountryDocumentModel)._id;
 
         if ((await VisualizationProvinceModel.countDocuments({ code: item.code })) === 0) {
             await VisualizationProvinceModel.create({
@@ -65,7 +65,7 @@ const importData = async (): Promise<void> => {
         const provinceCode: string = item.code.split('_')[1];
         const provinceId: number = (((await VisualizationProvinceModel.findOne({
             code: `${countryCode}_${provinceCode}`,
-        })) as unknown) as VisualizationMapPointDocumentModel)._id;
+        })) as unknown) as VisualMapPointDocumentModel)._id;
 
         if ((await VisualizationDistrictModel.countDocuments({ code: item.code })) === 0) {
             await VisualizationDistrictModel.create({
@@ -90,7 +90,7 @@ const importData = async (): Promise<void> => {
         const districtCode: string = item.code.split('_')[2];
         const districtId: number = ((await VisualizationDistrictModel.findOne({
             code: `${countryCode}_${provinceCode}_${districtCode}`,
-        })) as VisualizationDistrictDocumentModel)._id;
+        })) as VisualDistrictDocumentModel)._id;
 
         if ((await VisualizationWardModel.countDocuments({ code: item.code })) === 0) {
             await VisualizationWardModel.create({
@@ -122,7 +122,7 @@ const initializeVisualData = async (): Promise<void> => {
         }
     }
 
-    const districtList: VisualizationDistrictDocumentModel[] = await VisualizationDistrictModel.find();
+    const districtList: VisualDistrictDocumentModel[] = await VisualizationDistrictModel.find();
     for (const district of districtList) {
         const isSummaryDistrictExist: number = await VisualizationSummaryDistrictModel.countDocuments({
             districtId: district._id,
@@ -135,7 +135,7 @@ const initializeVisualData = async (): Promise<void> => {
             });
         }
 
-        const wardList: VisualizationWardDocumentModel[] = await VisualizationWardModel.find({
+        const wardList: VisualWardDocumentModel[] = await VisualizationWardModel.find({
             districtId: district._id,
         });
         for (const ward of wardList) {
