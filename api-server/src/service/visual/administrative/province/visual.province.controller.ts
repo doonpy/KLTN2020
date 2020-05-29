@@ -12,7 +12,7 @@ const specifyIdPath = '/province/:id';
 export default class VisualProvinceController extends VisualCommonController {
     private static instance: VisualProvinceController;
 
-    private visualizationProvinceLogic: VisualProvinceLogic = VisualProvinceLogic.getInstance();
+    private visualProvinceLogic: VisualProvinceLogic = VisualProvinceLogic.getInstance();
 
     constructor() {
         super();
@@ -65,13 +65,13 @@ export default class VisualProvinceController extends VisualCommonController {
             const documents: VisualProvinceDocumentModel[] = await VisualizationProvinceModel.find();
             if (this.populate) {
                 for (const document of documents) {
-                    await this.visualizationProvinceLogic.populateDocument(document);
+                    await this.visualProvinceLogic.populateDocument(document);
                 }
             }
 
             const responseBody: object = {
                 provinces: documents.map(
-                    (document): VisualProvinceApiModel => this.visualizationProvinceLogic.convertToApiResponse(document)
+                    (document): VisualProvinceApiModel => this.visualProvinceLogic.convertToApiResponse(document)
                 ),
             };
 

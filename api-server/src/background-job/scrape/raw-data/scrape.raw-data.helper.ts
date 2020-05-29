@@ -18,7 +18,7 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
         return value / 1000000;
     }
 
-    return Math.round(value);
+    return Math.round(value * 100) / 100;
 };
 
 /**

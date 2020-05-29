@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import VisualCommonController from '../visual.common.controller';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import ResponseStatusCode from '@common/common.response-status.code';
 import Validator from '@util/validator/validator';
@@ -8,6 +7,7 @@ import VisualMapPointLogic from './visual.map-point.logic';
 import { VisualMapPointApiModel, VisualMapPointDocumentModel } from './visual.map-point.interface';
 import VisualizationMapPointModel from './visual.map-point.model';
 import CommonConstant from '@common/common.constant';
+import VisualCommonController from '../visual.common.controller';
 
 const commonPath = '/map-points';
 const specifyIdPath = '/map-points/:id';
@@ -21,7 +21,7 @@ const MAX_NUMBER_VALUE = Number.MAX_SAFE_INTEGER;
 export default class VisualMapPointController extends VisualCommonController {
     private static instance: VisualMapPointController;
 
-    private visualizationMapPointLogic: VisualMapPointLogic = VisualMapPointLogic.getInstance();
+    private visualMapPointLogic: VisualMapPointLogic = VisualMapPointLogic.getInstance();
 
     private readonly PARAM_MIN_LAT: string = 'minLat';
 
@@ -155,35 +155,37 @@ export default class VisualMapPointController extends VisualCommonController {
             const propertyType: number | undefined = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
 
             documents = documents.filter((document): boolean => {
-                document.points = document.points.filter((point): boolean => {
-                    if (transactionType !== undefined && point.transactionType !== transactionType) {
-                        return false;
+                document.points = document.points.filter(
+                    ({ rawDataset, transactionType: itemTransactionType, propertyType: itemPropertyType }): boolean => {
+                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
+                            return false;
+                        }
+
+                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
+                            return false;
+                        }
+
+                        rawDataset = rawDataset.filter(
+                            ({ acreage, price }): boolean =>
+                                acreage >= minAcreage && acreage <= maxAcreage && price >= minPrice && price <= maxPrice
+                        );
+
+                        return rawDataset.length > 0;
                     }
-
-                    if (propertyType !== undefined && point.propertyType !== propertyType) {
-                        return false;
-                    }
-
-                    point.rawDataset = point.rawDataset.filter(
-                        ({ acreage, price }): boolean =>
-                            acreage >= minAcreage && acreage <= maxAcreage && price >= minPrice && price <= maxPrice
-                    );
-
-                    return point.rawDataset.length > 0;
-                });
+                );
 
                 return document.points.length > 0;
             });
 
             if (this.populate) {
                 for (const document of documents) {
-                    await this.visualizationMapPointLogic.populateDocument(document);
+                    await this.visualMapPointLogic.populateDocument(document);
                 }
             }
 
             const responseBody: object = {
                 mapPoints: documents.map(
-                    (document): VisualMapPointApiModel => this.visualizationMapPointLogic.convertToApiResponse(document)
+                    (document): VisualMapPointApiModel => this.visualMapPointLogic.convertToApiResponse(document)
                 ),
             };
 

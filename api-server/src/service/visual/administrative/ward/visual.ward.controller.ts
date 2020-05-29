@@ -12,7 +12,7 @@ const specifyIdPath = '/ward/:id';
 export default class VisualWardController extends VisualCommonController {
     private static instance: VisualWardController;
 
-    private visualizationWardLogic: VisualWardLogic = VisualWardLogic.getInstance();
+    private visualWardLogic: VisualWardLogic = VisualWardLogic.getInstance();
 
     constructor() {
         super();
@@ -65,13 +65,13 @@ export default class VisualWardController extends VisualCommonController {
             const documents: VisualWardDocumentModel[] = await VisualizationWardModel.find();
             if (this.populate) {
                 for (const document of documents) {
-                    await this.visualizationWardLogic.populateDocument(document);
+                    await this.visualWardLogic.populateDocument(document);
                 }
             }
 
             const responseBody: object = {
                 wards: documents.map(
-                    (document): VisualWardApiModel => this.visualizationWardLogic.convertToApiResponse(document)
+                    (document): VisualWardApiModel => this.visualWardLogic.convertToApiResponse(document)
                 ),
             };
 

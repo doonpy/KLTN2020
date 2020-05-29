@@ -1,8 +1,8 @@
 import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
 import { VisualCommonLogicInterface } from '../../visual.common.interface';
 import {
+    VisualDistrictApiModel,
     VisualDistrictDocumentModel,
-    VisualizationDistrictApiModel,
 } from '../../administrative/district/visual.district.interface';
 
 export interface VisualSummaryDistrictDocumentModel extends CommonDocumentModel {
@@ -12,7 +12,7 @@ export interface VisualSummaryDistrictDocumentModel extends CommonDocumentModel 
 }
 
 export interface VisualSummaryDistrictApiModel extends CommonApiModel {
-    district: VisualizationDistrictApiModel | number | null;
+    district: VisualDistrictApiModel | number | null;
     summaryAmount: number | null;
     summary:
         | {

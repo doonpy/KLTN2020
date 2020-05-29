@@ -15,7 +15,7 @@ const specifyIdPath = '/summary-district-ward/:id';
 export default class VisualSummaryDistrictWardController extends VisualCommonController {
     private static instance: VisualSummaryDistrictWardController;
 
-    private visualizationSummaryDistrictWardLogic: VisualSummaryDistrictWardLogic = VisualSummaryDistrictWardLogic.getInstance();
+    private visualSummaryDistrictWardLogic: VisualSummaryDistrictWardLogic = VisualSummaryDistrictWardLogic.getInstance();
 
     constructor() {
         super();
@@ -69,13 +69,13 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
 
             if (this.populate) {
                 for (const document of documents) {
-                    await this.visualizationSummaryDistrictWardLogic.populateDocument(document);
+                    await this.visualSummaryDistrictWardLogic.populateDocument(document);
                 }
             }
             const responseBody: object = {
                 summaryDistrictWard: documents.map(
                     (document): VisualSummaryDistrictWardApiModel =>
-                        this.visualizationSummaryDistrictWardLogic.convertToApiResponse(document)
+                        this.visualSummaryDistrictWardLogic.convertToApiResponse(document)
                 ),
             };
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);

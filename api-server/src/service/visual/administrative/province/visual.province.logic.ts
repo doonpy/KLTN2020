@@ -1,12 +1,12 @@
 import {
-    VisualizationProvinceLogicInterface,
     VisualProvinceApiModel,
     VisualProvinceDocumentModel,
+    VisualProvinceLogicInterface,
 } from './visual.province.interface';
 import { VisualCountryApiModel } from '../country/visual.country.interface';
 import VisualCountryLogic from '../country/visual.country.logic';
 
-export default class VisualProvinceLogic implements VisualizationProvinceLogicInterface {
+export default class VisualProvinceLogic implements VisualProvinceLogicInterface {
     public static instance: VisualProvinceLogic;
 
     /**

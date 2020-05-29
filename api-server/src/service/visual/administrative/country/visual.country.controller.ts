@@ -12,7 +12,7 @@ const specifyIdPath = '/country/:id';
 export default class VisualCountryController extends VisualCommonController {
     private static instance: VisualCountryController;
 
-    private visualizationCountryLogic: VisualCountryLogic = VisualCountryLogic.getInstance();
+    private visualCountryLogic: VisualCountryLogic = VisualCountryLogic.getInstance();
 
     constructor() {
         super();
@@ -65,7 +65,7 @@ export default class VisualCountryController extends VisualCommonController {
             const documents: VisualCountryDocumentModel[] = await VisualizationCountryModel.find();
             const responseBody: object = {
                 provinces: documents.map(
-                    (document): VisualCountryApiModel => this.visualizationCountryLogic.convertToApiResponse(document)
+                    (document): VisualCountryApiModel => this.visualCountryLogic.convertToApiResponse(document)
                 ),
             };
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);

@@ -3,7 +3,7 @@ import {
     VisualMapPointDocumentModel,
     VisualMapPointLogicInterface,
 } from './visual.map-point.interface';
-import { VisualizationDistrictApiModel } from '../administrative/district/visual.district.interface';
+import { VisualDistrictApiModel } from '../administrative/district/visual.district.interface';
 import VisualDistrictLogic from '../administrative/district/visual.district.logic';
 import { VisualWardApiModel } from '../administrative/ward/visual.ward.interface';
 import VisualWardLogic from '../administrative/ward/visual.ward.logic';
@@ -45,7 +45,7 @@ export default class VisualMapPointLogic implements VisualMapPointLogicInterface
         cTime,
         mTime,
     }: VisualMapPointDocumentModel): VisualMapPointApiModel {
-        let district: VisualizationDistrictApiModel | number | null = null;
+        let district: VisualDistrictApiModel | number | null = null;
         let ward: VisualWardApiModel | number | null = null;
 
         if (districtId) {

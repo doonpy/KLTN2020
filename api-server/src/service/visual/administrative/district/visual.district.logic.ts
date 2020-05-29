@@ -1,8 +1,8 @@
 import { VisualProvinceApiModel } from '../province/visual.province.interface';
 import {
+    VisualDistrictApiModel,
     VisualDistrictDocumentModel,
     VisualDistrictLogicInterface,
-    VisualizationDistrictApiModel,
 } from './visual.district.interface';
 import VisualProvinceLogic from '../province/visual.province.logic';
 
@@ -31,7 +31,7 @@ export default class VisualDistrictLogic implements VisualDistrictLogicInterface
     /**
      * @param {VisualDistrictDocumentModel} input
      *
-     * @return {VisualizationDistrictApiModel}
+     * @return {VisualDistrictApiModel}
      */
     public convertToApiResponse({
         _id,
@@ -41,7 +41,7 @@ export default class VisualDistrictLogic implements VisualDistrictLogicInterface
         acreage,
         cTime,
         mTime,
-    }: VisualDistrictDocumentModel): VisualizationDistrictApiModel {
+    }: VisualDistrictDocumentModel): VisualDistrictApiModel {
         let province: VisualProvinceApiModel | number | null = null;
 
         if (provinceId) {

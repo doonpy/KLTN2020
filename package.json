@@ -6,7 +6,7 @@
     "clean": "rimraf dist",
     "dev:initialize-data": "cd api-server/src && ts-node data-initialization.ts",
     "tsc:api": "tsc -w -p api-server",
-    "watcher:api": "nodemon -w api-server/src -e ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/server.ts'",
+    "watcher:api": "nodemon -w dist/api-bgr-job --exec 'ts-node -P api-server/tsconfig.json api-server/src/server.ts'",
     "watcher:bgr-job": "nodemon -w api-server/src -e ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/background-job/main.ts'",
     "dev:api": "npm-run-all -p tsc:api watcher:api --print-label",
     "dev:bgr-job": "npm-run-all -p tsc:api watcher:bgr-job --print-label",

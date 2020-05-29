@@ -170,14 +170,6 @@ async function* generateScript() {
 }
 
 /**
- * Execute crawler child process
- */
-export const executeCrawlerChildProcess = async (): Promise<void> => {
-    script = generateScript();
-    script.next();
-};
-
-/**
  * Scheduler
  */
 (async (): Promise<void> => {
@@ -196,13 +188,15 @@ export const executeCrawlerChildProcess = async (): Promise<void> => {
             }
 
             if (!isCrawlerRunning) {
-                await executeCrawlerChildProcess();
+                script = generateScript();
+                script.next();
             }
         }, 1000);
 
         if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
             await executeGroupDataChildProcess();
-            await executeCrawlerChildProcess();
+            script = generateScript();
+            script.next();
         }
     } catch (error) {
         await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nError: ${error.message}`);

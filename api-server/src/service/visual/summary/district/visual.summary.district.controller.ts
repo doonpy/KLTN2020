@@ -12,7 +12,7 @@ const specifyIdPath = '/summary-district/:id';
 export default class VisualSummaryDistrictController extends VisualCommonController {
     private static instance: VisualSummaryDistrictController;
 
-    private visualizationSummaryDistrictLogic: VisualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
+    private visualSummaryDistrictLogic: VisualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
 
     constructor() {
         super();
@@ -66,14 +66,14 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
 
             if (this.populate) {
                 for (const document of documents) {
-                    await this.visualizationSummaryDistrictLogic.populateDocument(document);
+                    await this.visualSummaryDistrictLogic.populateDocument(document);
                 }
             }
 
             const responseBody: object = {
                 summaryDistrict: documents.map(
                     (document): VisualSummaryDistrictApiModel =>
-                        this.visualizationSummaryDistrictLogic.convertToApiResponse(document)
+                        this.visualSummaryDistrictLogic.convertToApiResponse(document)
                 ),
             };
 

@@ -8,10 +8,10 @@ import RawDataLogic from '@service/raw-data/raw-data.logic';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
 import DateTime from '@util/datetime/datetime';
-import VisualizationCountryModel from '@service/visualization/administrative/country/visualization.country.model';
-import VisualizationProvinceModel from '@service/visualization/administrative/province/visualization.province.model';
-import VisualizationDistrictModel from '@service/visualization/administrative/district/visualization.district.model';
-import VisualizationWardModel from '@service/visualization/administrative/ward/visualization.ward.model';
+import VisualizationCountryModel from '@service/visual/administrative/country/visual.country.model';
+import VisualizationProvinceModel from '@service/visual/administrative/province/visual.province.model';
+import VisualizationDistrictModel from '@service/visual/administrative/district/visual.district.model';
+import VisualizationWardModel from '@service/visual/administrative/ward/visual.ward.model';
 import { CleanDataConstant } from './child-process.constant';
 
 type AggregationGroupDataResult = {

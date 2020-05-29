@@ -9,7 +9,7 @@ export interface VisualDistrictDocumentModel extends CommonDocumentModel {
     provinceId: number | VisualProvinceDocumentModel;
 }
 
-export interface VisualizationDistrictApiModel extends CommonApiModel {
+export interface VisualDistrictApiModel extends CommonApiModel {
     name: string | null;
     code: string | null;
     acreage: number | null;

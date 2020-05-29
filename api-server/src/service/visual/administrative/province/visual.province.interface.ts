@@ -16,7 +16,7 @@ export interface VisualProvinceApiModel extends CommonApiModel {
     acreage: number | null;
 }
 
-export interface VisualizationProvinceLogicInterface extends VisualCommonLogicInterface {
+export interface VisualProvinceLogicInterface extends VisualCommonLogicInterface {
     /**
      * @param {VisualProvinceDocumentModel} document
      *

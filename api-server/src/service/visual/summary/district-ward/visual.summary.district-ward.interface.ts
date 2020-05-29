@@ -2,8 +2,8 @@ import { CommonApiModel, CommonDocumentModel } from '@common/service/common.serv
 import { VisualWardApiModel, VisualWardDocumentModel } from '../../administrative/ward/visual.ward.interface';
 import { VisualCommonLogicInterface } from '../../visual.common.interface';
 import {
+    VisualDistrictApiModel,
     VisualDistrictDocumentModel,
-    VisualizationDistrictApiModel,
 } from '../../administrative/district/visual.district.interface';
 
 export interface VisualSummaryDistrictWardDocumentModel extends CommonDocumentModel {
@@ -18,7 +18,7 @@ export interface VisualSummaryDistrictWardDocumentModel extends CommonDocumentMo
 }
 
 export interface VisualSummaryDistrictWardApiModel extends CommonApiModel {
-    district: VisualizationDistrictApiModel | number | null;
+    district: VisualDistrictApiModel | number | null;
     ward: VisualWardApiModel | number | null;
     summaryAmount: number | null;
     summary:

@@ -1,4 +1,4 @@
-import { VisualizationDistrictApiModel } from '../district/visual.district.interface';
+import { VisualDistrictApiModel } from '../district/visual.district.interface';
 import { VisualWardApiModel, VisualWardDocumentModel, VisualWardLogicInterface } from './visual.ward.interface';
 import VisualDistrictLogic from '../district/visual.district.logic';
 
@@ -37,7 +37,7 @@ export default class VisualWardLogic implements VisualWardLogicInterface {
         cTime,
         mTime,
     }: VisualWardDocumentModel): VisualWardApiModel {
-        let district: VisualizationDistrictApiModel | number | null = null;
+        let district: VisualDistrictApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {

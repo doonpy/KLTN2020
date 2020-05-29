@@ -1,5 +1,6 @@
 import 'module-alias/register';
 import '@root/prepend';
+import App from '@root/app';
 import * as bodyParser from 'body-parser';
 import cors from 'cors';
 import requestLogger from '@middleware/request-logger/request-logger';
@@ -15,7 +16,7 @@ import VisualDistrictController from '@service/visual/administrative/district/vi
 import VisualWardController from '@service/visual/administrative/ward/visual.ward.controller';
 import VisualSummaryDistrictWardController from '@service/visual/summary/district-ward/visual.summary.district-ward.controller';
 import VisualMapPointController from '@service/visual/map-point/visual.map-point.controller';
-import App from '@root/app';
+import VisualAnalysisController from '@service/visual/analysis/visual.analysis.controller';
 
 /**
  * Main
@@ -36,6 +37,7 @@ import App from '@root/app';
             VisualSummaryDistrictController.getInstance(),
             VisualSummaryDistrictWardController.getInstance(),
             VisualMapPointController.getInstance(),
+            VisualAnalysisController.getInstance(),
         ]
     );
 })();

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import VisualCommonController from '../../visual.common.controller';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import ResponseStatusCode from '@common/common.response-status.code';
-import { VisualDistrictDocumentModel, VisualizationDistrictApiModel } from './visual.district.interface';
+import { VisualDistrictApiModel, VisualDistrictDocumentModel } from './visual.district.interface';
 import VisualizationDistrictModel from './visual.district.model';
 import VisualDistrictLogic from './visual.district.logic';
 
@@ -12,7 +12,7 @@ const specifyIdPath = '/district/:id';
 export default class VisualDistrictController extends VisualCommonController {
     private static instance: VisualDistrictController;
 
-    private visualizationDistrictLogic: VisualDistrictLogic = VisualDistrictLogic.getInstance();
+    private visualDistrictLogic: VisualDistrictLogic = VisualDistrictLogic.getInstance();
 
     constructor() {
         super();
@@ -65,14 +65,13 @@ export default class VisualDistrictController extends VisualCommonController {
             const documents: VisualDistrictDocumentModel[] = await VisualizationDistrictModel.find();
             if (this.populate) {
                 for (const document of documents) {
-                    await this.visualizationDistrictLogic.populateDocument(document);
+                    await this.visualDistrictLogic.populateDocument(document);
                 }
             }
 
             const responseBody: object = {
                 districts: documents.map(
-                    (document): VisualizationDistrictApiModel =>
-                        this.visualizationDistrictLogic.convertToApiResponse(document)
+                    (document): VisualDistrictApiModel => this.visualDistrictLogic.convertToApiResponse(document)
                 ),
             };
 

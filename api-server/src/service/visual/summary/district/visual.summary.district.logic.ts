@@ -3,7 +3,7 @@ import {
     VisualSummaryDistrictDocumentModel,
     VisualSummaryDistrictLogicInterface,
 } from './visual.summary.district.interface';
-import { VisualizationDistrictApiModel } from '../../administrative/district/visual.district.interface';
+import { VisualDistrictApiModel } from '../../administrative/district/visual.district.interface';
 import VisualDistrictLogic from '../../administrative/district/visual.district.logic';
 
 export default class VisualSummaryDistrictLogic implements VisualSummaryDistrictLogicInterface {
@@ -43,7 +43,7 @@ export default class VisualSummaryDistrictLogic implements VisualSummaryDistrict
         cTime,
         mTime,
     }: VisualSummaryDistrictDocumentModel): VisualSummaryDistrictApiModel {
-        let district: VisualizationDistrictApiModel | number | null = null;
+        let district: VisualDistrictApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
