@@ -33,7 +33,6 @@ import {
 const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
 const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
 const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
-const PROCESSES_LIMIT = 20;
 const DOCUMENTS_LIMIT = 1000;
 let script: AsyncGenerator;
 let rawDataset: {
