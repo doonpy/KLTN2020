@@ -39,7 +39,6 @@ let rawDataset: {
     documents: RawDataDocumentModel[];
     hasNext: boolean;
 };
-let processCount = 0;
 let districtPattern = '';
 let wardPattern = '';
 
@@ -388,66 +387,56 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
 
     while (rawDataset.hasNext && rawDataset.documents.length !== 0) {
         for (const rawData of rawDataset.documents) {
-            try {
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data -> RID: ${rawData._id}`).show();
-                const addressProperties: AddressProperties = getAddressProperties(rawData.address);
-                const districtId: number | undefined = districtList.find((item) =>
-                    new RegExp(`${item.name}$`, 'i').test(addressProperties?.district || '')
-                )?._id;
-                if (!districtId) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
-                    ).show();
-                    await rawDataLogic.delete(rawData._id);
-                    processCount -= 1;
-                    return;
-                }
+            new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data -> RID: ${rawData._id}`).show();
+            const addressProperties: AddressProperties = getAddressProperties(rawData.address);
 
-                const wardId: number | undefined = wardList.find(
-                    (item) =>
-                        item.districtId === districtId &&
-                        new RegExp(`${item.name}$`).test(addressProperties?.ward || '')
-                )?._id;
-                if (!wardId) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
-                    ).show();
-                    await rawDataLogic.delete(rawData._id);
-                    processCount -= 1;
-                    return;
-                }
-
-                const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
-                if (!coordinate) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Preprocessing data - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
-                    ).show();
-                    await rawDataLogic.delete(rawData._id);
-                    processCount -= 1;
-                    return;
-                }
-
-                rawData.coordinateId = coordinate._id;
-                await rawData.save();
-
-                await handleVisualizationSummaryDistrictData(districtId, rawData.transactionType, rawData.propertyType);
-                await handleVisualizationSummaryDistrictWardData(
-                    districtId,
-                    wardId,
-                    rawData.transactionType,
-                    rawData.propertyType
-                );
-                await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
-                await handleVisualizationAnalysis(rawData.postDate, rawData);
-            } catch (error) {
+            const districtId: number | undefined = districtList.find((item) =>
+                new RegExp(`${item.name}$`, 'i').test(addressProperties?.district || '')
+            )?._id;
+            if (!districtId) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - RID: ${rawData._id} - Error: ${error.message}`
+                    `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
                 ).show();
+                await rawDataLogic.delete(rawData._id);
+                continue;
             }
+
+            const wardId: number | undefined = wardList.find(
+                (item) =>
+                    item.districtId === districtId && new RegExp(`${item.name}$`).test(addressProperties?.ward || '')
+            )?._id;
+            if (!wardId) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
+                ).show();
+                await rawDataLogic.delete(rawData._id);
+                continue;
+            }
+
+            const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
+            if (!coordinate) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Preprocessing data - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
+                ).show();
+                await rawDataLogic.delete(rawData._id);
+                continue;
+            }
+
+            rawData.coordinateId = coordinate._id;
+            await rawData.save();
+
+            await handleVisualizationSummaryDistrictData(districtId, rawData.transactionType, rawData.propertyType);
+            await handleVisualizationSummaryDistrictWardData(
+                districtId,
+                wardId,
+                rawData.transactionType,
+                rawData.propertyType
+            );
+            await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
+            await handleVisualizationAnalysis(rawData.postDate, rawData);
         }
 
         rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, undefined, { coordinateId: null });
