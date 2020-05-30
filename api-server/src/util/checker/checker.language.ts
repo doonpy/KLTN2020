@@ -1,7 +1,7 @@
+import CommonLanguage from '@common/common.language';
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import CommonLanguage from '../../common/common.language';
+import ResponseStatusCode from '@common/common.response-status.code';
 
 export default class CheckerLanguage extends CheckerBase {
     /**

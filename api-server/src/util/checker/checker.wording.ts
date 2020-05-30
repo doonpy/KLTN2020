@@ -21,5 +21,6 @@ export default {
         MSG_CHK_10: ['kiểu dữ liệu của %s phải là đúng hoặc luận lý', 'data type of %s must be boolean'],
         MSG_CHK_11: ['kiểu dữ liệu của %s phải là mảng', 'data type of %s must be array'],
         MSG_CHK_12: ['%s không phải là một ngôn ngữ hợp lệ', '%s is not a valid language'],
+        MSG_CHK_13: ['%s không phải là một ngày hợp lệ', '%s is not a valid date'],
     },
 };

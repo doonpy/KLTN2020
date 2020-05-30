@@ -1,8 +1,8 @@
 import {
-    CommonDocumentModel,
     CommonApiModel,
+    CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 
 export interface HostApiModel extends CommonApiModel {
     name: string | null;

@@ -8,7 +8,7 @@ services:
     container_name: api-server
     entrypoint:
       - /bin/sh
-      - api-command.sh
+      - tools/docker/api/command.sh
     restart: unless-stopped
     working_dir: /usr/src/app
     environment:
@@ -16,13 +16,15 @@ services:
     tty: true
     ports:
       - 3000:3000
+    depends_on:
+      - database
 
   background-job:
     image: pk2020:latest
     container_name: background-job
     entrypoint:
       - /bin/sh
-      - background-job-command.sh
+      - tools/docker/background-job/command.sh
     restart: unless-stopped
     working_dir: /usr/src/app
     environment:
@@ -36,7 +38,7 @@ services:
     container_name: web-server
     entrypoint:
       - /bin/sh
-      - web-command.sh
+      - tools/docker/web/command.sh
     restart: unless-stopped
     working_dir: /usr/src/app
     environment:
@@ -46,3 +48,17 @@ services:
       - api-server
     ports:
       - 3001:3001
+
+  database:
+    image: mongo:latest
+    container_name: kltn2020-db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=alice
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo-root/secrets
+    volumes:
+      - ./tools/docker/database:/run/secrets/mongo-root
+      - ./mongo-volume:/data/db
+    ports:
+      - '27017-27019:27017-27019'
+    tty: true
+    restart: unless-stopped

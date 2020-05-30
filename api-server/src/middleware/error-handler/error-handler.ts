@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import ExceptionCustomize from '../../util/exception/exception.customize';
+import ResponseStatusCode from '@common/common.response-status.code';
+import ExceptionCustomize from '@util/exception/exception.customize';
 import ErrorHandlerWording from './error-handler.wording';
-import StringHandler from '../../util/helper/string-handler';
-import CommonLanguage from '../../common/common.language';
+import StringHandler from '@util/helper/string-handler';
+import CommonLanguage from '@common/common.language';
 
 /**
  * @param input
@@ -13,7 +13,7 @@ import CommonLanguage from '../../common/common.language';
 const convertToString = (input: { [key: string]: string | number }[]): string => {
     const inputString: string[] = [];
 
-    if (input.length === 0) {
+    if (!input || input.length === 0) {
         return '';
     }
 
@@ -96,7 +96,9 @@ export const errorHandler = (
     if (process.env.NODE_ENV === 'production') {
         body = {
             error: {
-                cause: StringHandler.upperCaseFirstCharacter(cause),
+                cause: StringHandler.upperCaseFirstCharacter(
+                    cause || ErrorHandlerWording.CAUSE.CAU_ERR_2[CommonLanguage[req.params.language] || 0]
+                ),
                 message: StringHandler.upperCaseFirstCharacter(message),
                 input: convertToString(input as { [key: string]: string | number }[]),
             },
@@ -104,7 +106,9 @@ export const errorHandler = (
     } else {
         body = {
             error: {
-                cause: StringHandler.upperCaseFirstCharacter(cause),
+                cause: StringHandler.upperCaseFirstCharacter(
+                    cause || ErrorHandlerWording.CAUSE.CAU_ERR_2[CommonLanguage[req.params.language] || 0]
+                ),
                 message: StringHandler.upperCaseFirstCharacter(message),
                 input: convertToString(input as { [key: string]: string | number }[]),
                 stack,

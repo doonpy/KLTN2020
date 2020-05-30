@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import GroupedDataLogic from './grouped-data.logic';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
 import { GroupedDataApiModel, GroupedDataDocumentModel } from './grouped-data.interface';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import ResponseStatusCode from '@common/common.response-status.code';
 import RawDataLogic from '../raw-data/raw-data.logic';
 
 const commonPath = '/grouped-dataset';
-const specifyIdPath = '/grouped-dataset/:id';
+const specifyIdPath = '/grouped-data/:id';
 
 export default class GroupedDataController extends CommonServiceControllerBase {
     private static instance: GroupedDataController;

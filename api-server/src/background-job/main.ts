@@ -1,13 +1,13 @@
+import 'module-alias/register';
+import '@root/prepend';
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
-import ChatBotTelegram from '../util/chatbot/chatBotTelegram';
-import ConsoleLog from '../util/console/console.log';
-import ConsoleConstant from '../util/console/console.constant';
-import CatalogLogic from '../service/catalog/catalog.logic';
-import RawDataConstant from '../service/raw-data/raw-data.constant';
-import DateTime from '../util/datetime/datetime';
-import initEnv from '../util/environment/environment';
-import DatabaseMongodb from '../service/database/mongodb/database.mongodb';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import CatalogLogic from '@service/catalog/catalog.logic';
+import DateTime from '@util/datetime/datetime';
+import CommonConstant from '@common/common.constant';
 import { GroupedDataConstant } from './child-process/child-process.constant';
 
 let isCrawlerRunning = false;
@@ -24,8 +24,8 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start group data child process...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart group data child process...`);
 
-    let propertyTypeIdList: number[] = RawDataConstant.PROPERTY_TYPE.map((item) => item.id);
-    const transactionTypeIdList: number[] = RawDataConstant.TRANSACTION_TYPE.map((item) => item.id);
+    let propertyTypeIdList: number[] = CommonConstant.PROPERTY_TYPE.map((item) => item.id);
+    const transactionTypeIdList: number[] = CommonConstant.TRANSACTION_TYPE.map((item) => item.id);
     let childProcessAmount = 0;
     let currentTransactionTypeId: number = transactionTypeIdList.shift() as number;
     let propertyTypeCloneList: number[] = [];
@@ -70,10 +70,10 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
 };
 
 /**
- * Execute add coordinate process
+ * Execute preprocessing data process
  */
-const executeAddCoordinateChildProcess = (): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.add-coordinate'));
+const executePreprocessingDataChildProcess = (): void => {
+    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.preprocessing-data'));
     childProcess.on('exit', (): void => {
         script.next();
     });
@@ -145,8 +145,8 @@ async function* generateScript() {
     executeCleanDataChildProcess();
     yield 'Step 2: Execute clean data child process...';
 
-    executeAddCoordinateChildProcess();
-    yield 'Step 3: Execute add coordinate child process...';
+    executePreprocessingDataChildProcess();
+    yield 'Step 3: Execute preprocessing data child process...';
 
     if (isGrouperRunning) {
         await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nContinue group child process.`);
@@ -170,20 +170,10 @@ async function* generateScript() {
 }
 
 /**
- * Execute crawler child process
- */
-export const executeCrawlerChildProcess = async (): Promise<void> => {
-    script = generateScript();
-    script.next();
-};
-
-/**
  * Scheduler
  */
 (async (): Promise<void> => {
     try {
-        initEnv();
-        await DatabaseMongodb.getInstance().connect();
         const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
             const expectTime: Date = new Date();
             expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));
@@ -198,16 +188,18 @@ export const executeCrawlerChildProcess = async (): Promise<void> => {
             }
 
             if (!isCrawlerRunning) {
-                await executeCrawlerChildProcess();
+                script = generateScript();
+                script.next();
             }
         }, 1000);
 
         if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
             await executeGroupDataChildProcess();
-            await executeCrawlerChildProcess();
+            script = generateScript();
+            script.next();
         }
     } catch (error) {
-        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖\nError: ${error.message}`);
+        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nError: ${error.message}`);
         throw error;
     }
 })();

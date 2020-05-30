@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Quận 1",
+    "code": "vn_hcm_quan-1",
+    "acreage": 7.72
+  },
+  {
+    "name": "Quận 2",
+    "code": "vn_hcm_quan-2",
+    "acreage": 49.79
+  },
+  {
+    "name": "Quận 3",
+    "code": "vn_hcm_quan-3",
+    "acreage": 4.92
+  },
+  {
+    "name": "Quận 4",
+    "code": "vn_hcm_quan-4",
+    "acreage": 4.18
+  },
+  {
+    "name": "Quận 5",
+    "code": "vn_hcm_quan-5",
+    "acreage": 4.27
+  },
+  {
+    "name": "Quận 6",
+    "code": "vn_hcm_quan-6",
+    "acreage": 7.14
+  },
+  {
+    "name": "Quận 7",
+    "code": "vn_hcm_quan-7",
+    "acreage": 35.69
+  },
+  {
+    "name": "Quận 8",
+    "code": "vn_hcm_quan-8",
+    "acreage": 19.11
+  },
+  {
+    "name": "Quận 9",
+    "code": "vn_hcm_quan-9",
+    "acreage": 114
+  },
+  {
+    "name": "Quận 10",
+    "code": "vn_hcm_quan-10",
+    "acreage": 5.72
+  },
+  {
+    "name": "Quận 11",
+    "code": "vn_hcm_quan-11",
+    "acreage": 5.14
+  },
+  {
+    "name": "Quận 12",
+    "code": "vn_hcm_quan-12",
+    "acreage": 52.74
+  },
+  {
+    "name": "Bình Tân",
+    "code": "vn_hcm_binh-tan",
+    "acreage": 52.02
+  },
+  {
+    "name": "Bình Thạnh",
+    "code": "vn_hcm_binh-thanh",
+    "acreage": 20.78
+  },
+  {
+    "name": "Gò Vấp",
+    "code": "vn_hcm_go-vap",
+    "acreage": 19.73
+  },
+  {
+    "name": "Phú Nhuận",
+    "code": "vn_hcm_phu-nhuan",
+    "acreage": 4.88
+  },
+  {
+    "name": "Tân Bình",
+    "code": "vn_hcm_tan-binh",
+    "acreage": 22.43
+  },
+  {
+    "name": "Tân Phú",
+    "code": "vn_hcm_tan-phu",
+    "acreage": 15.97
+  },
+  {
+    "name": "Thủ Đức",
+    "code": "vn_hcm_thu-duc",
+    "acreage": 47.8
+  },
+  {
+    "name": "Bình Chánh",
+    "code": "vn_hcm_binh-chanh",
+    "acreage": 252.56
+  },
+  {
+    "name": "Cần Giờ",
+    "code": "vn_hcm_can-gio",
+    "acreage": 704.45
+  },
+  {
+    "name": "Củ Chi",
+    "code": "vn_hcm_cu-chi",
+    "acreage": 434.77
+  },
+  {
+    "name": "Hóc Môn",
+    "code": "vn_hcm_hoc-mon",
+    "acreage": 109.17
+  },
+  {
+    "name": "Nhà Bè",
+    "code": "vn_hcm_nha-be",
+    "acreage": 100.43
+  }
+]

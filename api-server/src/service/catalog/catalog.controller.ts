@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import CatalogLogic from './catalog.logic';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
 import { CatalogApiModel, CatalogDocumentModel } from './catalog.interface';
-import ResponseStatusCode from '../../common/common.response-status.code';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import ResponseStatusCode from '@common/common.response-status.code';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
 
 const commonPath = '/catalogs';
-const specifyIdPath = '/catalogs/:id';
+const specifyIdPath = '/catalog/:id';
 
 export default class CatalogController extends CommonServiceControllerBase {
     private static instance: CatalogController;
@@ -52,6 +52,7 @@ export default class CatalogController extends CommonServiceControllerBase {
      * @param {Response} res
      * @param {NextFunction} next
      *
+     * @return {Promise<void>}
      */
     protected getAllRoute = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {

@@ -1,15 +1,15 @@
 import ScrapeBase from '../scrape.base';
-import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
-import StringHandler from '../../../util/helper/string-handler';
-import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
-import UrlHandler from '../../../util/url-handler/url-handler';
-import ConsoleLog from '../../../util/console/console.log';
-import ConsoleConstant from '../../../util/console/console.constant';
-import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
-import { HostDocumentModel } from '../../../service/host/host.interface';
-import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
+import { CatalogDocumentModel } from '@service/catalog/catalog.interface';
+import StringHandler from '@util/helper/string-handler';
+import UrlHandler from '@util/url-handler/url-handler';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import DetailUrlLogic from '@service/detail-url/detail-url.logic';
+import { HostDocumentModel } from '@service/host/host.interface';
+import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
 import ScrapeRawData from '../raw-data/scrape.raw-data';
-import DateTime from '../../../util/datetime/datetime';
+import DateTime from '@util/datetime/datetime';
+import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();

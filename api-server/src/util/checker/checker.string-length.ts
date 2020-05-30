@@ -1,7 +1,6 @@
+import ResponseStatusCode from '@common/common.response-status.code';
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
-
-import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerStringLength extends CheckerBase {
     private readonly minRange: number;

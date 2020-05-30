@@ -41,7 +41,7 @@ const request = {
     get: async (url, body = {}) => {
         const response = await request.call(url, request.parameters(METHOD.GET, body));
 
-        return response;
+        return response.json();
     },
 
     patch: async (url, body = {}) => {

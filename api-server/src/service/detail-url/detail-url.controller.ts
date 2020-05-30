@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
+import ResponseStatusCode from '@common/common.response-status.code';
 import DetailUrlLogic from './detail-url.logic';
-import ResponseStatusCode from '../../common/common.response-status.code';
 import { DetailUrlApiModel, DetailUrlDocumentModel } from './detail-url.interface';
 import CatalogLogic from '../catalog/catalog.logic';
 
 const commonPath = '/detail-urls';
-const specifyIdPath = '/detail-urls/:id';
+const specifyIdPath = '/detail-url/:id';
 
 export default class DetailUrlController extends CommonServiceControllerBase {
     private static instance: DetailUrlController;

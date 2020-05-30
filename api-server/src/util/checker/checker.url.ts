@@ -1,6 +1,6 @@
+import ResponseStatusCode from '@common/common.response-status.code';
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerUrl extends CheckerBase {
     private VALID_URL = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/);

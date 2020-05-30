@@ -18,7 +18,7 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
         return value / 1000000;
     }
 
-    return value;
+    return Math.round(value * 100) / 100;
 };
 
 /**
@@ -47,10 +47,10 @@ export const convertPriceValue = (value: number, fromUnitInput: string, toUnitIn
     switch (fromUnit) {
         case 'tỷ' || 'tỉ' || 'billion':
             if (toUnit === 'triệu' || toUnit === 'million') {
-                returnValue = Math.floor(value * 1000);
+                returnValue = value * 1000;
             } else {
                 // 'nghìn' || 'ngàn':
-                returnValue = Math.floor(value * 1000000000);
+                returnValue = value * 1000000000;
             }
             break;
         case 'triệu' || 'million':
@@ -58,7 +58,7 @@ export const convertPriceValue = (value: number, fromUnitInput: string, toUnitIn
                 returnValue = value / 1000;
             } else {
                 // 'nghìn' || 'ngàn':
-                returnValue = Math.floor(value * 1000000);
+                returnValue = value * 1000000;
             }
             break;
         default:
@@ -71,5 +71,5 @@ export const convertPriceValue = (value: number, fromUnitInput: string, toUnitIn
             break;
     }
 
-    return returnValue;
+    return Math.round(returnValue);
 };

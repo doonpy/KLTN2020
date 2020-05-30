@@ -3,7 +3,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
 import { HostApiModel, HostDocumentModel } from '../host/host.interface';
 

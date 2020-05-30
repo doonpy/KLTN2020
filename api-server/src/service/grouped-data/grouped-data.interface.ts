@@ -3,7 +3,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/raw-data.interface';
 
 export interface GroupedDataApiModel extends CommonApiModel {

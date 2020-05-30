@@ -1,12 +1,12 @@
-import StringHandler from '../../util/helper/string-handler';
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
-import GroupedDataLogic from '../../service/grouped-data/grouped-data.logic';
-import RawDataLogic from '../../service/raw-data/raw-data.logic';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
-import { GroupedDataDocumentModel } from '../../service/grouped-data/grouped-data.interface';
-import DateTime from '../../util/datetime/datetime';
+import StringHandler from '@util/helper/string-handler';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import GroupedDataLogic from '@service/grouped-data/grouped-data.logic';
+import RawDataLogic from '@service/raw-data/raw-data.logic';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
+import { GroupedDataDocumentModel } from '@service/grouped-data/grouped-data.interface';
+import DateTime from '@util/datetime/datetime';
 
 interface AggregationGroupDataResult {
     _id: number;
@@ -95,11 +95,11 @@ export default class GroupData {
                     const similarScore: number = this.getSimilarScore(document, item.represent);
 
                     if (similarScore >= this.OVER_FITTING_SCORE) {
-                        await this.rawDataLogic.delete(document._id);
                         new ConsoleLog(
                             ConsoleConstant.Type.ERROR,
                             `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: Over fitting.`
                         ).show();
+                        await this.rawDataLogic.update(document._id, document);
                         continue rawDataLoop;
                     }
 
@@ -185,8 +185,20 @@ export default class GroupData {
      * @return {number} totalPoint
      */
     private getSimilarScore(firstRawData: RawDataDocumentModel, secondRawData: RawDataDocumentModel): number {
-        if (firstRawData.acreage.value !== secondRawData.acreage.value) {
+        if (
+            firstRawData.acreage.value !== secondRawData.acreage.value &&
+            firstRawData.acreage.measureUnit === secondRawData.acreage.measureUnit
+        ) {
             return 0;
+        }
+
+        if (
+            firstRawData.postDate === secondRawData.postDate &&
+            firstRawData.price.value === secondRawData.price.value &&
+            firstRawData.price.currency === secondRawData.price.currency &&
+            firstRawData.price.timeUnit === secondRawData.price.timeUnit
+        ) {
+            return this.OVER_FITTING_SCORE;
         }
 
         let totalPoint = 0;

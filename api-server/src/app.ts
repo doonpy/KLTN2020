@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Application } from 'express';
 import path from 'path';
-import ConsoleLog from './util/console/console.log';
-import ConsoleConstant from './util/console/console.constant';
-import { errorHandler, notFoundRoute } from './middleware/error-handler/error-handler';
-import CommonServiceControllerBase from './common/service/common.service.controller.base';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import { errorHandler, notFoundRoute } from '@middleware/error-handler/error-handler';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 
 export default class App {
     private static instance: App | undefined;
@@ -41,8 +41,14 @@ export default class App {
         return this.instance;
     }
 
+    /**
+     * Start server
+     *
+     * @param middlewareArray
+     * @param controllerArray
+     */
     public start(middlewareArray: Array<any>, controllerArray: CommonServiceControllerBase[]): void {
-        this.settingAssets();
+        this.setAssets();
         this.bindMiddleware(middlewareArray);
         this.bindRoutes(controllerArray);
         this.enableListen();
@@ -75,7 +81,7 @@ export default class App {
     /**
      * Setting assets
      */
-    private settingAssets(): void {
+    private setAssets(): void {
         if (process.env.PUBLIC_FOLDER_PATH) {
             this.app.use(express.static(path.join(__dirname, process.env.PUBLIC_FOLDER_PATH)));
         }

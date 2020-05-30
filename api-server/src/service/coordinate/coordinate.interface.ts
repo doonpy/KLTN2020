@@ -2,7 +2,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 
 export interface CoordinateApiModel extends CommonApiModel {
     location: string | null;

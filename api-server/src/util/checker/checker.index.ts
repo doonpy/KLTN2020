@@ -1,3 +1,4 @@
+import CheckerDate from './checker.date';
 import CheckerDecimalRange from './checker.decimal-range';
 import CheckerDomain from './checker.domain';
 import CheckerIntegerRange from './checker.integer-range';
@@ -28,4 +29,5 @@ export default {
     StringLength: CheckerStringLength,
     Url: CheckerUrl,
     Language: CheckerLanguage,
+    Date: CheckerDate,
 };

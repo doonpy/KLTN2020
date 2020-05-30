@@ -2,7 +2,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 
 export interface PatternApiModel extends CommonApiModel {
     sourceUrl: string | null;

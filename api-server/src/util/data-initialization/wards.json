@@ -1,0 +1,1290 @@
+[
+  {
+    "name": "Tân Định",
+    "code": "vn_hcm_quan-1_tan-dinh"
+  },
+  {
+    "name": "Bến Nghé",
+    "code": "vn_hcm_quan-1_ben-nghe"
+  },
+  {
+    "name": "Bến Thành",
+    "code": "vn_hcm_quan-1_ben-thanh"
+  },
+  {
+    "name": "Đa Kao",
+    "code": "vn_hcm_quan-1_da-kao"
+  },
+  {
+    "name": "Cô Giang",
+    "code": "vn_hcm_quan-1_co-giang"
+  },
+  {
+    "name": "Cầu Kho",
+    "code": "vn_hcm_quan-1_cau-kho"
+  },
+  {
+    "name": "Nguyễn Thái Bình",
+    "code": "vn_hcm_quan-1_nguyen-thai-binh"
+  },
+  {
+    "name": "Phạm Ngũ Lão",
+    "code": "vn_hcm_quan-1_pham-ngu-lao"
+  },
+  {
+    "name": "Nguyễn Cư Trinh",
+    "code": "vn_hcm_quan-1_nguyen-cu-trinh"
+  },
+  {
+    "name": "Cầu Ông Lãnh",
+    "code": "vn_hcm_quan-1_cau-ong-lanh"
+  },
+  {
+    "name": "An Phú",
+    "code": "vn_hcm_quan-2_an-phu"
+  },
+  {
+    "name": "Thủ Thiêm",
+    "code": "vn_hcm_quan-2_thu-thiem"
+  },
+  {
+    "name": "Bình Trưng Tây",
+    "code": "vn_hcm_quan-2_binh-trung-tay"
+  },
+  {
+    "name": "Bình Trưng Đông",
+    "code": "vn_hcm_quan-2_binh-trung-dong"
+  },
+  {
+    "name": "An Lợi Đông",
+    "code": "vn_hcm_quan-2_an-loi-dong"
+  },
+  {
+    "name": "An Khánh",
+    "code": "vn_hcm_quan-2_an-khanh"
+  },
+  {
+    "name": "Cát Lái",
+    "code": "vn_hcm_quan-2_cat-lai"
+  },
+  {
+    "name": "Thạnh Mỹ Lợi",
+    "code": "vn_hcm_quan-2_thanh-my-loi"
+  },
+  {
+    "name": "Bình An",
+    "code": "vn_hcm_quan-2_binh-an"
+  },
+  {
+    "name": "Thảo Điền",
+    "code": "vn_hcm_quan-2_thao-dien"
+  },
+  {
+    "name": "Bình Khánh",
+    "code": "vn_hcm_quan-2_binh-khanh"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-3_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-3_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-3_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-3_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-3_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-3_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_quan-3_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-3_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-3_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-3_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_quan-3_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-3_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-3_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-3_phuong-14"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-4_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-4_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-4_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-4_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-4_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-4_phuong-6"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-4_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-4_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-4_phuong-10"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-4_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-4_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-4_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_quan-4_phuong-15"
+  },
+  {
+    "name": "Phường 16",
+    "code": "vn_hcm_quan-4_phuong-16"
+  },
+  {
+    "name": "Phường 18",
+    "code": "vn_hcm_quan-4_phuong-18"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-5_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-5_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-5_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-5_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-5_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-5_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_quan-5_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-5_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-5_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-5_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_quan-5_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-5_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-5_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-5_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_quan-5_phuong-15"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-6_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-6_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-6_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-6_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-6_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-6_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_quan-6_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-6_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-6_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-6_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_quan-6_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-6_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-6_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-6_phuong-14"
+  },
+  {
+    "name": "Tân Thuận Tây",
+    "code": "vn_hcm_quan-7_tan-thuan-tay"
+  },
+  {
+    "name": "Tân Thuận Đông",
+    "code": "vn_hcm_quan-7_tan-thuan-dong"
+  },
+  {
+    "name": "Tân Quy",
+    "code": "vn_hcm_quan-7_tan-quy"
+  },
+  {
+    "name": "Tân Phong",
+    "code": "vn_hcm_quan-7_tan-phong"
+  },
+  {
+    "name": "Tân Phú",
+    "code": "vn_hcm_quan-7_tan-phu"
+  },
+  {
+    "name": "Tân Hưng",
+    "code": "vn_hcm_quan-7_tan-hung"
+  },
+  {
+    "name": "Bình Thuận",
+    "code": "vn_hcm_quan-7_binh-thuan"
+  },
+  {
+    "name": "Phú Mỹ",
+    "code": "vn_hcm_quan-7_phu-my"
+  },
+  {
+    "name": "Tân Kiểng",
+    "code": "vn_hcm_quan-7_tan-kieng"
+  },
+  {
+    "name": "Phú Thuận",
+    "code": "vn_hcm_quan-7_phu-thuan"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-8_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-8_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-8_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-8_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-8_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-8_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_quan-8_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-8_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-8_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-8_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_quan-8_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-8_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-8_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-8_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_quan-8_phuong-15"
+  },
+  {
+    "name": "Phường 16",
+    "code": "vn_hcm_quan-8_phuong-16"
+  },
+  {
+    "name": "Long Bình",
+    "code": "vn_hcm_quan-9_long-binh"
+  },
+  {
+    "name": "Hiệp Phú",
+    "code": "vn_hcm_quan-9_hiep-phu"
+  },
+  {
+    "name": "Trường Thạnh",
+    "code": "vn_hcm_quan-9_truong-thanh"
+  },
+  {
+    "name": "Long Trường",
+    "code": "vn_hcm_quan-9_long-truong"
+  },
+  {
+    "name": "Tăng Nhơn Phú A",
+    "code": "vn_hcm_quan-9_tang-nhon-phu-a"
+  },
+  {
+    "name": "Tăng Nhơn Phú B",
+    "code": "vn_hcm_quan-9_tang-nhon-phu-b"
+  },
+  {
+    "name": "Phước Long A",
+    "code": "vn_hcm_quan-9_phuoc-long-a"
+  },
+  {
+    "name": "Phước Long B",
+    "code": "vn_hcm_quan-9_phuoc-long-b"
+  },
+  {
+    "name": "Phước Bình",
+    "code": "vn_hcm_quan-9_phuoc-binh"
+  },
+  {
+    "name": "Phú Hữu",
+    "code": "vn_hcm_quan-9_phu-huu"
+  },
+  {
+    "name": "Tân Phú",
+    "code": "vn_hcm_quan-9_tan-phu"
+  },
+  {
+    "name": "Long Thạnh Mỹ",
+    "code": "vn_hcm_quan-9_long-thanh-my"
+  },
+  {
+    "name": "Long Phước",
+    "code": "vn_hcm_quan-9_long-phuoc"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-10_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-10_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-10_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-10_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-10_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-10_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_quan-10_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-10_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-10_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-10_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_quan-10_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-10_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-10_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-10_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_quan-10_phuong-15"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_quan-11_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_quan-11_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_quan-11_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_quan-11_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_quan-11_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_quan-11_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_quan-11_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_quan-11_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_quan-11_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_quan-11_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_quan-11_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_quan-11_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_quan-11_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_quan-11_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_quan-11_phuong-15"
+  },
+  {
+    "name": "Phường 16",
+    "code": "vn_hcm_quan-11_phuong-16"
+  },
+  {
+    "name": "Thạnh Lộc",
+    "code": "vn_hcm_quan-12_thanh-loc"
+  },
+  {
+    "name": "An Phú Đông",
+    "code": "vn_hcm_quan-12_an-phu-dong"
+  },
+  {
+    "name": "Tân Thới Hiệp",
+    "code": "vn_hcm_quan-12_tan-thoi-hiep"
+  },
+  {
+    "name": "Tân Hưng Thuận",
+    "code": "vn_hcm_quan-12_tan-hung-thuan"
+  },
+  {
+    "name": "Đông Hưng Thuận",
+    "code": "vn_hcm_quan-12_dong-hung-thuan"
+  },
+  {
+    "name": "Tân Thới Nhất",
+    "code": "vn_hcm_quan-12_tan-thoi-nhat"
+  },
+  {
+    "name": "Tân Chánh Hiệp",
+    "code": "vn_hcm_quan-12_tan-chanh-hiep"
+  },
+  {
+    "name": "Thạnh Xuân",
+    "code": "vn_hcm_quan-12_thanh-xuan"
+  },
+  {
+    "name": "Hiệp Thành",
+    "code": "vn_hcm_quan-12_hiep-thanh"
+  },
+  {
+    "name": "Trung Mỹ Tây",
+    "code": "vn_hcm_quan-12_trung-my-tay"
+  },
+  {
+    "name": "Thới An",
+    "code": "vn_hcm_quan-12_thoi-an"
+  },
+  {
+    "name": "Bình Hưng Hòa",
+    "code": "vn_hcm_binh-tan_binh-hung-hoa"
+  },
+  {
+    "name": "Bình Hưng Hòa A",
+    "code": "vn_hcm_binh-tan_binh-hung-hoa-a"
+  },
+  {
+    "name": "Bình Hưng Hòa B",
+    "code": "vn_hcm_binh-tan_binh-hung-hoa-b"
+  },
+  {
+    "name": "Bình Trị Đông",
+    "code": "vn_hcm_binh-tan_binh-tri-dong"
+  },
+  {
+    "name": "Bình Trị Đông A",
+    "code": "vn_hcm_binh-tan_binh-tri-dong-a"
+  },
+  {
+    "name": "Bình Trị Đông B",
+    "code": "vn_hcm_binh-tan_binh-tri-dong-b"
+  },
+  {
+    "name": "Tân Tạo",
+    "code": "vn_hcm_binh-tan_tan-tao"
+  },
+  {
+    "name": "Tân Tạo A",
+    "code": "vn_hcm_binh-tan_tan-tao-a"
+  },
+  {
+    "name": "An Lạc",
+    "code": "vn_hcm_binh-tan_an-lac"
+  },
+  {
+    "name": "An Lạc A",
+    "code": "vn_hcm_binh-tan_an-lac-a"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_binh-thanh_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_binh-thanh_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_binh-thanh_phuong-3"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_binh-thanh_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_binh-thanh_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_binh-thanh_phuong-7"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_binh-thanh_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_binh-thanh_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_binh-thanh_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_binh-thanh_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_binh-thanh_phuong-15"
+  },
+  {
+    "name": "Phường 17",
+    "code": "vn_hcm_binh-thanh_phuong-17"
+  },
+  {
+    "name": "Phường 19",
+    "code": "vn_hcm_binh-thanh_phuong-19"
+  },
+  {
+    "name": "Phường 21",
+    "code": "vn_hcm_binh-thanh_phuong-21"
+  },
+  {
+    "name": "Phường 22",
+    "code": "vn_hcm_binh-thanh_phuong-22"
+  },
+  {
+    "name": "Phường 24",
+    "code": "vn_hcm_binh-thanh_phuong-24"
+  },
+  {
+    "name": "Phường 25",
+    "code": "vn_hcm_binh-thanh_phuong-25"
+  },
+  {
+    "name": "Phường 26",
+    "code": "vn_hcm_binh-thanh_phuong-26"
+  },
+  {
+    "name": "Phường 27",
+    "code": "vn_hcm_binh-thanh_phuong-27"
+  },
+  {
+    "name": "Phường 28",
+    "code": "vn_hcm_binh-thanh_phuong-28"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_go-vap_phuong-1"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_go-vap_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_go-vap_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_go-vap_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_go-vap_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_go-vap_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_go-vap_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_go-vap_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_go-vap_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_go-vap_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_go-vap_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_go-vap_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_go-vap_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_go-vap_phuong-15"
+  },
+  {
+    "name": "Phường 16",
+    "code": "vn_hcm_go-vap_phuong-16"
+  },
+  {
+    "name": "Phường 17",
+    "code": "vn_hcm_go-vap_phuong-17"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_phu-nhuan_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_phu-nhuan_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_phu-nhuan_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_phu-nhuan_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_phu-nhuan_phuong-5"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_phu-nhuan_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_phu-nhuan_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_phu-nhuan_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_phu-nhuan_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_phu-nhuan_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_phu-nhuan_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_phu-nhuan_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_phu-nhuan_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_phu-nhuan_phuong-15"
+  },
+  {
+    "name": "Phường 17",
+    "code": "vn_hcm_phu-nhuan_phuong-17"
+  },
+  {
+    "name": "Phường 1",
+    "code": "vn_hcm_tan-binh_phuong-1"
+  },
+  {
+    "name": "Phường 2",
+    "code": "vn_hcm_tan-binh_phuong-2"
+  },
+  {
+    "name": "Phường 3",
+    "code": "vn_hcm_tan-binh_phuong-3"
+  },
+  {
+    "name": "Phường 4",
+    "code": "vn_hcm_tan-binh_phuong-4"
+  },
+  {
+    "name": "Phường 5",
+    "code": "vn_hcm_tan-binh_phuong-5"
+  },
+  {
+    "name": "Phường 6",
+    "code": "vn_hcm_tan-binh_phuong-6"
+  },
+  {
+    "name": "Phường 7",
+    "code": "vn_hcm_tan-binh_phuong-7"
+  },
+  {
+    "name": "Phường 8",
+    "code": "vn_hcm_tan-binh_phuong-8"
+  },
+  {
+    "name": "Phường 9",
+    "code": "vn_hcm_tan-binh_phuong-9"
+  },
+  {
+    "name": "Phường 10",
+    "code": "vn_hcm_tan-binh_phuong-10"
+  },
+  {
+    "name": "Phường 11",
+    "code": "vn_hcm_tan-binh_phuong-11"
+  },
+  {
+    "name": "Phường 12",
+    "code": "vn_hcm_tan-binh_phuong-12"
+  },
+  {
+    "name": "Phường 13",
+    "code": "vn_hcm_tan-binh_phuong-13"
+  },
+  {
+    "name": "Phường 14",
+    "code": "vn_hcm_tan-binh_phuong-14"
+  },
+  {
+    "name": "Phường 15",
+    "code": "vn_hcm_tan-binh_phuong-15"
+  },
+  {
+    "name": "Tân Sơn Nhì",
+    "code": "vn_hcm_tan-phu_tan-son-nhi"
+  },
+  {
+    "name": "Tây Thạnh",
+    "code": "vn_hcm_tan-phu_tay-thanh"
+  },
+  {
+    "name": "Sơn Kỳ",
+    "code": "vn_hcm_tan-phu_son-ky"
+  },
+  {
+    "name": "Tân Quý",
+    "code": "vn_hcm_tan-phu_tan-quy"
+  },
+  {
+    "name": "Tân Thành",
+    "code": "vn_hcm_tan-phu_tan-thanh"
+  },
+  {
+    "name": "Phú Thọ Hòa",
+    "code": "vn_hcm_tan-phu_phu-tho-hoa"
+  },
+  {
+    "name": "Phú Thạnh",
+    "code": "vn_hcm_tan-phu_phu-thanh"
+  },
+  {
+    "name": "Phú Trung",
+    "code": "vn_hcm_tan-phu_phu-trung"
+  },
+  {
+    "name": "Hòa Thạnh",
+    "code": "vn_hcm_tan-phu_hoa-thanh"
+  },
+  {
+    "name": "Hiệp Tân",
+    "code": "vn_hcm_tan-phu_hiep-tan"
+  },
+  {
+    "name": "Tân Thới Hòa",
+    "code": "vn_hcm_tan-phu_tan-thoi-hoa"
+  },
+  {
+    "name": "Trường Thọ",
+    "code": "vn_hcm_thu-duc_truong-tho"
+  },
+  {
+    "name": "Linh Trung",
+    "code": "vn_hcm_thu-duc_linh-trung"
+  },
+  {
+    "name": "Bình Chiểu",
+    "code": "vn_hcm_thu-duc_binh-chieu"
+  },
+  {
+    "name": "Hiệp Bình Chánh",
+    "code": "vn_hcm_thu-duc_hiep-binh-chanh"
+  },
+  {
+    "name": "Hiệp Bình Phước",
+    "code": "vn_hcm_thu-duc_hiep-binh-phuoc"
+  },
+  {
+    "name": "Bình Thọ",
+    "code": "vn_hcm_thu-duc_binh-tho"
+  },
+  {
+    "name": "Tam Bình",
+    "code": "vn_hcm_thu-duc_tam-binh"
+  },
+  {
+    "name": "Tam Phú",
+    "code": "vn_hcm_thu-duc_tam-phu"
+  },
+  {
+    "name": "Linh Đông",
+    "code": "vn_hcm_thu-duc_linh-dong"
+  },
+  {
+    "name": "Linh Chiểu",
+    "code": "vn_hcm_thu-duc_linh-chieu"
+  },
+  {
+    "name": "Linh Tây",
+    "code": "vn_hcm_thu-duc_linh-tay"
+  },
+  {
+    "name": "Linh Xuân",
+    "code": "vn_hcm_thu-duc_linh-xuan"
+  },
+  {
+    "name": "Tân Túc",
+    "code": "vn_hcm_binh-chanh_tan-tuc"
+  },
+  {
+    "name": "An Phú Tây",
+    "code": "vn_hcm_binh-chanh_an-phu-tay"
+  },
+  {
+    "name": "Bình Chánh",
+    "code": "vn_hcm_binh-chanh_binh-chanh"
+  },
+  {
+    "name": "Bình Hưng",
+    "code": "vn_hcm_binh-chanh_binh-hung"
+  },
+  {
+    "name": "Bình Lợi",
+    "code": "vn_hcm_binh-chanh_binh-loi"
+  },
+  {
+    "name": "Đa Phước",
+    "code": "vn_hcm_binh-chanh_da-phuoc"
+  },
+  {
+    "name": "Hưng Long",
+    "code": "vn_hcm_binh-chanh_hung-long"
+  },
+  {
+    "name": "Lê Minh Xuân",
+    "code": "vn_hcm_binh-chanh_le-minh-xuan"
+  },
+  {
+    "name": "Phạm Văn Hai",
+    "code": "vn_hcm_binh-chanh_pham-van-hai"
+  },
+  {
+    "name": "Phong Phú",
+    "code": "vn_hcm_binh-chanh_phong-phu"
+  },
+  {
+    "name": "Quy Đức",
+    "code": "vn_hcm_binh-chanh_quy-duc"
+  },
+  {
+    "name": "Tân Kiên",
+    "code": "vn_hcm_binh-chanh_tan-kien"
+  },
+  {
+    "name": "Tân Nhựt",
+    "code": "vn_hcm_binh-chanh_tan-nhut"
+  },
+  {
+    "name": "Tân Quý Tây",
+    "code": "vn_hcm_binh-chanh_tan-quy-tay"
+  },
+  {
+    "name": "Vĩnh Lộc A",
+    "code": "vn_hcm_binh-chanh_vinh-loc-a"
+  },
+  {
+    "name": "Vĩnh Lộc B",
+    "code": "vn_hcm_binh-chanh_vinh-loc-b"
+  },
+  {
+    "name": "Cần Thạnh",
+    "code": "vn_hcm_can-gio_can-thanh"
+  },
+  {
+    "name": "An Thới Đông",
+    "code": "vn_hcm_can-gio_an-thoi-dong"
+  },
+  {
+    "name": "Bình Khánh",
+    "code": "vn_hcm_can-gio_binh-khanh"
+  },
+  {
+    "name": "Long Hòa",
+    "code": "vn_hcm_can-gio_long-hoa"
+  },
+  {
+    "name": "Lý Nhơn",
+    "code": "vn_hcm_can-gio_ly-nhon"
+  },
+  {
+    "name": "Tam Thôn Hiệp",
+    "code": "vn_hcm_can-gio_tam-thon-hiep"
+  },
+  {
+    "name": "Thạnh An",
+    "code": "vn_hcm_can-gio_thanh-an"
+  },
+  {
+    "name": "Củ Chi",
+    "code": "vn_hcm_cu-chi_cu-chi"
+  },
+  {
+    "name": "An Nhơn Tây",
+    "code": "vn_hcm_cu-chi_an-nhon-tay"
+  },
+  {
+    "name": "An Phú",
+    "code": "vn_hcm_cu-chi_an-phu"
+  },
+  {
+    "name": "Bình Mỹ",
+    "code": "vn_hcm_cu-chi_binh-my"
+  },
+  {
+    "name": "Hòa Phú",
+    "code": "vn_hcm_cu-chi_hoa-phu"
+  },
+  {
+    "name": "Nhuận Đức",
+    "code": "vn_hcm_cu-chi_nhuan-duc"
+  },
+  {
+    "name": "Phạm Văn Cội",
+    "code": "vn_hcm_cu-chi_pham-van-coi"
+  },
+  {
+    "name": "Phú Hòa Đông",
+    "code": "vn_hcm_cu-chi_phu-hoa-dong"
+  },
+  {
+    "name": "Phú Mỹ Hưng",
+    "code": "vn_hcm_cu-chi_phu-my-hung"
+  },
+  {
+    "name": "Phước Hiệp",
+    "code": "vn_hcm_cu-chi_phuoc-hiep"
+  },
+  {
+    "name": "Phước Thạnh",
+    "code": "vn_hcm_cu-chi_phuoc-thanh"
+  },
+  {
+    "name": "Phước Vĩnh An",
+    "code": "vn_hcm_cu-chi_phuoc-vinh-an"
+  },
+  {
+    "name": "Tân An Hội",
+    "code": "vn_hcm_cu-chi_tan-an-hoi"
+  },
+  {
+    "name": "Tân Phú Trung",
+    "code": "vn_hcm_cu-chi_tan-phu-trung"
+  },
+  {
+    "name": "Tân Thạnh Đông",
+    "code": "vn_hcm_cu-chi_tan-thanh-dong"
+  },
+  {
+    "name": "Tân Thạnh Tây",
+    "code": "vn_hcm_cu-chi_tan-thanh-tay"
+  },
+  {
+    "name": "Tân Thông Hội",
+    "code": "vn_hcm_cu-chi_tan-thong-hoi"
+  },
+  {
+    "name": "Thái Mỹ",
+    "code": "vn_hcm_cu-chi_thai-my"
+  },
+  {
+    "name": "Trung An",
+    "code": "vn_hcm_cu-chi_trung-an"
+  },
+  {
+    "name": "Trung Lập Hạ",
+    "code": "vn_hcm_cu-chi_trung-lap-ha"
+  },
+  {
+    "name": "Trung Lập Thượng",
+    "code": "vn_hcm_cu-chi_trung-lap-thuong"
+  },
+  {
+    "name": "Hóc Môn",
+    "code": "vn_hcm_hoc-mon_hoc-mon"
+  },
+  {
+    "name": "Bà Điểm",
+    "code": "vn_hcm_hoc-mon_ba-diem"
+  },
+  {
+    "name": "Đông Thạnh",
+    "code": "vn_hcm_hoc-mon_dong-thanh"
+  },
+  {
+    "name": "Nhị Bình",
+    "code": "vn_hcm_hoc-mon_nhi-binh"
+  },
+  {
+    "name": "Tân Hiệp",
+    "code": "vn_hcm_hoc-mon_tan-hiep"
+  },
+  {
+    "name": "Tân Thới Nhì",
+    "code": "vn_hcm_hoc-mon_tan-thoi-nhi"
+  },
+  {
+    "name": "Tân Xuân",
+    "code": "vn_hcm_hoc-mon_tan-xuan"
+  },
+  {
+    "name": "Thới Tam Thôn",
+    "code": "vn_hcm_hoc-mon_thoi-tam-thon"
+  },
+  {
+    "name": "Trung Chánh",
+    "code": "vn_hcm_hoc-mon_trung-chanh"
+  },
+  {
+    "name": "Xuân Thới Đông",
+    "code": "vn_hcm_hoc-mon_xuan-thoi-dong"
+  },
+  {
+    "name": "Xuân Thới Sơn",
+    "code": "vn_hcm_hoc-mon_xuan-thoi-son"
+  },
+  {
+    "name": "Xuân Thới Thượng",
+    "code": "vn_hcm_hoc-mon_xuan-thoi-thuong"
+  },
+  {
+    "name": "Nhà Bè",
+    "code": "vn_hcm_nha-be_nha-be"
+  },
+  {
+    "name": "Hiệp Phước",
+    "code": "vn_hcm_nha-be_hiep-phuoc"
+  },
+  {
+    "name": "Long Thới",
+    "code": "vn_hcm_nha-be_long-thoi"
+  },
+  {
+    "name": "Nhơn Đức",
+    "code": "vn_hcm_nha-be_nhon-duc"
+  },
+  {
+    "name": "Phú Xuân",
+    "code": "vn_hcm_nha-be_phu-xuan"
+  },
+  {
+    "name": "Phước Kiển",
+    "code": "vn_hcm_nha-be_phuoc-kien"
+  },
+  {
+    "name": "Phước Lộc",
+    "code": "vn_hcm_nha-be_phuoc-loc"
+  }
+]

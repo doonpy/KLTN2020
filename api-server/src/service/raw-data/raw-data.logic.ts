@@ -1,15 +1,15 @@
 import { DocumentQuery, Query } from 'mongoose';
+import ResponseStatusCode from '@common/common.response-status.code';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
+import CommonServiceWording from '@common/service/common.service.wording';
+import CommonConstant from '@common/common.constant';
 import RawDataModel from './raw-data.model';
-import RawDataConstant from './raw-data.constant';
-import ResponseStatusCode from '../../common/common.response-status.code';
 import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
 import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
 import CoordinateLogic from '../coordinate/coordinate.logic';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
 import { RawDataApiModel, RawDataDocumentModel, RawDataLogicInterface } from './raw-data.interface';
-import CommonServiceLogicBase from '../../common/service/common.service.logic.base';
 import RawDataWording from './raw-data.wording';
-import CommonServiceWording from '../../common/service/common.service.wording';
 
 export default class RawDataLogic extends CommonServiceLogicBase implements RawDataLogicInterface {
     private static instance: RawDataLogic;
@@ -218,11 +218,11 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
      * @return {number} index
      */
     public getPropertyTypeIndex(propertyTypeData: string): number {
-        const propertyType: number = RawDataConstant.PROPERTY_TYPE.findIndex(({ wording }) =>
-            new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData.toLowerCase())
-        );
+        const propertyType: number | undefined = CommonConstant.PROPERTY_TYPE.find(({ wording }) =>
+            new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData)
+        )?.id;
 
-        if (propertyType === -1) {
+        if (!propertyType) {
             return NaN;
         }
 
@@ -426,13 +426,13 @@ export default class RawDataLogic extends CommonServiceLogicBase implements RawD
         const priceClone: { value: number; currency: string; timeUnit: { id: number; wording: string[] } } = {
             value: price.value,
             currency: price.currency,
-            timeUnit: RawDataConstant.PRICE_TIME_UNIT[price.timeUnit],
+            timeUnit: CommonConstant.PRICE_TIME_UNIT[price.timeUnit],
         };
 
         return {
             id: _id ?? null,
-            transactionType: RawDataConstant.TRANSACTION_TYPE[transactionType] ?? null,
-            propertyType: RawDataConstant.PROPERTY_TYPE[propertyType] ?? null,
+            transactionType: CommonConstant.TRANSACTION_TYPE[transactionType] ?? null,
+            propertyType: CommonConstant.PROPERTY_TYPE[propertyType] ?? null,
             detailUrl,
             postDate: postDate ?? null,
             title: title ?? null,
