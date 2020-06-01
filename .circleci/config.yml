@@ -1,13 +1,29 @@
 version: 2
-orbs:
-  node: circleci/node@1.1.6
 jobs:
-  build-and-test:
-    executor:
-      name: node/default
+  build:
+    working_directory: /app
+    docker:
+      - image: docker:17.05.0-ce-git
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run: npm run eslint
-            - run: npm run build
+      - setup_remote_docker
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --no-cache \
+              py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
+            pip install --upgrade pip
+            pip install \
+              docker-compose
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build -t app .
+      - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "KLTN2020" ]; then
+              docker logic -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+              docker tag app "kltn2020/app:${CIRCLE_SHA1}"
+              docker push "kltn2020/app:${CIRCLE_SHA1}"
+            fi

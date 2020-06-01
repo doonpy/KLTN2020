@@ -3,7 +3,7 @@ services:
   api-server:
     build:
       context: .
-      dockerfile: tools/docker/Dockerfile
+      dockerfile: Dockerfile
     image: pk2020:latest
     container_name: api-server
     entrypoint:
