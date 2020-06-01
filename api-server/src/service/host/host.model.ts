@@ -4,7 +4,7 @@ import { HostDocumentModel } from './host.interface';
 
 autoIncrement.initialize(mongoose.connection);
 
-const hostSchema: Schema = new Schema(
+const hostSchema = new Schema<HostDocumentModel>(
     {
         name: Schema.Types.String,
         domain: Schema.Types.String,
@@ -21,4 +21,6 @@ hostSchema.plugin(autoIncrement.plugin, {
 hostSchema.index({ domain: 1 }, { name: 'idx_domain' });
 hostSchema.index({ name: 1 }, { name: 'idx_name' });
 
-export default mongoose.model<HostDocumentModel>('host', hostSchema);
+const HostModel = mongoose.model<HostDocumentModel>('host', hostSchema);
+
+export default HostModel;

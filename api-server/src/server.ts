@@ -11,9 +11,10 @@ import DetailUrlController from '@service/detail-url/detail-url.controller';
 import RawDataController from '@service/raw-data/raw-data.controller';
 import GroupedDataController from '@service/grouped-data/grouped-data.controller';
 import VisualSummaryDistrictController from '@service/visual/summary/district/visual.summary.district.controller';
-import VisualProvinceController from '@service/visual/administrative/province/visual.province.controller';
-import VisualDistrictController from '@service/visual/administrative/district/visual.district.controller';
-import VisualWardController from '@service/visual/administrative/ward/visual.ward.controller';
+import VisualAdministrativeCountryController from '@service/visual/administrative/country/visual.administrative.country.controller';
+import VisualAdministrativeProvinceController from '@service/visual/administrative/province/visual.administrative.province.controller';
+import VisualAdministrativeDistrictController from '@service/visual/administrative/district/visual.administrative.district.controller';
+import VisualAdministrativeWardController from '@service/visual/administrative/ward/visual.administrative.ward.controller';
 import VisualSummaryDistrictWardController from '@service/visual/summary/district-ward/visual.summary.district-ward.controller';
 import VisualMapPointController from '@service/visual/map-point/visual.map-point.controller';
 import VisualAnalysisController from '@service/visual/analysis/visual.analysis.controller';
@@ -31,9 +32,10 @@ import VisualAnalysisController from '@service/visual/analysis/visual.analysis.c
             DetailUrlController.getInstance(),
             RawDataController.getInstance(),
             GroupedDataController.getInstance(),
-            VisualProvinceController.getInstance(),
-            VisualDistrictController.getInstance(),
-            VisualWardController.getInstance(),
+            VisualAdministrativeCountryController.getInstance(),
+            VisualAdministrativeProvinceController.getInstance(),
+            VisualAdministrativeDistrictController.getInstance(),
+            VisualAdministrativeWardController.getInstance(),
             VisualSummaryDistrictController.getInstance(),
             VisualSummaryDistrictWardController.getInstance(),
             VisualMapPointController.getInstance(),

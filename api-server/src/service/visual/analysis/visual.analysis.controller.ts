@@ -6,12 +6,7 @@ import Checker from '@util/checker/checker.index';
 import CommonConstant from '@common/common.constant';
 import VisualCommonController from '@service/visual/visual.common.controller';
 import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
-import DateTime from '@util/datetime/datetime';
-import {
-    VisualAnalysisApiModel,
-    VisualAnalysisDocumentModel,
-} from '@service/visual/analysis/visual.analysis.interface';
-import VisualAnalysisModel from './visual.analysis.model';
+import { convertStringToDate } from '@util/helper/datetime';
 
 const commonPath = '/analyses';
 const specifyIdPath = '/analysis/:id';
@@ -22,15 +17,15 @@ const MIN_DATE = new Date(-8640000000000000);
 export default class VisualAnalysisController extends VisualCommonController {
     private static instance: VisualAnalysisController;
 
-    private visualAnalysisLogic: VisualAnalysisLogic = VisualAnalysisLogic.getInstance();
+    private visualAnalysisLogic = VisualAnalysisLogic.getInstance();
 
-    private readonly PARAM_FROM_DATE: string = 'fromDate';
+    private readonly PARAM_FROM_DATE = 'fromDate';
 
-    private readonly PARAM_TO_DATE: string = 'toDate';
+    private readonly PARAM_TO_DATE = 'toDate';
 
-    private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
+    private readonly PARAM_TRANSACTION_TYPE = 'transactionType';
 
-    private readonly PARAM_PROPERTY_TYPE: string = 'propertyType';
+    private readonly PARAM_PROPERTY_TYPE = 'propertyType';
 
     constructor() {
         super();
@@ -102,12 +97,12 @@ export default class VisualAnalysisController extends VisualCommonController {
 
             this.validator.validate(this.requestQuery);
 
-            const conditions: object = {
+            const conditions = {
                 $and: [
                     {
                         referenceDate: {
                             $gte: (this.requestQuery[this.PARAM_FROM_DATE] as string)
-                                ? DateTime.convertStringToDate(
+                                ? convertStringToDate(
                                       this.requestQuery[this.PARAM_FROM_DATE] as string,
                                       DATE_FORMAT,
                                       DATE_DELIMITER
@@ -118,7 +113,7 @@ export default class VisualAnalysisController extends VisualCommonController {
                     {
                         referenceDate: {
                             $lte: (this.requestQuery[this.PARAM_TO_DATE] as string)
-                                ? DateTime.convertStringToDate(
+                                ? convertStringToDate(
                                       this.requestQuery[this.PARAM_TO_DATE] as string,
                                       DATE_FORMAT,
                                       DATE_DELIMITER
@@ -128,14 +123,13 @@ export default class VisualAnalysisController extends VisualCommonController {
                     },
                 ],
             };
-            let documents: VisualAnalysisDocumentModel[] = await VisualAnalysisModel.find(conditions);
-            const transactionType: number | undefined =
-                Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
-            const propertyType: number | undefined = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            let { documents } = await this.visualAnalysisLogic.getAll({ conditions });
+            const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
+            const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
 
-            documents = documents.filter(({ priceAnalysisData, acreageAnalysisData }): boolean => {
+            documents = documents.filter(({ priceAnalysisData, acreageAnalysisData }) => {
                 acreageAnalysisData = acreageAnalysisData.filter(
-                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }): boolean => {
+                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) => {
                         if (transactionType !== undefined && itemTransactionType !== transactionType) {
                             return false;
                         }
@@ -149,7 +143,7 @@ export default class VisualAnalysisController extends VisualCommonController {
                 );
 
                 priceAnalysisData = priceAnalysisData.filter(
-                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }): boolean => {
+                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) => {
                         if (transactionType !== undefined && itemTransactionType !== transactionType) {
                             return false;
                         }
@@ -165,10 +159,8 @@ export default class VisualAnalysisController extends VisualCommonController {
                 return acreageAnalysisData.length > 0 && priceAnalysisData.length > 0;
             });
 
-            const responseBody: object = {
-                analyses: documents.map(
-                    (document): VisualAnalysisApiModel => this.visualAnalysisLogic.convertToApiResponse(document)
-                ),
+            const responseBody = {
+                analyses: documents.map((document) => this.visualAnalysisLogic.convertToApiResponse(document)),
             };
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
@@ -184,7 +176,7 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -197,5 +189,26 @@ export default class VisualAnalysisController extends VisualCommonController {
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualAnalysisLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-analysis', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

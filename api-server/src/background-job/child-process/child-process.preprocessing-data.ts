@@ -7,32 +7,36 @@ import RawDataLogic from '@service/raw-data/raw-data.logic';
 import CoordinateLogic from '@service/coordinate/coordinate.logic';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import { CoordinateDocumentModel } from '@service/coordinate/coordinate.interface';
-import DateTime from '@util/datetime/datetime';
-import VisualizationDistrictModel from '@service/visual/administrative/district/visual.district.model';
-import { VisualDistrictDocumentModel } from '@service/visual/administrative/district/visual.district.interface';
-import VisualizationWardModel from '@service/visual/administrative/ward/visual.ward.model';
-import { VisualWardDocumentModel } from '@service/visual/administrative/ward/visual.ward.interface';
 import { getGeocode } from '@util/external-api/external-api.map';
 import { MapPoint, VisualMapPointDocumentModel } from '@service/visual/map-point/visual.map-point.interface';
-import VisualizationMapPointModel from '@service/visual/map-point/visual.map-point.model';
-import VisualizationSummaryDistrictWardModel from '@service/visual/summary/district-ward/visual.summary.district-ward.model';
-import VisualizationSummaryDistrictModel from '@service/visual/summary/district/visual.summary.district.model';
 import { VisualSummaryDistrictWardDocumentModel } from '@service/visual/summary/district-ward/visual.summary.district-ward.interface';
-import { BingMapGeocodeResponse } from '@util/external-api/external-api.map.interface';
 import { VisualSummaryDistrictDocumentModel } from '@service/visual/summary/district/visual.summary.district.interface';
-import StringHandler from '@util/helper/string-handler';
+import { removeSpecialCharacterAtHeadAndTail } from '@util/helper/string';
 import CommonConstant from '@common/common.constant';
-import VisualAnalysisModel from '@service/visual/analysis/visual.analysis.model';
 import {
     AcreageAnalysisData,
     AnalysisData,
     PriceAnalysisData,
     VisualAnalysisDocumentModel,
 } from '@service/visual/analysis/visual.analysis.interface';
+import VisualSummaryDistrictLogic from '@service/visual/summary/district/visual.summary.district.logic';
+import VisualSummaryDistrictWardLogic from '@service/visual/summary/district-ward/visual.summary.district-ward.logic';
+import VisualMapPointLogic from '@service/visual/map-point/visual.map-point.logic';
+import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
+import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
+import { convertTotalSecondsToTime } from '@util/helper/datetime';
+import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/visual.administrative.district.interface';
 
-const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-const coordinateLogic: CoordinateLogic = CoordinateLogic.getInstance();
-const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
+const telegramChatBotInstance = ChatBotTelegram.getInstance();
+const coordinateLogic = CoordinateLogic.getInstance();
+const rawDataLogic = RawDataLogic.getInstance();
+const visualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
+const visualSummaryDistrictWardLogic = VisualSummaryDistrictWardLogic.getInstance();
+const visualMapPointLogic = VisualMapPointLogic.getInstance();
+const visualAnalysisLogic = VisualAnalysisLogic.getInstance();
+const visualAdministrativeDistrictLogic = VisualAdministrativeDistrictLogic.getInstance();
+const visualAdministrativeWardLogic = VisualAdministrativeWardLogic.getInstance();
 const DOCUMENTS_LIMIT = 1000;
 let script: AsyncGenerator;
 let rawDataset: {
@@ -64,14 +68,10 @@ type SummaryElement = {
  * @return {AddressProperties}
  */
 const getAddressProperties = (address: string): AddressProperties => {
-    const ward: string = StringHandler.removeSpecialCharacterAtHeadAndTail(
-        address.match(RegExp(wardPattern))?.shift() || ''
-    );
+    const ward = removeSpecialCharacterAtHeadAndTail(address.match(RegExp(wardPattern))?.shift() || '');
     address = address.replace(ward, '');
 
-    const district: string = StringHandler.removeSpecialCharacterAtHeadAndTail(
-        address.match(RegExp(districtPattern))?.shift() || ''
-    );
+    const district = removeSpecialCharacterAtHeadAndTail(address.match(RegExp(districtPattern))?.shift() || '');
 
     return {
         district,
@@ -92,9 +92,9 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel |
         return undefined;
     }
 
-    let coordinateDoc: CoordinateDocumentModel = await coordinateLogic.getByLocation(address);
+    let coordinateDoc = await coordinateLogic.getByLocation(address);
     if (!coordinateDoc) {
-        const apiResponse: BingMapGeocodeResponse | undefined = await getGeocode(address);
+        const apiResponse = await getGeocode(address);
 
         if (!apiResponse) {
             return undefined;
@@ -108,7 +108,7 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel |
             return undefined;
         }
 
-        const [lat, lng]: [number, number] = apiResponse.resourceSets[0].resources[0].point.coordinates;
+        const [lat, lng] = apiResponse.resourceSets[0].resources[0].point.coordinates;
 
         coordinateDoc = await coordinateLogic.create({
             location: address,
@@ -130,9 +130,8 @@ const updateAmount = (
     transactionType: number,
     propertyType: number
 ): void => {
-    const summaryElement: SummaryElement | undefined = summaryDocument.summary.find(
-        (item: SummaryElement): boolean =>
-            item.transactionType === transactionType && item.propertyType === propertyType
+    const summaryElement = summaryDocument.summary.find(
+        (item: SummaryElement) => item.transactionType === transactionType && item.propertyType === propertyType
     );
     if (!summaryElement) {
         summaryDocument.summary.push({
@@ -158,24 +157,19 @@ const handleVisualizationSummaryDistrictData = async (
     transactionType: number,
     propertyType: number
 ): Promise<void> => {
-    const visualSummaryDistrictDocument: VisualSummaryDistrictDocumentModel | null = await VisualizationSummaryDistrictModel.findOne(
-        { districtId }
-    );
+    const visualSummaryDistrictDocument = await visualSummaryDistrictLogic.getById(districtId);
 
     if (!visualSummaryDistrictDocument) {
-        await VisualizationSummaryDistrictModel.create({
+        await visualSummaryDistrictLogic.create({
             districtId,
             summaryAmount: 1,
             summary: [{ transactionType, propertyType, amount: 1 }],
-        });
+        } as VisualSummaryDistrictDocumentModel);
         return;
     }
 
     updateAmount(visualSummaryDistrictDocument, transactionType, propertyType);
-    await VisualizationSummaryDistrictModel.findByIdAndUpdate(
-        visualSummaryDistrictDocument._id,
-        visualSummaryDistrictDocument
-    );
+    await visualSummaryDistrictLogic.update(visualSummaryDistrictDocument._id, visualSummaryDistrictDocument);
 };
 
 /**
@@ -192,22 +186,25 @@ const handleVisualizationSummaryDistrictWardData = async (
     transactionType: number,
     propertyType: number
 ): Promise<void> => {
-    const visualSummaryDistrictWardDocument: VisualSummaryDistrictWardDocumentModel | null = await VisualizationSummaryDistrictWardModel.findOne(
-        { districtId, wardId }
-    );
+    const visualSummaryDistrictWardDocument = await visualSummaryDistrictWardLogic.getOne({
+        conditions: {
+            districtId,
+            wardId,
+        },
+    });
 
     if (!visualSummaryDistrictWardDocument) {
-        await VisualizationSummaryDistrictWardModel.create({
+        await visualSummaryDistrictWardLogic.create({
             districtId,
             wardId,
             summaryAmount: 1,
             summary: [{ transactionType, propertyType, amount: 1 }],
-        });
+        } as VisualSummaryDistrictWardDocumentModel);
         return;
     }
 
     updateAmount(visualSummaryDistrictWardDocument, transactionType, propertyType);
-    await VisualizationSummaryDistrictWardModel.findByIdAndUpdate(
+    await visualSummaryDistrictWardLogic.update(
         visualSummaryDistrictWardDocument._id,
         visualSummaryDistrictWardDocument
     );
@@ -229,9 +226,11 @@ const handleVisualizationMapPoint = async (
     lng: number,
     { _id, acreage, price, transactionType, propertyType }: RawDataDocumentModel
 ): Promise<void> => {
-    const visualMapPointDocument: VisualMapPointDocumentModel | null = await VisualizationMapPointModel.findOne({
-        lat,
-        lng,
+    const visualMapPointDocument = await visualMapPointLogic.getOne({
+        conditions: {
+            lat,
+            lng,
+        },
     });
 
     const newPoint: MapPoint = {
@@ -245,7 +244,7 @@ const handleVisualizationMapPoint = async (
     }
 
     if (!visualMapPointDocument) {
-        await VisualizationMapPointModel.create({
+        await visualMapPointLogic.create({
             districtId,
             wardId,
             lat,
@@ -257,17 +256,11 @@ const handleVisualizationMapPoint = async (
                     propertyType,
                 },
             ],
-        });
+        } as VisualMapPointDocumentModel);
         return;
     }
 
-    const point:
-        | {
-              rawDataset: MapPoint[];
-              transactionType: number;
-              propertyType: number;
-          }
-        | undefined = visualMapPointDocument.points.filter(
+    const point = visualMapPointDocument.points.filter(
         ({ transactionType: pointTransactionType, propertyType: pointPropertyType }) =>
             transactionType === pointTransactionType && propertyType === pointPropertyType
     )[0];
@@ -281,7 +274,7 @@ const handleVisualizationMapPoint = async (
         point.rawDataset.push(newPoint);
     }
 
-    await VisualizationMapPointModel.findByIdAndUpdate(visualMapPointDocument._id, visualMapPointDocument);
+    await visualMapPointLogic.update(visualMapPointDocument._id, visualMapPointDocument);
 };
 
 /**
@@ -337,20 +330,22 @@ const handleVisualizationAnalysis = async (
         measureUnit: acreage.measureUnit,
     };
 
-    const visualAnalysisDocument: VisualAnalysisDocumentModel | null = await VisualAnalysisModel.findOne({
-        referenceDate,
+    const visualAnalysisDocument = await visualAnalysisLogic.getOne({
+        conditions: {
+            referenceDate,
+        },
     });
     if (!visualAnalysisDocument) {
-        await VisualAnalysisModel.create({
+        await visualAnalysisLogic.create(({
             referenceDate: new Date(referenceDate),
             priceAnalysisData: [newPriceAnalysisData],
             acreageAnalysisData: [newAcreageAnalysisData],
-        });
+        } as unknown) as VisualAnalysisDocumentModel);
 
         return;
     }
 
-    let priceAnalysisData: PriceAnalysisData | undefined = visualAnalysisDocument.priceAnalysisData.filter(
+    let priceAnalysisData = visualAnalysisDocument.priceAnalysisData.filter(
         ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) =>
             itemTransactionType === transactionType && itemPropertyType === propertyType
     )[0];
@@ -360,7 +355,7 @@ const handleVisualizationAnalysis = async (
         priceAnalysisData = updateAnalysisData(priceAnalysisData, newPriceAnalysisData);
     }
 
-    let acreageAnalysisData: AcreageAnalysisData | undefined = visualAnalysisDocument.acreageAnalysisData.filter(
+    let acreageAnalysisData = visualAnalysisDocument.acreageAnalysisData.filter(
         ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) =>
             itemTransactionType === transactionType && itemPropertyType === propertyType
     )[0];
@@ -370,29 +365,36 @@ const handleVisualizationAnalysis = async (
         acreageAnalysisData = updateAnalysisData(acreageAnalysisData, newAcreageAnalysisData);
     }
 
-    await VisualAnalysisModel.findByIdAndUpdate(visualAnalysisDocument._id, visualAnalysisDocument);
+    await visualAnalysisLogic.update(visualAnalysisDocument._id, visualAnalysisDocument);
 };
 
 /**
  * Add coordinate and summary visualization data step
  */
 const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
-    const districtList: VisualDistrictDocumentModel[] = await VisualizationDistrictModel.find();
-    const wardList: VisualWardDocumentModel[] = await VisualizationWardModel.find();
-    districtPattern = districtList.map(({ name }): string => name).join(',|');
-    wardPattern = wardList.map(({ name }): string => name).join(',|');
-    rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, undefined, {
-        coordinateId: null,
+    const districtList = (await visualAdministrativeDistrictLogic.getAll({})).documents;
+    const districtNames = districtList.map(({ name }) => name);
+    districtPattern = districtNames.filter((name, index) => index === districtNames.lastIndexOf(name)).join(',|');
+
+    const wardList = (await visualAdministrativeWardLogic.getAll({})).documents;
+    const wardNames = wardList.map(({ name }) => name);
+    wardPattern = wardNames.filter((name, index) => index === wardNames.lastIndexOf(name)).join(',|');
+
+    rawDataset = await rawDataLogic.getAll({
+        limit: DOCUMENTS_LIMIT,
+        conditions: {
+            coordinateId: null,
+        },
     });
 
     while (rawDataset.hasNext && rawDataset.documents.length !== 0) {
         for (const rawData of rawDataset.documents) {
             new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data -> RID: ${rawData._id}`).show();
-            const addressProperties: AddressProperties = getAddressProperties(rawData.address);
+            const addressProperties = getAddressProperties(rawData.address);
 
-            const districtId: number | undefined = districtList.find((item) =>
-                new RegExp(`${item.name}$`, 'i').test(addressProperties?.district || '')
-            )?._id;
+            const districtId: number | undefined = districtList.filter(({ name: districtName }) =>
+                new RegExp(`${districtName}$`, 'i').test(addressProperties?.district || '')
+            )[0]?._id;
             if (!districtId) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
@@ -402,10 +404,11 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
                 continue;
             }
 
-            const wardId: number | undefined = wardList.find(
-                (item) =>
-                    item.districtId === districtId && new RegExp(`${item.name}$`).test(addressProperties?.ward || '')
-            )?._id;
+            const wardId: number | undefined = wardList.filter(
+                ({ name: wardName, districtId: wardDistrictId }) =>
+                    (wardDistrictId as VisualAdministrativeDistrictDocumentModel)._id === districtId &&
+                    new RegExp(`${wardName}$`, 'i').test(addressProperties?.ward || '')
+            )[0]?._id;
             if (!wardId) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
@@ -415,7 +418,7 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
                 continue;
             }
 
-            const coordinate: CoordinateDocumentModel | undefined = await getCoordinate(rawData.address);
+            const coordinate = await getCoordinate(rawData.address);
             if (!coordinate) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
@@ -439,7 +442,12 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
             await handleVisualizationAnalysis(rawData.postDate, rawData);
         }
 
-        rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, undefined, { coordinateId: null });
+        rawDataset = await rawDataLogic.getAll({
+            limit: DOCUMENTS_LIMIT,
+            conditions: {
+                coordinateId: null,
+            },
+        });
     }
 
     script.next();
@@ -449,14 +457,14 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
  * Script of preprocessing data
  */
 async function* generateScript() {
-    const startTime: [number, number] = process.hrtime();
+    const startTime = process.hrtime();
     await telegramChatBotInstance.sendMessage(`<b>🤖[Preprocessing data]🤖</b>\n📝 Start preprocessing data...`);
     new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data - Start`).show();
 
     await addCoordinateAndSummaryVisualizationData();
     yield 'Step 1: Add coordinate, summary and analysis visualization data';
 
-    const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
+    const executeTime = convertTotalSecondsToTime(process.hrtime(startTime)[0]);
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Preprocessing data]🤖</b>\n✅ Preprocessing data complete. Execute time: ${executeTime}`
     );

@@ -1,26 +1,28 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { Model } from 'mongoose';
+import { Query } from 'express-serve-static-core';
 import ResponseStatusCode from '@common/common.response-status.code';
-import { CommonDocumentModel, CommonServiceControllerBaseInterface } from '@common/service/common.service.interface';
+import { CommonServiceControllerBaseInterface } from '@common/service/common.service.interface';
 import ExceptionCustomize from '@util/exception/exception.customize';
 import Validator from '@util/validator/validator';
-import StringHandler from '@util/helper/string-handler';
+import { replaceMetaDataString } from '@util/helper/string';
 import CommonLanguage from '@common/common.language';
 import Checker from '@util/checker/checker.index';
-import HostModel from '@service/host/host.model';
-import CatalogModel from '@service/catalog/catalog.model';
-import PatternModel from '@service/pattern/pattern.model';
-import RawDataModel from '@service/raw-data/raw-data.model';
-import DetailUrlModel from '@service/detail-url/detail-url.model';
-import GroupedDataModel from '@service/grouped-data/grouped-data.model';
 import CommonServiceWording from '@common/service/common.service.wording';
+
+interface RequestParams {
+    [key: string]: string;
+}
+
+interface RequestBody {
+    [key: string]: any;
+}
 
 export default abstract class CommonServiceControllerBase implements CommonServiceControllerBaseInterface {
     protected commonPath = '/:language';
 
     protected specifyIdPath = '/:language';
 
-    protected documentAmountPath = '/:language/doc-amount/:schema';
+    private documentAmountPath = '/document-amount';
 
     protected limit = 100;
 
@@ -28,23 +30,17 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
     protected language = 0;
 
-    protected populate = false;
+    protected requestBody: RequestBody = {};
 
-    private schema = '';
+    protected requestParams: RequestParams = {};
 
-    protected keyword = '';
-
-    protected hasNext = false;
-
-    protected requestBody: { [key: string]: string | number | object } = {};
-
-    protected requestParams: { [key: string]: string } = {};
-
-    protected requestQuery: { [key: string]: string | string[] } = {};
+    protected requestQuery: Query = {};
 
     protected validator: Validator = new Validator();
 
     public router: Router = Router();
+
+    protected readonly PARAM_DOCUMENT_ID = '_id';
 
     protected readonly PARAM_ID: string = 'id';
 
@@ -52,13 +48,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
     protected readonly PARAM_OFFSET: string = 'offset';
 
-    protected readonly PARAM_POPULATE: string = 'populate';
-
-    protected readonly PARAM_KEYWORD: string = 'keyword';
-
     protected readonly PARAM_LANGUAGE: string = 'language';
-
-    private readonly PARAM_SCHEMA: string = 'schema';
 
     /**
      * @param {Request} req
@@ -76,7 +66,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      *
      * @return {Promise<void>}
      */
-    protected abstract async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void>;
+    protected abstract async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void>;
 
     /**
      * @param {Request} req
@@ -107,13 +97,13 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
         this.router
             .all(this.specifyIdPath, [this.initCommonInputs.bind(this), this.validateCommonInputs.bind(this)])
-            .get(this.specifyIdPath, this.getWithIdRoute.bind(this))
+            .get(this.specifyIdPath, this.getByIdRoute.bind(this))
             .put(this.specifyIdPath, this.updateRoute.bind(this))
             .delete(this.specifyIdPath, this.deleteRoute.bind(this));
 
         this.router
-            .all(this.documentAmountPath, this.initCommonInputs.bind(this))
-            .get(this.documentAmountPath, this.getDocumentAmount.bind(this));
+            .all(this.commonPath + this.documentAmountPath, this.initCommonInputs.bind(this))
+            .get(this.commonPath + this.documentAmountPath, this.getDocumentAmount.bind(this));
     }
 
     /**
@@ -132,52 +122,7 @@ export default abstract class CommonServiceControllerBase implements CommonServi
      *
      * @return {Promise<void>}
      */
-    private async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(this.PARAM_SCHEMA, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_SCHEMA, new Checker.StringLength(1));
-
-            this.validator.addParamValidator(this.PARAM_LANGUAGE, new Checker.Language());
-
-            this.validator.validate(this.requestParams);
-
-            let schemaModel: Model<CommonDocumentModel> | undefined;
-            switch (this.schema) {
-                case 'hosts':
-                    schemaModel = HostModel;
-                    break;
-                case 'catalogs':
-                    schemaModel = CatalogModel;
-                    break;
-                case 'patterns':
-                    schemaModel = PatternModel;
-                    break;
-                case 'detail-urls':
-                    schemaModel = DetailUrlModel;
-                    break;
-                case 'raw-dataset':
-                    schemaModel = RawDataModel;
-                    break;
-                case 'grouped-dataset':
-                    schemaModel = GroupedDataModel;
-                    break;
-                default:
-                    next();
-                    return;
-            }
-
-            const documentAmount: number = await schemaModel.countDocuments();
-            CommonServiceControllerBase.sendResponse(
-                ResponseStatusCode.OK,
-                { schema: StringHandler.upperCaseFirstCharacter(this.schema), documentAmount },
-                res
-            );
-        } catch (error) {
-            next(this.createError(error, this.language));
-        }
-    }
+    protected abstract async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void>;
 
     /**
      * @param req
@@ -195,13 +140,6 @@ export default abstract class CommonServiceControllerBase implements CommonServi
 
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.Type.Integer());
             this.validator.addParamValidator(this.PARAM_OFFSET, new Checker.IntegerRange(0, null));
-
-            this.validator.addParamValidator(this.PARAM_POPULATE, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_POPULATE, new Checker.IntegerRange(0, 1));
-
-            this.validator.addParamValidator(this.PARAM_KEYWORD, new Checker.Type.String());
-
-            this.validator.addParamValidator(this.PARAM_SCHEMA, new Checker.Type.String());
 
             this.validator.addParamValidator(this.PARAM_LANGUAGE, new Checker.Language());
 
@@ -224,17 +162,14 @@ export default abstract class CommonServiceControllerBase implements CommonServi
         try {
             this.limit = Number(req.query[this.PARAM_LIMIT]) || this.limit;
             this.offset = Number(req.query[this.PARAM_OFFSET]) || this.offset;
-            this.populate = Number(req.query[this.PARAM_POPULATE]) === 1;
             this.language = CommonLanguage[req.params[this.PARAM_LANGUAGE]] ?? this.language;
-            this.schema = req.params[this.PARAM_SCHEMA];
-            this.keyword = (req.query[this.PARAM_KEYWORD] as string) ?? this.keyword;
 
             this.requestParams = req.params ?? {};
             Object.keys(this.requestParams).forEach(
                 (key) => !this.requestParams[key] && delete this.requestParams[key]
             );
 
-            this.requestQuery = (req.query as { [key: string]: string }) ?? {};
+            this.requestQuery = req.query ?? {};
             Object.keys(this.requestQuery).forEach((key) => !this.requestQuery[key] && delete this.requestQuery[key]);
 
             this.requestBody = req.body ?? {};
@@ -287,13 +222,13 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             if (typeof cause === 'string') {
                 finalCause = cause;
             } else {
-                const causeValueByLanguage: (string | number)[] = cause.value.map((item): string | number => {
+                const causeValueByLanguage = cause.value.map((item): string | number => {
                     if (typeof item === 'number') {
                         return item;
                     }
                     return Array.isArray(item) ? item[languageIndex] : item;
                 });
-                finalCause = StringHandler.replaceString(cause.wording[languageIndex], causeValueByLanguage);
+                finalCause = replaceMetaDataString(cause.wording[languageIndex], causeValueByLanguage);
             }
         }
 
@@ -301,15 +236,13 @@ export default abstract class CommonServiceControllerBase implements CommonServi
             if (typeof message === 'string') {
                 finalMessage = message;
             } else {
-                const messageValueByLanguage: (string | number)[] | string = message.value.map((item):
-                    | string
-                    | number => {
+                const messageValueByLanguage = message.value.map((item): string | number => {
                     if (typeof item === 'number') {
                         return item;
                     }
                     return Array.isArray(item) ? item[languageIndex] : item;
                 });
-                finalMessage = StringHandler.replaceString(message.wording[languageIndex], messageValueByLanguage);
+                finalMessage = replaceMetaDataString(message.wording[languageIndex], messageValueByLanguage);
             }
         }
 
@@ -329,10 +262,8 @@ export default abstract class CommonServiceControllerBase implements CommonServi
     protected buildQueryConditions(queryParams: { paramName: string; isString: boolean }[]): object {
         const conditions: { [key: string]: any } = {};
 
-        Object.entries(this.requestQuery).forEach(([key, value]: [string, string | string[]]): void => {
-            const param: { paramName: string; isString: boolean } | undefined = queryParams.find(
-                (item) => item.paramName === key
-            );
+        Object.entries(this.requestQuery as { [key: string]: string | string[] }).forEach(([key, value]) => {
+            const param = queryParams.filter(({ paramName }) => paramName === key)[0];
             if (param) {
                 if (param.isString) {
                     let pattern = '';

@@ -1,4 +1,4 @@
-import StringHandler from '@util/helper/string-handler';
+import { getSimilarRate } from '@util/helper/string';
 import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import GroupedDataLogic from '@service/grouped-data/grouped-data.logic';
@@ -6,7 +6,7 @@ import RawDataLogic from '@service/raw-data/raw-data.logic';
 import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import { GroupedDataDocumentModel } from '@service/grouped-data/grouped-data.interface';
-import DateTime from '@util/datetime/datetime';
+import { convertTotalSecondsToTime } from '@util/helper/datetime';
 
 interface AggregationGroupDataResult {
     _id: number;
@@ -16,40 +16,44 @@ interface AggregationGroupDataResult {
 export default class GroupData {
     private isSuspense = false;
 
-    private rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
+    private rawDataLogic = RawDataLogic.getInstance();
 
-    private groupedDataLogic: GroupedDataLogic = GroupedDataLogic.getInstance();
+    private groupedDataLogic = GroupedDataLogic.getInstance();
 
-    private readonly EXPECTED_SCORE: number = 8;
+    private readonly EXPECTED_SCORE = 8;
 
-    private readonly ATTR_TITLE_SCORE: number = 4;
+    private readonly ATTR_TITLE_SCORE = 4;
 
-    private readonly ATTR_PRICE_SCORE: number = 3;
+    private readonly ATTR_PRICE_SCORE = 3;
 
-    private readonly ATTR_ADDRESS_SCORE: number = 3;
+    private readonly ATTR_ADDRESS_SCORE = 3;
 
-    private readonly OVER_FITTING_SCORE: number = 9;
+    private readonly OVER_FITTING_SCORE = 9;
 
     /**
      * Start
      */
     public async start(transactionType: number, propertyType: number): Promise<void> {
-        const startTime: [number, number] = process.hrtime();
+        const startTime = process.hrtime();
         const limit = 1000;
         let isCompareDone = true;
-        let rawDataset: {
-            documents: RawDataDocumentModel[];
-            hasNext: boolean;
-        } = await this.rawDataLogic.getAll(limit, undefined, { isGrouped: false, transactionType, propertyType });
+        let rawDataset = await this.rawDataLogic.getAll({
+            limit,
+            conditions: {
+                isGrouped: false,
+                transactionType,
+                propertyType,
+            },
+        });
 
-        const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+        const loop = setInterval(async (): Promise<void> => {
             if (this.isSuspense || !isCompareDone) {
                 return;
             }
 
             if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
                 clearInterval(loop);
-                const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
+                const executeTime = convertTotalSecondsToTime(process.hrtime(startTime)[0]);
                 await ChatBotTelegram.getInstance().sendMessage(
                     `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
                 );
@@ -64,7 +68,7 @@ export default class GroupData {
             const { documents } = rawDataset;
             rawDataLoop: for (const document of documents) {
                 document.isGrouped = true;
-                const aggregations: object[] = [
+                const aggregations = [
                     {
                         $lookup: {
                             from: 'raw_datas',
@@ -87,12 +91,12 @@ export default class GroupData {
                         },
                     },
                 ];
-                const representOfGroupedDataset: AggregationGroupDataResult[] = ((await this.groupedDataLogic.aggregationQuery(
+                const representOfGroupedDataset = ((await this.groupedDataLogic.aggregationQuery(
                     aggregations
                 )) as unknown) as AggregationGroupDataResult[];
 
                 for (const item of representOfGroupedDataset) {
-                    const similarScore: number = this.getSimilarScore(document, item.represent);
+                    const similarScore = this.getSimilarScore(document, item.represent);
 
                     if (similarScore >= this.OVER_FITTING_SCORE) {
                         new ConsoleLog(
@@ -104,7 +108,7 @@ export default class GroupData {
                     }
 
                     if (similarScore >= this.EXPECTED_SCORE) {
-                        const groupData: GroupedDataDocumentModel = await this.groupedDataLogic.getById(item._id);
+                        const groupData = await this.groupedDataLogic.getById(item._id);
 
                         groupData.items.push(document._id);
                         try {
@@ -132,7 +136,7 @@ export default class GroupData {
                     }
                 }
 
-                const groupedDataCreated: GroupedDataDocumentModel | undefined = (
+                const groupedDataCreated = (
                     await Promise.all([
                         this.groupedDataLogic.create(({
                             items: [document._id],
@@ -146,10 +150,13 @@ export default class GroupData {
                     `Group data -> RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
                 ).show();
             }
-            rawDataset = await this.rawDataLogic.getAll(limit, undefined, {
-                isGrouped: false,
-                transactionType,
-                propertyType,
+            rawDataset = await this.rawDataLogic.getAll({
+                limit,
+                conditions: {
+                    isGrouped: false,
+                    transactionType,
+                    propertyType,
+                },
             });
             isCompareDone = true;
         }, 0);
@@ -218,8 +225,8 @@ export default class GroupData {
      * @return {number} points
      */
     private calculatePriceScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
-        const firstPriceObj: { value: number; currency: string } = firstTarget.price;
-        const secondPriceObj: { value: number; currency: string } = secondTarget.price;
+        const firstPriceObj = firstTarget.price;
+        const secondPriceObj = secondTarget.price;
 
         if (!firstPriceObj.value || !secondPriceObj.value) {
             return 0;
@@ -254,11 +261,9 @@ export default class GroupData {
     ): number {
         switch (type) {
             case 'title':
-                return StringHandler.getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_TITLE_SCORE;
+                return getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_TITLE_SCORE;
             case 'address':
-                return (
-                    StringHandler.getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_ADDRESS_SCORE
-                );
+                return getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_ADDRESS_SCORE;
             default:
                 return 0;
         }

@@ -13,7 +13,7 @@ import CheckerTypeObject from './type/checker.type.object';
 import CheckerTypeString from './type/checker.type.string';
 import CheckerLanguage from './checker.language';
 
-export default {
+const Checker = {
     Type: {
         Array: CheckerTypeArray,
         Boolean: CheckerTypeBoolean,
@@ -31,3 +31,5 @@ export default {
     Language: CheckerLanguage,
     Date: CheckerDate,
 };
+
+export default Checker;

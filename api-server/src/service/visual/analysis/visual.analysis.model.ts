@@ -52,4 +52,6 @@ VisualAnalysisSchema.plugin(autoIncrement.plugin, {
 
 VisualAnalysisSchema.index({ referenceDate: 1 }, { name: 'idx_referenceDate', unique: true });
 
-export default mongoose.model<VisualAnalysisDocumentModel>('visual_analysis', VisualAnalysisSchema);
+const VisualAnalysisModel = mongoose.model<VisualAnalysisDocumentModel>('visual_analysis', VisualAnalysisSchema);
+
+export default VisualAnalysisModel;

@@ -2,13 +2,13 @@ import chalk from 'chalk';
 import ConsoleConstant from './console.constant';
 
 export default class ConsoleLog {
-    private readonly _msgType: number;
+    private readonly msgType: number;
 
-    private readonly _msgContent: string;
+    private readonly msgContent: string;
 
     constructor(msgType: number, msgContent: string) {
-        this._msgType = msgType !== undefined ? msgType : ConsoleConstant.Type.UNKNOWN;
-        this._msgContent = msgContent || '';
+        this.msgType = msgType !== undefined ? msgType : ConsoleConstant.Type.UNKNOWN;
+        this.msgContent = msgContent || '';
     }
 
     /**
@@ -19,7 +19,7 @@ export default class ConsoleLog {
     public show(): void {
         let prefix = chalk.bold(chalk.cyan(`[PID: ${process.pid}]`) + chalk.green(`[${new Date().toLocaleString()}]`));
 
-        switch (this._msgType) {
+        switch (this.msgType) {
             case ConsoleConstant.Type.INFO:
                 prefix += chalk.blue(ConsoleConstant.Tag[ConsoleConstant.Type.INFO]);
                 break;
@@ -35,6 +35,6 @@ export default class ConsoleLog {
         }
 
         // eslint-disable-next-line no-console
-        console.log(`${prefix} ${this._msgContent}`);
+        console.log(`${prefix} ${this.msgContent}`);
     }
 }

@@ -7,11 +7,11 @@ import DetailUrlLogic from '@service/detail-url/detail-url.logic';
 import RawDataLogic from '@service/raw-data/raw-data.logic';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
-import DateTime from '@util/datetime/datetime';
-import VisualizationCountryModel from '@service/visual/administrative/country/visual.country.model';
-import VisualizationProvinceModel from '@service/visual/administrative/province/visual.province.model';
-import VisualizationDistrictModel from '@service/visual/administrative/district/visual.district.model';
-import VisualizationWardModel from '@service/visual/administrative/ward/visual.ward.model';
+import VisualAdministrativeCountryLogic from '@service/visual/administrative/country/visual.administrative.country.logic';
+import VisualAdministrativeProvinceLogic from '@service/visual/administrative/province/visual.administrative.province.logic';
+import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
+import { convertTotalSecondsToTime } from '@util/helper/datetime';
 import { CleanDataConstant } from './child-process.constant';
 
 type AggregationGroupDataResult = {
@@ -20,8 +20,8 @@ type AggregationGroupDataResult = {
     docSize: number;
 };
 
-const detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
-const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
+const detailUrlLogic = DetailUrlLogic.getInstance();
+const rawDataLogic = RawDataLogic.getInstance();
 const PROCESSES_LIMIT = 30;
 
 let script: AsyncGenerator;
@@ -43,12 +43,12 @@ const deleteAction = async (rawData: RawDataDocumentModel): Promise<void> => {
  * Delete duplicate detail URL and raw data which scraped from that.
  */
 const deleteDuplicateData = async (): Promise<void> => {
-    const aggregationResult: AggregationGroupDataResult[] = ((await detailUrlLogic.aggregationQuery(
+    const aggregationResult = ((await detailUrlLogic.aggregationQuery(
         CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS
     )) as unknown) as AggregationGroupDataResult[];
     let processCount = 0;
 
-    const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+    const loop = setInterval(async (): Promise<void> => {
         if (aggregationResult.length === 0) {
             clearInterval(loop);
             new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete duplicate - Complete`).show();
@@ -60,7 +60,7 @@ const deleteDuplicateData = async (): Promise<void> => {
             return;
         }
 
-        const item: AggregationGroupDataResult | undefined = aggregationResult.shift();
+        const item = aggregationResult.shift();
         if (!item) {
             return;
         }
@@ -80,13 +80,9 @@ const deleteDuplicateData = async (): Promise<void> => {
 
             if (doc.isExtracted) {
                 try {
-                    const { documents }: { documents: RawDataDocumentModel[] } = await rawDataLogic.getAll(
-                        undefined,
-                        undefined,
-                        {
-                            detailUrlId: doc._id,
-                        }
-                    );
+                    const { documents } = await rawDataLogic.getAll({
+                        conditions: { detailUrlId: doc._id },
+                    });
                     for (const document of documents) {
                         await rawDataLogic.delete(document._id);
                         new ConsoleLog(
@@ -111,22 +107,32 @@ const deleteDuplicateData = async (): Promise<void> => {
  * Delete data which have address not contain district or ward
  */
 const deleteInvalidAddressData = async (): Promise<void> => {
-    const countryPattern: string = (await VisualizationCountryModel.find()).map((country) => country.name).join('|');
-    const provincePattern: string = (await VisualizationProvinceModel.find())
+    const countryPattern = (await VisualAdministrativeCountryLogic.getInstance().getAll({})).documents
+        .map((country) => country.name)
+        .join('|');
+    const provincePattern = (await VisualAdministrativeProvinceLogic.getInstance().getAll({})).documents
         .map((province) => province.name)
         .join('|');
-    const districtPattern: string = (await VisualizationDistrictModel.find())
+    const districtPattern = (await VisualAdministrativeDistrictLogic.getInstance().getAll({})).documents
         .map((district) => district.name)
         .join('|');
-    const wards: string[] = (await VisualizationWardModel.find()).map((ward) => ward.name);
-    const wardPattern: string = wards.filter((ward, index) => wards.lastIndexOf(ward) === index).join('|');
+    const wards: string[] = (await VisualAdministrativeWardLogic.getInstance().getAll({})).documents.map(
+        (ward) => ward.name
+    );
+    const wardPattern = wards.filter((ward, index) => wards.lastIndexOf(ward) === index).join('|');
     const validDistrictAndWardPattern = new RegExp(`(${wardPattern}).*(${districtPattern})`, 'i');
     const validProvincePattern = new RegExp(`(${provincePattern})`, 'i');
     const validCountryPattern = new RegExp(`(${countryPattern})$`, 'i');
     const DOCUMENTS_LIMIT = 1000;
     let processCount = 0;
     let offset = 0;
-    let rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, offset, { coordinateId: null });
+    let rawDataset = await rawDataLogic.getAll({
+        limit: DOCUMENTS_LIMIT,
+        offset,
+        conditions: {
+            coordinateId: null,
+        },
+    });
     const loop = setInterval(async () => {
         if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
             clearInterval(loop);
@@ -139,7 +145,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
             return;
         }
 
-        const rawData: RawDataDocumentModel | undefined = rawDataset.documents.shift();
+        const rawData = rawDataset.documents.shift();
         if (!rawData) {
             return;
         }
@@ -147,7 +153,13 @@ const deleteInvalidAddressData = async (): Promise<void> => {
 
         if (rawDataset.documents.length === 0) {
             offset += DOCUMENTS_LIMIT;
-            rawDataset = await rawDataLogic.getAll(DOCUMENTS_LIMIT, offset, { coordinateId: null });
+            rawDataset = await rawDataLogic.getAll({
+                limit: DOCUMENTS_LIMIT,
+                offset,
+                conditions: {
+                    coordinateId: null,
+                },
+            });
         }
 
         let { address } = rawData;
@@ -184,8 +196,8 @@ const deleteInvalidAddressData = async (): Promise<void> => {
  * Generate script of process
  */
 async function* generateScript() {
-    const startTime: [number, number] = process.hrtime();
-    const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
+    const startTime = process.hrtime();
+    const telegramChatBotInstance = ChatBotTelegram.getInstance();
     await telegramChatBotInstance.sendMessage(`<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`);
 
     new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete duplicate - Start`).show();
@@ -196,7 +208,7 @@ async function* generateScript() {
     await deleteInvalidAddressData();
     yield 'Step 1: Delete invalid address';
 
-    const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
+    const executeTime = convertTotalSecondsToTime(process.hrtime(startTime)[0]);
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Clean data]🤖</b>\n✅ Clean data complete. Execute time: ${executeTime}`
     );

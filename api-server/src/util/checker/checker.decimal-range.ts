@@ -18,15 +18,13 @@ export default class CheckerDecimalRange extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: object): void {
-        let value: string | null | number = this.getValue(paramName, input);
+        const value = this.getValue(paramName, input);
 
         if (!value) {
             return;
         }
 
-        value = Number(value);
-
-        if (!this.checkMinRange(value)) {
+        if (!this.checkMinRange(Number(value))) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
@@ -37,7 +35,7 @@ export default class CheckerDecimalRange extends CheckerBase {
             };
         }
 
-        if (!this.checkMaxRange(value)) {
+        if (!this.checkMaxRange(Number(value))) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },

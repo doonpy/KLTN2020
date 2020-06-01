@@ -1,4 +1,3 @@
-import { DocumentQuery } from 'mongoose';
 import {
     CommonApiModel,
     CommonDocumentModel,
@@ -14,27 +13,12 @@ export interface GroupedDataDocumentModel extends CommonDocumentModel {
     items: (RawDataDocumentModel | number)[];
 }
 
-export interface GroupedDataLogicInterface extends CommonLogicBaseInterface {
+export interface GroupedDataLogicInterface
+    extends CommonLogicBaseInterface<GroupedDataDocumentModel, GroupedDataApiModel> {
     /**
      * @param {Array<object>} aggregations
      *
      * @return {Promise<Array<any>>}
      */
     aggregationQuery(aggregations: object[]): Promise<object[]>;
-
-    /**
-     * @param {DocumentQuery<GroupedDataDocumentModel | GroupedDataDocumentModel[] | null, GroupedDataDocumentModel, {}>} query
-     *
-     * @return {DocumentQuery<GroupedDataDocumentModel | GroupedDataDocumentModel[] | null, GroupedDataDocumentModel, {}>}
-     */
-    addPopulateQuery(
-        query: DocumentQuery<GroupedDataDocumentModel | GroupedDataDocumentModel[] | null, GroupedDataDocumentModel, {}>
-    ): DocumentQuery<GroupedDataDocumentModel | GroupedDataDocumentModel[] | null, GroupedDataDocumentModel, {}>;
-
-    /**
-     * @param {GroupedDataDocumentModel} document
-     *
-     * @return {Promise<GroupedDataDocumentModel>}
-     */
-    getPopulateDocument(document: GroupedDataDocumentModel): Promise<GroupedDataDocumentModel>;
 }

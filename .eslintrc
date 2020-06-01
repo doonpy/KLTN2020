@@ -23,9 +23,9 @@
   "extends": [
     "plugin:react/recommended",
     "airbnb",
-    "plugin:prettier/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
   ],
   "rules": {
     "import/extensions": [
@@ -64,19 +64,20 @@
     "class-methods-use-this": "off",
     "no-param-reassign": "off",
     "@typescript-eslint/no-unused-vars": "off",
-    "react/jsx-indent": 0,
-    "@typescript-eslint/no-explicit-any": 0,
-    "@typescript-eslint/explicit-function-return-type": 0,
-    "@typescript-eslint/explicit-member-accessibility": 0,
-    "react/prop-types": 0,
-    "react/display-name": 0,
-    "import/prefer-default-export": 0,
-    "react/jsx-indent-props": 0,
-    "react/destructuring-assignment": 0,
+    "react/jsx-indent": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-member-accessibility": "off",
+    "react/prop-types": "off",
+    "react/display-name": "off",
+    "import/prefer-default-export": "off",
+    "react/jsx-indent-props": "off",
+    "react/destructuring-assignment": "off",
     "no-return-await": "off",
     "no-throw-literal": "off",
     "no-console": "error",
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "no-useless-constructor": "off"
   },
   "settings": {
     "import/resolver": {

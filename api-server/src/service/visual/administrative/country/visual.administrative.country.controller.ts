@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import VisualCommonController from '../../visual.common.controller';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import ResponseStatusCode from '@common/common.response-status.code';
-import { VisualWardApiModel, VisualWardDocumentModel } from './visual.ward.interface';
-import VisualizationWardModel from './visual.ward.model';
-import VisualWardLogic from './visual.ward.logic';
+import VisualCommonController from '../../visual.common.controller';
+import VisualAdministrativeCountryLogic from './visual.administrative.country.logic';
 
-const commonPath = '/wards';
-const specifyIdPath = '/ward/:id';
+const commonPath = '/administrative/countries';
+const specifyIdPath = '/administrative/country/:id';
 
-export default class VisualWardController extends VisualCommonController {
-    private static instance: VisualWardController;
+export default class VisualAdministrativeCountryController extends VisualCommonController {
+    private static instance: VisualAdministrativeCountryController;
 
-    private visualWardLogic: VisualWardLogic = VisualWardLogic.getInstance();
+    private visualAdministrativeCountryLogic = VisualAdministrativeCountryLogic.getInstance();
 
     constructor() {
         super();
@@ -24,9 +22,9 @@ export default class VisualWardController extends VisualCommonController {
     /**
      * Get instance
      */
-    public static getInstance(): VisualWardController {
+    public static getInstance(): VisualAdministrativeCountryController {
         if (!this.instance) {
-            this.instance = new VisualWardController();
+            this.instance = new VisualAdministrativeCountryController();
         }
         return this.instance;
     }
@@ -62,19 +60,16 @@ export default class VisualWardController extends VisualCommonController {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const documents: VisualWardDocumentModel[] = await VisualizationWardModel.find();
-            if (this.populate) {
-                for (const document of documents) {
-                    await this.visualWardLogic.populateDocument(document);
-                }
-            }
-
-            const responseBody: object = {
-                wards: documents.map(
-                    (document): VisualWardApiModel => this.visualWardLogic.convertToApiResponse(document)
+            const { documents, hasNext } = await this.visualAdministrativeCountryLogic.getAll({
+                limit: this.limit,
+                offset: this.offset,
+            });
+            const responseBody = {
+                countries: documents.map((document) =>
+                    this.visualAdministrativeCountryLogic.convertToApiResponse(document)
                 ),
+                hasNext,
             };
-
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
         } catch (error) {
             next(this.createError(error, this.language));
@@ -88,7 +83,7 @@ export default class VisualWardController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -101,5 +96,26 @@ export default class VisualWardController extends VisualCommonController {
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualAdministrativeCountryLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-administrative-country', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

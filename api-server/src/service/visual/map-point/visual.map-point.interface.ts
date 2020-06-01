@@ -1,10 +1,12 @@
 import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
 import {
-    VisualDistrictApiModel,
-    VisualDistrictDocumentModel,
-} from '../administrative/district/visual.district.interface';
-import { VisualWardApiModel, VisualWardDocumentModel } from '../administrative/ward/visual.ward.interface';
-import { VisualCommonLogicInterface } from '../visual.common.interface';
+    VisualAdministrativeDistrictApiModel,
+    VisualAdministrativeDistrictDocumentModel,
+} from '../administrative/district/visual.administrative.district.interface';
+import {
+    VisualAdministrativeWardApiModel,
+    VisualAdministrativeWardDocumentModel,
+} from '../administrative/ward/visual.administrative.ward.interface';
 
 export interface MapPoint {
     rawDataId: number;
@@ -15,8 +17,8 @@ export interface MapPoint {
 }
 
 export interface VisualMapPointDocumentModel extends CommonDocumentModel {
-    districtId: number | VisualDistrictDocumentModel;
-    wardId: number | VisualWardDocumentModel;
+    districtId: number | VisualAdministrativeDistrictDocumentModel;
+    wardId: number | VisualAdministrativeWardDocumentModel;
     lat: number;
     lng: number;
     points: {
@@ -27,8 +29,8 @@ export interface VisualMapPointDocumentModel extends CommonDocumentModel {
 }
 
 export interface VisualMapPointApiModel extends CommonApiModel {
-    district: number | VisualDistrictApiModel | null;
-    ward: number | VisualWardApiModel | null;
+    district: number | VisualAdministrativeDistrictApiModel | null;
+    ward: number | VisualAdministrativeWardApiModel | null;
     lat: number | null;
     lng: number | null;
     points:
@@ -38,13 +40,4 @@ export interface VisualMapPointApiModel extends CommonApiModel {
               propertyType: number;
           }[]
         | null;
-}
-
-export interface VisualMapPointLogicInterface extends VisualCommonLogicInterface {
-    /**
-     * @param {VisualMapPointDocumentModel} document
-     *
-     * @return {VisualMapPointDocumentModel}
-     */
-    populateDocument(document: VisualMapPointDocumentModel): Promise<VisualMapPointDocumentModel>;
 }

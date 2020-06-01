@@ -2,7 +2,6 @@ import { Document } from 'mongoose';
 import { Router } from 'express';
 
 export interface CommonDocumentModel extends Document {
-    _id: number;
     cTime: string;
     mTime: string;
 }
@@ -13,46 +12,53 @@ export interface CommonApiModel {
     updateAt: string | null;
 }
 
-export interface CommonLogicBaseInterface {
+export interface GetAllReturnData<T extends CommonDocumentModel> {
+    documents: T[];
+    hasNext: boolean;
+}
+
+export interface CommonOptions {
+    limit?: number;
+    offset?: number;
+    conditions?: object;
+}
+
+export interface CommonLogicBaseInterface<T extends CommonDocumentModel, A extends CommonApiModel> {
     /**
-     * @param {number | undefined} limit
-     * @param {number | undefined} offset
-     * @param {object | undefined} conditions
-     * @param {boolean | undefined} isPopulate
+     * @param {CommonOptions} options
      *
-     * @return {Promise<{ documents: CommonDocumentModel[]; hasNext: boolean }>}
+     * @return {Promise<GetAllReturnData<T>>}
      */
-    getAll(
-        limit?: number,
-        offset?: number,
-        conditions?: object,
-        isPopulate?: boolean
-    ): Promise<{ documents: CommonDocumentModel[]; hasNext: boolean }>;
+    getAll(options: CommonOptions): Promise<GetAllReturnData<T>>;
 
     /**
      * @param {number} id
-     * @param {boolean | undefined} isPopulate
      *
-     * @return {Promise<CommonDocumentModel>}
+     * @return {Promise<T | null>}
      */
-    getById(id: number, isPopulate?: boolean): Promise<CommonDocumentModel>;
+    getById(id: number): Promise<T | null>;
 
     /**
-     * @param {CommonDocumentModel} input
-     * @param {boolean | undefined} isPopulate
+     * @param {object} conditions
      *
-     * @return {Promise<CommonDocumentModel>}
+     * @return {Promise<T | null>}
      */
-    create(input: CommonDocumentModel, isPopulate?: boolean): Promise<CommonDocumentModel>;
+    getOne(conditions: object): Promise<T | null>;
+
+    /**
+     * @param {T} input
+     *
+     * @return {Promise<T>}
+     */
+    create(input: T): Promise<T>;
 
     /**
      * @param {number} id
-     * @param {CommonDocumentModel} input
-     * @param {boolean | undefined} isPopulate
+     * @param {T} input
      *
-     * @return {Promise<CommonDocumentModel>}
+     * @return {Promise<T>}
      */
-    update(id: number, input: CommonDocumentModel, isPopulate?: boolean): Promise<CommonDocumentModel>;
+    update(id: number, input: T): Promise<T>;
 
     /**
      * @param {number} id
@@ -62,26 +68,37 @@ export interface CommonLogicBaseInterface {
     delete(id: number): Promise<void>;
 
     /**
-     * @param {number | CommonDocumentModel} id
+     * @param {object} conditions
      *
      * @return {Promise<boolean>}
      */
-    isExistsWithId(id: number | CommonDocumentModel): Promise<boolean>;
+    isExisted(conditions: object): Promise<boolean>;
 
     /**
-     * @param {number | CommonDocumentModel} id
-     * @param {boolean | undefined} isNot
+     * @param {object} conditions
      *
      * @return {Promise<void>}
      */
-    checkExistsWithId(id: number | CommonDocumentModel, isNot?: boolean): Promise<void>;
+    checkExisted(conditions: object): Promise<void>;
 
     /**
-     * @param {CommonDocumentModel} input
+     * @param {object} conditions
      *
-     * @return {CommonApiModel}
+     * @return {Promise<void>}
      */
-    convertToApiResponse(input: CommonDocumentModel): CommonApiModel;
+    checkNotExisted(conditions: object): Promise<void>;
+
+    /**
+     * @param {T} input
+     *
+     * @return {A}
+     */
+    convertToApiResponse(input: T): A;
+
+    /**
+     * Get current amount document
+     */
+    getDocumentAmount(conditions?: object): Promise<number>;
 }
 
 export interface CommonServiceControllerBaseInterface {

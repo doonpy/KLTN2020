@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import autoPopulate from 'mongoose-autopopulate';
 import CommonConstant from '@common/common.constant';
 import { VisualSummaryDistrictWardDocumentModel } from './visual.summary.district-ward.interface';
 
@@ -7,8 +8,8 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualSummaryDistrictWardSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district' },
-        wardId: { type: Schema.Types.Number, ref: 'visual_administrative_ward' },
+        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
+        wardId: { type: Schema.Types.Number, ref: 'visual_administrative_ward', autopopulate: true },
         summaryAmount: { type: Schema.Types.Number },
         summary: [
             {
@@ -30,10 +31,13 @@ VisualSummaryDistrictWardSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     incrementBy: 1,
 });
+VisualSummaryDistrictWardSchema.plugin(autoPopulate);
 
 VisualSummaryDistrictWardSchema.index({ districtId: 1, wardId: 1 }, { name: 'idx_districtId_wardId', unique: true });
 
-export default mongoose.model<VisualSummaryDistrictWardDocumentModel>(
+const VisualSummaryDistrictWardModel = mongoose.model<VisualSummaryDistrictWardDocumentModel>(
     'visual_summary_district_ward',
     VisualSummaryDistrictWardSchema
 );
+
+export default VisualSummaryDistrictWardModel;

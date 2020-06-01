@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
-import PatternLogic from './pattern.logic';
 import Validator from '@util/validator/validator';
 import Checker from '@util/checker/checker.index';
-import { PatternApiModel, PatternDocumentModel } from './pattern.interface';
 import ResponseStatusCode from '@common/common.response-status.code';
+import { PatternDocumentModel } from './pattern.interface';
+import PatternLogic from './pattern.logic';
 
 const commonPath = '/patterns';
 const specifyIdPath = '/pattern/:id';
@@ -12,31 +12,31 @@ const specifyIdPath = '/pattern/:id';
 export default class PatternController extends CommonServiceControllerBase {
     private static instance: PatternController;
 
-    private patternLogic: PatternLogic = PatternLogic.getInstance();
+    private patternLogic = PatternLogic.getInstance();
 
-    private readonly PARAM_SOURCE_URL: string = 'sourceUrl';
+    private readonly PARAM_SOURCE_URL = 'sourceUrl';
 
-    private readonly PARAM_MAIN_LOCATOR: string = 'mainLocator';
+    private readonly PARAM_MAIN_LOCATOR = 'mainLocator';
 
-    private readonly PARAM_SUB_LOCATOR: string = 'subLocator';
+    private readonly PARAM_SUB_LOCATOR = 'subLocator';
 
-    private readonly PARAM_TITLE_LOCATOR: string = 'title';
+    private readonly PARAM_TITLE_LOCATOR = 'title';
 
-    private readonly PARAM_DESCRIBE_LOCATOR: string = 'describe';
+    private readonly PARAM_DESCRIBE_LOCATOR = 'describe';
 
-    private readonly PARAM_PRICE_LOCATOR: string = 'price';
+    private readonly PARAM_PRICE_LOCATOR = 'price';
 
-    private readonly PARAM_ACREAGE_LOCATOR: string = 'acreage';
+    private readonly PARAM_ACREAGE_LOCATOR = 'acreage';
 
-    private readonly PARAM_ADDRESS_LOCATOR: string = 'address';
+    private readonly PARAM_ADDRESS_LOCATOR = 'address';
 
-    private readonly PARAM_PROPERTY_TYPE_LOCATOR: string = 'propertyType';
+    private readonly PARAM_PROPERTY_TYPE_LOCATOR = 'propertyType';
 
-    private readonly PARAM_POST_DATE_LOCATOR: string = 'postDate';
+    private readonly PARAM_POST_DATE_LOCATOR = 'postDate';
 
-    private readonly PARAM_NAME_SUB_LOCATOR: string = 'name';
+    private readonly PARAM_NAME_SUB_LOCATOR = 'name';
 
-    private readonly PARAM_VALUE_SUB_LOCATOR: string = 'value';
+    private readonly PARAM_VALUE_SUB_LOCATOR = 'value';
 
     constructor() {
         super();
@@ -74,18 +74,12 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestQuery);
 
-            const {
-                documents,
-                hasNext,
-            }: { documents: PatternDocumentModel[]; hasNext: boolean } = await this.patternLogic.getAll(
-                this.limit,
-                this.offset,
-                this.buildQueryConditions([{ paramName: this.PARAM_SOURCE_URL, isString: true }]),
-                this.populate
-            );
-            const patterns: object[] = documents.map(
-                (pattern): PatternApiModel => this.patternLogic.convertToApiResponse(pattern)
-            );
+            const { documents, hasNext } = await this.patternLogic.getAll({
+                limit: this.limit,
+                offset: this.offset,
+                conditions: this.buildQueryConditions([{ paramName: this.PARAM_SOURCE_URL, isString: true }]),
+            });
+            const patterns = documents.map((pattern) => this.patternLogic.convertToApiResponse(pattern));
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -107,7 +101,7 @@ export default class PatternController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             this.validator = new Validator();
 
@@ -117,9 +111,8 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.patternLogic.checkExistsWithId(idBody);
             const pattern: PatternDocumentModel = await this.patternLogic.getById(idBody);
-            const responseBody: object = {
+            const responseBody = {
                 pattern: this.patternLogic.convertToApiResponse(pattern),
             };
 
@@ -174,9 +167,9 @@ export default class PatternController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestBody);
 
-            const patternBody: PatternDocumentModel = (this.requestBody as unknown) as PatternDocumentModel;
-            await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
-            const createdPattern: PatternDocumentModel = await this.patternLogic.create(patternBody);
+            const patternBody = (this.requestBody as unknown) as PatternDocumentModel;
+            await this.patternLogic.checkNotExisted({ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl });
+            const createdPattern = await this.patternLogic.create(patternBody);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -238,13 +231,12 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const patternBody: PatternDocumentModel = (this.requestBody as unknown) as PatternDocumentModel;
-            await this.patternLogic.checkExistsWithId(idBody);
-            const currentPattern: PatternDocumentModel = await this.patternLogic.getById(idBody);
+            const patternBody = (this.requestBody as unknown) as PatternDocumentModel;
+            const currentPattern = await this.patternLogic.getById(idBody);
             if (patternBody.sourceUrl !== currentPattern.sourceUrl) {
-                await this.patternLogic.checkExistsWithSourceUrl(patternBody.sourceUrl, true);
+                await this.patternLogic.checkNotExisted({ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl });
             }
-            const editedPattern: PatternDocumentModel = await this.patternLogic.update(idBody, patternBody);
+            const editedPattern = await this.patternLogic.update(idBody, patternBody);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -273,10 +265,26 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.patternLogic.checkExistsWithId(idBody);
             await this.patternLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.patternLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, { schema: 'pattern', documentAmount }, res);
         } catch (error) {
             next(this.createError(error, this.language));
         }

@@ -1,4 +1,3 @@
-import { DocumentQuery } from 'mongoose';
 import {
     CommonApiModel,
     CommonDocumentModel,
@@ -20,42 +19,11 @@ export interface DetailUrlDocumentModel extends CommonDocumentModel {
     requestRetries: number;
 }
 
-export interface DetailUrlLogicInterface extends CommonLogicBaseInterface {
-    /**
-     * @param {string} url
-     *
-     * @return {Promise<boolean>}
-     */
-    isExistsWithUrl(url: string): Promise<boolean>;
-
-    /**
-     * @param {string} url
-     * @param {boolean | undefined} isNot
-     *
-     * @return {Promise<void>}
-     */
-    checkExistsWithUrl(url: string, isNot?: boolean): Promise<void>;
-
+export interface DetailUrlLogicInterface extends CommonLogicBaseInterface<DetailUrlDocumentModel, DetailUrlApiModel> {
     /**
      * @param {object[]} aggregations
      *
      * @return {Promise<any[]>}
      */
     aggregationQuery(aggregations: object[]): Promise<object[]>;
-
-    /**
-     * @param {DocumentQuery<DetailUrlDocumentModel | DetailUrlDocumentModel[] | null, DetailUrlDocumentModel, {}>} query
-     *
-     * @return {DocumentQuery<DetailUrlDocumentModel | DetailUrlDocumentModel[] | null, DetailUrlDocumentModel, {}>}
-     */
-    addPopulateQuery(
-        query: DocumentQuery<DetailUrlDocumentModel | DetailUrlDocumentModel[] | null, DetailUrlDocumentModel, {}>
-    ): DocumentQuery<DetailUrlDocumentModel | DetailUrlDocumentModel[] | null, DetailUrlDocumentModel, {}>;
-
-    /**
-     * @param {DetailUrlDocumentModel} document
-     *
-     * @return {Promise<DetailUrlDocumentModel>}
-     */
-    getPopulateDocument(document: DetailUrlDocumentModel): Promise<DetailUrlDocumentModel>;
 }

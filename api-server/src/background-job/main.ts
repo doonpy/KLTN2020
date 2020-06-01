@@ -6,7 +6,7 @@ import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
 import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import CatalogLogic from '@service/catalog/catalog.logic';
-import DateTime from '@util/datetime/datetime';
+import { isExactTime } from '@util/helper/datetime';
 import CommonConstant from '@common/common.constant';
 import { GroupedDataConstant } from './child-process/child-process.constant';
 
@@ -24,12 +24,12 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
     new ConsoleLog(ConsoleConstant.Type.INFO, `Start group data child process...`).show();
     await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart group data child process...`);
 
-    let propertyTypeIdList: number[] = CommonConstant.PROPERTY_TYPE.map((item) => item.id);
-    const transactionTypeIdList: number[] = CommonConstant.TRANSACTION_TYPE.map((item) => item.id);
+    let propertyTypeIdList = CommonConstant.PROPERTY_TYPE.map((item) => item.id);
+    const transactionTypeIdList = CommonConstant.TRANSACTION_TYPE.map((item) => item.id);
     let childProcessAmount = 0;
-    let currentTransactionTypeId: number = transactionTypeIdList.shift() as number;
+    let currentTransactionTypeId = transactionTypeIdList.shift() as number;
     let propertyTypeCloneList: number[] = [];
-    const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+    const loop = setInterval(async (): Promise<void> => {
         if (propertyTypeIdList.length === 0) {
             if (transactionTypeIdList.length !== 0) {
                 currentTransactionTypeId = transactionTypeIdList.shift() as number;
@@ -48,10 +48,10 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
             return;
         }
 
-        const currentPropertyTypeId: number = propertyTypeIdList.shift() as number;
+        const currentPropertyTypeId = propertyTypeIdList.shift() as number;
         propertyTypeCloneList.push(currentPropertyTypeId);
 
-        const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
+        const childProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
         childProcessSet.add(childProcess);
         childProcess.on(
             'exit',
@@ -73,7 +73,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
  * Execute preprocessing data process
  */
 const executePreprocessingDataChildProcess = (): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.preprocessing-data'));
+    const childProcess = fork(path.join(__dirname, './child-process/child-process.preprocessing-data'));
     childProcess.on('exit', (): void => {
         script.next();
     });
@@ -84,7 +84,7 @@ const executePreprocessingDataChildProcess = (): void => {
  * Execute clean data child process
  */
 const executeCleanDataChildProcess = (): void => {
-    const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.clean-data'));
+    const childProcess = fork(path.join(__dirname, './child-process/child-process.clean-data'));
     childProcess.on(
         'exit',
         async (): Promise<void> => {
@@ -98,9 +98,11 @@ const executeCleanDataChildProcess = (): void => {
  * Execute scrape child process
  */
 const executeScrapeChildProcess = async (): Promise<void> => {
-    const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll()).documents.map((catalog) => catalog._id);
+    const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll({})).documents.map(
+        (catalog) => catalog._id
+    );
     let childProcessAmount = 0;
-    const loop: NodeJS.Timeout = setInterval((): void => {
+    const loop = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
             clearInterval(loop);
             script.next();
@@ -111,12 +113,12 @@ const executeScrapeChildProcess = async (): Promise<void> => {
             return;
         }
 
-        const catalogId: number | undefined = catalogIdList.shift();
+        const catalogId = catalogIdList.shift();
         if (!catalogId) {
             return;
         }
 
-        const childProcess: ChildProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
+        const childProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
         childProcess.on('exit', (): void => {
             childProcessAmount -= 1;
         });
@@ -174,12 +176,12 @@ async function* generateScript() {
  */
 (async (): Promise<void> => {
     try {
-        const checkTimeLoop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
-            const expectTime: Date = new Date();
+        const checkTimeLoop = setInterval(async (): Promise<void> => {
+            const expectTime = new Date();
             expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));
             expectTime.setUTCMinutes(parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10));
             expectTime.setUTCSeconds(parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10));
-            if (!DateTime.isExactTime(expectTime, true)) {
+            if (!isExactTime(expectTime, true)) {
                 return;
             }
 

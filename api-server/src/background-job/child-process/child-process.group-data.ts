@@ -6,8 +6,8 @@ import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
 import GroupData from '../group-data/group-data';
 import { GroupedDataConstant } from './child-process.constant';
 
-const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-const groupDataInstance: GroupData = new GroupData();
+const telegramChatBotInstance = ChatBotTelegram.getInstance();
+const groupDataInstance = new GroupData();
 const { MESSAGE_TYPE } = GroupedDataConstant;
 
 process.on(

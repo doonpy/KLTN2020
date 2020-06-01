@@ -1,4 +1,4 @@
-export default {
+const ErrorHandlerWording = {
     MESSAGE: {
         MSG_ERR_1: ['đường dẫn không tồn tại', 'specify path does not exist'],
     },
@@ -7,3 +7,5 @@ export default {
         CAU_ERR_2: ['lỗi không xác định', 'unknown error'],
     },
 };
+
+export default ErrorHandlerWording;
