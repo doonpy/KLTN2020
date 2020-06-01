@@ -75,9 +75,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                     { paramName: this.PARAM_REQUEST_RETRIES, isString: false },
                 ]),
             });
-            const detailUrlList = documents.map((detailUrl: DetailUrlDocumentModel) =>
-                this.detailUrlLogic.convertToApiResponse(detailUrl)
-            );
+            const detailUrlList = documents.map((detailUrl) => this.detailUrlLogic.convertToApiResponse(detailUrl));
 
             const responseBody = {
                 detailUrls: detailUrlList,
@@ -108,7 +106,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const detailUrl = await this.detailUrlLogic.getById(idBody);
-            const responseBody: object = {
+            const responseBody = {
                 detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl),
             };
 
@@ -140,8 +138,11 @@ export default class DetailUrlController extends CommonServiceControllerBase {
 
             const detailUrlBody = (this.requestBody as unknown) as DetailUrlDocumentModel;
             await CatalogLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId });
-            await this.detailUrlLogic.checkNotExisted({ [this.PARAM_URL]: detailUrlBody.url });
-            const createdDetailUrl = await this.detailUrlLogic.create(detailUrlBody);
+            const createdDetailUrl = await this.detailUrlLogic.create(
+                detailUrlBody,
+                [],
+                [{ [this.PARAM_URL]: detailUrlBody.url }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -184,8 +185,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const detailUrlBody = (this.requestBody as unknown) as DetailUrlDocumentModel;
             await CatalogLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId });
-            await this.detailUrlLogic.checkNotExisted({ [this.PARAM_URL]: detailUrlBody.url });
-            const editedDetailUrl = await this.detailUrlLogic.update(idBody, detailUrlBody);
+            const editedDetailUrl = await this.detailUrlLogic.update(idBody, detailUrlBody, undefined, [
+                { [this.PARAM_URL]: detailUrlBody.url },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,

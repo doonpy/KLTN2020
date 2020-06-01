@@ -1,11 +1,10 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import DetailUrlModel from './detail-url.model';
 import { CatalogApiModel, CatalogDocumentModel } from '../catalog/catalog.interface';
-import { DetailUrlApiModel, DetailUrlDocumentModel, DetailUrlLogicInterface } from './detail-url.interface';
+import { DetailUrlApiModel, DetailUrlDocumentModel } from './detail-url.interface';
 import CatalogLogic from '../catalog/catalog.logic';
 
-export default class DetailUrlLogic extends CommonServiceLogicBase<DetailUrlDocumentModel, DetailUrlApiModel>
-    implements DetailUrlLogicInterface {
+export default class DetailUrlLogic extends CommonServiceLogicBase<DetailUrlDocumentModel, DetailUrlApiModel> {
     private static instance: DetailUrlLogic;
 
     constructor() {
@@ -21,15 +20,6 @@ export default class DetailUrlLogic extends CommonServiceLogicBase<DetailUrlDocu
         }
 
         return this.instance;
-    }
-
-    /**
-     * @param {object[]} aggregations
-     *
-     * @return {Promise<any[]>}
-     */
-    public async aggregationQuery(aggregations: object[]): Promise<object[]> {
-        return DetailUrlModel.aggregate(aggregations).allowDiskUse(true).exec();
     }
 
     /**

@@ -91,9 +91,9 @@ export default class GroupData {
                         },
                     },
                 ];
-                const representOfGroupedDataset = ((await this.groupedDataLogic.aggregationQuery(
-                    aggregations
-                )) as unknown) as AggregationGroupDataResult[];
+                const representOfGroupedDataset = await this.groupedDataLogic.getWithAggregation<
+                    AggregationGroupDataResult
+                >(aggregations);
 
                 for (const item of representOfGroupedDataset) {
                     const similarScore = this.getSimilarScore(document, item.represent);

@@ -125,8 +125,9 @@ export default class HostController extends CommonServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const hostBody = (this.requestBody as unknown) as HostDocumentModel;
-            await this.hostLogic.checkExisted({ [this.PARAM_DOMAIN]: hostBody.domain });
-            const createdHost = await this.hostLogic.create(hostBody);
+            const createdHost = await this.hostLogic.create(hostBody, undefined, [
+                { [this.PARAM_DOMAIN]: hostBody.domain },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -164,8 +165,9 @@ export default class HostController extends CommonServiceControllerBase {
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const hostBody = (this.requestBody as unknown) as HostDocumentModel;
-            await this.hostLogic.checkNotExisted({ [this.PARAM_DOMAIN]: hostBody.domain });
-            const editedHost = await this.hostLogic.update(idBody, hostBody);
+            const editedHost = await this.hostLogic.update(idBody, hostBody, undefined, [
+                { [this.PARAM_DOMAIN]: hostBody.domain },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,

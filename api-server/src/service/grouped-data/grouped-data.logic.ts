@@ -1,11 +1,10 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import GroupedDataModel from './grouped-data.model';
-import { GroupedDataApiModel, GroupedDataDocumentModel, GroupedDataLogicInterface } from './grouped-data.interface';
+import { GroupedDataApiModel, GroupedDataDocumentModel } from './grouped-data.interface';
 import RawDataLogic from '../raw-data/raw-data.logic';
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/raw-data.interface';
 
-export default class GroupedDataLogic extends CommonServiceLogicBase<GroupedDataDocumentModel, GroupedDataApiModel>
-    implements GroupedDataLogicInterface {
+export default class GroupedDataLogic extends CommonServiceLogicBase<GroupedDataDocumentModel, GroupedDataApiModel> {
     private static instance: GroupedDataLogic;
 
     constructor() {
@@ -21,15 +20,6 @@ export default class GroupedDataLogic extends CommonServiceLogicBase<GroupedData
         }
 
         return this.instance;
-    }
-
-    /**
-     * @param {Array<object>} aggregations
-     *
-     * @return {Promise<Array<any>>}
-     */
-    public async aggregationQuery(aggregations: object[]): Promise<object[]> {
-        return GroupedDataModel.aggregate(aggregations).exec();
     }
 
     /**

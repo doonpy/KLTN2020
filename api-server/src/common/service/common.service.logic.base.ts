@@ -9,9 +9,31 @@ import { Model } from 'mongoose';
 import ResponseStatusCode from '@common/common.response-status.code';
 import CommonServiceWording from '@common/service/common.service.wording';
 
+enum ValidateType {
+    EXISTED,
+    NOT_EXISTED,
+}
+
 export default abstract class CommonServiceLogicBase<T extends CommonDocumentModel, A extends CommonApiModel>
     implements CommonLogicBaseInterface<T, A> {
     protected constructor(protected model: Model<T>) {}
+
+    /**
+     * @param properties
+     * @param {ValidateType} type
+     */
+    private async validate(properties: { [key: string]: any }[], type: ValidateType): Promise<void> {
+        const promise: Promise<void>[] = [];
+        properties.forEach((prop) => {
+            if (type === ValidateType.EXISTED) {
+                promise.push(this.checkExisted(prop));
+            } else {
+                promise.push(this.checkNotExisted(prop));
+            }
+        });
+
+        await Promise.all(promise);
+    }
 
     /**
      * @param {CommonOptions} input
@@ -31,8 +53,11 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
             documentQuery.limit(limit);
         }
 
-        const documents = await documentQuery.exec();
-        const remainAmount = await remainQuery.exec();
+        const promises: [Promise<T[]>, Promise<number> | number] = [
+            documentQuery.exec(),
+            limit ? remainQuery.exec() : -1,
+        ];
+        const [documents, remainAmount] = await Promise.all(promises);
 
         return { documents, hasNext: documents.length < remainAmount };
     }
@@ -59,21 +84,50 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
 
     /**
      * @param {T} input
+     * @param validateExistedProperties
+     * @param validateNotExistedProperties
      *
      * @return {Promise<T>}
      */
-    public async create(input: T): Promise<T> {
+    public async create(
+        input: T,
+        validateExistedProperties?: { [key: string]: any }[],
+        validateNotExistedProperties?: { [key: string]: any }[]
+    ): Promise<T> {
+        if (validateExistedProperties) {
+            await this.validate(validateExistedProperties, ValidateType.EXISTED);
+        }
+
+        if (validateNotExistedProperties) {
+            await this.validate(validateNotExistedProperties, ValidateType.NOT_EXISTED);
+        }
+
         return this.model.create(input);
     }
 
     /**
      * @param {number} id
      * @param {T} input
+     * @param validateExistedProperties
+     * @param validateNotExistedProperties
      *
      * @return {Promise<T | never>}
      */
-    public async update(id: number, input: T): Promise<T | never> {
+    public async update(
+        id: number,
+        input: T,
+        validateExistedProperties?: { [key: string]: any }[],
+        validateNotExistedProperties?: { [key: string]: any }[]
+    ): Promise<T | never> {
         await this.checkExisted({ _id: id });
+
+        if (validateExistedProperties) {
+            await this.validate(validateExistedProperties, ValidateType.EXISTED);
+        }
+
+        if (validateNotExistedProperties) {
+            await this.validate(validateNotExistedProperties, ValidateType.NOT_EXISTED);
+        }
 
         return (await this.model.findByIdAndUpdate(id, input, { new: true, omitUndefined: true })) as T;
     }
@@ -152,4 +206,13 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
      * @return {CommonApiModel}
      */
     public abstract convertToApiResponse(input: T): A;
+
+    /**
+     * @param {object[]} aggregations
+     *
+     * @return {Promise<any[]>}
+     */
+    public async getWithAggregation<AT>(aggregations: object[]): Promise<AT[]> {
+        return this.model.aggregate<AT>(aggregations).allowDiskUse(true).exec();
+    }
 }

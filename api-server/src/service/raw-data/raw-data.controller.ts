@@ -237,8 +237,9 @@ export default class RawDataController extends CommonServiceControllerBase {
 
             const rawDataBody = (this.requestBody as unknown) as RawDataDocumentModel;
             await DetailUrlLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId });
-            await this.rawDataLogic.checkNotExisted({ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId });
-            const createdRawData = await this.rawDataLogic.create(rawDataBody);
+            const createdRawData = await this.rawDataLogic.create(rawDataBody, undefined, [
+                { [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -331,10 +332,15 @@ export default class RawDataController extends CommonServiceControllerBase {
             const rawDataBody = (this.requestBody as unknown) as RawDataDocumentModel;
             const currentRawData = await this.rawDataLogic.getById(idBody);
             await DetailUrlLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: idBody });
+            let editedRawData: RawDataDocumentModel;
+
             if (currentRawData.detailUrlId !== rawDataBody.detailUrlId) {
-                await this.rawDataLogic.checkNotExisted({ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId });
+                editedRawData = await this.rawDataLogic.update(idBody, rawDataBody, undefined, [
+                    { [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId },
+                ]);
+            } else {
+                editedRawData = await this.rawDataLogic.update(idBody, rawDataBody);
             }
-            const editedRawData = await this.rawDataLogic.update(idBody, rawDataBody);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,

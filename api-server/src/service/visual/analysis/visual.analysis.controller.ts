@@ -7,12 +7,13 @@ import CommonConstant from '@common/common.constant';
 import VisualCommonController from '@service/visual/visual.common.controller';
 import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
 import { convertStringToDate } from '@util/helper/datetime';
+import { VisualAnalysisDocumentModel } from '@service/visual/analysis/visual.analysis.interface';
 
 const commonPath = '/analyses';
 const specifyIdPath = '/analysis/:id';
 const DATE_FORMAT = 'dd-mm-yyyy';
 const DATE_DELIMITER = '-';
-const MIN_DATE = new Date(-8640000000000000);
+const MIN_FROM_DATE = new Date(-8640000000000000);
 
 export default class VisualAnalysisController extends VisualCommonController {
     private static instance: VisualAnalysisController;
@@ -96,68 +97,74 @@ export default class VisualAnalysisController extends VisualCommonController {
             );
 
             this.validator.validate(this.requestQuery);
+            const fromDateQuery = (this.requestQuery[this.PARAM_FROM_DATE] as string) ?? '';
+            const toDateQuery = (this.requestQuery[this.PARAM_TO_DATE] as string) ?? '';
 
-            const conditions = {
-                $and: [
-                    {
-                        referenceDate: {
-                            $gte: (this.requestQuery[this.PARAM_FROM_DATE] as string)
-                                ? convertStringToDate(
-                                      this.requestQuery[this.PARAM_FROM_DATE] as string,
-                                      DATE_FORMAT,
-                                      DATE_DELIMITER
-                                  )
-                                : MIN_DATE.toISOString(),
-                        },
-                    },
-                    {
-                        referenceDate: {
-                            $lte: (this.requestQuery[this.PARAM_TO_DATE] as string)
-                                ? convertStringToDate(
-                                      this.requestQuery[this.PARAM_TO_DATE] as string,
-                                      DATE_FORMAT,
-                                      DATE_DELIMITER
-                                  )
-                                : new Date().toISOString(),
-                        },
-                    },
-                ],
-            };
-            let { documents } = await this.visualAnalysisLogic.getAll({ conditions });
+            let fromDate = convertStringToDate(fromDateQuery, DATE_FORMAT, DATE_DELIMITER);
+            fromDate = !fromDate ? MIN_FROM_DATE : fromDate;
+
+            let toDate = convertStringToDate(toDateQuery, DATE_FORMAT, DATE_DELIMITER);
+            toDate = !toDate ? new Date() : toDate;
+
             const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
             const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
-
-            documents = documents.filter(({ priceAnalysisData, acreageAnalysisData }) => {
-                acreageAnalysisData = acreageAnalysisData.filter(
-                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) => {
-                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
-                            return false;
-                        }
-
-                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-
-                priceAnalysisData = priceAnalysisData.filter(
-                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) => {
-                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
-                            return false;
-                        }
-
-                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-
-                return acreageAnalysisData.length > 0 && priceAnalysisData.length > 0;
-            });
+            const transactionTypeAndPropertyTypeAggregations = {
+                $and: [
+                    transactionType
+                        ? {
+                              $eq: ['$$analysisItem.transactionType', transactionType],
+                          }
+                        : {},
+                    propertyType
+                        ? {
+                              $eq: ['$$analysisItem.propertyType', propertyType],
+                          }
+                        : {},
+                ],
+            };
+            const aggregations = [
+                {
+                    $match: {
+                        $and: [
+                            {
+                                referenceDate: {
+                                    $gte: fromDate,
+                                },
+                            },
+                            {
+                                referenceDate: {
+                                    $lte: toDate,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        referenceDate: 1,
+                        priceAnalysisData: {
+                            $filter: {
+                                input: '$priceAnalysisData',
+                                as: 'analysisItem',
+                                cond: transactionTypeAndPropertyTypeAggregations,
+                            },
+                        },
+                        acreageAnalysisData: {
+                            $filter: {
+                                input: '$acreageAnalysisData',
+                                as: 'analysisItem',
+                                cond: transactionTypeAndPropertyTypeAggregations,
+                            },
+                        },
+                    },
+                },
+            ];
+            const documents = (
+                await this.visualAnalysisLogic.getWithAggregation<VisualAnalysisDocumentModel>(aggregations)
+            ).filter(
+                ({ priceAnalysisData, acreageAnalysisData }) =>
+                    priceAnalysisData.length > 0 || acreageAnalysisData.length > 0
+            );
 
             const responseBody = {
                 analyses: documents.map((document) => this.visualAnalysisLogic.convertToApiResponse(document)),

@@ -153,11 +153,14 @@ export default class CatalogController extends CommonServiceControllerBase {
             this.validator.validate((this.requestBody[this.PARAM_LOCATOR] as object) ?? {});
 
             const catalogBody = (this.requestBody as unknown) as CatalogDocumentModel;
-            await this.catalogLogic.checkNotExisted({ [this.PARAM_URL]: catalogBody.url });
-            await HostLogic.getInstance().checkExisted({ [this.PARAM_HOST_ID]: catalogBody.hostId });
+            await HostLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.hostId });
             await PatternLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.patternId });
 
-            const createdCatalog = await this.catalogLogic.create(catalogBody);
+            const createdCatalog = await this.catalogLogic.create(
+                catalogBody,
+                [],
+                [{ [this.PARAM_URL]: catalogBody.url }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -209,11 +212,12 @@ export default class CatalogController extends CommonServiceControllerBase {
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const catalogBody = (this.requestBody as unknown) as CatalogDocumentModel;
-            await this.catalogLogic.checkNotExisted({ [this.PARAM_URL]: catalogBody.url });
             await HostLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.hostId });
             await PatternLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.patternId });
 
-            const editedCatalog = await this.catalogLogic.update(idBody, catalogBody);
+            const editedCatalog = await this.catalogLogic.update(idBody, catalogBody, undefined, [
+                { [this.PARAM_URL]: catalogBody.url },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,

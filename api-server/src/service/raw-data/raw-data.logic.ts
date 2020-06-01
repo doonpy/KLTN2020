@@ -44,15 +44,6 @@ export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocument
     }
 
     /**
-     * @param {object[]} aggregations
-     *
-     * @return {Promise<any[]>}
-     */
-    public async queryWithAggregation(aggregations: object[]): Promise<any[]> {
-        return RawDataModel.aggregate(aggregations).exec();
-    }
-
-    /**
      * @param {object | undefined} conditions
      *
      * @return {number}

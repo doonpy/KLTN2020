@@ -72,13 +72,6 @@ export interface RawDataLogicInterface extends CommonLogicBaseInterface<RawDataD
     getPropertyTypeIndex(propertyTypeData: string): number;
 
     /**
-     * @param {object[]} aggregations
-     *
-     * @return {Promise<any[]>}
-     */
-    queryWithAggregation(aggregations: object[]): Promise<any[]>;
-
-    /**
      * @param {object | undefined} conditions
      *
      * @return {number}

@@ -111,7 +111,7 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const pattern: PatternDocumentModel = await this.patternLogic.getById(idBody);
+            const pattern = await this.patternLogic.getById(idBody);
             const responseBody = {
                 pattern: this.patternLogic.convertToApiResponse(pattern),
             };
@@ -168,8 +168,11 @@ export default class PatternController extends CommonServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const patternBody = (this.requestBody as unknown) as PatternDocumentModel;
-            await this.patternLogic.checkNotExisted({ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl });
-            const createdPattern = await this.patternLogic.create(patternBody);
+            const createdPattern = await this.patternLogic.create(
+                patternBody,
+                [],
+                [{ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -233,10 +236,16 @@ export default class PatternController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const patternBody = (this.requestBody as unknown) as PatternDocumentModel;
             const currentPattern = await this.patternLogic.getById(idBody);
+            let editedPattern: PatternDocumentModel;
             if (patternBody.sourceUrl !== currentPattern.sourceUrl) {
-                await this.patternLogic.checkNotExisted({ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl });
+                editedPattern = await this.patternLogic.update(idBody, patternBody, undefined, [
+                    { [this.PARAM_SOURCE_URL]: patternBody.sourceUrl },
+                ]);
+            } else {
+                editedPattern = await this.patternLogic.update(idBody, patternBody, [
+                    { [this.PARAM_DOCUMENT_ID]: idBody },
+                ]);
             }
-            const editedPattern = await this.patternLogic.update(idBody, patternBody);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,

@@ -3,7 +3,11 @@
  * @param format
  * @param delimiter
  */
-export const convertStringToDate = (value: string, format: string, delimiter: '/' | '-' | '.' | string): Date => {
+export const convertStringToDate = (
+    value: string,
+    format: string,
+    delimiter: '/' | '-' | '.' | string
+): Date | undefined => {
     format = format.toLowerCase();
     const separatedFormat = format.split(delimiter);
     const separatedValue = value.split(delimiter);
@@ -11,10 +15,20 @@ export const convertStringToDate = (value: string, format: string, delimiter: '/
     const monthIndex = separatedFormat.indexOf('mm');
     const yearIndex = separatedFormat.indexOf('yyyy');
 
+    if (!separatedValue[dayIndex] || !Number(!separatedValue[dayIndex])) {
+        return undefined;
+    }
+    if (!separatedValue[monthIndex] || !Number(!separatedValue[monthIndex])) {
+        return undefined;
+    }
+    if (!separatedValue[yearIndex] || !Number(!separatedValue[yearIndex])) {
+        return undefined;
+    }
+
     return new Date(
-        parseInt(separatedValue[yearIndex], 10),
-        parseInt(separatedValue[monthIndex], 10) - 1,
-        parseInt(separatedValue[dayIndex], 10)
+        Number(separatedValue[yearIndex]),
+        Number(separatedValue[monthIndex]) - 1,
+        Number(separatedValue[dayIndex])
     );
 };
 

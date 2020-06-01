@@ -95,7 +95,7 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const groupedData: GroupedDataDocumentModel = await this.groupedDataLogic.getById(idBody);
+            const groupedData = await this.groupedDataLogic.getById(idBody);
             const responseBody = {
                 groupedData: this.groupedDataLogic.convertToApiResponse(groupedData),
             };
@@ -161,7 +161,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             for (const item of groupedDataBody.items) {
                 await RawDataLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: item });
             }
-            const editedGroupedData = await this.groupedDataLogic.update(idBody, groupedDataBody);
+            const editedGroupedData = await this.groupedDataLogic.update(idBody, groupedDataBody, [
+                { [this.PARAM_DOCUMENT_ID]: idBody },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,

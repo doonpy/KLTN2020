@@ -19,8 +19,7 @@ export default class CheckerDate extends CheckerBase {
             return;
         }
 
-        const dateConverted = convertStringToDate(value, this.format, this.delimiter);
-        if (dateConverted.toString() === 'Invalid Date') {
+        if (!convertStringToDate(value, this.format, this.delimiter)) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },

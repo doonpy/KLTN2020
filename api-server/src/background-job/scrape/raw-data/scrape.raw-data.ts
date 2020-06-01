@@ -303,7 +303,7 @@ export default class ScrapeRawData extends ScrapeBase {
             this.pattern.mainLocator.postDate.format,
             this.pattern.mainLocator.postDate.delimiter
         );
-        if (postDate.toString() === 'Invalid Date') {
+        if (!postDate) {
             postDate = new Date();
         }
 

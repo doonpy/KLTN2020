@@ -43,9 +43,9 @@ const deleteAction = async (rawData: RawDataDocumentModel): Promise<void> => {
  * Delete duplicate detail URL and raw data which scraped from that.
  */
 const deleteDuplicateData = async (): Promise<void> => {
-    const aggregationResult = ((await detailUrlLogic.aggregationQuery(
+    const aggregationResult = await detailUrlLogic.getWithAggregation<AggregationGroupDataResult>(
         CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS
-    )) as unknown) as AggregationGroupDataResult[];
+    );
     let processCount = 0;
 
     const loop = setInterval(async (): Promise<void> => {

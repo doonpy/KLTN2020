@@ -40,25 +40,44 @@ export interface CommonLogicBaseInterface<T extends CommonDocumentModel, A exten
 
     /**
      * @param {object} conditions
+     * @param validateExistedProperties
+     * @param validateNotExistedProperties
      *
      * @return {Promise<T | null>}
      */
-    getOne(conditions: object): Promise<T | null>;
+    getOne(
+        conditions: object,
+        validateExistedProperties?: { [key: string]: any }[],
+        validateNotExistedProperties?: { [key: string]: any }[]
+    ): Promise<T | null>;
 
     /**
      * @param {T} input
+     * @param validateExistedProperties
+     * @param validateNotExistedProperties
      *
      * @return {Promise<T>}
      */
-    create(input: T): Promise<T>;
+    create(
+        input: T,
+        validateExistedProperties?: { [key: string]: any }[],
+        validateNotExistedProperties?: { [key: string]: any }[]
+    ): Promise<T>;
 
     /**
      * @param {number} id
      * @param {T} input
+     * @param validateExistedProperties
+     * @param validateNotExistedProperties
      *
      * @return {Promise<T>}
      */
-    update(id: number, input: T): Promise<T>;
+    update(
+        id: number,
+        input: T,
+        validateExistedProperties?: { [key: string]: any }[],
+        validateNotExistedProperties?: { [key: string]: any }[]
+    ): Promise<T>;
 
     /**
      * @param {number} id
@@ -99,6 +118,13 @@ export interface CommonLogicBaseInterface<T extends CommonDocumentModel, A exten
      * Get current amount document
      */
     getDocumentAmount(conditions?: object): Promise<number>;
+
+    /**
+     * @param {object[]} aggregations
+     *
+     * @return {Promise<AT[]>}
+     */
+    getWithAggregation<AT>(aggregations: object[]): Promise<AT[]>;
 }
 
 export interface CommonServiceControllerBaseInterface {

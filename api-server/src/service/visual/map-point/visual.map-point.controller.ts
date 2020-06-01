@@ -5,8 +5,10 @@ import Validator from '@util/validator/validator';
 import Checker from '@util/checker/checker.index';
 import CommonConstant from '@common/common.constant';
 import VisualMapPointLogic from './visual.map-point.logic';
-import { VisualMapPointApiModel } from './visual.map-point.interface';
+import { VisualMapPointDocumentModel } from './visual.map-point.interface';
 import VisualCommonController from '../visual.common.controller';
+import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
+import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/visual.administrative.ward.interface';
 
 const commonPath = '/map-points';
 const specifyIdPath = '/map-points/:id';
@@ -136,49 +138,134 @@ export default class VisualMapPointController extends VisualCommonController {
 
             this.validator.validate(this.requestQuery);
 
-            const conditions = {
-                $and: [
-                    { lat: { $gte: this.requestQuery[this.PARAM_MIN_LAT] || MIN_LAT } },
-                    { lat: { $lte: this.requestQuery[this.PARAM_MAX_LAT] || MAX_LAT } },
-                    { lng: { $gte: this.requestQuery[this.PARAM_MIN_LNG] || MIN_LNG } },
-                    { lng: { $lte: this.requestQuery[this.PARAM_MAX_LNG] || MAX_LNG } },
-                ],
-            };
-            let { documents } = await this.visualMapPointLogic.getAll({ conditions });
+            const visualAdministrativeWardLogic = VisualAdministrativeWardLogic.getInstance();
+            const minLat = Number(this.requestQuery[this.PARAM_MIN_LAT]) || MIN_LAT;
+            const maxLat = Number(this.requestQuery[this.PARAM_MAX_LAT]) || MAX_LAT;
+            const minLng = Number(this.requestQuery[this.PARAM_MIN_LNG]) || MIN_LNG;
+            const maxLng = Number(this.requestQuery[this.PARAM_MAX_LNG]) || MAX_LNG;
             const minAcreage = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_NUMBER_VALUE;
             const maxAcreage = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_NUMBER_VALUE;
             const minPrice = Number(this.requestQuery[this.PARAM_MIN_PRICE]) || MIN_NUMBER_VALUE;
             const maxPrice = Number(this.requestQuery[this.PARAM_MAX_PRICE]) || MAX_NUMBER_VALUE;
             const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
             const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const transactionTypeAndPropertyTypeAggregations = {
+                $and: [
+                    transactionType
+                        ? {
+                              $eq: ['$$point.transactionType', transactionType],
+                          }
+                        : {},
+                    propertyType
+                        ? {
+                              $eq: ['$$point.propertyType', propertyType],
+                          }
+                        : {},
+                ],
+            };
+            const aggregations = [
+                {
+                    $match: {
+                        $and: [
+                            {
+                                lat: {
+                                    $gte: minLat,
+                                },
+                            },
+                            {
+                                lat: {
+                                    $lte: maxLat,
+                                },
+                            },
+                            {
+                                lng: {
+                                    $gte: minLng,
+                                },
+                            },
+                            {
+                                lng: {
+                                    $lte: maxLng,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        districtId: 1,
+                        wardId: 1,
+                        lat: 1,
+                        lng: 1,
+                        points: {
+                            $filter: {
+                                input: '$points',
+                                as: 'point',
+                                cond: transactionTypeAndPropertyTypeAggregations,
+                            },
+                        },
+                        cTime: 1,
+                        mTime: 1,
+                    },
+                },
+                {
+                    $project: {
+                        districtId: 1,
+                        wardId: 1,
+                        lat: 1,
+                        lng: 1,
+                        points: {
+                            $map: {
+                                input: '$points',
+                                as: 'point',
+                                in: {
+                                    rawDataset: {
+                                        $filter: {
+                                            input: '$$point.rawDataset',
+                                            as: 'rawData',
+                                            cond: {
+                                                $and: [
+                                                    {
+                                                        $gte: ['$$rawData.acreage', minAcreage],
+                                                    },
+                                                    {
+                                                        $lte: ['$$rawData.acreage', maxAcreage],
+                                                    },
+                                                    {
+                                                        $gte: ['$$rawData.price', minPrice],
+                                                    },
+                                                    {
+                                                        $lte: ['$$rawData.price', maxPrice],
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                    transactionType: '$$point.transactionType',
+                                    propertyType: '$$point.propertyType',
+                                },
+                            },
+                        },
+                        cTime: 1,
+                        mTime: 1,
+                    },
+                },
+            ];
+            const [documents, { documents: visualAdministrativeWards }] = await Promise.all<
+                VisualMapPointDocumentModel[],
+                { documents: VisualAdministrativeWardDocumentModel[] }
+            >([
+                this.visualMapPointLogic.getWithAggregation<VisualMapPointDocumentModel>(aggregations),
+                visualAdministrativeWardLogic.getAll({}),
+            ]);
 
-            documents = documents.filter((document) => {
-                document.points = document.points.filter(
-                    ({ rawDataset, transactionType: itemTransactionType, propertyType: itemPropertyType }) => {
-                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
-                            return false;
-                        }
+            const mapPoints = documents.map((document) => {
+                document.wardId = visualAdministrativeWards.filter(({ _id }) => document.wardId === _id)[0] || null;
+                document.districtId = document.wardId.districtId;
 
-                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
-                            return false;
-                        }
-
-                        rawDataset = rawDataset.filter(
-                            ({ acreage, price }) =>
-                                acreage >= minAcreage && acreage <= maxAcreage && price >= minPrice && price <= maxPrice
-                        );
-
-                        return rawDataset.length > 0;
-                    }
-                );
-
-                return document.points.length > 0;
+                return document;
             });
-
             const responseBody = {
-                mapPoints: documents.map(
-                    (document): VisualMapPointApiModel => this.visualMapPointLogic.convertToApiResponse(document)
-                ),
+                mapPoints: mapPoints.map((mapPoint) => this.visualMapPointLogic.convertToApiResponse(mapPoint)),
             };
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
