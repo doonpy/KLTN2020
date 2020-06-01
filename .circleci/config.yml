@@ -23,7 +23,7 @@ jobs:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "KLTN2020" ]; then
-              docker logic -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
+              docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
               docker tag app "kltn2020/app:${CIRCLE_SHA1}"
               docker push "kltn2020/app:${CIRCLE_SHA1}"
             fi
