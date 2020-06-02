@@ -24,7 +24,10 @@ export default class CheckerLanguage extends CheckerBase {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_12, value: [value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_12,
+                    value: [value],
+                },
             };
         }
     }

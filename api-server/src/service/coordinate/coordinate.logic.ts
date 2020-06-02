@@ -1,8 +1,13 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import CoordinateModel from './coordinate.model';
-import { CoordinateApiModel, CoordinateDocumentModel, CoordinateLogicInterface } from './coordinate.interface';
+import {
+    CoordinateApiModel,
+    CoordinateDocumentModel,
+    CoordinateLogicInterface,
+} from './coordinate.interface';
 
-export default class CoordinateLogic extends CommonServiceLogicBase<CoordinateDocumentModel, CoordinateApiModel>
+export default class CoordinateLogic
+    extends CommonServiceLogicBase<CoordinateDocumentModel, CoordinateApiModel>
     implements CoordinateLogicInterface {
     private static instance: CoordinateLogic;
 
@@ -26,9 +31,13 @@ export default class CoordinateLogic extends CommonServiceLogicBase<CoordinateDo
      *
      * @return Promise<CoordinateDocumentModel>
      */
-    public async getByLocation(location: string): Promise<CoordinateDocumentModel> {
+    public async getByLocation(
+        location: string
+    ): Promise<CoordinateDocumentModel> {
         location = location.trim();
-        return (await CoordinateModel.findOne({ location }).exec()) as CoordinateDocumentModel;
+        return (await CoordinateModel.findOne({
+            location,
+        }).exec()) as CoordinateDocumentModel;
     }
 
     /**

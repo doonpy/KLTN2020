@@ -1,6 +1,9 @@
 import VisualSummaryDistrictModel from '@service/visual/summary/district/visual.summary.district.model';
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
-import { VisualSummaryDistrictApiModel, VisualSummaryDistrictDocumentModel } from './visual.summary.district.interface';
+import {
+    VisualSummaryDistrictApiModel,
+    VisualSummaryDistrictDocumentModel,
+} from './visual.summary.district.interface';
 import { VisualAdministrativeDistrictApiModel } from '../../administrative/district/visual.administrative.district.interface';
 import VisualAdministrativeDistrictLogic from '../../administrative/district/visual.administrative.district.logic';
 
@@ -37,11 +40,16 @@ export default class VisualSummaryDistrictLogic extends CommonServiceLogicBase<
         cTime,
         mTime,
     }: VisualSummaryDistrictDocumentModel): VisualSummaryDistrictApiModel {
-        let district: VisualAdministrativeDistrictApiModel | number | null = null;
+        let district:
+            | VisualAdministrativeDistrictApiModel
+            | number
+            | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(
+                    districtId
+                );
             } else {
                 district = districtId;
             }

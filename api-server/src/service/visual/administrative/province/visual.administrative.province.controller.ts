@@ -36,7 +36,11 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -47,7 +51,11 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -58,21 +66,34 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
-            const { documents, hasNext } = await this.visualAdministrativeProvinceLogic.getAll({
+            const {
+                documents,
+                hasNext,
+            } = await this.visualAdministrativeProvinceLogic.getAll({
                 limit: this.limit,
                 offset: this.offset,
             });
 
             const responseBody = {
                 provinces: documents.map((document) =>
-                    this.visualAdministrativeProvinceLogic.convertToApiResponse(document)
+                    this.visualAdministrativeProvinceLogic.convertToApiResponse(
+                        document
+                    )
                 ),
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -85,7 +106,11 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -96,7 +121,11 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -107,7 +136,11 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.visualAdministrativeProvinceLogic.getDocumentAmount();
 

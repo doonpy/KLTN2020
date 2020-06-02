@@ -1,13 +1,21 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
+import {
+    CommonApiModel,
+    CommonDocumentModel,
+} from '@common/service/common.service.interface';
 import {
     VisualAdministrativeDistrictApiModel,
     VisualAdministrativeDistrictDocumentModel,
 } from '../../administrative/district/visual.administrative.district.interface';
 
-export interface VisualSummaryDistrictDocumentModel extends CommonDocumentModel {
+export interface VisualSummaryDistrictDocumentModel
+    extends CommonDocumentModel {
     districtId: number | VisualAdministrativeDistrictDocumentModel;
     summaryAmount: number;
-    summary: { transactionType: number; propertyType: number; amount: number }[];
+    summary: {
+        transactionType: number;
+        propertyType: number;
+        amount: number;
+    }[];
 }
 
 export interface VisualSummaryDistrictApiModel extends CommonApiModel {

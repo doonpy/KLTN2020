@@ -3,8 +3,14 @@ import {
     CommonDocumentModel,
     CommonLogicBaseInterface,
 } from '@common/service/common.service.interface';
-import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
-import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
+import {
+    DetailUrlApiModel,
+    DetailUrlDocumentModel,
+} from '../detail-url/detail-url.interface';
+import {
+    CoordinateApiModel,
+    CoordinateDocumentModel,
+} from '../coordinate/coordinate.interface';
 
 export interface RawDataApiModel extends CommonApiModel {
     detailUrl: DetailUrlApiModel | number | null;
@@ -63,7 +69,8 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     isGrouped: boolean;
 }
 
-export interface RawDataLogicInterface extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
+export interface RawDataLogicInterface
+    extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
     /**
      * @param {string} propertyTypeData
      *

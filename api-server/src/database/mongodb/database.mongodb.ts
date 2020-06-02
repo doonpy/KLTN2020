@@ -66,9 +66,15 @@ export default class DatabaseMongodb {
             }
 
             this.connection = await connect(connString, options);
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Successful connection to (DB: ${this.dbName}).`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Successful connection to (DB: ${this.dbName}).`
+            ).show();
         } catch (error) {
-            new ConsoleLog(ConsoleConstant.Type.ERROR, DatabaseWording.CAUSE.DBC_1[0]).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                DatabaseWording.CAUSE.DBC_1[0]
+            ).show();
         }
     }
 }

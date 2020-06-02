@@ -2,11 +2,17 @@ import CommonLogicBase from '@common/service/common.service.logic.base';
 import CatalogModel from './catalog.model';
 import { CatalogApiModel, CatalogDocumentModel } from './catalog.interface';
 import { HostApiModel, HostDocumentModel } from '../host/host.interface';
-import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
+import {
+    PatternApiModel,
+    PatternDocumentModel,
+} from '../pattern/pattern.interface';
 import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
 
-export default class CatalogLogic extends CommonLogicBase<CatalogDocumentModel, CatalogApiModel> {
+export default class CatalogLogic extends CommonLogicBase<
+    CatalogDocumentModel,
+    CatalogApiModel
+> {
     public static instance: CatalogLogic;
 
     constructor() {
@@ -43,7 +49,9 @@ export default class CatalogLogic extends CommonLogicBase<CatalogDocumentModel, 
 
         if (hostId) {
             if (typeof hostId === 'object') {
-                host = HostLogic.getInstance().convertToApiResponse(hostId as HostDocumentModel);
+                host = HostLogic.getInstance().convertToApiResponse(
+                    hostId as HostDocumentModel
+                );
             } else {
                 host = hostId as number;
             }
@@ -51,7 +59,9 @@ export default class CatalogLogic extends CommonLogicBase<CatalogDocumentModel, 
 
         if (patternId) {
             if (typeof patternId === 'object') {
-                pattern = PatternLogic.getInstance().convertToApiResponse(patternId as PatternDocumentModel);
+                pattern = PatternLogic.getInstance().convertToApiResponse(
+                    patternId as PatternDocumentModel
+                );
             } else {
                 pattern = patternId as number;
             }

@@ -45,7 +45,9 @@ export default class VisualAdministrativeProvinceLogic extends CommonServiceLogi
 
         if (countryId) {
             if (typeof countryId === 'object') {
-                country = VisualAdministrativeCountryLogic.getInstance().convertToApiResponse(countryId);
+                country = VisualAdministrativeCountryLogic.getInstance().convertToApiResponse(
+                    countryId
+                );
             } else {
                 country = countryId;
             }

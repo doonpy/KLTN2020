@@ -1,4 +1,7 @@
-import requestPromise, { RequestPromise, RequestPromiseOptions } from 'request-promise';
+import requestPromise, {
+    RequestPromise,
+    RequestPromiseOptions,
+} from 'request-promise';
 import { Response } from 'request';
 
 /**
@@ -6,6 +9,9 @@ import { Response } from 'request';
  *
  * @return Promise<Response>
  */
-export const sendRequest = <T>(url: string, options: RequestPromiseOptions): RequestPromise<T> => {
+export const sendRequest = <T>(
+    url: string,
+    options: RequestPromiseOptions
+): RequestPromise<T> => {
     return requestPromise(url, options);
 };

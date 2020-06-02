@@ -3,7 +3,9 @@ import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
 
 export default class CheckerUrl extends CheckerBase {
-    private VALID_URL = new RegExp(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/);
+    private VALID_URL = new RegExp(
+        /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/
+    );
 
     /**
      * @param paramName
@@ -20,7 +22,10 @@ export default class CheckerUrl extends CheckerBase {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_2, value: [value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_2,
+                    value: [value],
+                },
             };
         }
     }

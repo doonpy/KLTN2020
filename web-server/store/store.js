@@ -18,5 +18,8 @@ export const rootReducer = combineReducers({
     patterns: patternReducer,
     detailUrls: detailUrlReducer,
 });
-const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunkMiddleware, logger)));
+const store = createStore(
+    rootReducer,
+    composeWithDevTools(applyMiddleware(thunkMiddleware, logger))
+);
 export default store;

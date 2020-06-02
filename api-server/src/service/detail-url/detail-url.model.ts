@@ -7,7 +7,11 @@ autoIncrement.initialize(mongoose.connection);
 
 const detailUrlSchema: Schema = new Schema(
     {
-        catalogId: { type: Schema.Types.Number, ref: 'catalog', autopopulate: true },
+        catalogId: {
+            type: Schema.Types.Number,
+            ref: 'catalog',
+            autopopulate: true,
+        },
         url: { type: Schema.Types.String },
         isExtracted: { type: Schema.Types.Boolean, default: false },
         requestRetries: { type: Schema.Types.Number, default: 0 },
@@ -30,6 +34,9 @@ detailUrlSchema.index(
     { name: 'idx_catalogId_isExtracted_requestRetries' }
 );
 
-const DetailUrlModel = mongoose.model<DetailUrlDocumentModel>('detail_url', detailUrlSchema);
+const DetailUrlModel = mongoose.model<DetailUrlDocumentModel>(
+    'detail_url',
+    detailUrlSchema
+);
 
 export default DetailUrlModel;

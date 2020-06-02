@@ -8,7 +8,11 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualSummaryDistrictSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
+        districtId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_district',
+            autopopulate: true,
+        },
         summaryAmount: { type: Schema.Types.Number },
         summary: [
             {
@@ -17,7 +21,10 @@ const VisualSummaryDistrictSchema: Schema = new Schema(
                     type: Schema.Types.Number,
                     enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
                 },
-                propertyType: { type: Schema.Types.Number, enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id) },
+                propertyType: {
+                    type: Schema.Types.Number,
+                    enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                },
                 amount: { type: Schema.Types.Number },
             },
         ],
@@ -32,11 +39,13 @@ VisualSummaryDistrictSchema.plugin(autoIncrement.plugin, {
 });
 VisualSummaryDistrictSchema.plugin(autoPopulate);
 
-VisualSummaryDistrictSchema.index({ districtId: 1 }, { name: 'idx_districtId', unique: true });
-
-const VisualSummaryDistrictModel = mongoose.model<VisualSummaryDistrictDocumentModel>(
-    'visual_summary_district',
-    VisualSummaryDistrictSchema
+VisualSummaryDistrictSchema.index(
+    { districtId: 1 },
+    { name: 'idx_districtId', unique: true }
 );
+
+const VisualSummaryDistrictModel = mongoose.model<
+    VisualSummaryDistrictDocumentModel
+>('visual_summary_district', VisualSummaryDistrictSchema);
 
 export default VisualSummaryDistrictModel;

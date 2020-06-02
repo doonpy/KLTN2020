@@ -21,6 +21,9 @@ CoordinateCacheSchema.plugin(autoIncrement.plugin, {
 
 CoordinateCacheSchema.index({ location: 1 }, { name: 'idx_location' });
 
-const CoordinateModel = mongoose.model<CoordinateDocumentModel>('coordinate', CoordinateCacheSchema);
+const CoordinateModel = mongoose.model<CoordinateDocumentModel>(
+    'coordinate',
+    CoordinateCacheSchema
+);
 
 export default CoordinateModel;

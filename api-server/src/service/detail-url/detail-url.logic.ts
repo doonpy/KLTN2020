@@ -1,10 +1,19 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import DetailUrlModel from './detail-url.model';
-import { CatalogApiModel, CatalogDocumentModel } from '../catalog/catalog.interface';
-import { DetailUrlApiModel, DetailUrlDocumentModel } from './detail-url.interface';
+import {
+    CatalogApiModel,
+    CatalogDocumentModel,
+} from '../catalog/catalog.interface';
+import {
+    DetailUrlApiModel,
+    DetailUrlDocumentModel,
+} from './detail-url.interface';
 import CatalogLogic from '../catalog/catalog.logic';
 
-export default class DetailUrlLogic extends CommonServiceLogicBase<DetailUrlDocumentModel, DetailUrlApiModel> {
+export default class DetailUrlLogic extends CommonServiceLogicBase<
+    DetailUrlDocumentModel,
+    DetailUrlApiModel
+> {
     private static instance: DetailUrlLogic;
 
     constructor() {
@@ -40,7 +49,9 @@ export default class DetailUrlLogic extends CommonServiceLogicBase<DetailUrlDocu
 
         if (catalogId) {
             if (typeof catalogId === 'object') {
-                catalog = CatalogLogic.getInstance().convertToApiResponse(catalogId as CatalogDocumentModel);
+                catalog = CatalogLogic.getInstance().convertToApiResponse(
+                    catalogId as CatalogDocumentModel
+                );
             } else {
                 catalog = catalogId as number;
             }

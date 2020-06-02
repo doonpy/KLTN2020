@@ -18,7 +18,10 @@ export default class ScrapeDetailUrl extends ScrapeBase {
 
     private scrapedPageNumber: string[] = [];
 
-    private readonly MAX_REQUEST = parseInt(process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1', 10);
+    private readonly MAX_REQUEST = parseInt(
+        process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1',
+        10
+    );
 
     private readonly ATTRIBUTE_TO_GET_DATA = 'href';
 
@@ -34,18 +37,24 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape detail URL -> CID: ${this.catalog._id} - Start`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape detail URL -> CID: ${this.catalog._id} - Start`
+            ).show();
             await this.telegramChatBotInstance.sendMessage(
-                replaceMetaDataString(ScrapeDetailUrlConstantChatBotMessage.START, [
-                    this.catalog.title,
-                    this.catalog.id,
-                ])
+                replaceMetaDataString(
+                    ScrapeDetailUrlConstantChatBotMessage.START,
+                    [this.catalog.title, this.catalog.id]
+                )
             );
 
             this.scrapeAction();
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
-                replaceMetaDataString(error.message, [this.catalog._id, error.message])
+                replaceMetaDataString(error.message, [
+                    this.catalog._id,
+                    error.message,
+                ])
             );
             this.isRunning = false;
             throw new Error(
@@ -61,7 +70,10 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         this.pageNumberQueue = [this.catalog.url];
 
         const loop = setInterval(async (): Promise<void> => {
-            if (this.pageNumberQueue.length === 0 && this.requestCounter === 0) {
+            if (
+                this.pageNumberQueue.length === 0 &&
+                this.requestCounter === 0
+            ) {
                 clearInterval(loop);
                 await this.finishAction(this.catalog);
             }
@@ -75,17 +87,20 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 return;
             }
 
-            this.requestCounter += 1;
-            const $ = await this.getStaticBody((this.catalog.hostId as HostDocumentModel).domain, currentUrl);
+            this.requestCounter++;
+            const $ = await this.getStaticBody(
+                (this.catalog.hostId as HostDocumentModel).domain,
+                currentUrl
+            );
             this.scrapedPageNumber.push(currentUrl);
 
             if (!$) {
-                this.requestCounter -= 1;
+                this.requestCounter--;
                 return;
             }
 
             await this.handleSuccessRequest($);
-            this.requestCounter -= 1;
+            this.requestCounter--;
         }, this.REQUEST_DELAY);
     }
 
@@ -93,7 +108,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      * @param $
      */
     private async handleSuccessRequest($: CheerioStatic): Promise<void> {
-        let newDetailUrlList = ScrapeBase.extractData($, this.catalog.locator.detailUrl, this.ATTRIBUTE_TO_GET_DATA);
+        let newDetailUrlList = ScrapeBase.extractData(
+            $,
+            this.catalog.locator.detailUrl,
+            this.ATTRIBUTE_TO_GET_DATA
+        );
 
         newDetailUrlList = newDetailUrlList.map((url) => sanitizeUrl(url));
         for (const newDetailUrl of newDetailUrlList) {
@@ -105,7 +124,9 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                     } as unknown) as DetailUrlDocumentModel);
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
-                        `Scrape detail URL -> DID: ${createdDoc ? createdDoc._id : 'N/A'}`
+                        `Scrape detail URL -> DID: ${
+                            createdDoc ? createdDoc._id : 'N/A'
+                        }`
                     ).show();
                 } catch (error) {
                     new ConsoleLog(
@@ -116,7 +137,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             }
         }
 
-        let newPageNumberUrls = ScrapeBase.extractData($, this.catalog.locator.pageNumber, this.ATTRIBUTE_TO_GET_DATA);
+        let newPageNumberUrls = ScrapeBase.extractData(
+            $,
+            this.catalog.locator.pageNumber,
+            this.ATTRIBUTE_TO_GET_DATA
+        );
 
         newPageNumberUrls = newPageNumberUrls.map((url) => sanitizeUrl(url));
         for (const newPageNumberUrl of newPageNumberUrls) {
@@ -134,10 +159,15 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      */
     protected async finishAction(catalog: CatalogDocumentModel): Promise<void> {
         await this.telegramChatBotInstance.sendMessage(
-            replaceMetaDataString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [catalog.title, catalog.id])
+            replaceMetaDataString(
+                ScrapeDetailUrlConstantChatBotMessage.FINISH,
+                [catalog.title, catalog.id]
+            )
         );
         this.isRunning = false;
-        const executeTime = convertTotalSecondsToTime(process.hrtime(this.startTime)[0]);
+        const executeTime = convertTotalSecondsToTime(
+            process.hrtime(this.startTime)[0]
+        );
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
             `Scrape detail URL -> CID: ${catalog._id} - Execute time: ${executeTime} - Complete`

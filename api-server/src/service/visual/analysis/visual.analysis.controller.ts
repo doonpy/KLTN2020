@@ -52,7 +52,11 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -63,7 +67,11 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -74,50 +82,95 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_FROM_DATE, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_FROM_DATE, new Checker.Date(DATE_FORMAT, DATE_DELIMITER));
-
-            this.validator.addParamValidator(this.PARAM_TO_DATE, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_TO_DATE, new Checker.Date(DATE_FORMAT, DATE_DELIMITER));
-
-            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.validator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.DecimalRange(1, CommonConstant.TRANSACTION_TYPE.length)
+                this.PARAM_FROM_DATE,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_FROM_DATE,
+                new Checker.Date(DATE_FORMAT, DATE_DELIMITER)
             );
 
-            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(
+                this.PARAM_TO_DATE,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TO_DATE,
+                new Checker.Date(DATE_FORMAT, DATE_DELIMITER)
+            );
+
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.DecimalRange(
+                    1,
+                    CommonConstant.TRANSACTION_TYPE.length
+                )
+            );
+
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.Type.Integer()
+            );
             this.validator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
                 new Checker.DecimalRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
             this.validator.validate(this.requestQuery);
-            const fromDateQuery = (this.requestQuery[this.PARAM_FROM_DATE] as string) ?? '';
-            const toDateQuery = (this.requestQuery[this.PARAM_TO_DATE] as string) ?? '';
+            const fromDateQuery =
+                (this.requestQuery[this.PARAM_FROM_DATE] as string) ?? '';
+            const toDateQuery =
+                (this.requestQuery[this.PARAM_TO_DATE] as string) ?? '';
 
-            let fromDate = convertStringToDate(fromDateQuery, DATE_FORMAT, DATE_DELIMITER);
+            let fromDate = convertStringToDate(
+                fromDateQuery,
+                DATE_FORMAT,
+                DATE_DELIMITER
+            );
             fromDate = !fromDate ? MIN_FROM_DATE : fromDate;
 
-            let toDate = convertStringToDate(toDateQuery, DATE_FORMAT, DATE_DELIMITER);
+            let toDate = convertStringToDate(
+                toDateQuery,
+                DATE_FORMAT,
+                DATE_DELIMITER
+            );
             toDate = !toDate ? new Date() : toDate;
 
-            const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
-            const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const transactionType =
+                Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) ||
+                undefined;
+            const propertyType =
+                Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) ||
+                undefined;
             const transactionTypeAndPropertyTypeAggregations = {
                 $and: [
                     transactionType
                         ? {
-                              $eq: ['$$analysisItem.transactionType', transactionType],
+                              $eq: [
+                                  '$$analysisItem.transactionType',
+                                  transactionType,
+                              ],
                           }
                         : {},
                     propertyType
                         ? {
-                              $eq: ['$$analysisItem.propertyType', propertyType],
+                              $eq: [
+                                  '$$analysisItem.propertyType',
+                                  propertyType,
+                              ],
                           }
                         : {},
                 ],
@@ -160,17 +213,26 @@ export default class VisualAnalysisController extends VisualCommonController {
                 },
             ];
             const documents = (
-                await this.visualAnalysisLogic.getWithAggregation<VisualAnalysisDocumentModel>(aggregations)
+                await this.visualAnalysisLogic.getWithAggregation<
+                    VisualAnalysisDocumentModel
+                >(aggregations)
             ).filter(
                 ({ priceAnalysisData, acreageAnalysisData }) =>
-                    priceAnalysisData.length > 0 || acreageAnalysisData.length > 0
+                    priceAnalysisData.length > 0 ||
+                    acreageAnalysisData.length > 0
             );
 
             const responseBody = {
-                analyses: documents.map((document) => this.visualAnalysisLogic.convertToApiResponse(document)),
+                analyses: documents.map((document) =>
+                    this.visualAnalysisLogic.convertToApiResponse(document)
+                ),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -183,7 +245,11 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -194,7 +260,11 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -205,7 +275,11 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.visualAnalysisLogic.getDocumentAmount();
 

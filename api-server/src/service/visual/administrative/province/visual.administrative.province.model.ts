@@ -9,7 +9,11 @@ const VisualAdministrativeProvinceSchema: Schema = new Schema(
     {
         name: { type: Schema.Types.String },
         code: { type: Schema.Types.String },
-        countryId: { type: Schema.Types.Number, ref: 'visual_administrative_country', autopopulate: true },
+        countryId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_country',
+            autopopulate: true,
+        },
         acreage: { type: Schema.Types.Number },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
@@ -24,9 +28,8 @@ VisualAdministrativeProvinceSchema.plugin(autoPopulate);
 
 VisualAdministrativeProvinceSchema.index({ name: 1 }, { name: 'idx_name' });
 
-const VisualAdministrativeProvinceModel = mongoose.model<VisualAdministrativeProvinceDocumentModel>(
-    'visual_administrative_province',
-    VisualAdministrativeProvinceSchema
-);
+const VisualAdministrativeProvinceModel = mongoose.model<
+    VisualAdministrativeProvinceDocumentModel
+>('visual_administrative_province', VisualAdministrativeProvinceSchema);
 
 export default VisualAdministrativeProvinceModel;

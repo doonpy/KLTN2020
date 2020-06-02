@@ -8,17 +8,30 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualSummaryDistrictWardSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
-        wardId: { type: Schema.Types.Number, ref: 'visual_administrative_ward', autopopulate: true },
+        districtId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_district',
+            autopopulate: true,
+        },
+        wardId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_ward',
+            autopopulate: true,
+        },
         summaryAmount: { type: Schema.Types.Number },
         summary: [
             {
                 _id: false,
                 transactionType: {
                     type: Schema.Types.Number,
-                    enum: CommonConstant.TRANSACTION_TYPE.map((item) => item.id),
+                    enum: CommonConstant.TRANSACTION_TYPE.map(
+                        (item) => item.id
+                    ),
                 },
-                propertyType: { type: Schema.Types.Number, enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id) },
+                propertyType: {
+                    type: Schema.Types.Number,
+                    enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                },
                 amount: { type: Schema.Types.Number },
             },
         ],
@@ -33,11 +46,13 @@ VisualSummaryDistrictWardSchema.plugin(autoIncrement.plugin, {
 });
 VisualSummaryDistrictWardSchema.plugin(autoPopulate);
 
-VisualSummaryDistrictWardSchema.index({ districtId: 1, wardId: 1 }, { name: 'idx_districtId_wardId', unique: true });
-
-const VisualSummaryDistrictWardModel = mongoose.model<VisualSummaryDistrictWardDocumentModel>(
-    'visual_summary_district_ward',
-    VisualSummaryDistrictWardSchema
+VisualSummaryDistrictWardSchema.index(
+    { districtId: 1, wardId: 1 },
+    { name: 'idx_districtId_wardId', unique: true }
 );
+
+const VisualSummaryDistrictWardModel = mongoose.model<
+    VisualSummaryDistrictWardDocumentModel
+>('visual_summary_district_ward', VisualSummaryDistrictWardSchema);
 
 export default VisualSummaryDistrictWardModel;

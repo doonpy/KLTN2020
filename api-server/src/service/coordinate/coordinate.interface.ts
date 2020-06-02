@@ -17,7 +17,10 @@ export interface CoordinateDocumentModel extends CommonDocumentModel {
 }
 
 export interface CoordinateLogicInterface
-    extends CommonLogicBaseInterface<CoordinateDocumentModel, CoordinateApiModel> {
+    extends CommonLogicBaseInterface<
+        CoordinateDocumentModel,
+        CoordinateApiModel
+    > {
     /**
      * @param {string} location
      *

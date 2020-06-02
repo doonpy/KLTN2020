@@ -82,27 +82,64 @@ export default class RawDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.IntegerRange(0, null));
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.IntegerRange(0, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.IntegerRange(0, null));
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.IntegerRange(0, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.Type.String()
+            );
 
-            this.validator.addParamValidator(this.PARAM_DESCRIBE, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_DESCRIBE,
+                new Checker.Type.String()
+            );
 
-            this.validator.addParamValidator(this.PARAM_ADDRESS, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_ADDRESS,
+                new Checker.Type.String()
+            );
 
-            this.validator.addParamValidator(this.PRAM_IS_GROUPED, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PRAM_IS_GROUPED, new Checker.IntegerRange(0, 1));
+            this.validator.addParamValidator(
+                this.PRAM_IS_GROUPED,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PRAM_IS_GROUPED,
+                new Checker.IntegerRange(0, 1)
+            );
 
             this.validator.validate(this.requestParams);
 
@@ -119,15 +156,20 @@ export default class RawDataController extends CommonServiceControllerBase {
                     { paramName: this.PRAM_IS_GROUPED, isString: false },
                 ]),
             });
-            const rawDataList = documents.map((rawDataItem: RawDataDocumentModel) =>
-                this.rawDataLogic.convertToApiResponse(rawDataItem)
+            const rawDataList = documents.map(
+                (rawDataItem: RawDataDocumentModel) =>
+                    this.rawDataLogic.convertToApiResponse(rawDataItem)
             );
             const responseBody = {
                 rawDataset: rawDataList,
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -140,12 +182,22 @@ export default class RawDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
@@ -155,7 +207,11 @@ export default class RawDataController extends CommonServiceControllerBase {
                 rawData: this.rawDataLogic.convertToApiResponse(rawData),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -168,7 +224,11 @@ export default class RawDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.bodyValidator = new Validator();
             this.priceValidator = new Validator();
@@ -176,70 +236,165 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.othersValidator = new Validator();
 
             // Validate request body
-            this.bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.Type.Integer());
-            this.bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.IntegerRange(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DETAIL_URL_ID,
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DETAIL_URL_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(1, Object.keys(CommonConstant.TRANSACTION_TYPE).length)
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.IntegerRange(
+                    1,
+                    Object.keys(CommonConstant.TRANSACTION_TYPE).length
+                )
             );
 
-            this.bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(1, Object.keys(CommonConstant.PROPERTY_TYPE).length)
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.IntegerRange(
+                    1,
+                    Object.keys(CommonConstant.PROPERTY_TYPE).length
+                )
             );
 
-            this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_POST_DATE,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_POST_DATE,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DESCRIBE,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DESCRIBE,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_PRICE, new Checker.Type.Object());
+            this.bodyValidator.addParamValidator(
+                this.PARAM_PRICE,
+                new Checker.Type.Object()
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_ACREAGE, new Checker.Type.Object());
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ACREAGE,
+                new Checker.Type.Object()
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_ADDRESS, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_ADDRESS, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ADDRESS,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ADDRESS,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_OTHERS, new Checker.Type.Object());
+            this.bodyValidator.addParamValidator(
+                this.PARAM_OTHERS,
+                new Checker.Type.Object()
+            );
 
             // Validate price object
-            this.priceValidator.addParamValidator(this.PARAM_PRICE_CURRENCY, new Checker.Type.String());
+            this.priceValidator.addParamValidator(
+                this.PARAM_PRICE_CURRENCY,
+                new Checker.Type.String()
+            );
 
-            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.Type.Integer());
-            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.IntegerRange(0, 2));
+            this.priceValidator.addParamValidator(
+                this.PARAM_PRICE_TIME_UNIT,
+                new Checker.Type.Integer()
+            );
+            this.priceValidator.addParamValidator(
+                this.PARAM_PRICE_TIME_UNIT,
+                new Checker.IntegerRange(0, 2)
+            );
 
-            this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.Decimal());
-            this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.DecimalRange(0, null));
+            this.priceValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.Type.Decimal()
+            );
+            this.priceValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.DecimalRange(0, null)
+            );
 
             // Validate acreage object
-            this.acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new Checker.Type.String());
-            this.acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new Checker.MeasureUnit('m²'));
+            this.acreageValidator.addParamValidator(
+                this.PARAM_ACREAGE_MEASURE_UNIT,
+                new Checker.Type.String()
+            );
+            this.acreageValidator.addParamValidator(
+                this.PARAM_ACREAGE_MEASURE_UNIT,
+                new Checker.MeasureUnit('m²')
+            );
 
-            this.acreageValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.Decimal());
-            this.acreageValidator.addParamValidator(this.PARAM_VALUE, new Checker.DecimalRange(0, null));
+            this.acreageValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.Type.Decimal()
+            );
+            this.acreageValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.DecimalRange(0, null)
+            );
 
             // Validate others object
-            this.othersValidator.addParamValidator(this.PARAM_OTHERS_NAME, new Checker.Type.String());
+            this.othersValidator.addParamValidator(
+                this.PARAM_OTHERS_NAME,
+                new Checker.Type.String()
+            );
 
-            this.othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
+            this.othersValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.Type.String()
+            );
 
             this.bodyValidator.validate(this.requestBody);
-            this.priceValidator.validate((this.requestBody[this.PARAM_PRICE] as object) ?? {});
-            this.acreageValidator.validate((this.requestBody[this.PARAM_ACREAGE] as object) ?? {});
-            this.othersValidator.validate((this.requestBody[this.PARAM_OTHERS] as object) ?? {});
+            this.priceValidator.validate(
+                (this.requestBody[this.PARAM_PRICE] as object) ?? {}
+            );
+            this.acreageValidator.validate(
+                (this.requestBody[this.PARAM_ACREAGE] as object) ?? {}
+            );
+            this.othersValidator.validate(
+                (this.requestBody[this.PARAM_OTHERS] as object) ?? {}
+            );
 
-            const rawDataBody = (this.requestBody as unknown) as RawDataDocumentModel;
-            await DetailUrlLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId });
-            const createdRawData = await this.rawDataLogic.create(rawDataBody, undefined, [
-                { [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId },
-            ]);
+            const rawDataBody = (this
+                .requestBody as unknown) as RawDataDocumentModel;
+            await DetailUrlLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId,
+            });
+            const createdRawData = await this.rawDataLogic.create(
+                rawDataBody,
+                undefined,
+                [{ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -258,7 +413,11 @@ export default class RawDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.bodyValidator = new Validator();
             this.priceValidator = new Validator();
@@ -266,80 +425,185 @@ export default class RawDataController extends CommonServiceControllerBase {
             this.othersValidator = new Validator();
 
             // Validate request body
-            this.bodyValidator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.bodyValidator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.Type.Integer());
-            this.bodyValidator.addParamValidator(this.PARAM_DETAIL_URL_ID, new Checker.IntegerRange(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DETAIL_URL_ID,
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DETAIL_URL_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(1, Object.keys(CommonConstant.PROPERTY_TYPE).length)
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.IntegerRange(
+                    1,
+                    Object.keys(CommonConstant.PROPERTY_TYPE).length
+                )
             );
 
-            this.bodyValidator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(1, Object.keys(CommonConstant.PROPERTY_TYPE).length)
+                new Checker.Type.Integer()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.IntegerRange(
+                    1,
+                    Object.keys(CommonConstant.PROPERTY_TYPE).length
+                )
             );
 
-            this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_POST_DATE, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_POST_DATE,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_POST_DATE,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_TITLE, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_DESCRIBE, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DESCRIBE,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_DESCRIBE,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_PRICE, new Checker.Type.Object());
+            this.bodyValidator.addParamValidator(
+                this.PARAM_PRICE,
+                new Checker.Type.Object()
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_ACREAGE, new Checker.Type.Object());
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ACREAGE,
+                new Checker.Type.Object()
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_ADDRESS, new Checker.Type.String());
-            this.bodyValidator.addParamValidator(this.PARAM_ADDRESS, new Checker.StringLength(1, null));
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ADDRESS,
+                new Checker.Type.String()
+            );
+            this.bodyValidator.addParamValidator(
+                this.PARAM_ADDRESS,
+                new Checker.StringLength(1, null)
+            );
 
-            this.bodyValidator.addParamValidator(this.PARAM_OTHERS, new Checker.Type.Object());
+            this.bodyValidator.addParamValidator(
+                this.PARAM_OTHERS,
+                new Checker.Type.Object()
+            );
 
             // Validate price object
-            this.priceValidator.addParamValidator(this.PARAM_PRICE_CURRENCY, new Checker.Type.String());
+            this.priceValidator.addParamValidator(
+                this.PARAM_PRICE_CURRENCY,
+                new Checker.Type.String()
+            );
 
-            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.Type.Integer());
-            this.priceValidator.addParamValidator(this.PARAM_PRICE_TIME_UNIT, new Checker.IntegerRange(0, 2));
+            this.priceValidator.addParamValidator(
+                this.PARAM_PRICE_TIME_UNIT,
+                new Checker.Type.Integer()
+            );
+            this.priceValidator.addParamValidator(
+                this.PARAM_PRICE_TIME_UNIT,
+                new Checker.IntegerRange(0, 2)
+            );
 
-            this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.Decimal());
-            this.priceValidator.addParamValidator(this.PARAM_VALUE, new Checker.DecimalRange(0, null));
+            this.priceValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.Type.Decimal()
+            );
+            this.priceValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.DecimalRange(0, null)
+            );
 
             // Validate acreage object
-            this.acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new Checker.Type.String());
-            this.acreageValidator.addParamValidator(this.PARAM_ACREAGE_MEASURE_UNIT, new Checker.MeasureUnit('m²'));
+            this.acreageValidator.addParamValidator(
+                this.PARAM_ACREAGE_MEASURE_UNIT,
+                new Checker.Type.String()
+            );
+            this.acreageValidator.addParamValidator(
+                this.PARAM_ACREAGE_MEASURE_UNIT,
+                new Checker.MeasureUnit('m²')
+            );
 
-            this.acreageValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.Decimal());
-            this.acreageValidator.addParamValidator(this.PARAM_VALUE, new Checker.DecimalRange(0, null));
+            this.acreageValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.Type.Decimal()
+            );
+            this.acreageValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.DecimalRange(0, null)
+            );
 
             // Validate others object
-            this.othersValidator.addParamValidator(this.PARAM_OTHERS_NAME, new Checker.Type.String());
+            this.othersValidator.addParamValidator(
+                this.PARAM_OTHERS_NAME,
+                new Checker.Type.String()
+            );
 
-            this.othersValidator.addParamValidator(this.PARAM_VALUE, new Checker.Type.String());
+            this.othersValidator.addParamValidator(
+                this.PARAM_VALUE,
+                new Checker.Type.String()
+            );
 
             this.bodyValidator.validate(this.requestBody);
-            this.priceValidator.validate((this.requestBody[this.PARAM_PRICE] as object) ?? {});
-            this.acreageValidator.validate((this.requestBody[this.PARAM_ACREAGE] as object) ?? {});
-            this.othersValidator.validate((this.requestBody[this.PARAM_OTHERS] as object) ?? {});
+            this.priceValidator.validate(
+                (this.requestBody[this.PARAM_PRICE] as object) ?? {}
+            );
+            this.acreageValidator.validate(
+                (this.requestBody[this.PARAM_ACREAGE] as object) ?? {}
+            );
+            this.othersValidator.validate(
+                (this.requestBody[this.PARAM_OTHERS] as object) ?? {}
+            );
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const rawDataBody = (this.requestBody as unknown) as RawDataDocumentModel;
+            const rawDataBody = (this
+                .requestBody as unknown) as RawDataDocumentModel;
             const currentRawData = await this.rawDataLogic.getById(idBody);
-            await DetailUrlLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: idBody });
+            await DetailUrlLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             let editedRawData: RawDataDocumentModel;
 
             if (currentRawData.detailUrlId !== rawDataBody.detailUrlId) {
-                editedRawData = await this.rawDataLogic.update(idBody, rawDataBody, undefined, [
-                    { [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId },
-                ]);
+                editedRawData = await this.rawDataLogic.update(
+                    idBody,
+                    rawDataBody,
+                    undefined,
+                    [{ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId }]
+                );
             } else {
-                editedRawData = await this.rawDataLogic.update(idBody, rawDataBody);
+                editedRawData = await this.rawDataLogic.update(
+                    idBody,
+                    rawDataBody
+                );
             }
 
             CommonServiceControllerBase.sendResponse(
@@ -359,19 +623,33 @@ export default class RawDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.rawDataLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.NO_CONTENT,
+                {},
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -384,15 +662,31 @@ export default class RawDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.IntegerRange(0, null));
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.IntegerRange(0, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.IntegerRange(0, null));
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.IntegerRange(0, null)
+            );
 
             this.validator.validate(this.requestQuery);
 

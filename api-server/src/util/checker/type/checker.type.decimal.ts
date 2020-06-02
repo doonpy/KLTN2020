@@ -13,7 +13,10 @@ export default class CheckerTypeDecimal extends CheckerTypeBase {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_7, value: [paramName] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_7,
+                    value: [paramName],
+                },
             };
         }
     }

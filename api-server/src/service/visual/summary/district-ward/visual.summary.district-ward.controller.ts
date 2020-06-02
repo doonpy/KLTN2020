@@ -36,7 +36,11 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -47,7 +51,11 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -58,15 +66,27 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
-            const { documents } = await this.visualSummaryDistrictWardLogic.getAll({});
+            const {
+                documents,
+            } = await this.visualSummaryDistrictWardLogic.getAll({});
             const responseBody = {
                 summaryDistrictWard: documents.map((document) =>
-                    this.visualSummaryDistrictWardLogic.convertToApiResponse(document)
+                    this.visualSummaryDistrictWardLogic.convertToApiResponse(
+                        document
+                    )
                 ),
             };
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -79,7 +99,11 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -90,7 +114,11 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -101,7 +129,11 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.visualSummaryDistrictWardLogic.getDocumentAmount();
 

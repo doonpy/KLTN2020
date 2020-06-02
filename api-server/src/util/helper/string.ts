@@ -25,7 +25,9 @@ export const replaceMetaDataString = (str: string, value: any[]): string => {
                     completedCause += `'${value.shift() || 'null'}'`;
                     break;
                 case METADATA_KEY_OBJECT:
-                    completedCause += `${JSON.stringify(value.shift() || {}) || '{}'}`;
+                    completedCause += `${
+                        JSON.stringify(value.shift() || {}) || '{}'
+                    }`;
                     break;
                 default:
                     // REPLACE_SIGN_RAW:
@@ -45,7 +47,10 @@ export const replaceMetaDataString = (str: string, value: any[]): string => {
  * @param {string} secondString
  * @return {number}
  */
-export const calculateSimilarRate = (firstString: string, secondString: string): number => {
+export const calculateSimilarRate = (
+    firstString: string,
+    secondString: string
+): number => {
     function termFreqMap(str: string): { [key: string]: number } {
         const words = str.split(' ');
         const termFreq: { [key: string]: number } = {};
@@ -55,13 +60,19 @@ export const calculateSimilarRate = (firstString: string, secondString: string):
         return termFreq;
     }
 
-    function addKeysToDictionary(map: { [key: string]: number }, dictionary: { [key: string]: boolean }): void {
+    function addKeysToDictionary(
+        map: { [key: string]: number },
+        dictionary: { [key: string]: boolean }
+    ): void {
         for (const key of Object.keys(map)) {
             dictionary[key] = true;
         }
     }
 
-    function termFreqMapToVector(map: { [key: string]: number }, dictionary: { [key: string]: boolean }): number[] {
+    function termFreqMapToVector(
+        map: { [key: string]: number },
+        dictionary: { [key: string]: boolean }
+    ): number[] {
         const termFreqVector: number[] = [];
         Object.keys(dictionary).forEach((term: string): void => {
             termFreqVector.push(map[term] || 0);
@@ -86,7 +97,10 @@ export const calculateSimilarRate = (firstString: string, secondString: string):
     }
 
     function cosineSimilarity(vecA: number[], vecB: number[]): number {
-        return vecDotProduct(vecA, vecB) / (vecMagnitude(vecA) * vecMagnitude(vecB));
+        return (
+            vecDotProduct(vecA, vecB) /
+            (vecMagnitude(vecA) * vecMagnitude(vecB))
+        );
     }
 
     const termFreqA = termFreqMap(firstString);
@@ -108,7 +122,10 @@ export const calculateSimilarRate = (firstString: string, secondString: string):
  * @param {string} secondString
  * @return number
  */
-export const getSimilarRate = (firstString: string, secondString: string): number => {
+export const getSimilarRate = (
+    firstString: string,
+    secondString: string
+): number => {
     if (firstString === secondString) {
         return 1;
     }

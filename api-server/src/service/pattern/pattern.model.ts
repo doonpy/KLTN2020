@@ -37,6 +37,9 @@ patternSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-const PatternModel = mongoose.model<PatternDocumentModel>('pattern', patternSchema);
+const PatternModel = mongoose.model<PatternDocumentModel>(
+    'pattern',
+    patternSchema
+);
 
 export default PatternModel;

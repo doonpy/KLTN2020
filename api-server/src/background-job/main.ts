@@ -21,11 +21,20 @@ const { MESSAGE_TYPE } = GroupedDataConstant;
  */
 export const executeGroupDataChildProcess = async (): Promise<void> => {
     isGrouperRunning = true;
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Start group data child process...`).show();
-    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart group data child process...`);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Start group data child process...`
+    ).show();
+    await ChatBotTelegram.getInstance().sendMessage(
+        `<b>🤖[Background Job]🤖</b>\nStart group data child process...`
+    );
 
-    let propertyTypeIdList = CommonConstant.PROPERTY_TYPE.map((item) => item.id);
-    const transactionTypeIdList = CommonConstant.TRANSACTION_TYPE.map((item) => item.id);
+    let propertyTypeIdList = CommonConstant.PROPERTY_TYPE.map(
+        (item) => item.id
+    );
+    const transactionTypeIdList = CommonConstant.TRANSACTION_TYPE.map(
+        (item) => item.id
+    );
     let childProcessAmount = 0;
     let currentTransactionTypeId = transactionTypeIdList.shift() as number;
     let propertyTypeCloneList: number[] = [];
@@ -38,25 +47,35 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
             } else if (childProcessAmount === 0) {
                 clearInterval(loop);
                 isGrouperRunning = false;
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Group data complete`).show();
-                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nGroup data complete`);
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `Group data complete`
+                ).show();
+                await ChatBotTelegram.getInstance().sendMessage(
+                    `<b>🤖[Background Job]🤖</b>\nGroup data complete`
+                );
             }
             return;
         }
 
-        if (childProcessAmount >= parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)) {
+        if (
+            childProcessAmount >=
+            parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)
+        ) {
             return;
         }
 
         const currentPropertyTypeId = propertyTypeIdList.shift() as number;
         propertyTypeCloneList.push(currentPropertyTypeId);
 
-        const childProcess = fork(path.join(__dirname, './child-process/child-process.group-data'));
+        const childProcess = fork(
+            path.join(__dirname, './child-process/child-process.group-data')
+        );
         childProcessSet.add(childProcess);
         childProcess.on(
             'exit',
             async (): Promise<void> => {
-                childProcessAmount -= 1;
+                childProcessAmount--;
                 childProcessSet.delete(childProcess);
             }
         );
@@ -65,7 +84,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
             transactionTypeId: currentTransactionTypeId,
             propertyTypeId: currentPropertyTypeId,
         });
-        childProcessAmount += 1;
+        childProcessAmount++;
     }, 0);
 };
 
@@ -73,7 +92,9 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
  * Execute preprocessing data process
  */
 const executePreprocessingDataChildProcess = (): void => {
-    const childProcess = fork(path.join(__dirname, './child-process/child-process.preprocessing-data'));
+    const childProcess = fork(
+        path.join(__dirname, './child-process/child-process.preprocessing-data')
+    );
     childProcess.on('exit', (): void => {
         script.next();
     });
@@ -84,7 +105,9 @@ const executePreprocessingDataChildProcess = (): void => {
  * Execute clean data child process
  */
 const executeCleanDataChildProcess = (): void => {
-    const childProcess = fork(path.join(__dirname, './child-process/child-process.clean-data'));
+    const childProcess = fork(
+        path.join(__dirname, './child-process/child-process.clean-data')
+    );
     childProcess.on(
         'exit',
         async (): Promise<void> => {
@@ -98,9 +121,9 @@ const executeCleanDataChildProcess = (): void => {
  * Execute scrape child process
  */
 const executeScrapeChildProcess = async (): Promise<void> => {
-    const catalogIdList: number[] = (await CatalogLogic.getInstance().getAll({})).documents.map(
-        (catalog) => catalog._id
-    );
+    const catalogIdList: number[] = (
+        await CatalogLogic.getInstance().getAll({})
+    ).documents.map((catalog) => catalog._id);
     let childProcessAmount = 0;
     const loop = setInterval((): void => {
         if (catalogIdList.length === 0 && childProcessAmount === 0) {
@@ -109,7 +132,10 @@ const executeScrapeChildProcess = async (): Promise<void> => {
             return;
         }
 
-        if (childProcessAmount >= parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)) {
+        if (
+            childProcessAmount >=
+            parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)
+        ) {
             return;
         }
 
@@ -118,12 +144,14 @@ const executeScrapeChildProcess = async (): Promise<void> => {
             return;
         }
 
-        const childProcess = fork(path.join(__dirname, './child-process/child-process.scrape-data'));
+        const childProcess = fork(
+            path.join(__dirname, './child-process/child-process.scrape-data')
+        );
         childProcess.on('exit', (): void => {
-            childProcessAmount -= 1;
+            childProcessAmount--;
         });
         childProcess.send({ catalogId });
-        childProcessAmount += 1;
+        childProcessAmount++;
     }, 0);
 };
 
@@ -132,13 +160,25 @@ const executeScrapeChildProcess = async (): Promise<void> => {
  */
 async function* generateScript() {
     isCrawlerRunning = true;
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Start crawler child process...`).show();
-    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nStart crawler child process...`);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Start crawler child process...`
+    ).show();
+    await ChatBotTelegram.getInstance().sendMessage(
+        `<b>🤖[Background Job]🤖</b>\nStart crawler child process...`
+    );
     if (isGrouperRunning) {
-        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nSuspense group child process.`);
+        await ChatBotTelegram.getInstance().sendMessage(
+            `<b>🤖[Background Job]🤖</b>\nSuspense group child process.`
+        );
         childProcessSet.forEach((childProcess): void => {
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Suspense group child process - PID: ${childProcess.pid}`).show();
-            childProcess.send({ messageType: GroupedDataConstant.MESSAGE_TYPE.SUSPENSE });
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Suspense group child process - PID: ${childProcess.pid}`
+            ).show();
+            childProcess.send({
+                messageType: GroupedDataConstant.MESSAGE_TYPE.SUSPENSE,
+            });
         });
     }
     await executeScrapeChildProcess();
@@ -151,22 +191,31 @@ async function* generateScript() {
     yield 'Step 3: Execute preprocessing data child process...';
 
     if (isGrouperRunning) {
-        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nContinue group child process.`);
+        await ChatBotTelegram.getInstance().sendMessage(
+            `<b>🤖[Background Job]🤖</b>\nContinue group child process.`
+        );
         childProcessSet.forEach((childProcess): void => {
-            childProcess.on('message', ({ isSuspense }: { isSuspense: boolean }): void => {
-                if (isSuspense) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.INFO,
-                        `Continue group child process - PID: ${childProcess.pid}`
-                    ).show();
-                    childProcess.send({ messageType: MESSAGE_TYPE.CONTINUE });
+            childProcess.on(
+                'message',
+                ({ isSuspense }: { isSuspense: boolean }): void => {
+                    if (isSuspense) {
+                        new ConsoleLog(
+                            ConsoleConstant.Type.INFO,
+                            `Continue group child process - PID: ${childProcess.pid}`
+                        ).show();
+                        childProcess.send({
+                            messageType: MESSAGE_TYPE.CONTINUE,
+                        });
+                    }
                 }
-            });
+            );
             childProcess.send({ messageType: MESSAGE_TYPE.IS_SUSPENSE });
         });
     }
     new ConsoleLog(ConsoleConstant.Type.INFO, `Crawler complete`).show();
-    await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nCrawler complete`);
+    await ChatBotTelegram.getInstance().sendMessage(
+        `<b>🤖[Background Job]🤖</b>\nCrawler complete`
+    );
     isCrawlerRunning = false;
     return 'Done';
 }
@@ -178,9 +227,15 @@ async function* generateScript() {
     try {
         const checkTimeLoop = setInterval(async (): Promise<void> => {
             const expectTime = new Date();
-            expectTime.setUTCHours(parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10));
-            expectTime.setUTCMinutes(parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10));
-            expectTime.setUTCSeconds(parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10));
+            expectTime.setUTCHours(
+                parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10)
+            );
+            expectTime.setUTCMinutes(
+                parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10)
+            );
+            expectTime.setUTCSeconds(
+                parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10)
+            );
             if (!isExactTime(expectTime, true)) {
                 return;
             }
@@ -201,7 +256,9 @@ async function* generateScript() {
             script.next();
         }
     } catch (error) {
-        await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Background Job]🤖</b>\nError: ${error.message}`);
+        await ChatBotTelegram.getInstance().sendMessage(
+            `<b>🤖[Background Job]🤖</b>\nError: ${error.message}`
+        );
         throw error;
     }
 })();

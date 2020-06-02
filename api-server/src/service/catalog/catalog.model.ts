@@ -37,8 +37,14 @@ catalogSchema.plugin(autoPopulate);
 catalogSchema.index({ title: 1 }, { name: 'idx_title' });
 catalogSchema.index({ url: 1 }, { name: 'idx_url' });
 catalogSchema.index({ patternId: 1 }, { name: 'idx_patternId' });
-catalogSchema.index({ hostId: 1, patternId: 1, url: 1, title: 1 }, { name: 'idx_hostId_patternId_url_title' });
+catalogSchema.index(
+    { hostId: 1, patternId: 1, url: 1, title: 1 },
+    { name: 'idx_hostId_patternId_url_title' }
+);
 
-const CatalogModel = mongoose.model<CatalogDocumentModel>('catalog', catalogSchema);
+const CatalogModel = mongoose.model<CatalogDocumentModel>(
+    'catalog',
+    catalogSchema
+);
 
 export default CatalogModel;

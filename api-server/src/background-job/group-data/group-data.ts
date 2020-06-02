@@ -33,7 +33,10 @@ export default class GroupData {
     /**
      * Start
      */
-    public async start(transactionType: number, propertyType: number): Promise<void> {
+    public async start(
+        transactionType: number,
+        propertyType: number
+    ): Promise<void> {
         const startTime = process.hrtime();
         const limit = 1000;
         let isCompareDone = true;
@@ -53,7 +56,9 @@ export default class GroupData {
 
             if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
                 clearInterval(loop);
-                const executeTime = convertTotalSecondsToTime(process.hrtime(startTime)[0]);
+                const executeTime = convertTotalSecondsToTime(
+                    process.hrtime(startTime)[0]
+                );
                 await ChatBotTelegram.getInstance().sendMessage(
                     `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
                 );
@@ -85,7 +90,9 @@ export default class GroupData {
                     {
                         $match: {
                             $and: [
-                                { 'represent.transactionType': transactionType },
+                                {
+                                    'represent.transactionType': transactionType,
+                                },
                                 { 'represent.propertyType': propertyType },
                             ],
                         },
@@ -96,7 +103,10 @@ export default class GroupData {
                 >(aggregations);
 
                 for (const item of representOfGroupedDataset) {
-                    const similarScore = this.getSimilarScore(document, item.represent);
+                    const similarScore = this.getSimilarScore(
+                        document,
+                        item.represent
+                    );
 
                     if (similarScore >= this.OVER_FITTING_SCORE) {
                         new ConsoleLog(
@@ -108,13 +118,21 @@ export default class GroupData {
                     }
 
                     if (similarScore >= this.EXPECTED_SCORE) {
-                        const groupData = await this.groupedDataLogic.getById(item._id);
+                        const groupData = await this.groupedDataLogic.getById(
+                            item._id
+                        );
 
                         groupData.items.push(document._id);
                         try {
                             await Promise.all([
-                                this.groupedDataLogic.update(item._id, groupData),
-                                this.rawDataLogic.update(document._id, document),
+                                this.groupedDataLogic.update(
+                                    item._id,
+                                    groupData
+                                ),
+                                this.rawDataLogic.update(
+                                    document._id,
+                                    document
+                                ),
                             ]);
                             new ConsoleLog(
                                 ConsoleConstant.Type.INFO,
@@ -122,13 +140,15 @@ export default class GroupData {
                             ).show();
                         } catch (error) {
                             await ChatBotTelegram.getInstance().sendMessage(
-                                `Error:\n<code>${error.cause || error.message}</code>`
+                                `Error:\n<code>${
+                                    error.cause || error.message
+                                }</code>`
                             );
                             new ConsoleLog(
                                 ConsoleConstant.Type.ERROR,
-                                `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: ${
-                                    error.cause || error.message
-                                }`
+                                `Group data -> RID: ${document._id} -> GID: ${
+                                    item._id
+                                } - Error: ${error.cause || error.message}`
                             ).show();
                         }
 
@@ -191,10 +211,14 @@ export default class GroupData {
      *
      * @return {number} totalPoint
      */
-    private getSimilarScore(firstRawData: RawDataDocumentModel, secondRawData: RawDataDocumentModel): number {
+    private getSimilarScore(
+        firstRawData: RawDataDocumentModel,
+        secondRawData: RawDataDocumentModel
+    ): number {
         if (
             firstRawData.acreage.value !== secondRawData.acreage.value &&
-            firstRawData.acreage.measureUnit === secondRawData.acreage.measureUnit
+            firstRawData.acreage.measureUnit ===
+                secondRawData.acreage.measureUnit
         ) {
             return 0;
         }
@@ -209,8 +233,16 @@ export default class GroupData {
         }
 
         let totalPoint = 0;
-        totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'title');
-        totalPoint += this.calculateStringAttributeScore(firstRawData, secondRawData, 'address');
+        totalPoint += this.calculateStringAttributeScore(
+            firstRawData,
+            secondRawData,
+            'title'
+        );
+        totalPoint += this.calculateStringAttributeScore(
+            firstRawData,
+            secondRawData,
+            'address'
+        );
         totalPoint += this.calculatePriceScore(firstRawData, secondRawData);
 
         return totalPoint;
@@ -224,7 +256,10 @@ export default class GroupData {
      *
      * @return {number} points
      */
-    private calculatePriceScore(firstTarget: RawDataDocumentModel, secondTarget: RawDataDocumentModel): number {
+    private calculatePriceScore(
+        firstTarget: RawDataDocumentModel,
+        secondTarget: RawDataDocumentModel
+    ): number {
         const firstPriceObj = firstTarget.price;
         const secondPriceObj = secondTarget.price;
 
@@ -237,7 +272,8 @@ export default class GroupData {
         }
 
         const differenceRate: number =
-            Math.abs(firstPriceObj.value - secondPriceObj.value) / ((firstPriceObj.value + secondPriceObj.value) / 2);
+            Math.abs(firstPriceObj.value - secondPriceObj.value) /
+            ((firstPriceObj.value + secondPriceObj.value) / 2);
         if (differenceRate >= 1) {
             return 0;
         }
@@ -261,9 +297,15 @@ export default class GroupData {
     ): number {
         switch (type) {
             case 'title':
-                return getSimilarRate(firstTarget.title, secondTarget.title) * this.ATTR_TITLE_SCORE;
+                return (
+                    getSimilarRate(firstTarget.title, secondTarget.title) *
+                    this.ATTR_TITLE_SCORE
+                );
             case 'address':
-                return getSimilarRate(firstTarget.address, secondTarget.address) * this.ATTR_ADDRESS_SCORE;
+                return (
+                    getSimilarRate(firstTarget.address, secondTarget.address) *
+                    this.ATTR_ADDRESS_SCORE
+                );
             default:
                 return 0;
         }

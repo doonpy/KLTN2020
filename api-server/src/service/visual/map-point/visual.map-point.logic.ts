@@ -1,6 +1,9 @@
 import VisualMapPointModel from '@service/visual/map-point/visual.map-point.model';
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
-import { VisualMapPointApiModel, VisualMapPointDocumentModel } from './visual.map-point.interface';
+import {
+    VisualMapPointApiModel,
+    VisualMapPointDocumentModel,
+} from './visual.map-point.interface';
 import { VisualAdministrativeDistrictApiModel } from '../administrative/district/visual.administrative.district.interface';
 import VisualAdministrativeDistrictLogic from '../administrative/district/visual.administrative.district.logic';
 import { VisualAdministrativeWardApiModel } from '../administrative/ward/visual.administrative.ward.interface';
@@ -41,12 +44,17 @@ export default class VisualMapPointLogic extends CommonServiceLogicBase<
         cTime,
         mTime,
     }: VisualMapPointDocumentModel): VisualMapPointApiModel {
-        let district: VisualAdministrativeDistrictApiModel | number | null = null;
+        let district:
+            | VisualAdministrativeDistrictApiModel
+            | number
+            | null = null;
         let ward: VisualAdministrativeWardApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(
+                    districtId
+                );
             } else {
                 district = districtId;
             }
@@ -54,7 +62,9 @@ export default class VisualMapPointLogic extends CommonServiceLogicBase<
 
         if (wardId) {
             if (typeof wardId === 'object') {
-                ward = VisualAdministrativeWardLogic.getInstance().convertToApiResponse(wardId);
+                ward = VisualAdministrativeWardLogic.getInstance().convertToApiResponse(
+                    wardId
+                );
             } else {
                 ward = wardId;
             }

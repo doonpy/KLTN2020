@@ -8,7 +8,8 @@ const requestOptionsDefault: RequestPromiseOptions = {
     method: 'GET',
     headers: {
         headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+            'User-Agent':
+                'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
         },
     },
     json: true,
@@ -56,7 +57,10 @@ export const getGeocode = async (
         maxResults: 1,
     };
     const endPoint = `https://dev.virtualearth.net/REST/v1/Locations`;
-    result = await sendRequest<BingMapGeocodeResponse>(endPoint, requestOptionsDefault);
+    result = await sendRequest<BingMapGeocodeResponse>(
+        endPoint,
+        requestOptionsDefault
+    );
     while (result.statusCode !== ResponseStatusCode.OK) {
         apiKey = BING_API_KEYS.shift();
         if (!apiKey) {
@@ -64,7 +68,10 @@ export const getGeocode = async (
         }
 
         requestOptionsDefault.qs.key = apiKey;
-        result = await sendRequest<BingMapGeocodeResponse>(endPoint, requestOptionsDefault);
+        result = await sendRequest<BingMapGeocodeResponse>(
+            endPoint,
+            requestOptionsDefault
+        );
     }
     return result;
 };

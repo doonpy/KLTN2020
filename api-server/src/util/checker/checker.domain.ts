@@ -3,7 +3,9 @@ import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
 
 export default class CheckerDomain extends CheckerBase {
-    private VALID_DOMAIN = new RegExp(/^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+$/);
+    private VALID_DOMAIN = new RegExp(
+        /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+$/
+    );
 
     /**
      * @param paramName
@@ -20,7 +22,10 @@ export default class CheckerDomain extends CheckerBase {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_1, value: [value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_1,
+                    value: [value],
+                },
             };
         }
     }

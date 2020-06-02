@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import ResponseStatusCode from '@common/common.response-status.code';
 import ExceptionCustomize from '@util/exception/exception.customize';
-import { replaceMetaDataString, upperCaseFirstCharacter } from '@util/helper/string';
+import {
+    replaceMetaDataString,
+    upperCaseFirstCharacter,
+} from '@util/helper/string';
 import CommonLanguage from '@common/common.language';
 import ErrorHandlerWording from './error-handler.wording';
 
@@ -10,7 +13,9 @@ import ErrorHandlerWording from './error-handler.wording';
  *
  * @return {string} inputString
  */
-const convertToString = (input: { [key: string]: string | number }[]): string => {
+const convertToString = (
+    input: { [key: string]: string | number }[]
+): string => {
     const inputString: string[] = [];
 
     if (!input || input.length === 0) {
@@ -38,9 +43,13 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
 
                 if (typeof value === 'object') {
                     if (Array.isArray(value)) {
-                        inputString.push(`'${key}' => {${convertToString(value)}}`);
+                        inputString.push(
+                            `'${key}' => {${convertToString(value)}}`
+                        );
                     } else {
-                        inputString.push(`'${key}' => {${convertToString([value])}}`);
+                        inputString.push(
+                            `'${key}' => {${convertToString([value])}}`
+                        );
                     }
                     continue;
                 }
@@ -48,7 +57,7 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
                 inputString.push(`'${key}' => '${value}'`);
             }
         }
-        index += 1;
+        index++;
     }
 
     return inputString.join(', ');
@@ -63,14 +72,23 @@ const convertToString = (input: { [key: string]: string | number }[]): string =>
  *
  * @return {void}
  */
-export const notFoundRoute = (req: Request, res: Response, next: NextFunction): void => {
+export const notFoundRoute = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
     next(
         new ExceptionCustomize(
             ResponseStatusCode.NOT_FOUND,
-            replaceMetaDataString(ErrorHandlerWording.CAUSE.CAU_ERR_1[CommonLanguage[req.params.language] || 0], [
-                req.path,
-            ]),
-            ErrorHandlerWording.MESSAGE.MSG_ERR_1[CommonLanguage[req.params.language] || 0]
+            replaceMetaDataString(
+                ErrorHandlerWording.CAUSE.CAU_ERR_1[
+                    CommonLanguage[req.params.language] || 0
+                ],
+                [req.path]
+            ),
+            ErrorHandlerWording.MESSAGE.MSG_ERR_1[
+                CommonLanguage[req.params.language] || 0
+            ]
         )
     );
 };
@@ -97,20 +115,30 @@ export const errorHandler = (
         body = {
             error: {
                 cause: upperCaseFirstCharacter(
-                    cause || ErrorHandlerWording.CAUSE.CAU_ERR_2[CommonLanguage[req.params.language] || 0]
+                    cause ||
+                        ErrorHandlerWording.CAUSE.CAU_ERR_2[
+                            CommonLanguage[req.params.language] || 0
+                        ]
                 ),
                 message: upperCaseFirstCharacter(message),
-                input: convertToString(input as { [key: string]: string | number }[]),
+                input: convertToString(
+                    input as { [key: string]: string | number }[]
+                ),
             },
         };
     } else {
         body = {
             error: {
                 cause: upperCaseFirstCharacter(
-                    cause || ErrorHandlerWording.CAUSE.CAU_ERR_2[CommonLanguage[req.params.language] || 0]
+                    cause ||
+                        ErrorHandlerWording.CAUSE.CAU_ERR_2[
+                            CommonLanguage[req.params.language] || 0
+                        ]
                 ),
                 message: upperCaseFirstCharacter(message),
-                input: convertToString(input as { [key: string]: string | number }[]),
+                input: convertToString(
+                    input as { [key: string]: string | number }[]
+                ),
                 stack,
             },
         };
@@ -119,6 +147,8 @@ export const errorHandler = (
     if (statusCode === ResponseStatusCode.NO_CONTENT) {
         res.status(statusCode).json();
     } else {
-        res.status(statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR).json(body);
+        res.status(statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR).json(
+            body
+        );
     }
 };

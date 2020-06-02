@@ -36,7 +36,11 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -47,7 +51,11 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -58,20 +66,33 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
-            const { documents, hasNext } = await this.visualAdministrativeDistrictLogic.getAll({
+            const {
+                documents,
+                hasNext,
+            } = await this.visualAdministrativeDistrictLogic.getAll({
                 limit: this.limit,
                 offset: this.offset,
             });
             const responseBody = {
                 countries: documents.map((document) =>
-                    this.visualAdministrativeDistrictLogic.convertToApiResponse(document)
+                    this.visualAdministrativeDistrictLogic.convertToApiResponse(
+                        document
+                    )
                 ),
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -84,7 +105,11 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -95,7 +120,11 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -106,7 +135,11 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.visualAdministrativeDistrictLogic.getDocumentAmount();
 

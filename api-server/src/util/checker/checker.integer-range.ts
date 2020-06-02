@@ -28,7 +28,10 @@ export default class CheckerIntegerRange extends CheckerBase {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_3, value: [paramName, this.minRange, value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_3,
+                    value: [paramName, this.minRange, value],
+                },
             };
         }
 
@@ -36,7 +39,10 @@ export default class CheckerIntegerRange extends CheckerBase {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_4, value: [paramName, this.maxRange, value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_4,
+                    value: [paramName, this.maxRange, value],
+                },
             };
         }
     }

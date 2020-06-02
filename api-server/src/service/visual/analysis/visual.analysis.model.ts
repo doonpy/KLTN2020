@@ -15,7 +15,10 @@ const VisualAnalysisSchema: Schema = new Schema(
                     type: Schema.Types.Number,
                     enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
                 },
-                propertyType: { type: Schema.Types.Number, enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id) },
+                propertyType: {
+                    type: Schema.Types.Number,
+                    enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                },
                 summary: { type: Schema.Types.Number },
                 amount: { type: Schema.Types.Number },
                 average: { type: Schema.Types.Number },
@@ -31,7 +34,10 @@ const VisualAnalysisSchema: Schema = new Schema(
                     type: Schema.Types.Number,
                     enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
                 },
-                propertyType: { type: Schema.Types.Number, enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id) },
+                propertyType: {
+                    type: Schema.Types.Number,
+                    enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                },
                 summary: { type: Schema.Types.Number },
                 amount: { type: Schema.Types.Number },
                 average: { type: Schema.Types.Number },
@@ -50,8 +56,14 @@ VisualAnalysisSchema.plugin(autoIncrement.plugin, {
     incrementBy: 1,
 });
 
-VisualAnalysisSchema.index({ referenceDate: 1 }, { name: 'idx_referenceDate', unique: true });
+VisualAnalysisSchema.index(
+    { referenceDate: 1 },
+    { name: 'idx_referenceDate', unique: true }
+);
 
-const VisualAnalysisModel = mongoose.model<VisualAnalysisDocumentModel>('visual_analysis', VisualAnalysisSchema);
+const VisualAnalysisModel = mongoose.model<VisualAnalysisDocumentModel>(
+    'visual_analysis',
+    VisualAnalysisSchema
+);
 
 export default VisualAnalysisModel;
