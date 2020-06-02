@@ -59,8 +59,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
         }
 
         if (
-            childProcessAmount >=
-            parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)
+            childProcessAmount >= Number(process.env.BGR_THREAD_AMOUNT || '1')
         ) {
             return;
         }
@@ -133,8 +132,7 @@ const executeScrapeChildProcess = async (): Promise<void> => {
         }
 
         if (
-            childProcessAmount >=
-            parseInt(process.env.BGR_THREAD_AMOUNT || '1', 10)
+            childProcessAmount >= Number(process.env.BGR_THREAD_AMOUNT || '1')
         ) {
             return;
         }
@@ -228,13 +226,13 @@ async function* generateScript() {
         const checkTimeLoop = setInterval(async (): Promise<void> => {
             const expectTime = new Date();
             expectTime.setUTCHours(
-                parseInt(process.env.BGR_SCHEDULE_TIME_HOUR || '0', 10)
+                Number(process.env.BGR_SCHEDULE_TIME_HOUR || '0')
             );
             expectTime.setUTCMinutes(
-                parseInt(process.env.BGR_SCHEDULE_TIME_MINUTE || '0', 10)
+                Number(process.env.BGR_SCHEDULE_TIME_MINUTE || '0')
             );
             expectTime.setUTCSeconds(
-                parseInt(process.env.BGR_SCHEDULE_TIME_SECOND || '0', 10)
+                Number(process.env.BGR_SCHEDULE_TIME_SECOND || '0')
             );
             if (!isExactTime(expectTime, true)) {
                 return;

@@ -16,9 +16,8 @@ export default class ScrapeBase {
 
     protected telegramChatBotInstance = ChatBotTelegram.getInstance();
 
-    protected readonly REQUEST_DELAY = parseInt(
-        process.env.BGR_SCRAPE_REQUEST_DELAY || '100',
-        10
+    protected readonly REQUEST_DELAY = Number(
+        process.env.BGR_SCRAPE_REQUEST_DELAY || '100'
     );
 
     private readonly requestOptions: RequestPromiseOptions = {
@@ -27,7 +26,7 @@ export default class ScrapeBase {
                 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
             Accept: 'text/plain,text/html,*/*',
         },
-        timeout: parseInt(process.env.REQUEST_TIMEOUT || '10000', 10),
+        timeout: Number(process.env.REQUEST_TIMEOUT || '10000'),
         resolveWithFullResponse: true,
         time: true,
     };

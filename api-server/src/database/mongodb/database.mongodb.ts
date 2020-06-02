@@ -21,18 +21,15 @@ export default class DatabaseMongodb {
     private readonly password: string | undefined;
 
     constructor() {
-        if (process.env.NODE_ENV === 'production') {
-            this.dbHost = process.env.PROD_DB_HOST ?? '';
-            this.dbPort = process.env.PROD_DB_PORT ?? '';
-            this.dbName = process.env.PROD_DB_NAME ?? '';
-            this.username = process.env.PROD_DB_USERNAME ?? '';
-            this.password = process.env.PROD_DB_PASS ?? '';
-            this.authDb = process.env.PROD_DB_AUTH_DB ?? '';
-        } else {
-            this.dbHost = process.env.DEV_DB_HOST ?? '';
-            this.dbPort = process.env.DEV_DB_PORT ?? '';
-            this.dbName = process.env.DEV_DB_NAME ?? '';
-            set('debug', (Number(process.env.DEV_DB_DEBUG_MODE) ?? 0) === 1);
+        this.dbHost = process.env.DB_HOST ?? '';
+        this.dbPort = process.env.DB_PORT ?? '';
+        this.dbName = process.env.DB_NAME ?? '';
+        this.username = process.env.DB_USERNAME ?? '';
+        this.password = process.env.DB_PASS ?? '';
+        this.authDb = process.env.DB_AUTH_DB ?? '';
+
+        if (process.env.NODE_ENV !== 'production') {
+            set('debug', (Number(process.env.DB_DEBUG_MODE) ?? 0) === 1);
         }
     }
 
