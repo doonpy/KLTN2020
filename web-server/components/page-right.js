@@ -9,7 +9,9 @@ const TabButton = ({ title, onClick, isActive }) => {
                 role="presentation"
                 type="button"
                 className={` w-full hover:bg-gray-800 text-center cursor-pointer ${
-                    isActive ? 'border-b-2 border-blue-400 py-1' : 'border-b-1  border-primay py-1'
+                    isActive
+                        ? 'border-b-2 border-blue-400 py-1'
+                        : 'border-b-1  border-light-primary dark:border-primary py-1'
                 }`}
                 onClick={onClick}
             >
@@ -25,7 +27,7 @@ const PageRight = ({ dataSummary, tabs, setTabs }) => {
     });
 
     return (
-        <div className="w-3/12 dark:bg-gray-900 bg-white border-l border-solid border-primay h-full flex flex-col">
+        <div className="w-3/12 dark:bg-gray-900 bg-white border-l border-solid border-light-primary dark:border-primary h-full flex flex-col">
             <div className="dark:bg-gray-900 bg-white h-6">
                 <div className="text-xs w-full flex justify-around">
                     <TabButton title="Bán" onClick={() => setTabs(0)} isActive={tabs === 0} />

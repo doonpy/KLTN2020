@@ -9,9 +9,13 @@ module.exports = {
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      'dark-primary': '#707070',
+      'primary': '#707070',
+      'light-primary':'rgba(0,0,0,.0625)',
     }),
-
+    textColor: (theme) => ({
+      ...theme('colors'),
+      'light':'#72777a',
+    }),
     extend: {},
   },
   variants: {

@@ -30,6 +30,7 @@
   "homepage": "https://github.com/doonpy/KLTN2020#readme",
   "dependencies": {
     "@highcharts/map-collection": "^1.1.3",
+    "@next/bundle-analyzer": "^9.4.4",
     "@types/puppeteer": "^2.1.0",
     "@zeit/fetch": "^6.0.0",
     "autoprefixer": "^9.8.0",

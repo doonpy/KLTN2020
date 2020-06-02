@@ -85,9 +85,12 @@ const Home = ({ mapStaticJSON }) => {
         <>
             {dataDistrict && dataWard ? (
                 <PageLayout>
-                    <main className="text-white block" style={{ height: 'calc(100vh - 100px)' }}>
+                    <main
+                        className="dark:text-white text-light font-medium block"
+                        style={{ height: 'calc(100vh - 100px)' }}
+                    >
                         <div className="w-full flex h-full">
-                            <PageLeft setTabmap={setTabmap} />
+                            <PageLeft setTabmap={setTabmap} tabMap={tabMap} />
                             <div className="w-full flex">
                                 {/* <div className="text-ww text-6xl">sdsd</div> */}
                                 <div className="w-9/12 h-full">
@@ -105,7 +108,7 @@ const Home = ({ mapStaticJSON }) => {
                     </main>
                 </PageLayout>
             ) : (
-                <div className="w-full h-screen bg-black-alt max-h-screen">
+                <div className="w-full h-screen bg-gray-900 max-h-screen">
                     <div className="flex justify-center items-center h-full">
                         <Loading />
                     </div>

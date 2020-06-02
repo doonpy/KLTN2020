@@ -36,7 +36,7 @@ const TypeTransactionBox = ({ data }) => {
 
     return (
         <div className="m-0 m-auto h-full mt-4" style={{ maxWidth: '90%' }}>
-            <div className="dark:bg-gray-900 bg-white border border-primay border-solid">
+            <div className="dark:bg-gray-900 bg-white border border-light-primary dark:border-primary border-solid">
                 <TypePropertyPieChart data={resultPropertyData()} />
             </div>
         </div>

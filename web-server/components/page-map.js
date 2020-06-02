@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import RenderCompleted from '../hooks/use-mounted';
-import MapOverview from './maps/MapOverview';
-import MapWard from './maps/MapWard';
+import LoadingIcon from './LoadingIcon';
 import { PROPERTY_TYPE } from '../util/constants';
 
 const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
 });
+const MapOverview = dynamic(() => import('./maps/MapOverview'), { loading: () => <LoadingIcon /> });
+const MapWard = dynamic(() => import('./maps/MapWard'), { loading: () => <LoadingIcon /> });
 
 const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
     const [stage, setStage] = useState(0);
@@ -34,7 +35,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
             <div
                 className={
                     tabMap === 0
-                        ? `bottom-0 left-0 w-full  border border-solid border-primay absolute dark:bg-gray-900 bg-white`
+                        ? `bottom-0 left-0 w-full  border border-solid border-light-primary dark:border-primary absolute dark:bg-gray-900 bg-white`
                         : 'hidden'
                 }
                 style={{ height: '35px' }}
@@ -63,7 +64,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
                 </div>
             </div>
             {tabMap === 0 ? (
-                <div className="w-full border-r border-primary">
+                <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
                         {isMounted && <MapLeaf mapData={mapData} property={propertyStatge} />}
                     </div>
