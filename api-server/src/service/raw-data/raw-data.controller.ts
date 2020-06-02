@@ -10,7 +10,6 @@ import DetailUrlLogic from '../detail-url/detail-url.logic';
 
 const commonPath = '/raw-dataset';
 const specifyIdPath = '/raw-data/:id';
-const countDocumentPath = '/count-document';
 
 export default class RawDataController extends CommonServiceControllerBase {
     private static instance: RawDataController;
