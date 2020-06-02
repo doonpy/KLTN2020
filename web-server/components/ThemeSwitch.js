@@ -23,11 +23,11 @@ const ThemeSwitch = () => {
             checked={hasActiveDarkMode}
             checkedIcon={<FaMoon className="inline-block mx-2 my-1 text-yellow-400" />}
             uncheckedIcon={<FaSun className="inline-block mx-2 my-1 text-orange-500" />}
-            onColor="#1a202c"
+            onColor="#000a1f"
             offColor="#f7fafc"
             onHandleColor="#f7fafc"
-            offHandleColor="#1a202c"
-            className="text-gray-900 dark:text-gray-100 border border-gray-400 dark:border-0"
+            offHandleColor="#000a1f"
+            // className="text-white dark:text-gray-100 border border-gray-400 dark:border-dark-primary border-solid dark:border-0"
         />
     );
 };

@@ -9,7 +9,7 @@ module.exports = {
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
-      primary: '#707070',
+      'dark-primary': '#707070',
     }),
 
     extend: {},
