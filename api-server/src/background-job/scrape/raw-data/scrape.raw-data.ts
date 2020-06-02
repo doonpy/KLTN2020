@@ -37,7 +37,10 @@ export default class ScrapeRawData extends ScrapeBase {
 
     private readonly MAX_REQUEST_RETRIES = 3;
 
-    private readonly MAX_REQUEST = parseInt(process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1', 10);
+    private readonly MAX_REQUEST = parseInt(
+        process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1',
+        10
+    );
 
     constructor(catalog: CatalogDocumentModel) {
         super();
@@ -55,9 +58,15 @@ export default class ScrapeRawData extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape raw data -> CID: ${this.catalog._id} - Start`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape raw data -> CID: ${this.catalog._id} - Start`
+            ).show();
             await this.telegramChatBotInstance.sendMessage(
-                replaceMetaDataString(ScrapeRawDataConstantChatBotMessage.START, [this.catalog.title, this.catalog.id])
+                replaceMetaDataString(
+                    ScrapeRawDataConstantChatBotMessage.START,
+                    [this.catalog.title, this.catalog.id]
+                )
             );
 
             const conditions = {
@@ -65,7 +74,9 @@ export default class ScrapeRawData extends ScrapeBase {
                 isExtracted: this.NOT_EXTRACTED,
                 requestRetries: { $lt: this.MAX_REQUEST_RETRIES },
             };
-            this.detailUrls = (await this.detailUrlLogic.getAll({ conditions })).documents;
+            this.detailUrls = (
+                await this.detailUrlLogic.getAll({ conditions })
+            ).documents;
 
             if (this.detailUrls.length === 0) {
                 await this.finishAction();
@@ -75,7 +86,10 @@ export default class ScrapeRawData extends ScrapeBase {
             this.scrapeAction();
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
-                replaceMetaDataString(error.message, [this.catalog._id, error.message])
+                replaceMetaDataString(error.message, [
+                    this.catalog._id,
+                    error.message,
+                ])
             );
             throw new Error(
                 `Scrape raw data of catalog ${this.catalog?.title} (ID:${this.catalog._id}) failed.\nError: ${error.message}`
@@ -108,7 +122,10 @@ export default class ScrapeRawData extends ScrapeBase {
             this.extractedDetailUrl.push(currentDetailUrlDocument.url);
 
             this.requestCounter += 1;
-            const $ = await this.getStaticBody((this.catalog.hostId as HostDocumentModel).domain, currentUrl);
+            const $ = await this.getStaticBody(
+                (this.catalog.hostId as HostDocumentModel).domain,
+                currentUrl
+            );
 
             if (!$) {
                 await this.handleFailedRequest(currentDetailUrlDocument);
@@ -129,13 +146,33 @@ export default class ScrapeRawData extends ScrapeBase {
         $: CheerioStatic,
         currentDetailUrlDocument: DetailUrlDocumentModel
     ): Promise<void> {
-        const { propertyType, postDate, title, describe, price, acreage, address } = this.pattern.mainLocator;
-        const propertyTypeData = removeBreakLineAndTrim(ScrapeBase.extractData($, propertyType).join('. '));
-        const postDateData = removeBreakLineAndTrim(ScrapeBase.extractData($, postDate.locator).join('. '));
-        const titleData = removeBreakLineAndTrim(ScrapeBase.extractData($, title).join('. '));
-        const describeData = removeBreakLineAndTrim(ScrapeBase.extractData($, describe).join('. '));
-        const priceData = removeBreakLineAndTrim(ScrapeBase.extractData($, price).join('. '));
-        const acreageData = removeBreakLineAndTrim(ScrapeBase.extractData($, acreage).join('. '));
+        const {
+            propertyType,
+            postDate,
+            title,
+            describe,
+            price,
+            acreage,
+            address,
+        } = this.pattern.mainLocator;
+        const propertyTypeData = removeBreakLineAndTrim(
+            ScrapeBase.extractData($, propertyType).join('. ')
+        );
+        const postDateData = removeBreakLineAndTrim(
+            ScrapeBase.extractData($, postDate.locator).join('. ')
+        );
+        const titleData = removeBreakLineAndTrim(
+            ScrapeBase.extractData($, title).join('. ')
+        );
+        const describeData = removeBreakLineAndTrim(
+            ScrapeBase.extractData($, describe).join('. ')
+        );
+        const priceData = removeBreakLineAndTrim(
+            ScrapeBase.extractData($, price).join('. ')
+        );
+        const acreageData = removeBreakLineAndTrim(
+            ScrapeBase.extractData($, acreage).join('. ')
+        );
         const addressData = removeBreakLineAndTrim(
             ScrapeBase.extractData($, address)
                 .map((item) => removeSpecialCharacterAtHeadAndTail(item))
@@ -144,8 +181,16 @@ export default class ScrapeRawData extends ScrapeBase {
         const othersData = this.pattern.subLocator
             .map((subLocatorItem) =>
                 Object({
-                    name: removeBreakLineAndTrim(ScrapeBase.extractData($, subLocatorItem.name).join('. ')),
-                    value: removeBreakLineAndTrim(ScrapeBase.extractData($, subLocatorItem.value).join('. ')),
+                    name: removeBreakLineAndTrim(
+                        ScrapeBase.extractData($, subLocatorItem.name).join(
+                            '. '
+                        )
+                    ),
+                    value: removeBreakLineAndTrim(
+                        ScrapeBase.extractData($, subLocatorItem.value).join(
+                            '. '
+                        )
+                    ),
                 })
             )
             .filter((item) => !!item.value);
@@ -166,7 +211,10 @@ export default class ScrapeRawData extends ScrapeBase {
 
         if (this.isHasEmptyProperty(rawData)) {
             try {
-                await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
+                await this.detailUrlLogic.update(
+                    currentDetailUrlDocument._id,
+                    currentDetailUrlDocument
+                );
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: Invalid value.`
@@ -174,7 +222,9 @@ export default class ScrapeRawData extends ScrapeBase {
             } catch (error) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
-                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.cause || error.message}`
+                    `Scrape raw data -> DID: ${
+                        currentDetailUrlDocument._id
+                    } - Error: ${error.cause || error.message}`
                 ).show();
             }
             return;
@@ -182,17 +232,24 @@ export default class ScrapeRawData extends ScrapeBase {
 
         try {
             const result = await Promise.all([
-                this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument),
+                this.detailUrlLogic.update(
+                    currentDetailUrlDocument._id,
+                    currentDetailUrlDocument
+                ),
                 this.rawDataLogic.create(rawData),
             ]);
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
-                `Scrape raw data -> DID: ${result[0]._id} -> RID: ${result[1] ? result[1]._id : 'N/A'}`
+                `Scrape raw data -> DID: ${result[0]._id} -> RID: ${
+                    result[1] ? result[1]._id : 'N/A'
+                }`
             ).show();
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
-                `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.cause || error.message}`
+                `Scrape raw data -> DID: ${
+                    currentDetailUrlDocument._id
+                } - Error: ${error.cause || error.message}`
             ).show();
         }
     }
@@ -232,7 +289,10 @@ export default class ScrapeRawData extends ScrapeBase {
                     if (Object.keys(value).length === 0) {
                         break;
                     }
-                    if ((JSON.stringify(value).match(/""|null/g) || []).length > 0) {
+                    if (
+                        (JSON.stringify(value).match(/""|null/g) || []).length >
+                        0
+                    ) {
                         return true;
                     }
                     break;
@@ -247,13 +307,20 @@ export default class ScrapeRawData extends ScrapeBase {
     /**
      * @param currentDetailUrlDocument
      */
-    protected async handleFailedRequest(currentDetailUrlDocument: DetailUrlDocumentModel): Promise<void> {
+    protected async handleFailedRequest(
+        currentDetailUrlDocument: DetailUrlDocumentModel
+    ): Promise<void> {
         currentDetailUrlDocument.requestRetries += 1;
-        if (currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES) {
+        if (
+            currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES
+        ) {
             this.detailUrls.push(currentDetailUrlDocument);
         } else {
             try {
-                await this.detailUrlLogic.update(currentDetailUrlDocument._id, currentDetailUrlDocument);
+                await this.detailUrlLogic.update(
+                    currentDetailUrlDocument._id,
+                    currentDetailUrlDocument
+                );
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
                     `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
@@ -291,13 +358,21 @@ export default class ScrapeRawData extends ScrapeBase {
         addressData: string,
         othersData: { name: string; value: string }[]
     ): RawDataDocumentModel {
-        const transactionType = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(propertyTypeData)
+        const transactionType = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(
+            propertyTypeData
+        )
             ? CommonConstant.TRANSACTION_TYPE[1].id
             : CommonConstant.TRANSACTION_TYPE[0].id;
 
-        const propertyType = RawDataLogic.getInstance().getPropertyTypeIndex(propertyTypeData);
+        const propertyType = RawDataLogic.getInstance().getPropertyTypeIndex(
+            propertyTypeData
+        );
 
-        const postDateString = (postDateData.match(ScrapeRawDataConstant.POST_DATE_PATTERN) || []).shift() || '';
+        const postDateString =
+            (
+                postDateData.match(ScrapeRawDataConstant.POST_DATE_PATTERN) ||
+                []
+            ).shift() || '';
         let postDate = convertStringToDate(
             postDateString,
             this.pattern.mainLocator.postDate.format,
@@ -310,24 +385,50 @@ export default class ScrapeRawData extends ScrapeBase {
         let priceString = '';
         let priceTimeUnit = '';
         if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
-            priceString = (priceData.match(ScrapeRawDataConstant.SALE_PRICE_PATTERN) || []).shift() || '';
+            priceString =
+                (
+                    priceData.match(ScrapeRawDataConstant.SALE_PRICE_PATTERN) ||
+                    []
+                ).shift() || '';
         } else {
-            priceString = (priceData.match(ScrapeRawDataConstant.RENT_PRICE_PATTERN) || []).shift() || '';
-            priceTimeUnit = (priceData.match(ScrapeRawDataConstant.PRICE_TIME_UNIT_PATTERN) || []).shift() || '';
+            priceString =
+                (
+                    priceData.match(ScrapeRawDataConstant.RENT_PRICE_PATTERN) ||
+                    []
+                ).shift() || '';
+            priceTimeUnit =
+                (
+                    priceData.match(
+                        ScrapeRawDataConstant.PRICE_TIME_UNIT_PATTERN
+                    ) || []
+                ).shift() || '';
         }
-        const priceUnit = (priceString.match(ScrapeRawDataConstant.PRICE_VALUE_UNIT_PATTERN) || []).shift() || '';
+        const priceUnit =
+            (
+                priceString.match(
+                    ScrapeRawDataConstant.PRICE_VALUE_UNIT_PATTERN
+                ) || []
+            ).shift() || '';
         const priceValue = convertPriceValue(
-            Number((priceString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
+            Number(
+                (
+                    priceString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []
+                ).shift()
+            ),
             priceUnit,
             'nghìn'
         );
-        const priceCurrency = (priceString.match(/$/) || []).shift() ? 'usd' : 'vnd';
+        const priceCurrency = (priceString.match(/$/) || []).shift()
+            ? 'usd'
+            : 'vnd';
         const price = {
             value: priceValue,
             currency: priceCurrency,
             timeUnit:
-                CommonConstant.PRICE_TIME_UNIT.find((item): boolean => item.wording.indexOf(priceTimeUnit) !== -1)
-                    ?.id || -1,
+                CommonConstant.PRICE_TIME_UNIT.find(
+                    (item): boolean =>
+                        item.wording.indexOf(priceTimeUnit) !== -1
+                )?.id || -1,
         };
         if (price.timeUnit === -1) {
             if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
@@ -337,17 +438,36 @@ export default class ScrapeRawData extends ScrapeBase {
             }
         }
 
-        const acreageString = (acreageData.match(ScrapeRawDataConstant.ACREAGE_PATTERN) || []).shift() || '';
+        const acreageString =
+            (
+                acreageData.match(ScrapeRawDataConstant.ACREAGE_PATTERN) || []
+            ).shift() || '';
         const acreageMeasureUnit =
-            (acreageString.match(ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN) || []).shift() || '';
+            (
+                acreageString.match(
+                    ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN
+                ) || []
+            ).shift() || '';
         const acreageValue =
             acreageMeasureUnit === 'km²' || acreageMeasureUnit === 'km2'
                 ? convertAcreageValue(
-                      Number((acreageString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift()),
+                      Number(
+                          (
+                              acreageString.match(
+                                  ScrapeRawDataConstant.VALUE_PATTERN
+                              ) || []
+                          ).shift()
+                      ),
                       'km²',
                       'm²'
                   )
-                : Number((acreageString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []).shift());
+                : Number(
+                      (
+                          acreageString.match(
+                              ScrapeRawDataConstant.VALUE_PATTERN
+                          ) || []
+                      ).shift()
+                  );
         const acreage = {
             value: acreageValue,
             measureUnit: 'm²',
@@ -372,10 +492,15 @@ export default class ScrapeRawData extends ScrapeBase {
      */
     public async finishAction(): Promise<void> {
         await this.telegramChatBotInstance.sendMessage(
-            replaceMetaDataString(ScrapeRawDataConstantChatBotMessage.FINISH, [this.catalog.title, this.catalog.id])
+            replaceMetaDataString(ScrapeRawDataConstantChatBotMessage.FINISH, [
+                this.catalog.title,
+                this.catalog.id,
+            ])
         );
         this.isRunning = false;
-        const executeTime = convertTotalSecondsToTime(process.hrtime(this.startTime)[0]);
+        const executeTime = convertTotalSecondsToTime(
+            process.hrtime(this.startTime)[0]
+        );
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
             `Scrape raw data -> CID: ${this.catalog._id} - Execute time: ${executeTime} - Complete`

@@ -35,7 +35,9 @@ export default class VisualAdministrativeWardLogic extends CommonServiceLogicBas
     public async populateDocument(
         document: VisualAdministrativeWardDocumentModel
     ): Promise<VisualAdministrativeWardDocumentModel> {
-        return document.populate({ path: 'districtId', populate: { path: 'provinceId' } }).execPopulate();
+        return document
+            .populate({ path: 'districtId', populate: { path: 'provinceId' } })
+            .execPopulate();
     }
 
     /**
@@ -51,11 +53,16 @@ export default class VisualAdministrativeWardLogic extends CommonServiceLogicBas
         cTime,
         mTime,
     }: VisualAdministrativeWardDocumentModel): VisualAdministrativeWardApiModel {
-        let district: VisualAdministrativeDistrictApiModel | number | null = null;
+        let district:
+            | VisualAdministrativeDistrictApiModel
+            | number
+            | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(
+                    districtId
+                );
             } else {
                 district = districtId;
             }

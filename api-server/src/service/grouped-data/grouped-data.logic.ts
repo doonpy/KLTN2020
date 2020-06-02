@@ -4,7 +4,10 @@ import { GroupedDataApiModel, GroupedDataDocumentModel } from './grouped-data.in
 import RawDataLogic from '../raw-data/raw-data.logic';
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/raw-data.interface';
 
-export default class GroupedDataLogic extends CommonServiceLogicBase<GroupedDataDocumentModel, GroupedDataApiModel> {
+export default class GroupedDataLogic extends CommonServiceLogicBase<
+    GroupedDataDocumentModel,
+    GroupedDataApiModel
+> {
     private static instance: GroupedDataLogic;
 
     constructor() {
@@ -27,20 +30,26 @@ export default class GroupedDataLogic extends CommonServiceLogicBase<GroupedData
      *
      * @return {GroupedDataApiModel}
      */
-    public convertToApiResponse({ _id, items, cTime, mTime }: GroupedDataDocumentModel): GroupedDataApiModel {
-        const itemsConverted: (RawDataApiModel | number | null)[] = items.map((item):
-            | RawDataApiModel
-            | number
-            | null => {
-            if (item) {
-                if (typeof item === 'object') {
-                    return RawDataLogic.getInstance().convertToApiResponse(item as RawDataDocumentModel);
+    public convertToApiResponse({
+        _id,
+        items,
+        cTime,
+        mTime,
+    }: GroupedDataDocumentModel): GroupedDataApiModel {
+        const itemsConverted: (RawDataApiModel | number | null)[] = items.map(
+            (item): RawDataApiModel | number | null => {
+                if (item) {
+                    if (typeof item === 'object') {
+                        return RawDataLogic.getInstance().convertToApiResponse(
+                            item as RawDataDocumentModel
+                        );
+                    }
+                    return item as number;
                 }
-                return item as number;
-            }
 
-            return null;
-        });
+                return null;
+            }
+        );
 
         return {
             id: _id ?? null,

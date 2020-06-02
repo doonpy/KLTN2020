@@ -21,9 +21,8 @@ VisualAdministrativeCountrySchema.plugin(autoIncrement.plugin, {
 
 VisualAdministrativeCountrySchema.index({ name: 1 }, { name: 'idx_name' });
 
-const VisualAdministrativeCountryModel = mongoose.model<VisualAdministrativeCountryDocumentModel>(
-    'visual_administrative_country',
-    VisualAdministrativeCountrySchema
-);
+const VisualAdministrativeCountryModel = mongoose.model<
+    VisualAdministrativeCountryDocumentModel
+>('visual_administrative_country', VisualAdministrativeCountrySchema);
 
 export default VisualAdministrativeCountryModel;

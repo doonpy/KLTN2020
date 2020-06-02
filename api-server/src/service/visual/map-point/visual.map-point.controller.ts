@@ -68,7 +68,11 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -79,7 +83,11 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -90,47 +98,84 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_MIN_LAT, new Checker.Type.Decimal());
-            this.validator.addParamValidator(this.PARAM_MAX_LAT, new Checker.DecimalRange(MIN_LAT, MAX_LAT));
+            this.validator.addParamValidator(
+                this.PARAM_MIN_LAT,
+                new Checker.Type.Decimal()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_MAX_LAT,
+                new Checker.DecimalRange(MIN_LAT, MAX_LAT)
+            );
 
-            this.validator.addParamValidator(this.PARAM_MIN_LNG, new Checker.Type.Decimal());
-            this.validator.addParamValidator(this.PARAM_MAX_LNG, new Checker.DecimalRange(MIN_LNG, MAX_LNG));
+            this.validator.addParamValidator(
+                this.PARAM_MIN_LNG,
+                new Checker.Type.Decimal()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_MAX_LNG,
+                new Checker.DecimalRange(MIN_LNG, MAX_LNG)
+            );
 
-            this.validator.addParamValidator(this.PARAM_MIN_ACREAGE, new Checker.Type.Decimal());
+            this.validator.addParamValidator(
+                this.PARAM_MIN_ACREAGE,
+                new Checker.Type.Decimal()
+            );
             this.validator.addParamValidator(
                 this.PARAM_MIN_ACREAGE,
                 new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
             );
 
-            this.validator.addParamValidator(this.PARAM_MAX_ACREAGE, new Checker.Type.Decimal());
+            this.validator.addParamValidator(
+                this.PARAM_MAX_ACREAGE,
+                new Checker.Type.Decimal()
+            );
             this.validator.addParamValidator(
                 this.PARAM_MAX_ACREAGE,
                 new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
             );
 
-            this.validator.addParamValidator(this.PARAM_MIN_PRICE, new Checker.Type.Decimal());
+            this.validator.addParamValidator(
+                this.PARAM_MIN_PRICE,
+                new Checker.Type.Decimal()
+            );
             this.validator.addParamValidator(
                 this.PARAM_MIN_PRICE,
                 new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
             );
 
-            this.validator.addParamValidator(this.PARAM_MAX_PRICE, new Checker.Type.Decimal());
+            this.validator.addParamValidator(
+                this.PARAM_MAX_PRICE,
+                new Checker.Type.Decimal()
+            );
             this.validator.addParamValidator(
                 this.PARAM_MAX_PRICE,
                 new Checker.DecimalRange(MIN_NUMBER_VALUE, MAX_NUMBER_VALUE)
             );
 
-            this.validator.addParamValidator(this.PARAM_TRANSACTION_TYPE, new Checker.Type.Integer());
             this.validator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.DecimalRange(1, CommonConstant.TRANSACTION_TYPE.length)
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TRANSACTION_TYPE,
+                new Checker.DecimalRange(
+                    1,
+                    CommonConstant.TRANSACTION_TYPE.length
+                )
             );
 
-            this.validator.addParamValidator(this.PARAM_PROPERTY_TYPE, new Checker.Type.Integer());
+            this.validator.addParamValidator(
+                this.PARAM_PROPERTY_TYPE,
+                new Checker.Type.Integer()
+            );
             this.validator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
                 new Checker.DecimalRange(1, CommonConstant.PROPERTY_TYPE.length)
@@ -139,16 +184,32 @@ export default class VisualMapPointController extends VisualCommonController {
             this.validator.validate(this.requestQuery);
 
             const visualAdministrativeWardLogic = VisualAdministrativeWardLogic.getInstance();
-            const minLat = Number(this.requestQuery[this.PARAM_MIN_LAT]) || MIN_LAT;
-            const maxLat = Number(this.requestQuery[this.PARAM_MAX_LAT]) || MAX_LAT;
-            const minLng = Number(this.requestQuery[this.PARAM_MIN_LNG]) || MIN_LNG;
-            const maxLng = Number(this.requestQuery[this.PARAM_MAX_LNG]) || MAX_LNG;
-            const minAcreage = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_NUMBER_VALUE;
-            const maxAcreage = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_NUMBER_VALUE;
-            const minPrice = Number(this.requestQuery[this.PARAM_MIN_PRICE]) || MIN_NUMBER_VALUE;
-            const maxPrice = Number(this.requestQuery[this.PARAM_MAX_PRICE]) || MAX_NUMBER_VALUE;
-            const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
-            const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const minLat =
+                Number(this.requestQuery[this.PARAM_MIN_LAT]) || MIN_LAT;
+            const maxLat =
+                Number(this.requestQuery[this.PARAM_MAX_LAT]) || MAX_LAT;
+            const minLng =
+                Number(this.requestQuery[this.PARAM_MIN_LNG]) || MIN_LNG;
+            const maxLng =
+                Number(this.requestQuery[this.PARAM_MAX_LNG]) || MAX_LNG;
+            const minAcreage =
+                Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) ||
+                MIN_NUMBER_VALUE;
+            const maxAcreage =
+                Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) ||
+                MAX_NUMBER_VALUE;
+            const minPrice =
+                Number(this.requestQuery[this.PARAM_MIN_PRICE]) ||
+                MIN_NUMBER_VALUE;
+            const maxPrice =
+                Number(this.requestQuery[this.PARAM_MAX_PRICE]) ||
+                MAX_NUMBER_VALUE;
+            const transactionType =
+                Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) ||
+                undefined;
+            const propertyType =
+                Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) ||
+                undefined;
             const transactionTypeAndPropertyTypeAggregations = {
                 $and: [
                     transactionType
@@ -225,16 +286,28 @@ export default class VisualMapPointController extends VisualCommonController {
                                             cond: {
                                                 $and: [
                                                     {
-                                                        $gte: ['$$rawData.acreage', minAcreage],
+                                                        $gte: [
+                                                            '$$rawData.acreage',
+                                                            minAcreage,
+                                                        ],
                                                     },
                                                     {
-                                                        $lte: ['$$rawData.acreage', maxAcreage],
+                                                        $lte: [
+                                                            '$$rawData.acreage',
+                                                            maxAcreage,
+                                                        ],
                                                     },
                                                     {
-                                                        $gte: ['$$rawData.price', minPrice],
+                                                        $gte: [
+                                                            '$$rawData.price',
+                                                            minPrice,
+                                                        ],
                                                     },
                                                     {
-                                                        $lte: ['$$rawData.price', maxPrice],
+                                                        $lte: [
+                                                            '$$rawData.price',
+                                                            maxPrice,
+                                                        ],
                                                     },
                                                 ],
                                             },
@@ -250,25 +323,39 @@ export default class VisualMapPointController extends VisualCommonController {
                     },
                 },
             ];
-            const [documents, { documents: visualAdministrativeWards }] = await Promise.all<
+            const [
+                documents,
+                { documents: visualAdministrativeWards },
+            ] = await Promise.all<
                 VisualMapPointDocumentModel[],
                 { documents: VisualAdministrativeWardDocumentModel[] }
             >([
-                this.visualMapPointLogic.getWithAggregation<VisualMapPointDocumentModel>(aggregations),
+                this.visualMapPointLogic.getWithAggregation<
+                    VisualMapPointDocumentModel
+                >(aggregations),
                 visualAdministrativeWardLogic.getAll({}),
             ]);
 
             const mapPoints = documents.map((document) => {
-                document.wardId = visualAdministrativeWards.filter(({ _id }) => document.wardId === _id)[0] || null;
+                document.wardId =
+                    visualAdministrativeWards.filter(
+                        ({ _id }) => document.wardId === _id
+                    )[0] || null;
                 document.districtId = document.wardId.districtId;
 
                 return document;
             });
             const responseBody = {
-                mapPoints: mapPoints.map((mapPoint) => this.visualMapPointLogic.convertToApiResponse(mapPoint)),
+                mapPoints: mapPoints.map((mapPoint) =>
+                    this.visualMapPointLogic.convertToApiResponse(mapPoint)
+                ),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -281,7 +368,11 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -292,7 +383,11 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -303,7 +398,11 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.visualMapPointLogic.getDocumentAmount();
 

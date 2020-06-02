@@ -7,7 +7,9 @@ autoIncrement.initialize(mongoose.connection);
 
 const GroupedDataSchema: Schema = new Schema(
     {
-        items: [{ type: Schema.Types.Number, ref: 'raw_data', autopopulate: true }],
+        items: [
+            { type: Schema.Types.Number, ref: 'raw_data', autopopulate: true },
+        ],
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
@@ -21,6 +23,9 @@ GroupedDataSchema.plugin(autoPopulate);
 
 GroupedDataSchema.index({ items: 1 }, { name: 'idx_items' });
 
-const GroupedDataModel = mongoose.model<GroupedDataDocumentModel>('grouped_data', GroupedDataSchema);
+const GroupedDataModel = mongoose.model<GroupedDataDocumentModel>(
+    'grouped_data',
+    GroupedDataSchema
+);
 
 export default GroupedDataModel;

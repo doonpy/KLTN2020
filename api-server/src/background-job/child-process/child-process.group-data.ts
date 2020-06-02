@@ -32,7 +32,10 @@ process.on(
                         `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Start`
                     ).show();
 
-                    await groupDataInstance.start(transactionTypeId, propertyTypeId);
+                    await groupDataInstance.start(
+                        transactionTypeId,
+                        propertyTypeId
+                    );
                 } catch (error) {
                     await telegramChatBotInstance.sendMessage(
                         `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
@@ -51,11 +54,18 @@ process.on(
                 groupDataInstance.continue();
                 break;
             case MESSAGE_TYPE.IS_SUSPENSE:
-                (process as any).send({ isSuspense: groupDataInstance.isProcessSuspense() });
+                (process as any).send({
+                    isSuspense: groupDataInstance.isProcessSuspense(),
+                });
                 break;
             default:
-                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Group data]🤖</b>\nGroup data - Force stop...`);
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Group data - Force stop...`).show();
+                await ChatBotTelegram.getInstance().sendMessage(
+                    `<b>🤖[Group data]🤖</b>\nGroup data - Force stop...`
+                );
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `Group data - Force stop...`
+                ).show();
                 process.exit(0);
         }
     }

@@ -36,7 +36,11 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -47,7 +51,11 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -58,17 +66,29 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
-            const { documents } = await this.visualSummaryDistrictLogic.getAll({});
+            const { documents } = await this.visualSummaryDistrictLogic.getAll(
+                {}
+            );
 
             const responseBody = {
                 summaryDistrict: documents.map((document) =>
-                    this.visualSummaryDistrictLogic.convertToApiResponse(document)
+                    this.visualSummaryDistrictLogic.convertToApiResponse(
+                        document
+                    )
                 ),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -81,7 +101,11 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -92,7 +116,11 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         next();
     }
 
@@ -103,7 +131,11 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.visualSummaryDistrictLogic.getDocumentAmount();
 

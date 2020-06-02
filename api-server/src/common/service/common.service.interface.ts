@@ -23,7 +23,10 @@ export interface CommonOptions {
     conditions?: object;
 }
 
-export interface CommonLogicBaseInterface<T extends CommonDocumentModel, A extends CommonApiModel> {
+export interface CommonLogicBaseInterface<
+    T extends CommonDocumentModel,
+    A extends CommonApiModel
+> {
     /**
      * @param {CommonOptions} options
      *

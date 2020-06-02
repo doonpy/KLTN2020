@@ -54,19 +54,41 @@ export default class CatalogController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected getAllRoute = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    protected getAllRoute = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> => {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_HOST_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_HOST_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.Type.String()
+            );
 
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.Type.String()
+            );
 
-            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_PATTERN_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_PATTERN_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestQuery);
 
@@ -81,10 +103,16 @@ export default class CatalogController extends CommonServiceControllerBase {
                 ]),
             });
             const responseBody = {
-                catalogs: documents.map((catalog) => this.catalogLogic.convertToApiResponse(catalog)),
+                catalogs: documents.map((catalog) =>
+                    this.catalogLogic.convertToApiResponse(catalog)
+                ),
                 hasNext,
             };
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -97,12 +125,22 @@ export default class CatalogController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
@@ -112,7 +150,11 @@ export default class CatalogController extends CommonServiceControllerBase {
                 catalog: this.catalogLogic.convertToApiResponse(catalog),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -125,36 +167,86 @@ export default class CatalogController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.StringLength(1, 100));
+            this.validator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.StringLength(1, 100)
+            );
 
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.StringLength(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.StringLength(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_LOCATOR, new Checker.Type.Object());
+            this.validator.addParamValidator(
+                this.PARAM_LOCATOR,
+                new Checker.Type.Object()
+            );
 
-            this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_HOST_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_HOST_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_PATTERN_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_PATTERN_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL,
+                new Checker.StringLength(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_PAGE_NUMBER, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_PAGE_NUMBER,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL,
+                new Checker.StringLength(1, null)
+            );
 
             this.validator.validate(this.requestBody);
-            this.validator.validate((this.requestBody[this.PARAM_LOCATOR] as object) ?? {});
+            this.validator.validate(
+                (this.requestBody[this.PARAM_LOCATOR] as object) ?? {}
+            );
 
-            const catalogBody = (this.requestBody as unknown) as CatalogDocumentModel;
-            await HostLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.hostId });
-            await PatternLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.patternId });
+            const catalogBody = (this
+                .requestBody as unknown) as CatalogDocumentModel;
+            await HostLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: catalogBody.hostId,
+            });
+            await PatternLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
+            });
 
             const createdCatalog = await this.catalogLogic.create(
                 catalogBody,
@@ -179,45 +271,101 @@ export default class CatalogController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_TITLE, new Checker.StringLength(1, 100));
+            this.validator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TITLE,
+                new Checker.StringLength(1, 100)
+            );
 
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.Type.String()
+            );
             this.validator.addParamValidator(this.PARAM_URL, new Checker.Url());
 
-            this.validator.addParamValidator(this.PARAM_LOCATOR, new Checker.Type.Object());
+            this.validator.addParamValidator(
+                this.PARAM_LOCATOR,
+                new Checker.Type.Object()
+            );
 
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL,
+                new Checker.StringLength(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_PAGE_NUMBER, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_DETAIL_URL, new Checker.StringLength(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_PAGE_NUMBER,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_DETAIL_URL,
+                new Checker.StringLength(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_HOST_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_HOST_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_HOST_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_PATTERN_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_PATTERN_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_PATTERN_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
-            this.validator.validate((this.requestBody[this.PARAM_LOCATOR] as object) ?? {});
+            this.validator.validate(
+                (this.requestBody[this.PARAM_LOCATOR] as object) ?? {}
+            );
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const catalogBody = (this.requestBody as unknown) as CatalogDocumentModel;
-            await HostLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.hostId });
-            await PatternLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: catalogBody.patternId });
+            const catalogBody = (this
+                .requestBody as unknown) as CatalogDocumentModel;
+            await HostLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: catalogBody.hostId,
+            });
+            await PatternLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
+            });
 
-            const editedCatalog = await this.catalogLogic.update(idBody, catalogBody, undefined, [
-                { [this.PARAM_URL]: catalogBody.url },
-            ]);
+            const editedCatalog = await this.catalogLogic.update(
+                idBody,
+                catalogBody,
+                undefined,
+                [{ [this.PARAM_URL]: catalogBody.url }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -236,19 +384,33 @@ export default class CatalogController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.catalogLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.NO_CONTENT,
+                {},
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -261,11 +423,19 @@ export default class CatalogController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.catalogLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, { schema: 'catalog', documentAmount }, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'catalog', documentAmount },
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }

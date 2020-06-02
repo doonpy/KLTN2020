@@ -5,7 +5,11 @@
  * @param {string} toUnit
  * @return {number} value
  */
-export const convertAcreageValue = (value: number, fromUnit: string, toUnit: string): number => {
+export const convertAcreageValue = (
+    value: number,
+    fromUnit: string,
+    toUnit: string
+): number => {
     if (!value) {
         return value;
     }
@@ -28,7 +32,11 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
  * @param {string} toUnitInput
  * @return {number} returnValue
  */
-export const convertPriceValue = (value: number, fromUnitInput: string, toUnitInput: string): number => {
+export const convertPriceValue = (
+    value: number,
+    fromUnitInput: string,
+    toUnitInput: string
+): number => {
     if (!value) {
         return value;
     }

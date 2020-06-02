@@ -14,7 +14,8 @@ export interface HostDocumentModel extends CommonDocumentModel {
     domain: string;
 }
 
-export interface HostLogicInterface extends CommonLogicBaseInterface<HostDocumentModel, HostApiModel> {
+export interface HostLogicInterface
+    extends CommonLogicBaseInterface<HostDocumentModel, HostApiModel> {
     /**
      * @param {string} domain
      *

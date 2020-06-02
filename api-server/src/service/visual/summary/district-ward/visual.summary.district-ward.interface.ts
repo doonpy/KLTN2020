@@ -8,7 +8,8 @@ import {
     VisualAdministrativeDistrictDocumentModel,
 } from '../../administrative/district/visual.administrative.district.interface';
 
-export interface VisualSummaryDistrictWardDocumentModel extends CommonDocumentModel {
+export interface VisualSummaryDistrictWardDocumentModel
+    extends CommonDocumentModel {
     districtId: number | VisualAdministrativeDistrictDocumentModel;
     wardId: number | VisualAdministrativeWardDocumentModel;
     summaryAmount: number;

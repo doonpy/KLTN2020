@@ -1,5 +1,6 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
-import VisualAdministrativeProvinceModel from '@service/visual/administrative/province/visual.administrative.province.model';
+import VisualAdministrativeProvinceModel
+    from '@service/visual/administrative/province/visual.administrative.province.model';
 import {
     VisualAdministrativeProvinceApiModel,
     VisualAdministrativeProvinceDocumentModel,
@@ -45,7 +46,9 @@ export default class VisualAdministrativeProvinceLogic extends CommonServiceLogi
 
         if (countryId) {
             if (typeof countryId === 'object') {
-                country = VisualAdministrativeCountryLogic.getInstance().convertToApiResponse(countryId);
+                country = VisualAdministrativeCountryLogic.getInstance().convertToApiResponse(
+                    countryId
+                );
             } else {
                 country = countryId;
             }

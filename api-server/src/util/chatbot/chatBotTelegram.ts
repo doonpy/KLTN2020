@@ -6,7 +6,9 @@ const receiverList = [ADMIN_TELEGRAM_ID];
 export default class ChatBotTelegram {
     private static instance: ChatBotTelegram;
 
-    private telegramBot = new TelegramBot(process.env.CHAT_BOT_TELEGRAM_TOKEN || '');
+    private telegramBot = new TelegramBot(
+        process.env.CHAT_BOT_TELEGRAM_TOKEN || ''
+    );
 
     constructor() {
         this.bindListener();
@@ -31,10 +33,14 @@ export default class ChatBotTelegram {
             if (!this.telegramBot) {
                 return;
             }
-            await this.telegramBot.sendMessage(receiver, `<b>[PID: ${process.pid}]</b>\n${message}`, {
-                // eslint-disable-next-line @typescript-eslint/camelcase
-                parse_mode: 'HTML',
-            });
+            await this.telegramBot.sendMessage(
+                receiver,
+                `<b>[PID: ${process.pid}]</b>\n${message}`,
+                {
+                    // eslint-disable-next-line @typescript-eslint/camelcase
+                    parse_mode: 'HTML',
+                }
+            );
         }
     }
 

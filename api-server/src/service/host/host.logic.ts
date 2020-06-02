@@ -2,7 +2,9 @@ import CommonLogicBase from '@common/service/common.service.logic.base';
 import HostModel from './host.model';
 import { HostApiModel, HostDocumentModel, HostLogicInterface } from './host.interface';
 
-export default class HostLogic extends CommonLogicBase<HostDocumentModel, HostApiModel> implements HostLogicInterface {
+export default class HostLogic
+    extends CommonLogicBase<HostDocumentModel, HostApiModel>
+    implements HostLogicInterface {
     public static instance: HostLogic;
 
     constructor() {
@@ -28,7 +30,9 @@ export default class HostLogic extends CommonLogicBase<HostDocumentModel, HostAp
     public async getByDomain(domain: string): Promise<HostDocumentModel> {
         await this.checkExisted({ domain });
 
-        return (await HostModel.findOne({ domain }).exec()) as HostDocumentModel;
+        return (await HostModel.findOne({
+            domain,
+        }).exec()) as HostDocumentModel;
     }
 
     /**
@@ -36,7 +40,13 @@ export default class HostLogic extends CommonLogicBase<HostDocumentModel, HostAp
      *
      * @return {HostApiModel}
      */
-    public convertToApiResponse({ _id, name, domain, cTime, mTime }: HostDocumentModel): HostApiModel {
+    public convertToApiResponse({
+        _id,
+        name,
+        domain,
+        cTime,
+        mTime,
+    }: HostDocumentModel): HostApiModel {
         return {
             id: _id ?? null,
             name: name ?? null,

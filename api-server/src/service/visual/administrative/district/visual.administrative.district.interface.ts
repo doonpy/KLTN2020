@@ -4,7 +4,8 @@ import {
     VisualAdministrativeProvinceDocumentModel,
 } from '../province/visual.administrative.province.interface';
 
-export interface VisualAdministrativeDistrictDocumentModel extends CommonDocumentModel {
+export interface VisualAdministrativeDistrictDocumentModel
+    extends CommonDocumentModel {
     name: string;
     code: string;
     acreage: number;

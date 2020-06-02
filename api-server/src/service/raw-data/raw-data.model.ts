@@ -41,7 +41,12 @@ const rawDataSchema = new Schema(
                 _id: false,
             },
         ],
-        coordinateId: { type: Schema.Types.Number, ref: 'coordinate', default: null, autopopulate: true },
+        coordinateId: {
+            type: Schema.Types.Number,
+            ref: 'coordinate',
+            default: null,
+            autopopulate: true,
+        },
         isGrouped: { type: Schema.Types.Boolean, default: false },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
@@ -65,6 +70,9 @@ rawDataSchema.index(
     { name: 'idx_transactionType_propertyType_isGrouped' }
 );
 
-const RawDataModel = mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);
+const RawDataModel = mongoose.model<RawDataDocumentModel>(
+    'raw_data',
+    rawDataSchema
+);
 
 export default RawDataModel;

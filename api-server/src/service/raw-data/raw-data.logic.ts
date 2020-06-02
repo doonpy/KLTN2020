@@ -1,13 +1,24 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import CommonConstant from '@common/common.constant';
 import RawDataModel from './raw-data.model';
-import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
-import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
+import {
+    DetailUrlApiModel,
+    DetailUrlDocumentModel,
+} from '../detail-url/detail-url.interface';
+import {
+    CoordinateApiModel,
+    CoordinateDocumentModel,
+} from '../coordinate/coordinate.interface';
 import CoordinateLogic from '../coordinate/coordinate.logic';
 import DetailUrlLogic from '../detail-url/detail-url.logic';
-import { RawDataApiModel, RawDataDocumentModel, RawDataLogicInterface } from './raw-data.interface';
+import {
+    RawDataApiModel,
+    RawDataDocumentModel,
+    RawDataLogicInterface,
+} from './raw-data.interface';
 
-export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocumentModel, RawDataApiModel>
+export default class RawDataLogic
+    extends CommonServiceLogicBase<RawDataDocumentModel, RawDataApiModel>
     implements RawDataLogicInterface {
     private static instance: RawDataLogic;
 
@@ -32,8 +43,12 @@ export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocument
      * @return {number} index
      */
     public getPropertyTypeIndex(propertyTypeData: string): number {
-        const propertyType: number | undefined = CommonConstant.PROPERTY_TYPE.find(({ wording }) =>
-            new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(propertyTypeData)
+        const propertyType:
+            | number
+            | undefined = CommonConstant.PROPERTY_TYPE.find(({ wording }) =>
+            new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(
+                propertyTypeData
+            )
         )?.id;
 
         if (!propertyType) {
@@ -48,7 +63,9 @@ export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocument
      *
      * @return {number}
      */
-    public async countDocumentsWithConditions(conditions?: object): Promise<number> {
+    public async countDocumentsWithConditions(
+        conditions?: object
+    ): Promise<number> {
         return RawDataModel.countDocuments(conditions || {}).exec();
     }
 
@@ -79,7 +96,9 @@ export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocument
 
         if (detailUrlId) {
             if (typeof detailUrlId === 'object') {
-                detailUrl = DetailUrlLogic.getInstance().convertToApiResponse(detailUrlId as DetailUrlDocumentModel);
+                detailUrl = DetailUrlLogic.getInstance().convertToApiResponse(
+                    detailUrlId as DetailUrlDocumentModel
+                );
             } else {
                 detailUrl = detailUrlId as number;
             }
@@ -95,7 +114,11 @@ export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocument
             }
         }
 
-        const priceClone: { value: number; currency: string; timeUnit: { id: number; wording: string[] } } = {
+        const priceClone: {
+            value: number;
+            currency: string;
+            timeUnit: { id: number; wording: string[] };
+        } = {
             value: price.value,
             currency: price.currency,
             timeUnit: CommonConstant.PRICE_TIME_UNIT[price.timeUnit],
@@ -103,7 +126,8 @@ export default class RawDataLogic extends CommonServiceLogicBase<RawDataDocument
 
         return {
             id: _id ?? null,
-            transactionType: CommonConstant.TRANSACTION_TYPE[transactionType] ?? null,
+            transactionType:
+                CommonConstant.TRANSACTION_TYPE[transactionType] ?? null,
             propertyType: CommonConstant.PROPERTY_TYPE[propertyType] ?? null,
             detailUrl,
             postDate: postDate ?? null,

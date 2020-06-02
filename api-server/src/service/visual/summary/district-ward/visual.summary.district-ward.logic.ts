@@ -43,12 +43,17 @@ export default class VisualSummaryDistrictWardLogic extends CommonServiceLogicBa
         cTime,
         mTime,
     }: VisualSummaryDistrictWardDocumentModel): VisualSummaryDistrictWardApiModel {
-        let district: VisualAdministrativeDistrictApiModel | number | null = null;
+        let district:
+            | VisualAdministrativeDistrictApiModel
+            | number
+            | null = null;
         let ward: VisualAdministrativeWardApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(
+                    districtId
+                );
             } else {
                 district = districtId;
             }
@@ -56,7 +61,9 @@ export default class VisualSummaryDistrictWardLogic extends CommonServiceLogicBa
 
         if (wardId) {
             if (typeof wardId === 'object') {
-                ward = VisualAdministrativeWardLogic.getInstance().convertToApiResponse(wardId);
+                ward = VisualAdministrativeWardLogic.getInstance().convertToApiResponse(
+                    wardId
+                );
             } else {
                 ward = wardId;
             }

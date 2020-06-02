@@ -1,6 +1,7 @@
 import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
 
-export interface VisualAdministrativeCountryDocumentModel extends CommonDocumentModel {
+export interface VisualAdministrativeCountryDocumentModel
+    extends CommonDocumentModel {
     name: string;
     code: string;
     acreage: number;

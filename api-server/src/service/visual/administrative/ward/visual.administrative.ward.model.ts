@@ -9,7 +9,11 @@ const VisualAdministrativeWardSchema: Schema = new Schema(
     {
         name: { type: Schema.Types.String },
         code: { type: Schema.Types.String },
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
+        districtId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_district',
+            autopopulate: true,
+        },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
@@ -22,11 +26,13 @@ VisualAdministrativeWardSchema.plugin(autoIncrement.plugin, {
 VisualAdministrativeWardSchema.plugin(autoPopulate);
 
 VisualAdministrativeWardSchema.index({ name: 1 }, { name: 'idx_name' });
-VisualAdministrativeWardSchema.index({ districtId: 1 }, { name: 'idx_districtId' });
-
-const VisualAdministrativeWardModel = mongoose.model<VisualAdministrativeWardDocumentModel>(
-    'visual_administrative_ward',
-    VisualAdministrativeWardSchema
+VisualAdministrativeWardSchema.index(
+    { districtId: 1 },
+    { name: 'idx_districtId' }
 );
+
+const VisualAdministrativeWardModel = mongoose.model<
+    VisualAdministrativeWardDocumentModel
+>('visual_administrative_ward', VisualAdministrativeWardSchema);
 
 export default VisualAdministrativeWardModel;

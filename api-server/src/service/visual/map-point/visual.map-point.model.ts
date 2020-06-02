@@ -8,8 +8,16 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualMapPointSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
-        wardId: { type: Schema.Types.Number, ref: 'visual_administrative_ward', autopopulate: true },
+        districtId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_district',
+            autopopulate: true,
+        },
+        wardId: {
+            type: Schema.Types.Number,
+            ref: 'visual_administrative_ward',
+            autopopulate: true,
+        },
         lat: { type: Schema.Types.Number },
         lng: { type: Schema.Types.Number },
         points: [
@@ -18,7 +26,10 @@ const VisualMapPointSchema: Schema = new Schema(
                 rawDataset: [
                     {
                         _id: false,
-                        rawDataId: { type: Schema.Types.Number, ref: 'raw_data' },
+                        rawDataId: {
+                            type: Schema.Types.Number,
+                            ref: 'raw_data',
+                        },
                         acreage: { type: Schema.Types.Number },
                         price: { type: Schema.Types.Number },
                         currency: { type: Schema.Types.String },
@@ -27,9 +38,14 @@ const VisualMapPointSchema: Schema = new Schema(
                 ],
                 transactionType: {
                     type: Schema.Types.Number,
-                    enum: CommonConstant.TRANSACTION_TYPE.map((item) => item.id),
+                    enum: CommonConstant.TRANSACTION_TYPE.map(
+                        (item) => item.id
+                    ),
                 },
-                propertyType: { type: Schema.Types.Number, enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id) },
+                propertyType: {
+                    type: Schema.Types.Number,
+                    enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                },
             },
         ],
     },
@@ -59,6 +75,9 @@ VisualMapPointSchema.index(
     }
 );
 
-const VisualMapPointModel = mongoose.model<VisualMapPointDocumentModel>('visual_map_point', VisualMapPointSchema);
+const VisualMapPointModel = mongoose.model<VisualMapPointDocumentModel>(
+    'visual_map_point',
+    VisualMapPointSchema
+);
 
 export default VisualMapPointModel;

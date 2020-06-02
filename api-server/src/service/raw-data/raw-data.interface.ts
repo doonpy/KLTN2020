@@ -63,7 +63,8 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     isGrouped: boolean;
 }
 
-export interface RawDataLogicInterface extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
+export interface RawDataLogicInterface
+    extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
     /**
      * @param {string} propertyTypeData
      *

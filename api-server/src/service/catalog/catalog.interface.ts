@@ -1,5 +1,11 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
-import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
+import {
+    CommonApiModel,
+    CommonDocumentModel,
+} from '@common/service/common.service.interface';
+import {
+    PatternApiModel,
+    PatternDocumentModel,
+} from '../pattern/pattern.interface';
 import { HostApiModel, HostDocumentModel } from '../host/host.interface';
 
 export interface CatalogApiModel extends CommonApiModel {

@@ -9,9 +9,12 @@ import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/visual.administrative.ward.interface';
 import { VisualAdministrativeCountryDocumentModel } from '@service/visual/administrative/country/visual.administrative.country.interface';
-import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
-import VisualAdministrativeCountryLogic from '@service/visual/administrative/country/visual.administrative.country.logic';
-import VisualAdministrativeProvinceLogic from '@service/visual/administrative/province/visual.administrative.province.logic';
+import VisualAdministrativeDistrictLogic
+    from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeCountryLogic
+    from '@service/visual/administrative/country/visual.administrative.country.logic';
+import VisualAdministrativeProvinceLogic
+    from '@service/visual/administrative/province/visual.administrative.province.logic';
 import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
 import { VisualAdministrativeProvinceDocumentModel } from '@service/visual/administrative/province/visual.administrative.province.interface';
 import VisualSummaryDistrictLogic from '@service/visual/summary/district/visual.summary.district.logic';
@@ -34,21 +37,37 @@ const TRANSACTION_TYPE_AMOUNT = 2;
  */
 const importData = async (): Promise<void> => {
     // Import country data
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize country data...').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize country data...'
+    ).show();
     for (const item of countryData) {
-        if (!(await visualAdministrativeCountryLogic.isExisted({ code: item.code }))) {
+        if (
+            !(await visualAdministrativeCountryLogic.isExisted({
+                code: item.code,
+            }))
+        ) {
             await visualAdministrativeCountryLogic.create({
                 name: item.name,
                 code: item.code,
                 acreage: item.acreage,
             } as VisualAdministrativeCountryDocumentModel);
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Initialize country data -> ${item.name} - ${item.code}`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Initialize country data -> ${item.name} - ${item.code}`
+            ).show();
         }
     }
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize country data - Done').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize country data - Done'
+    ).show();
 
     // Import province data
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize province data...').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize province data...'
+    ).show();
     for (const item of provinceData) {
         const countryCode = item.code.split('_')[0];
         const countryId = (
@@ -57,7 +76,11 @@ const importData = async (): Promise<void> => {
             })
         )?._id;
 
-        if (!(await visualAdministrativeProvinceLogic.isExisted({ code: item.code }))) {
+        if (
+            !(await visualAdministrativeProvinceLogic.isExisted({
+                code: item.code,
+            }))
+        ) {
             await visualAdministrativeProvinceLogic.create({
                 name: item.name,
                 code: item.code,
@@ -70,10 +93,16 @@ const importData = async (): Promise<void> => {
             ).show();
         }
     }
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize province data - Done').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize province data - Done'
+    ).show();
 
     // Import district data
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize district data...').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize district data...'
+    ).show();
     for (const item of districtData) {
         const countryCode = item.code.split('_')[0];
         const provinceCode = item.code.split('_')[1];
@@ -83,7 +112,11 @@ const importData = async (): Promise<void> => {
             })
         )?._id;
 
-        if (!(await visualAdministrativeDistrictLogic.isExisted({ code: item.code }))) {
+        if (
+            !(await visualAdministrativeDistrictLogic.isExisted({
+                code: item.code,
+            }))
+        ) {
             await visualAdministrativeDistrictLogic.create({
                 name: item.name,
                 provinceId,
@@ -96,7 +129,10 @@ const importData = async (): Promise<void> => {
             ).show();
         }
     }
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize district data - Done').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize district data - Done'
+    ).show();
 
     // Import ward data
     new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize ward data...').show();
@@ -110,7 +146,11 @@ const importData = async (): Promise<void> => {
             })
         )?._id;
 
-        if (!(await visualAdministrativeWardLogic.isExisted({ code: item.code }))) {
+        if (
+            !(await visualAdministrativeWardLogic.isExisted({
+                code: item.code,
+            }))
+        ) {
             await visualAdministrativeWardLogic.create({
                 name: item.name,
                 code: item.code,
@@ -122,7 +162,10 @@ const importData = async (): Promise<void> => {
             ).show();
         }
     }
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize ward data - Done').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize ward data - Done'
+    ).show();
 
     script.next();
 };
@@ -131,18 +174,34 @@ const importData = async (): Promise<void> => {
  * Initialize data for visualization
  */
 const initializeVisualData = async (): Promise<void> => {
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize visualization data...').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize visualization data...'
+    ).show();
 
-    const summaryDefault: { transactionType: number; propertyType: number; amount: number }[] = [];
+    const summaryDefault: {
+        transactionType: number;
+        propertyType: number;
+        amount: number;
+    }[] = [];
     for (let i = 1; i < TRANSACTION_TYPE_AMOUNT; i++) {
         for (let j = 1; j < PROPERTY_TYPE_AMOUNT; j++) {
-            summaryDefault.push({ transactionType: i, propertyType: j, amount: 0 });
+            summaryDefault.push({
+                transactionType: i,
+                propertyType: j,
+                amount: 0,
+            });
         }
     }
 
-    const districtList = (await visualAdministrativeDistrictLogic.getAll({})).documents;
+    const districtList = (await visualAdministrativeDistrictLogic.getAll({}))
+        .documents;
     for (const district of districtList) {
-        if (!(await visualSummaryDistrictLogic.isExisted({ districtId: district._id }))) {
+        if (
+            !(await visualSummaryDistrictLogic.isExisted({
+                districtId: district._id,
+            }))
+        ) {
             await visualSummaryDistrictLogic.create({
                 districtId: district._id,
                 summaryAmount: 0,
@@ -162,7 +221,12 @@ const initializeVisualData = async (): Promise<void> => {
             })
         ).documents;
         for (const ward of wardList) {
-            if (!(await visualSummaryDistrictWardLogic.isExisted({ districtId: district._id, wardId: ward._id }))) {
+            if (
+                !(await visualSummaryDistrictWardLogic.isExisted({
+                    districtId: district._id,
+                    wardId: ward._id,
+                }))
+            ) {
                 await visualSummaryDistrictWardLogic.create({
                     districtId: district._id,
                     wardId: ward._id,
@@ -177,7 +241,10 @@ const initializeVisualData = async (): Promise<void> => {
         }
     }
 
-    new ConsoleLog(ConsoleConstant.Type.INFO, 'Initialize visualization data - Done').show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        'Initialize visualization data - Done'
+    ).show();
 };
 
 /**

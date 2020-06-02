@@ -2,7 +2,10 @@ import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import PatternModel from './pattern.model';
 import { PatternApiModel, PatternDocumentModel } from './pattern.interface';
 
-export default class PatternLogic extends CommonServiceLogicBase<PatternDocumentModel, PatternApiModel> {
+export default class PatternLogic extends CommonServiceLogicBase<
+    PatternDocumentModel,
+    PatternApiModel
+> {
     public static instance: PatternLogic;
 
     constructor() {

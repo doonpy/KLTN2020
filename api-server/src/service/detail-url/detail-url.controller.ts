@@ -48,20 +48,45 @@ export default class DetailUrlController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_CATALOG_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_CATALOG_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.Type.String()
+            );
 
-            this.validator.addParamValidator(this.PARAM_IS_EXTRACTED, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_IS_EXTRACTED, new Checker.IntegerRange(0, 1));
+            this.validator.addParamValidator(
+                this.PARAM_IS_EXTRACTED,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_IS_EXTRACTED,
+                new Checker.IntegerRange(0, 1)
+            );
 
-            this.validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.IntegerRange(0, null));
+            this.validator.addParamValidator(
+                this.PARAM_REQUEST_RETRIES,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_REQUEST_RETRIES,
+                new Checker.IntegerRange(0, null)
+            );
 
             this.validator.validate(this.requestQuery);
 
@@ -75,14 +100,20 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                     { paramName: this.PARAM_REQUEST_RETRIES, isString: false },
                 ]),
             });
-            const detailUrlList = documents.map((detailUrl) => this.detailUrlLogic.convertToApiResponse(detailUrl));
+            const detailUrlList = documents.map((detailUrl) =>
+                this.detailUrlLogic.convertToApiResponse(detailUrl)
+            );
 
             const responseBody = {
                 detailUrls: detailUrlList,
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -95,12 +126,22 @@ export default class DetailUrlController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
@@ -110,7 +151,11 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                 detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -123,21 +168,40 @@ export default class DetailUrlController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_CATALOG_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_CATALOG_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.StringLength(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.StringLength(1, null)
+            );
             this.validator.addParamValidator(this.PARAM_URL, new Checker.Url());
 
             this.validator.validate(this.requestBody);
 
-            const detailUrlBody = (this.requestBody as unknown) as DetailUrlDocumentModel;
-            await CatalogLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId });
+            const detailUrlBody = (this
+                .requestBody as unknown) as DetailUrlDocumentModel;
+            await CatalogLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId,
+            });
             const createdDetailUrl = await this.detailUrlLogic.create(
                 detailUrlBody,
                 [],
@@ -161,33 +225,70 @@ export default class DetailUrlController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_CATALOG_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_CATALOG_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_CATALOG_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Type.String());
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.StringLength(1, 100));
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.Type.String()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_URL,
+                new Checker.StringLength(1, 100)
+            );
 
-            this.validator.addParamValidator(this.PARAM_IS_EXTRACTED, new Checker.Type.Boolean());
+            this.validator.addParamValidator(
+                this.PARAM_IS_EXTRACTED,
+                new Checker.Type.Boolean()
+            );
 
-            this.validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_REQUEST_RETRIES, new Checker.IntegerRange(0, null));
+            this.validator.addParamValidator(
+                this.PARAM_REQUEST_RETRIES,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_REQUEST_RETRIES,
+                new Checker.IntegerRange(0, null)
+            );
 
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const detailUrlBody = (this.requestBody as unknown) as DetailUrlDocumentModel;
-            await CatalogLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId });
-            const editedDetailUrl = await this.detailUrlLogic.update(idBody, detailUrlBody, undefined, [
-                { [this.PARAM_URL]: detailUrlBody.url },
-            ]);
+            const detailUrlBody = (this
+                .requestBody as unknown) as DetailUrlDocumentModel;
+            await CatalogLogic.getInstance().checkExisted({
+                [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId,
+            });
+            const editedDetailUrl = await this.detailUrlLogic.update(
+                idBody,
+                detailUrlBody,
+                undefined,
+                [{ [this.PARAM_URL]: detailUrlBody.url }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -206,19 +307,33 @@ export default class DetailUrlController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.detailUrlLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.NO_CONTENT,
+                {},
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -231,7 +346,11 @@ export default class DetailUrlController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.detailUrlLogic.getDocumentAmount();
 

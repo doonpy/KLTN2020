@@ -1,5 +1,11 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
-import { CatalogApiModel, CatalogDocumentModel } from '../catalog/catalog.interface';
+import {
+    CommonApiModel,
+    CommonDocumentModel,
+} from '@common/service/common.service.interface';
+import {
+    CatalogApiModel,
+    CatalogDocumentModel,
+} from '../catalog/catalog.interface';
 
 export interface DetailUrlApiModel extends CommonApiModel {
     catalog: CatalogApiModel | number | null;

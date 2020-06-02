@@ -23,7 +23,8 @@ import VisualSummaryDistrictLogic from '@service/visual/summary/district/visual.
 import VisualSummaryDistrictWardLogic from '@service/visual/summary/district-ward/visual.summary.district-ward.logic';
 import VisualMapPointLogic from '@service/visual/map-point/visual.map-point.logic';
 import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
-import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeDistrictLogic
+    from '@service/visual/administrative/district/visual.administrative.district.logic';
 import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
 import { convertTotalSecondsToTime } from '@util/helper/datetime';
 import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/visual.administrative.district.interface';
@@ -68,10 +69,14 @@ type SummaryElement = {
  * @return {AddressProperties}
  */
 const getAddressProperties = (address: string): AddressProperties => {
-    const ward = removeSpecialCharacterAtHeadAndTail(address.match(RegExp(wardPattern))?.shift() || '');
+    const ward = removeSpecialCharacterAtHeadAndTail(
+        address.match(RegExp(wardPattern))?.shift() || ''
+    );
     address = address.replace(ward, '');
 
-    const district = removeSpecialCharacterAtHeadAndTail(address.match(RegExp(districtPattern))?.shift() || '');
+    const district = removeSpecialCharacterAtHeadAndTail(
+        address.match(RegExp(districtPattern))?.shift() || ''
+    );
 
     return {
         district,
@@ -86,7 +91,9 @@ const getAddressProperties = (address: string): AddressProperties => {
  *
  * @return {Promise<CoordinateDocumentModel | undefined>}
  */
-const getCoordinate = async (address: string): Promise<CoordinateDocumentModel | undefined> => {
+const getCoordinate = async (
+    address: string
+): Promise<CoordinateDocumentModel | undefined> => {
     const [addressFiltered] = address.match(/(đường|phố).*/i) || [''];
     if (!addressFiltered) {
         return undefined;
@@ -100,15 +107,24 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel |
             return undefined;
         }
 
-        if (!apiResponse.resourceSets || apiResponse.resourceSets.length === 0) {
+        if (
+            !apiResponse.resourceSets ||
+            apiResponse.resourceSets.length === 0
+        ) {
             return undefined;
         }
 
-        if (!apiResponse.resourceSets[0] || apiResponse.resourceSets[0].resources.length === 0) {
+        if (
+            !apiResponse.resourceSets[0] ||
+            apiResponse.resourceSets[0].resources.length === 0
+        ) {
             return undefined;
         }
 
-        const [lat, lng] = apiResponse.resourceSets[0].resources[0].point.coordinates;
+        const [
+            lat,
+            lng,
+        ] = apiResponse.resourceSets[0].resources[0].point.coordinates;
 
         coordinateDoc = await coordinateLogic.create({
             location: address,
@@ -126,12 +142,16 @@ const getCoordinate = async (address: string): Promise<CoordinateDocumentModel |
  * @param {number} propertyType
  */
 const updateAmount = (
-    summaryDocument: VisualSummaryDistrictWardDocumentModel | VisualSummaryDistrictDocumentModel,
+    summaryDocument:
+        | VisualSummaryDistrictWardDocumentModel
+        | VisualSummaryDistrictDocumentModel,
     transactionType: number,
     propertyType: number
 ): void => {
     const summaryElement = summaryDocument.summary.find(
-        (item: SummaryElement) => item.transactionType === transactionType && item.propertyType === propertyType
+        (item: SummaryElement) =>
+            item.transactionType === transactionType &&
+            item.propertyType === propertyType
     );
     if (!summaryElement) {
         summaryDocument.summary.push({
@@ -157,7 +177,9 @@ const handleVisualizationSummaryDistrictData = async (
     transactionType: number,
     propertyType: number
 ): Promise<void> => {
-    const visualSummaryDistrictDocument = await visualSummaryDistrictLogic.getById(districtId);
+    const visualSummaryDistrictDocument = await visualSummaryDistrictLogic.getById(
+        districtId
+    );
 
     if (!visualSummaryDistrictDocument) {
         await visualSummaryDistrictLogic.create({
@@ -169,7 +191,10 @@ const handleVisualizationSummaryDistrictData = async (
     }
 
     updateAmount(visualSummaryDistrictDocument, transactionType, propertyType);
-    await visualSummaryDistrictLogic.update(visualSummaryDistrictDocument._id, visualSummaryDistrictDocument);
+    await visualSummaryDistrictLogic.update(
+        visualSummaryDistrictDocument._id,
+        visualSummaryDistrictDocument
+    );
 };
 
 /**
@@ -186,12 +211,14 @@ const handleVisualizationSummaryDistrictWardData = async (
     transactionType: number,
     propertyType: number
 ): Promise<void> => {
-    const visualSummaryDistrictWardDocument = await visualSummaryDistrictWardLogic.getOne({
-        conditions: {
-            districtId,
-            wardId,
-        },
-    });
+    const visualSummaryDistrictWardDocument = await visualSummaryDistrictWardLogic.getOne(
+        {
+            conditions: {
+                districtId,
+                wardId,
+            },
+        }
+    );
 
     if (!visualSummaryDistrictWardDocument) {
         await visualSummaryDistrictWardLogic.create({
@@ -203,7 +230,11 @@ const handleVisualizationSummaryDistrictWardData = async (
         return;
     }
 
-    updateAmount(visualSummaryDistrictWardDocument, transactionType, propertyType);
+    updateAmount(
+        visualSummaryDistrictWardDocument,
+        transactionType,
+        propertyType
+    );
     await visualSummaryDistrictWardLogic.update(
         visualSummaryDistrictWardDocument._id,
         visualSummaryDistrictWardDocument
@@ -240,7 +271,8 @@ const handleVisualizationMapPoint = async (
         currency: price.currency,
     };
     if (transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
-        newPoint.timeUnit = CommonConstant.PRICE_TIME_UNIT[price.timeUnit].wording;
+        newPoint.timeUnit =
+            CommonConstant.PRICE_TIME_UNIT[price.timeUnit].wording;
     }
 
     if (!visualMapPointDocument) {
@@ -261,8 +293,12 @@ const handleVisualizationMapPoint = async (
     }
 
     const point = visualMapPointDocument.points.filter(
-        ({ transactionType: pointTransactionType, propertyType: pointPropertyType }) =>
-            transactionType === pointTransactionType && propertyType === pointPropertyType
+        ({
+            transactionType: pointTransactionType,
+            propertyType: pointPropertyType,
+        }) =>
+            transactionType === pointTransactionType &&
+            propertyType === pointPropertyType
     )[0];
     if (!point) {
         visualMapPointDocument.points.push({
@@ -274,7 +310,10 @@ const handleVisualizationMapPoint = async (
         point.rawDataset.push(newPoint);
     }
 
-    await visualMapPointLogic.update(visualMapPointDocument._id, visualMapPointDocument);
+    await visualMapPointLogic.update(
+        visualMapPointDocument._id,
+        visualMapPointDocument
+    );
 };
 
 /**
@@ -289,7 +328,8 @@ const updateAnalysisData = <T extends AnalysisData>(
 ): T => {
     srcData.summary = Math.round((srcData.summary + desSummary) * 100) / 100;
     srcData.amount += 1;
-    srcData.average = Math.round((srcData.summary / srcData.amount) * 100) / 100;
+    srcData.average =
+        Math.round((srcData.summary / srcData.amount) * 100) / 100;
     srcData.max = desMax > srcData.max ? desMax : srcData.max;
     srcData.min = desMin < srcData.min ? desMin : srcData.min;
 
@@ -316,7 +356,8 @@ const handleVisualizationAnalysis = async (
         min: price.value,
     };
     if (transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
-        newPriceAnalysisData.timeUnit = CommonConstant.PRICE_TIME_UNIT[price.timeUnit].wording;
+        newPriceAnalysisData.timeUnit =
+            CommonConstant.PRICE_TIME_UNIT[price.timeUnit].wording;
     }
 
     const newAcreageAnalysisData: AcreageAnalysisData = {
@@ -346,39 +387,61 @@ const handleVisualizationAnalysis = async (
     }
 
     let priceAnalysisData = visualAnalysisDocument.priceAnalysisData.filter(
-        ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) =>
-            itemTransactionType === transactionType && itemPropertyType === propertyType
+        ({
+            transactionType: itemTransactionType,
+            propertyType: itemPropertyType,
+        }) =>
+            itemTransactionType === transactionType &&
+            itemPropertyType === propertyType
     )[0];
     if (!priceAnalysisData) {
         visualAnalysisDocument.priceAnalysisData.push(newPriceAnalysisData);
     } else {
-        priceAnalysisData = updateAnalysisData(priceAnalysisData, newPriceAnalysisData);
+        priceAnalysisData = updateAnalysisData(
+            priceAnalysisData,
+            newPriceAnalysisData
+        );
     }
 
     let acreageAnalysisData = visualAnalysisDocument.acreageAnalysisData.filter(
-        ({ transactionType: itemTransactionType, propertyType: itemPropertyType }) =>
-            itemTransactionType === transactionType && itemPropertyType === propertyType
+        ({
+            transactionType: itemTransactionType,
+            propertyType: itemPropertyType,
+        }) =>
+            itemTransactionType === transactionType &&
+            itemPropertyType === propertyType
     )[0];
     if (!acreageAnalysisData) {
         visualAnalysisDocument.acreageAnalysisData.push(newAcreageAnalysisData);
     } else {
-        acreageAnalysisData = updateAnalysisData(acreageAnalysisData, newAcreageAnalysisData);
+        acreageAnalysisData = updateAnalysisData(
+            acreageAnalysisData,
+            newAcreageAnalysisData
+        );
     }
 
-    await visualAnalysisLogic.update(visualAnalysisDocument._id, visualAnalysisDocument);
+    await visualAnalysisLogic.update(
+        visualAnalysisDocument._id,
+        visualAnalysisDocument
+    );
 };
 
 /**
  * Add coordinate and summary visualization data step
  */
 const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
-    const districtList = (await visualAdministrativeDistrictLogic.getAll({})).documents;
+    const districtList = (await visualAdministrativeDistrictLogic.getAll({}))
+        .documents;
     const districtNames = districtList.map(({ name }) => name);
-    districtPattern = districtNames.filter((name, index) => index === districtNames.lastIndexOf(name)).join(',|');
+    districtPattern = districtNames
+        .filter((name, index) => index === districtNames.lastIndexOf(name))
+        .join(',|');
 
     const wardList = (await visualAdministrativeWardLogic.getAll({})).documents;
     const wardNames = wardList.map(({ name }) => name);
-    wardPattern = wardNames.filter((name, index) => index === wardNames.lastIndexOf(name)).join(',|');
+    wardPattern = wardNames
+        .filter((name, index) => index === wardNames.lastIndexOf(name))
+        .join(',|');
 
     rawDataset = await rawDataLogic.getAll({
         limit: DOCUMENTS_LIMIT,
@@ -389,11 +452,18 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
 
     while (rawDataset.hasNext && rawDataset.documents.length !== 0) {
         for (const rawData of rawDataset.documents) {
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data -> RID: ${rawData._id}`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Preprocessing data -> RID: ${rawData._id}`
+            ).show();
             const addressProperties = getAddressProperties(rawData.address);
 
-            const districtId: number | undefined = districtList.filter(({ name: districtName }) =>
-                new RegExp(`${districtName}$`, 'i').test(addressProperties?.district || '')
+            const districtId:
+                | number
+                | undefined = districtList.filter(({ name: districtName }) =>
+                new RegExp(`${districtName}$`, 'i').test(
+                    addressProperties?.district || ''
+                )
             )[0]?._id;
             if (!districtId) {
                 new ConsoleLog(
@@ -406,8 +476,11 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
 
             const wardId: number | undefined = wardList.filter(
                 ({ name: wardName, districtId: wardDistrictId }) =>
-                    (wardDistrictId as VisualAdministrativeDistrictDocumentModel)._id === districtId &&
-                    new RegExp(`${wardName}$`, 'i').test(addressProperties?.ward || '')
+                    (wardDistrictId as VisualAdministrativeDistrictDocumentModel)
+                        ._id === districtId &&
+                    new RegExp(`${wardName}$`, 'i').test(
+                        addressProperties?.ward || ''
+                    )
             )[0]?._id;
             if (!wardId) {
                 new ConsoleLog(
@@ -433,14 +506,24 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
             try {
                 await Promise.all([
                     rawData.save(),
-                    handleVisualizationSummaryDistrictData(districtId, rawData.transactionType, rawData.propertyType),
+                    handleVisualizationSummaryDistrictData(
+                        districtId,
+                        rawData.transactionType,
+                        rawData.propertyType
+                    ),
                     handleVisualizationSummaryDistrictWardData(
                         districtId,
                         wardId,
                         rawData.transactionType,
                         rawData.propertyType
                     ),
-                    handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData),
+                    handleVisualizationMapPoint(
+                        districtId,
+                        wardId,
+                        coordinate.lat,
+                        coordinate.lng,
+                        rawData
+                    ),
                     handleVisualizationAnalysis(rawData.postDate, rawData),
                 ]);
             } catch (error) {
@@ -467,8 +550,13 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
  */
 async function* generateScript() {
     const startTime = process.hrtime();
-    await telegramChatBotInstance.sendMessage(`<b>🤖[Preprocessing data]🤖</b>\n📝 Start preprocessing data...`);
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data - Start`).show();
+    await telegramChatBotInstance.sendMessage(
+        `<b>🤖[Preprocessing data]🤖</b>\n📝 Start preprocessing data...`
+    );
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Start`
+    ).show();
 
     await addCoordinateAndSummaryVisualizationData();
     yield 'Step 1: Add coordinate, summary and analysis visualization data';
@@ -477,7 +565,10 @@ async function* generateScript() {
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Preprocessing data]🤖</b>\n✅ Preprocessing data complete. Execute time: ${executeTime}`
     );
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Preprocessing data - Execute time: ${executeTime} - Complete`).show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Execute time: ${executeTime} - Complete`
+    ).show();
     process.exit(0);
     return 'Done';
 }

@@ -78,7 +78,7 @@ export const convertTotalSecondsToTime = (totalSeconds: number): string => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
 
-    return `${days} day(s) - ${hours < 9 ? `0${hours}` : hours}:${minutes < 9 ? `0${minutes}` : minutes}:${
-        seconds < 9 ? `0${seconds}` : seconds
-    }`;
+    return `${days} day(s) - ${hours < 9 ? `0${hours}` : hours}:${
+        minutes < 9 ? `0${minutes}` : minutes
+    }:${seconds < 9 ? `0${seconds}` : seconds}`;
 };

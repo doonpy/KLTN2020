@@ -42,7 +42,11 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
@@ -52,8 +56,14 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             } else {
                 items = this.requestQuery[this.PARAM_ITEMS] as string[];
                 items.forEach((item, index): void => {
-                    this.validator.addParamValidator(index.toString(), new Checker.Type.Integer());
-                    this.validator.addParamValidator(index.toString(), new Checker.IntegerRange(1, null));
+                    this.validator.addParamValidator(
+                        index.toString(),
+                        new Checker.Type.Integer()
+                    );
+                    this.validator.addParamValidator(
+                        index.toString(),
+                        new Checker.IntegerRange(1, null)
+                    );
                 });
             }
 
@@ -62,17 +72,24 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             const { documents, hasNext } = await this.groupedDataLogic.getAll({
                 limit: this.limit,
                 offset: this.offset,
-                conditions: this.buildQueryConditions([{ paramName: this.PARAM_ITEMS, isString: false }]),
+                conditions: this.buildQueryConditions([
+                    { paramName: this.PARAM_ITEMS, isString: false },
+                ]),
             });
-            const groupedDataList = documents.map((groupedData: GroupedDataDocumentModel) =>
-                this.groupedDataLogic.convertToApiResponse(groupedData)
+            const groupedDataList = documents.map(
+                (groupedData: GroupedDataDocumentModel) =>
+                    this.groupedDataLogic.convertToApiResponse(groupedData)
             );
             const responseBody = {
                 groupedDataset: groupedDataList,
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -85,22 +102,38 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const groupedData = await this.groupedDataLogic.getById(idBody);
             const responseBody = {
-                groupedData: this.groupedDataLogic.convertToApiResponse(groupedData),
+                groupedData: this.groupedDataLogic.convertToApiResponse(
+                    groupedData
+                ),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -113,19 +146,31 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
+            this.validator.addParamValidator(
+                this.PARAM_ITEMS,
+                new Checker.Type.Array()
+            );
 
             this.validator.validate(this.requestBody);
 
-            const groupedDataBody = (this.requestBody as unknown) as GroupedDataDocumentModel;
+            const groupedDataBody = (this
+                .requestBody as unknown) as GroupedDataDocumentModel;
             for (const item of groupedDataBody.items) {
-                await RawDataLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: item });
+                await RawDataLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: item,
+                });
             }
-            const createdGroupedData = await this.groupedDataLogic.create(groupedDataBody);
+            const createdGroupedData = await this.groupedDataLogic.create(
+                groupedDataBody
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -144,26 +189,44 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
+            this.validator.addParamValidator(
+                this.PARAM_ITEMS,
+                new Checker.Type.Array()
+            );
 
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const groupedDataBody = (this.requestBody as unknown) as GroupedDataDocumentModel;
+            const groupedDataBody = (this
+                .requestBody as unknown) as GroupedDataDocumentModel;
             for (const item of groupedDataBody.items) {
-                await RawDataLogic.getInstance().checkExisted({ [this.PARAM_DOCUMENT_ID]: item });
+                await RawDataLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: item,
+                });
             }
-            const editedGroupedData = await this.groupedDataLogic.update(idBody, groupedDataBody, [
-                { [this.PARAM_DOCUMENT_ID]: idBody },
-            ]);
+            const editedGroupedData = await this.groupedDataLogic.update(
+                idBody,
+                groupedDataBody,
+                [{ [this.PARAM_DOCUMENT_ID]: idBody }]
+            );
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -182,19 +245,33 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.groupedDataLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.NO_CONTENT,
+                {},
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -207,7 +284,11 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             const documentAmount = await this.groupedDataLogic.getDocumentAmount();
 

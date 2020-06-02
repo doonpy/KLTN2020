@@ -4,7 +4,8 @@ import {
     VisualAdministrativeDistrictDocumentModel,
 } from '../district/visual.administrative.district.interface';
 
-export interface VisualAdministrativeWardDocumentModel extends CommonDocumentModel {
+export interface VisualAdministrativeWardDocumentModel
+    extends CommonDocumentModel {
     name: string;
     code: string;
     districtId: number | VisualAdministrativeDistrictDocumentModel;

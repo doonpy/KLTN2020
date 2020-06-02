@@ -24,7 +24,12 @@ import VisualAnalysisController from '@service/visual/analysis/visual.analysis.c
  */
 (async (): Promise<void> => {
     await App.getInstance().start(
-        [cors(), bodyParser.json(), bodyParser.urlencoded({ extended: true }), requestLogger],
+        [
+            cors(),
+            bodyParser.json(),
+            bodyParser.urlencoded({ extended: true }),
+            requestLogger,
+        ],
         [
             HostController.getInstance(),
             CatalogController.getInstance(),

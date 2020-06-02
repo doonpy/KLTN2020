@@ -14,15 +14,20 @@ enum ValidateType {
     NOT_EXISTED,
 }
 
-export default abstract class CommonServiceLogicBase<T extends CommonDocumentModel, A extends CommonApiModel>
-    implements CommonLogicBaseInterface<T, A> {
+export default abstract class CommonServiceLogicBase<
+    T extends CommonDocumentModel,
+    A extends CommonApiModel
+> implements CommonLogicBaseInterface<T, A> {
     protected constructor(protected model: Model<T>) {}
 
     /**
      * @param properties
      * @param {ValidateType} type
      */
-    private async validate(properties: { [key: string]: any }[], type: ValidateType): Promise<void> {
+    private async validate(
+        properties: { [key: string]: any }[],
+        type: ValidateType
+    ): Promise<void> {
         const promise: Promise<void>[] = [];
         properties.forEach((prop) => {
             if (type === ValidateType.EXISTED) {
@@ -40,7 +45,11 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
      *
      * @return {Promise<GetAllReturnData<T>>}
      */
-    public async getAll({ limit, offset, conditions }: CommonOptions): Promise<GetAllReturnData<T>> {
+    public async getAll({
+        limit,
+        offset,
+        conditions,
+    }: CommonOptions): Promise<GetAllReturnData<T>> {
         const documentQuery = this.model.find(conditions ?? {});
         const remainQuery = this.model.countDocuments(conditions ?? {});
 
@@ -95,11 +104,17 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
         validateNotExistedProperties?: { [key: string]: any }[]
     ): Promise<T> {
         if (validateExistedProperties) {
-            await this.validate(validateExistedProperties, ValidateType.EXISTED);
+            await this.validate(
+                validateExistedProperties,
+                ValidateType.EXISTED
+            );
         }
 
         if (validateNotExistedProperties) {
-            await this.validate(validateNotExistedProperties, ValidateType.NOT_EXISTED);
+            await this.validate(
+                validateNotExistedProperties,
+                ValidateType.NOT_EXISTED
+            );
         }
 
         return this.model.create(input);
@@ -122,14 +137,23 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
         await this.checkExisted({ _id: id });
 
         if (validateExistedProperties) {
-            await this.validate(validateExistedProperties, ValidateType.EXISTED);
+            await this.validate(
+                validateExistedProperties,
+                ValidateType.EXISTED
+            );
         }
 
         if (validateNotExistedProperties) {
-            await this.validate(validateNotExistedProperties, ValidateType.NOT_EXISTED);
+            await this.validate(
+                validateNotExistedProperties,
+                ValidateType.NOT_EXISTED
+            );
         }
 
-        return (await this.model.findByIdAndUpdate(id, input, { new: true, omitUndefined: true })) as T;
+        return (await this.model.findByIdAndUpdate(id, input, {
+            new: true,
+            omitUndefined: true,
+        })) as T;
     }
 
     /**
@@ -166,7 +190,10 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
                 },
                 message: {
                     wording: CommonServiceWording.MESSAGE.MSG_CM_SER_1,
-                    value: [CommonServiceWording.RESOURCE.RSC_CM_SER_1, conditions],
+                    value: [
+                        CommonServiceWording.RESOURCE.RSC_CM_SER_1,
+                        conditions,
+                    ],
                 },
             };
         }
@@ -187,7 +214,10 @@ export default abstract class CommonServiceLogicBase<T extends CommonDocumentMod
                 },
                 message: {
                     wording: CommonServiceWording.MESSAGE.MSG_CM_SER_2,
-                    value: [CommonServiceWording.RESOURCE.RSC_CM_SER_1, conditions],
+                    value: [
+                        CommonServiceWording.RESOURCE.RSC_CM_SER_1,
+                        conditions,
+                    ],
                 },
             };
         }
