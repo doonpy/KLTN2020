@@ -30,9 +30,21 @@ const PageRight = ({ dataSummary, tabs, setTabs }) => {
         <div className="w-3/12 dark:bg-gray-900 bg-white border-l border-solid border-light-primary dark:border-primary h-full flex flex-col">
             <div className="dark:bg-gray-900 bg-white h-6">
                 <div className="text-xs w-full flex justify-around">
-                    <TabButton title="Bán" onClick={() => setTabs(0)} isActive={tabs === 0} />
-                    <TabButton title="Tổng" onClick={() => setTabs(2)} isActive={tabs === 2} />
-                    <TabButton title="Thuê" onClick={() => setTabs(1)} isActive={tabs === 1} />
+                    <TabButton
+                        title="Bán"
+                        onClick={() => setTabs(0)}
+                        isActive={tabs === 0}
+                    />
+                    <TabButton
+                        title="Tổng"
+                        onClick={() => setTabs(2)}
+                        isActive={tabs === 2}
+                    />
+                    <TabButton
+                        title="Thuê"
+                        onClick={() => setTabs(1)}
+                        isActive={tabs === 1}
+                    />
                 </div>
             </div>
             <div>

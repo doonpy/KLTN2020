@@ -8,10 +8,19 @@ const MODE_TRANSITION_DURATION = 500;
 
 function setDarkModeTransition() {
     document.documentElement.classList.add(MODE_TRANSITION_CLASS_NAME);
-    setTimeout(() => document.documentElement.classList.remove(MODE_TRANSITION_CLASS_NAME), MODE_TRANSITION_DURATION);
+    setTimeout(
+        () =>
+            document.documentElement.classList.remove(
+                MODE_TRANSITION_CLASS_NAME
+            ),
+        MODE_TRANSITION_DURATION
+    );
 }
 const ThemeSwitch = () => {
-    const { value: hasActiveDarkMode, toggle: activateDarkMode } = useDarkMode();
+    const {
+        value: hasActiveDarkMode,
+        toggle: activateDarkMode,
+    } = useDarkMode();
 
     const toggleDarkMode = () => {
         setDarkModeTransition();
@@ -21,8 +30,12 @@ const ThemeSwitch = () => {
         <Switch
             onChange={toggleDarkMode}
             checked={hasActiveDarkMode}
-            checkedIcon={<FaMoon className="inline-block mx-2 my-1 text-yellow-400" />}
-            uncheckedIcon={<FaSun className="inline-block mx-2 my-1 text-orange-500" />}
+            checkedIcon={
+                <FaMoon className="inline-block mx-2 my-1 text-yellow-400" />
+            }
+            uncheckedIcon={
+                <FaSun className="inline-block mx-2 my-1 text-orange-500" />
+            }
             onColor="#000a1f"
             offColor="#f7fafc"
             onHandleColor="#f7fafc"

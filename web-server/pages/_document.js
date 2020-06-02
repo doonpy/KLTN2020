@@ -11,8 +11,14 @@ class MyDocument extends Document {
         return (
             <Html>
                 <Head>
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css" />
-                    <link href="https://unpkg.com/leaflet-geosearch@latest/assets/css/leaflet.css" rel="stylesheet" />
+                    <link
+                        rel="stylesheet"
+                        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css"
+                    />
+                    <link
+                        href="https://unpkg.com/leaflet-geosearch@latest/assets/css/leaflet.css"
+                        rel="stylesheet"
+                    />
                     <link rel="shortcut icon" href="/icons/favicon.ico" />
                 </Head>
                 <body>

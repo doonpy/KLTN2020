@@ -7,8 +7,12 @@ import { PROPERTY_TYPE } from '../util/constants';
 const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
 });
-const MapOverview = dynamic(() => import('./maps/MapOverview'), { loading: () => <LoadingIcon /> });
-const MapWard = dynamic(() => import('./maps/MapWard'), { loading: () => <LoadingIcon /> });
+const MapOverview = dynamic(() => import('./maps/MapOverview'), {
+    loading: () => <LoadingIcon />,
+});
+const MapWard = dynamic(() => import('./maps/MapWard'), {
+    loading: () => <LoadingIcon />,
+});
 
 const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
     const [stage, setStage] = useState(0);
@@ -66,16 +70,28 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
             {tabMap === 0 ? (
                 <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
-                        {isMounted && <MapLeaf mapData={mapData} property={propertyStatge} />}
+                        {isMounted && (
+                            <MapLeaf
+                                mapData={mapData}
+                                property={propertyStatge}
+                            />
+                        )}
                     </div>
                 </div>
             ) : (
                 <div className="w-full h-full">
                     {dataSummary &&
                         (stage === 0 ? (
-                            <MapOverview mapData={mapData} dataMap={dataMap} setStage={(number) => setStage(number)} />
+                            <MapOverview
+                                mapData={mapData}
+                                dataMap={dataMap}
+                                setStage={(number) => setStage(number)}
+                            />
                         ) : (
-                            <MapWard dataWard={dataMap} setStage={(number) => setStage(number)} />
+                            <MapWard
+                                dataWard={dataMap}
+                                setStage={(number) => setStage(number)}
+                            />
                         ))}
                 </div>
             )}

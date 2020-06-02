@@ -12,7 +12,10 @@ import useDistrict from '../hooks/use-district';
 import useWard from '../hooks/use-ward';
 
 export async function getStaticProps() {
-    const postsDirectory = path.join(process.cwd(), '/web-server/api/geojson/hcm');
+    const postsDirectory = path.join(
+        process.cwd(),
+        '/web-server/api/geojson/hcm'
+    );
     const filenames = fs.readdirSync(postsDirectory);
 
     const fullGEO = filenames.map((filename) => {
@@ -47,16 +50,27 @@ const Home = ({ mapStaticJSON }) => {
         const _key = `${key}_${tabKey}`;
         const _synmetricKey = `${tabKey}_${key}`;
         if (summaryData.cache[_key]) return summaryData.cache[_key];
-        if (summaryData.cache[_synmetricKey]) return summaryData.cache[_synmetricKey];
+        if (summaryData.cache[_synmetricKey])
+            return summaryData.cache[_synmetricKey];
 
         if (key !== 'full') {
-            const dataWardFilter = dataWard.summaryDistrictWard.filter((w) => w.district.code === key);
+            const dataWardFilter = dataWard.summaryDistrictWard.filter(
+                (w) => w.district.code === key
+            );
             const dataSummaryWard = dataWardFilter.map((w) => {
-                const summary = tabKey !== 2 ? w.summary.filter((sum) => sum.transactionType === tabKey) : w.summary;
+                const summary =
+                    tabKey !== 2
+                        ? w.summary.filter(
+                              (sum) => sum.transactionType === tabKey
+                          )
+                        : w.summary;
                 return {
                     name: w.ward.name,
                     code: w.ward.code,
-                    summaryAmount: summary.reduce((sum, p) => sum + p.amount, 0),
+                    summaryAmount: summary.reduce(
+                        (sum, p) => sum + p.amount,
+                        0
+                    ),
                     acreage: 1,
                     summary,
                 };
@@ -66,7 +80,10 @@ const Home = ({ mapStaticJSON }) => {
             return dataSummaryWard;
         }
         const dataSummaryDistrict = dataDistrict.summaryDistrict.map((w) => {
-            const summary = tabKey !== 2 ? w.summary.filter((sum) => sum.transactionType === tabKey) : w.summary;
+            const summary =
+                tabKey !== 2
+                    ? w.summary.filter((sum) => sum.transactionType === tabKey)
+                    : w.summary;
             return {
                 name: w.district.name,
                 drilldown: w.district.code,
@@ -98,11 +115,18 @@ const Home = ({ mapStaticJSON }) => {
                                         <PageMap
                                             tabMap={tabMap}
                                             mapStaticJSON={mapStaticJSON}
-                                            dataSummary={summaryData(mapKey, tabs)}
+                                            dataSummary={summaryData(
+                                                mapKey,
+                                                tabs
+                                            )}
                                         />
                                     </div>
                                 </div>
-                                <PageRight dataSummary={summaryData(mapKey, tabs)} tabs={tabs} setTabs={setTabs} />
+                                <PageRight
+                                    dataSummary={summaryData(mapKey, tabs)}
+                                    tabs={tabs}
+                                    setTabs={setTabs}
+                                />
                             </div>
                         </div>
                     </main>

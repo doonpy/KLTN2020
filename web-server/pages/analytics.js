@@ -33,7 +33,9 @@ const analytics = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">Total Revenue</h5>
+                                                <h5 className="font-bold uppercase text-gray-400">
+                                                    Total Revenue
+                                                </h5>
                                                 <h3 className="font-bold text-3xl text-gray-600">
                                                     sd
                                                     <span className="text-green-500">
@@ -53,7 +55,9 @@ const analytics = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">Total Users</h5>
+                                                <h5 className="font-bold uppercase text-gray-400">
+                                                    Total Users
+                                                </h5>
                                                 <h3 className="font-bold text-3xl text-gray-600">
                                                     123
                                                     <span className="text-orange-500">
@@ -73,7 +77,9 @@ const analytics = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">New Users</h5>
+                                                <h5 className="font-bold uppercase text-gray-400">
+                                                    New Users
+                                                </h5>
                                                 <h3 className="font-bold text-3xl text-gray-600">
                                                     <span className="text-yellow-600">
                                                         <i className="fas fa-caret-up" />
@@ -92,8 +98,12 @@ const analytics = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">Server Uptime</h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">152 days</h3>
+                                                <h5 className="font-bold uppercase text-gray-400">
+                                                    Server Uptime
+                                                </h5>
+                                                <h3 className="font-bold text-3xl text-gray-600">
+                                                    152 days
+                                                </h3>
                                             </div>
                                         </div>
                                     </div>
@@ -107,8 +117,12 @@ const analytics = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">To Do List</h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">7 tasks</h3>
+                                                <h5 className="font-bold uppercase text-gray-400">
+                                                    To Do List
+                                                </h5>
+                                                <h3 className="font-bold text-3xl text-gray-600">
+                                                    7 tasks
+                                                </h3>
                                             </div>
                                         </div>
                                     </div>
@@ -122,7 +136,9 @@ const analytics = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">Issues</h5>
+                                                <h5 className="font-bold uppercase text-gray-400">
+                                                    Issues
+                                                </h5>
                                                 <h3 className="font-bold text-3xl text-gray-600">
                                                     <span className="text-red-500">
                                                         <i className="fas fa-caret-up" />
@@ -139,7 +155,9 @@ const analytics = () => {
                                 <div className="w-full md:w-1/2 p-3">
                                     <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
                                         <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">Graph</h5>
+                                            <h5 className="font-bold uppercase text-gray-600">
+                                                Graph
+                                            </h5>
                                         </div>
                                         <div className="p-5">
                                             <canvas
@@ -154,7 +172,9 @@ const analytics = () => {
                                 <div className="w-full md:w-1/2 p-3">
                                     <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
                                         <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">Graph</h5>
+                                            <h5 className="font-bold uppercase text-gray-600">
+                                                Graph
+                                            </h5>
                                         </div>
                                         <div className="p-5">
                                             <canvas
@@ -169,7 +189,9 @@ const analytics = () => {
                                 <div className="w-full md:w-1/2 xl:w-1/3 p-3">
                                     <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
                                         <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">Graph</h5>
+                                            <h5 className="font-bold uppercase text-gray-600">
+                                                Graph
+                                            </h5>
                                         </div>
                                         <div className="p-5">
                                             <canvas
@@ -184,7 +206,9 @@ const analytics = () => {
                                 <div className="w-full md:w-1/2 xl:w-1/3 p-3">
                                     <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
                                         <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">Graph</h5>
+                                            <h5 className="font-bold uppercase text-gray-600">
+                                                Graph
+                                            </h5>
                                         </div>
                                         <div className="p-5">
                                             <canvas
@@ -199,7 +223,9 @@ const analytics = () => {
                                 <div className="w-full md:w-1/2 xl:w-1/3 p-3">
                                     <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
                                         <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">Template</h5>
+                                            <h5 className="font-bold uppercase text-gray-600">
+                                                Template
+                                            </h5>
                                         </div>
                                     </div>
                                 </div>

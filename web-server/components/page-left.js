@@ -8,13 +8,17 @@ const PageLeft = ({ setTabmap, tabMap }) => {
             style={{ width: '64px' }}
         >
             <FaMapMarkedAlt
-                className={`mt-8 cursor-pointer shadow-sm ${tabMap === 0 ? 'text-blue-600' : ''}`}
+                className={`mt-8 cursor-pointer shadow-sm ${
+                    tabMap === 0 ? 'text-blue-600' : ''
+                }`}
                 size={24}
                 onClick={() => setTabmap(0)}
             />
             <FaMap
                 size={24}
-                className={`mt-8 cursor-pointer shadow-sm ${tabMap === 1 ? 'text-blue-600' : ''}`}
+                className={`mt-8 cursor-pointer shadow-sm ${
+                    tabMap === 1 ? 'text-blue-600' : ''
+                }`}
                 onClick={() => setTabmap(1)}
             />
             <FaHandHoldingUsd size={24} className="mt-8 cursor-pointer" />

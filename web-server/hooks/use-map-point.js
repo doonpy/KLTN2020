@@ -3,7 +3,15 @@ import useSWR from 'swr';
 import fetcher from '../util/api/fetcher';
 
 export default function useMapPoint({
-    variables: { minAcreage, maxAcreage, minLat, maxLat, minLng, maxLng, propertyType },
+    variables: {
+        minAcreage,
+        maxAcreage,
+        minLat,
+        maxLat,
+        minLng,
+        maxLng,
+        propertyType,
+    },
 }) {
     return useSWR(
         propertyType

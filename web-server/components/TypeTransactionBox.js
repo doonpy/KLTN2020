@@ -30,7 +30,10 @@ const TypeTransactionBox = ({ data }) => {
         });
 
         const totalPropertyData = propertyData.reduce((sum, p) => sum + p, 0);
-        const dataPieChart = PROPERTY_TYPE.map((w, index) => [w[0], (propertyData[index] / totalPropertyData) * 100]);
+        const dataPieChart = PROPERTY_TYPE.map((w, index) => [
+            w[0],
+            (propertyData[index] / totalPropertyData) * 100,
+        ]);
         return dataPieChart;
     };
 
