@@ -1,8 +1,14 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import GroupedDataModel from './grouped-data.model';
-import { GroupedDataApiModel, GroupedDataDocumentModel } from './grouped-data.interface';
+import {
+    GroupedDataApiModel,
+    GroupedDataDocumentModel,
+} from './grouped-data.interface';
 import RawDataLogic from '../raw-data/raw-data.logic';
-import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/raw-data.interface';
+import {
+    RawDataApiModel,
+    RawDataDocumentModel,
+} from '../raw-data/raw-data.interface';
 
 export default class GroupedDataLogic extends CommonServiceLogicBase<
     GroupedDataDocumentModel,

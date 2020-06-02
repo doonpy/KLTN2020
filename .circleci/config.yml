@@ -19,10 +19,11 @@ jobs:
           name: Build application Docker image
           command: |
             docker build -t app .
+
   deploy-docker-hub:
-    - docker:
+    docker:
         - image: docker:17.05.0-ce-git
-    - steps:
+    steps:
       - setup_remote_docker
       - deploy:
           name: Push application Docker image

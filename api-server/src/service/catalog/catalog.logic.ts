@@ -2,7 +2,10 @@ import CommonLogicBase from '@common/service/common.service.logic.base';
 import CatalogModel from './catalog.model';
 import { CatalogApiModel, CatalogDocumentModel } from './catalog.interface';
 import { HostApiModel, HostDocumentModel } from '../host/host.interface';
-import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
+import {
+    PatternApiModel,
+    PatternDocumentModel,
+} from '../pattern/pattern.interface';
 import HostLogic from '../host/host.logic';
 import PatternLogic from '../pattern/pattern.logic';
 

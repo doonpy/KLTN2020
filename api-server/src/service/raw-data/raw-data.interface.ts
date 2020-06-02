@@ -3,8 +3,14 @@ import {
     CommonDocumentModel,
     CommonLogicBaseInterface,
 } from '@common/service/common.service.interface';
-import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
-import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
+import {
+    DetailUrlApiModel,
+    DetailUrlDocumentModel,
+} from '../detail-url/detail-url.interface';
+import {
+    CoordinateApiModel,
+    CoordinateDocumentModel,
+} from '../coordinate/coordinate.interface';
 
 export interface RawDataApiModel extends CommonApiModel {
     detailUrl: DetailUrlApiModel | number | null;
