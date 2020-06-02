@@ -1,5 +1,5 @@
 import ResponseStatusCode from '@common/common.response-status.code';
-import DateTime from '@util/datetime/datetime';
+import { convertStringToDate } from '@util/helper/datetime';
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
 
@@ -13,14 +13,13 @@ export default class CheckerDate extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: object): void {
-        const value: string | null = this.getValue(paramName, input);
+        const value = this.getValue(paramName, input);
 
         if (!value) {
             return;
         }
 
-        const dateConverted: Date = DateTime.convertStringToDate(value, this.format, this.delimiter);
-        if (dateConverted.toString() === 'Invalid Date') {
+        if (!convertStringToDate(value, this.format, this.delimiter)) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },

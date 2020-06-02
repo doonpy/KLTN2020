@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
-import HostLogic from './host.logic';
 import Validator from '@util/validator/validator';
 import Checker from '@util/checker/checker.index';
 import ResponseStatusCode from '@common/common.response-status.code';
-import { HostApiModel, HostDocumentModel } from './host.interface';
+import HostLogic from './host.logic';
+import { HostDocumentModel } from './host.interface';
 
 const commonPath = '/hosts';
 const specifyIdPath = '/host/:id';
@@ -12,11 +12,11 @@ const specifyIdPath = '/host/:id';
 export default class HostController extends CommonServiceControllerBase {
     private static instance: HostController;
 
-    private hostLogic: HostLogic = HostLogic.getInstance();
+    private hostLogic = HostLogic.getInstance();
 
-    private readonly PARAM_NAME: string = 'name';
+    private readonly PARAM_NAME = 'name';
 
-    private readonly PARAM_DOMAIN: string = 'domain';
+    private readonly PARAM_DOMAIN = 'domain';
 
     constructor() {
         super();
@@ -53,19 +53,15 @@ export default class HostController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestQuery);
 
-            const {
-                documents,
-                hasNext,
-            }: { documents: HostDocumentModel[]; hasNext: boolean } = await this.hostLogic.getAll(
-                this.limit,
-                this.offset,
-                this.buildQueryConditions([
+            const { documents, hasNext } = await this.hostLogic.getAll({
+                limit: this.limit,
+                offset: this.offset,
+                conditions: this.buildQueryConditions([
                     { paramName: this.PARAM_DOMAIN, isString: true },
                     { paramName: this.PARAM_NAME, isString: true },
                 ]),
-                this.populate
-            );
-            const hosts: object[] = documents.map((host): HostApiModel => this.hostLogic.convertToApiResponse(host));
+            });
+            const hosts = documents.map((host) => this.hostLogic.convertToApiResponse(host));
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -87,7 +83,7 @@ export default class HostController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             this.validator = new Validator();
 
@@ -97,9 +93,8 @@ export default class HostController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.hostLogic.checkExistsWithId(idBody);
-            const host: HostDocumentModel = await this.hostLogic.getById(idBody);
-            const responseBody: object = {
+            const host = await this.hostLogic.getById(idBody);
+            const responseBody = {
                 host: this.hostLogic.convertToApiResponse(host),
             };
 
@@ -129,9 +124,10 @@ export default class HostController extends CommonServiceControllerBase {
 
             this.validator.validate(this.requestBody);
 
-            const hostBody: HostDocumentModel = (this.requestBody as unknown) as HostDocumentModel;
-            await this.hostLogic.checkExistsWithDomain(hostBody.domain, true);
-            const createdHost: HostDocumentModel = await this.hostLogic.create(hostBody);
+            const hostBody = (this.requestBody as unknown) as HostDocumentModel;
+            const createdHost = await this.hostLogic.create(hostBody, undefined, [
+                { [this.PARAM_DOMAIN]: hostBody.domain },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.CREATED,
@@ -168,10 +164,10 @@ export default class HostController extends CommonServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const hostBody: HostDocumentModel = (this.requestBody as unknown) as HostDocumentModel;
-            await this.hostLogic.checkExistsWithId(idBody);
-            await this.hostLogic.checkExistsWithDomain(hostBody.domain, true);
-            const editedHost: HostDocumentModel = await this.hostLogic.update(idBody, hostBody);
+            const hostBody = (this.requestBody as unknown) as HostDocumentModel;
+            const editedHost = await this.hostLogic.update(idBody, hostBody, undefined, [
+                { [this.PARAM_DOMAIN]: hostBody.domain },
+            ]);
 
             CommonServiceControllerBase.sendResponse(
                 ResponseStatusCode.OK,
@@ -200,10 +196,26 @@ export default class HostController extends CommonServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.hostLogic.checkExistsWithId(idBody);
             await this.hostLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.hostLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, { schema: 'host', documentAmount }, res);
         } catch (error) {
             next(this.createError(error, this.language));
         }

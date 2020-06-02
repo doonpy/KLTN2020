@@ -1,15 +1,23 @@
+import VisualSummaryDistrictWardModel from '@service/visual/summary/district-ward/visual.summary.district-ward.model';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import {
     VisualSummaryDistrictWardApiModel,
     VisualSummaryDistrictWardDocumentModel,
-    VisualSummaryDistrictWardLogicInterface,
 } from './visual.summary.district-ward.interface';
-import { VisualDistrictApiModel } from '../../administrative/district/visual.district.interface';
-import VisualDistrictLogic from '../../administrative/district/visual.district.logic';
-import { VisualWardApiModel } from '../../administrative/ward/visual.ward.interface';
-import VisualWardLogic from '../../administrative/ward/visual.ward.logic';
+import { VisualAdministrativeDistrictApiModel } from '../../administrative/district/visual.administrative.district.interface';
+import VisualAdministrativeDistrictLogic from '../../administrative/district/visual.administrative.district.logic';
+import { VisualAdministrativeWardApiModel } from '../../administrative/ward/visual.administrative.ward.interface';
+import VisualAdministrativeWardLogic from '../../administrative/ward/visual.administrative.ward.logic';
 
-export default class VisualSummaryDistrictWardLogic implements VisualSummaryDistrictWardLogicInterface {
+export default class VisualSummaryDistrictWardLogic extends CommonServiceLogicBase<
+    VisualSummaryDistrictWardDocumentModel,
+    VisualSummaryDistrictWardApiModel
+> {
     public static instance: VisualSummaryDistrictWardLogic;
+
+    constructor() {
+        super(VisualSummaryDistrictWardModel);
+    }
 
     /**
      * @return {VisualSummaryDistrictWardLogic}
@@ -19,17 +27,6 @@ export default class VisualSummaryDistrictWardLogic implements VisualSummaryDist
             this.instance = new VisualSummaryDistrictWardLogic();
         }
         return this.instance;
-    }
-
-    /**
-     * @param {VisualSummaryDistrictWardDocumentModel} document
-     *
-     * @return {VisualSummaryDistrictWardDocumentModel}
-     */
-    public async populateDocument(
-        document: VisualSummaryDistrictWardDocumentModel
-    ): Promise<VisualSummaryDistrictWardDocumentModel> {
-        return document.populate('districtId wardId').execPopulate();
     }
 
     /**
@@ -46,12 +43,12 @@ export default class VisualSummaryDistrictWardLogic implements VisualSummaryDist
         cTime,
         mTime,
     }: VisualSummaryDistrictWardDocumentModel): VisualSummaryDistrictWardApiModel {
-        let district: VisualDistrictApiModel | number | null = null;
-        let ward: VisualWardApiModel | number | null = null;
+        let district: VisualAdministrativeDistrictApiModel | number | null = null;
+        let ward: VisualAdministrativeWardApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
             } else {
                 district = districtId;
             }
@@ -59,7 +56,7 @@ export default class VisualSummaryDistrictWardLogic implements VisualSummaryDist
 
         if (wardId) {
             if (typeof wardId === 'object') {
-                ward = VisualWardLogic.getInstance().convertToApiResponse(wardId);
+                ward = VisualAdministrativeWardLogic.getInstance().convertToApiResponse(wardId);
             } else {
                 ward = wardId;
             }

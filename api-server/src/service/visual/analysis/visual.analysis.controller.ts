@@ -6,31 +6,27 @@ import Checker from '@util/checker/checker.index';
 import CommonConstant from '@common/common.constant';
 import VisualCommonController from '@service/visual/visual.common.controller';
 import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
-import DateTime from '@util/datetime/datetime';
-import {
-    VisualAnalysisApiModel,
-    VisualAnalysisDocumentModel,
-} from '@service/visual/analysis/visual.analysis.interface';
-import VisualAnalysisModel from './visual.analysis.model';
+import { convertStringToDate } from '@util/helper/datetime';
+import { VisualAnalysisDocumentModel } from '@service/visual/analysis/visual.analysis.interface';
 
 const commonPath = '/analyses';
 const specifyIdPath = '/analysis/:id';
 const DATE_FORMAT = 'dd-mm-yyyy';
 const DATE_DELIMITER = '-';
-const MIN_DATE = new Date(-8640000000000000);
+const MIN_FROM_DATE = new Date(-8640000000000000);
 
 export default class VisualAnalysisController extends VisualCommonController {
     private static instance: VisualAnalysisController;
 
-    private visualAnalysisLogic: VisualAnalysisLogic = VisualAnalysisLogic.getInstance();
+    private visualAnalysisLogic = VisualAnalysisLogic.getInstance();
 
-    private readonly PARAM_FROM_DATE: string = 'fromDate';
+    private readonly PARAM_FROM_DATE = 'fromDate';
 
-    private readonly PARAM_TO_DATE: string = 'toDate';
+    private readonly PARAM_TO_DATE = 'toDate';
 
-    private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
+    private readonly PARAM_TRANSACTION_TYPE = 'transactionType';
 
-    private readonly PARAM_PROPERTY_TYPE: string = 'propertyType';
+    private readonly PARAM_PROPERTY_TYPE = 'propertyType';
 
     constructor() {
         super();
@@ -101,74 +97,77 @@ export default class VisualAnalysisController extends VisualCommonController {
             );
 
             this.validator.validate(this.requestQuery);
+            const fromDateQuery = (this.requestQuery[this.PARAM_FROM_DATE] as string) ?? '';
+            const toDateQuery = (this.requestQuery[this.PARAM_TO_DATE] as string) ?? '';
 
-            const conditions: object = {
+            let fromDate = convertStringToDate(fromDateQuery, DATE_FORMAT, DATE_DELIMITER);
+            fromDate = !fromDate ? MIN_FROM_DATE : fromDate;
+
+            let toDate = convertStringToDate(toDateQuery, DATE_FORMAT, DATE_DELIMITER);
+            toDate = !toDate ? new Date() : toDate;
+
+            const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
+            const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const transactionTypeAndPropertyTypeAggregations = {
                 $and: [
-                    {
-                        referenceDate: {
-                            $gte: (this.requestQuery[this.PARAM_FROM_DATE] as string)
-                                ? DateTime.convertStringToDate(
-                                      this.requestQuery[this.PARAM_FROM_DATE] as string,
-                                      DATE_FORMAT,
-                                      DATE_DELIMITER
-                                  )
-                                : MIN_DATE.toISOString(),
-                        },
-                    },
-                    {
-                        referenceDate: {
-                            $lte: (this.requestQuery[this.PARAM_TO_DATE] as string)
-                                ? DateTime.convertStringToDate(
-                                      this.requestQuery[this.PARAM_TO_DATE] as string,
-                                      DATE_FORMAT,
-                                      DATE_DELIMITER
-                                  )
-                                : new Date().toISOString(),
-                        },
-                    },
+                    transactionType
+                        ? {
+                              $eq: ['$$analysisItem.transactionType', transactionType],
+                          }
+                        : {},
+                    propertyType
+                        ? {
+                              $eq: ['$$analysisItem.propertyType', propertyType],
+                          }
+                        : {},
                 ],
             };
-            let documents: VisualAnalysisDocumentModel[] = await VisualAnalysisModel.find(conditions);
-            const transactionType: number | undefined =
-                Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
-            const propertyType: number | undefined = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const aggregations = [
+                {
+                    $match: {
+                        $and: [
+                            {
+                                referenceDate: {
+                                    $gte: fromDate,
+                                },
+                            },
+                            {
+                                referenceDate: {
+                                    $lte: toDate,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        referenceDate: 1,
+                        priceAnalysisData: {
+                            $filter: {
+                                input: '$priceAnalysisData',
+                                as: 'analysisItem',
+                                cond: transactionTypeAndPropertyTypeAggregations,
+                            },
+                        },
+                        acreageAnalysisData: {
+                            $filter: {
+                                input: '$acreageAnalysisData',
+                                as: 'analysisItem',
+                                cond: transactionTypeAndPropertyTypeAggregations,
+                            },
+                        },
+                    },
+                },
+            ];
+            const documents = (
+                await this.visualAnalysisLogic.getWithAggregation<VisualAnalysisDocumentModel>(aggregations)
+            ).filter(
+                ({ priceAnalysisData, acreageAnalysisData }) =>
+                    priceAnalysisData.length > 0 || acreageAnalysisData.length > 0
+            );
 
-            documents = documents.filter(({ priceAnalysisData, acreageAnalysisData }): boolean => {
-                acreageAnalysisData = acreageAnalysisData.filter(
-                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }): boolean => {
-                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
-                            return false;
-                        }
-
-                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-
-                priceAnalysisData = priceAnalysisData.filter(
-                    ({ transactionType: itemTransactionType, propertyType: itemPropertyType }): boolean => {
-                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
-                            return false;
-                        }
-
-                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-
-                return acreageAnalysisData.length > 0 && priceAnalysisData.length > 0;
-            });
-
-            const responseBody: object = {
-                analyses: documents.map(
-                    (document): VisualAnalysisApiModel => this.visualAnalysisLogic.convertToApiResponse(document)
-                ),
+            const responseBody = {
+                analyses: documents.map((document) => this.visualAnalysisLogic.convertToApiResponse(document)),
             };
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
@@ -184,7 +183,7 @@ export default class VisualAnalysisController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -197,5 +196,26 @@ export default class VisualAnalysisController extends VisualCommonController {
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualAnalysisLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-analysis', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

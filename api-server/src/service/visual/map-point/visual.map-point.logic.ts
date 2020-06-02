@@ -1,15 +1,20 @@
-import {
-    VisualMapPointApiModel,
-    VisualMapPointDocumentModel,
-    VisualMapPointLogicInterface,
-} from './visual.map-point.interface';
-import { VisualDistrictApiModel } from '../administrative/district/visual.district.interface';
-import VisualDistrictLogic from '../administrative/district/visual.district.logic';
-import { VisualWardApiModel } from '../administrative/ward/visual.ward.interface';
-import VisualWardLogic from '../administrative/ward/visual.ward.logic';
+import VisualMapPointModel from '@service/visual/map-point/visual.map-point.model';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
+import { VisualMapPointApiModel, VisualMapPointDocumentModel } from './visual.map-point.interface';
+import { VisualAdministrativeDistrictApiModel } from '../administrative/district/visual.administrative.district.interface';
+import VisualAdministrativeDistrictLogic from '../administrative/district/visual.administrative.district.logic';
+import { VisualAdministrativeWardApiModel } from '../administrative/ward/visual.administrative.ward.interface';
+import VisualAdministrativeWardLogic from '../administrative/ward/visual.administrative.ward.logic';
 
-export default class VisualMapPointLogic implements VisualMapPointLogicInterface {
+export default class VisualMapPointLogic extends CommonServiceLogicBase<
+    VisualMapPointDocumentModel,
+    VisualMapPointApiModel
+> {
     public static instance: VisualMapPointLogic;
+
+    constructor() {
+        super(VisualMapPointModel);
+    }
 
     /**
      * @return {VisualMapPointLogic}
@@ -19,15 +24,6 @@ export default class VisualMapPointLogic implements VisualMapPointLogicInterface
             this.instance = new VisualMapPointLogic();
         }
         return this.instance;
-    }
-
-    /**
-     * @param {VisualMapPointDocumentModel} document
-     *
-     * @return {VisualMapPointDocumentModel}
-     */
-    public async populateDocument(document: VisualMapPointDocumentModel): Promise<VisualMapPointDocumentModel> {
-        return document.populate('districtId wardId').execPopulate();
     }
 
     /**
@@ -45,12 +41,12 @@ export default class VisualMapPointLogic implements VisualMapPointLogicInterface
         cTime,
         mTime,
     }: VisualMapPointDocumentModel): VisualMapPointApiModel {
-        let district: VisualDistrictApiModel | number | null = null;
-        let ward: VisualWardApiModel | number | null = null;
+        let district: VisualAdministrativeDistrictApiModel | number | null = null;
+        let ward: VisualAdministrativeWardApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
             } else {
                 district = districtId;
             }
@@ -58,7 +54,7 @@ export default class VisualMapPointLogic implements VisualMapPointLogicInterface
 
         if (wardId) {
             if (typeof wardId === 'object') {
-                ward = VisualWardLogic.getInstance().convertToApiResponse(wardId);
+                ward = VisualAdministrativeWardLogic.getInstance().convertToApiResponse(wardId);
             } else {
                 ward = wardId;
             }

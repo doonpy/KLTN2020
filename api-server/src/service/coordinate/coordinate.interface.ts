@@ -16,26 +16,12 @@ export interface CoordinateDocumentModel extends CommonDocumentModel {
     lng: number;
 }
 
-export interface CoordinateLogicInterface extends CommonLogicBaseInterface {
+export interface CoordinateLogicInterface
+    extends CommonLogicBaseInterface<CoordinateDocumentModel, CoordinateApiModel> {
     /**
      * @param {string} location
      *
      * @return {Promise<CoordinateDocumentModel>}
      */
     getByLocation(location: string): Promise<CoordinateDocumentModel>;
-
-    /**
-     * @param {string} location
-     *
-     * @return {Promise<boolean>}
-     */
-    isExistsWithLocation(location: string): Promise<boolean>;
-
-    /**
-     * @param {string} location
-     * @param {boolean | undefined} isNot
-     *
-     * @return {Promise<void>}
-     */
-    checkExistsWithLocation(location: string, isNot?: boolean): Promise<void>;
 }

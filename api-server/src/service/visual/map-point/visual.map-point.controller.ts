@@ -3,11 +3,12 @@ import CommonServiceControllerBase from '@common/service/common.service.controll
 import ResponseStatusCode from '@common/common.response-status.code';
 import Validator from '@util/validator/validator';
 import Checker from '@util/checker/checker.index';
-import VisualMapPointLogic from './visual.map-point.logic';
-import { VisualMapPointApiModel, VisualMapPointDocumentModel } from './visual.map-point.interface';
-import VisualizationMapPointModel from './visual.map-point.model';
 import CommonConstant from '@common/common.constant';
+import VisualMapPointLogic from './visual.map-point.logic';
+import { VisualMapPointDocumentModel } from './visual.map-point.interface';
 import VisualCommonController from '../visual.common.controller';
+import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
+import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/visual.administrative.ward.interface';
 
 const commonPath = '/map-points';
 const specifyIdPath = '/map-points/:id';
@@ -21,27 +22,27 @@ const MAX_NUMBER_VALUE = Number.MAX_SAFE_INTEGER;
 export default class VisualMapPointController extends VisualCommonController {
     private static instance: VisualMapPointController;
 
-    private visualMapPointLogic: VisualMapPointLogic = VisualMapPointLogic.getInstance();
+    private visualMapPointLogic = VisualMapPointLogic.getInstance();
 
-    private readonly PARAM_MIN_LAT: string = 'minLat';
+    private readonly PARAM_MIN_LAT = 'minLat';
 
-    private readonly PARAM_MAX_LAT: string = 'maxLat';
+    private readonly PARAM_MAX_LAT = 'maxLat';
 
-    private readonly PARAM_MIN_LNG: string = 'minLng';
+    private readonly PARAM_MIN_LNG = 'minLng';
 
-    private readonly PARAM_MAX_LNG: string = 'maxLng';
+    private readonly PARAM_MAX_LNG = 'maxLng';
 
-    private readonly PARAM_MIN_ACREAGE: string = 'minAcreage';
+    private readonly PARAM_MIN_ACREAGE = 'minAcreage';
 
-    private readonly PARAM_MAX_ACREAGE: string = 'maxAcreage';
+    private readonly PARAM_MAX_ACREAGE = 'maxAcreage';
 
-    private readonly PARAM_MIN_PRICE: string = 'minPrice';
+    private readonly PARAM_MIN_PRICE = 'minPrice';
 
-    private readonly PARAM_MAX_PRICE: string = 'maxPrice';
+    private readonly PARAM_MAX_PRICE = 'maxPrice';
 
-    private readonly PARAM_TRANSACTION_TYPE: string = 'transactionType';
+    private readonly PARAM_TRANSACTION_TYPE = 'transactionType';
 
-    private readonly PARAM_PROPERTY_TYPE: string = 'propertyType';
+    private readonly PARAM_PROPERTY_TYPE = 'propertyType';
 
     constructor() {
         super();
@@ -137,56 +138,134 @@ export default class VisualMapPointController extends VisualCommonController {
 
             this.validator.validate(this.requestQuery);
 
-            const conditions: object = {
+            const visualAdministrativeWardLogic = VisualAdministrativeWardLogic.getInstance();
+            const minLat = Number(this.requestQuery[this.PARAM_MIN_LAT]) || MIN_LAT;
+            const maxLat = Number(this.requestQuery[this.PARAM_MAX_LAT]) || MAX_LAT;
+            const minLng = Number(this.requestQuery[this.PARAM_MIN_LNG]) || MIN_LNG;
+            const maxLng = Number(this.requestQuery[this.PARAM_MAX_LNG]) || MAX_LNG;
+            const minAcreage = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_NUMBER_VALUE;
+            const maxAcreage = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_NUMBER_VALUE;
+            const minPrice = Number(this.requestQuery[this.PARAM_MIN_PRICE]) || MIN_NUMBER_VALUE;
+            const maxPrice = Number(this.requestQuery[this.PARAM_MAX_PRICE]) || MAX_NUMBER_VALUE;
+            const transactionType = Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
+            const propertyType = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const transactionTypeAndPropertyTypeAggregations = {
                 $and: [
-                    { lat: { $gte: this.requestQuery[this.PARAM_MIN_LAT] || MIN_LAT } },
-                    { lat: { $lte: this.requestQuery[this.PARAM_MAX_LAT] || MAX_LAT } },
-                    { lng: { $gte: this.requestQuery[this.PARAM_MIN_LNG] || MIN_LNG } },
-                    { lng: { $lte: this.requestQuery[this.PARAM_MAX_LNG] || MAX_LNG } },
+                    transactionType
+                        ? {
+                              $eq: ['$$point.transactionType', transactionType],
+                          }
+                        : {},
+                    propertyType
+                        ? {
+                              $eq: ['$$point.propertyType', propertyType],
+                          }
+                        : {},
                 ],
             };
-            let documents: VisualMapPointDocumentModel[] = await VisualizationMapPointModel.find(conditions);
-            const minAcreage: number = Number(this.requestQuery[this.PARAM_MIN_ACREAGE]) || MIN_NUMBER_VALUE;
-            const maxAcreage: number = Number(this.requestQuery[this.PARAM_MAX_ACREAGE]) || MAX_NUMBER_VALUE;
-            const minPrice: number = Number(this.requestQuery[this.PARAM_MIN_PRICE]) || MIN_NUMBER_VALUE;
-            const maxPrice: number = Number(this.requestQuery[this.PARAM_MAX_PRICE]) || MAX_NUMBER_VALUE;
-            const transactionType: number | undefined =
-                Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) || undefined;
-            const propertyType: number | undefined = Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) || undefined;
+            const aggregations = [
+                {
+                    $match: {
+                        $and: [
+                            {
+                                lat: {
+                                    $gte: minLat,
+                                },
+                            },
+                            {
+                                lat: {
+                                    $lte: maxLat,
+                                },
+                            },
+                            {
+                                lng: {
+                                    $gte: minLng,
+                                },
+                            },
+                            {
+                                lng: {
+                                    $lte: maxLng,
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    $project: {
+                        districtId: 1,
+                        wardId: 1,
+                        lat: 1,
+                        lng: 1,
+                        points: {
+                            $filter: {
+                                input: '$points',
+                                as: 'point',
+                                cond: transactionTypeAndPropertyTypeAggregations,
+                            },
+                        },
+                        cTime: 1,
+                        mTime: 1,
+                    },
+                },
+                {
+                    $project: {
+                        districtId: 1,
+                        wardId: 1,
+                        lat: 1,
+                        lng: 1,
+                        points: {
+                            $map: {
+                                input: '$points',
+                                as: 'point',
+                                in: {
+                                    rawDataset: {
+                                        $filter: {
+                                            input: '$$point.rawDataset',
+                                            as: 'rawData',
+                                            cond: {
+                                                $and: [
+                                                    {
+                                                        $gte: ['$$rawData.acreage', minAcreage],
+                                                    },
+                                                    {
+                                                        $lte: ['$$rawData.acreage', maxAcreage],
+                                                    },
+                                                    {
+                                                        $gte: ['$$rawData.price', minPrice],
+                                                    },
+                                                    {
+                                                        $lte: ['$$rawData.price', maxPrice],
+                                                    },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                    transactionType: '$$point.transactionType',
+                                    propertyType: '$$point.propertyType',
+                                },
+                            },
+                        },
+                        cTime: 1,
+                        mTime: 1,
+                    },
+                },
+            ];
+            const [documents, { documents: visualAdministrativeWards }] = await Promise.all<
+                VisualMapPointDocumentModel[],
+                { documents: VisualAdministrativeWardDocumentModel[] }
+            >([
+                this.visualMapPointLogic.getWithAggregation<VisualMapPointDocumentModel>(aggregations),
+                visualAdministrativeWardLogic.getAll({}),
+            ]);
 
-            documents = documents.filter((document): boolean => {
-                document.points = document.points.filter(
-                    ({ rawDataset, transactionType: itemTransactionType, propertyType: itemPropertyType }): boolean => {
-                        if (transactionType !== undefined && itemTransactionType !== transactionType) {
-                            return false;
-                        }
+            const mapPoints = documents.map((document) => {
+                document.wardId = visualAdministrativeWards.filter(({ _id }) => document.wardId === _id)[0] || null;
+                document.districtId = document.wardId.districtId;
 
-                        if (propertyType !== undefined && itemPropertyType !== propertyType) {
-                            return false;
-                        }
-
-                        rawDataset = rawDataset.filter(
-                            ({ acreage, price }): boolean =>
-                                acreage >= minAcreage && acreage <= maxAcreage && price >= minPrice && price <= maxPrice
-                        );
-
-                        return rawDataset.length > 0;
-                    }
-                );
-
-                return document.points.length > 0;
+                return document;
             });
-
-            if (this.populate) {
-                for (const document of documents) {
-                    await this.visualMapPointLogic.populateDocument(document);
-                }
-            }
-
-            const responseBody: object = {
-                mapPoints: documents.map(
-                    (document): VisualMapPointApiModel => this.visualMapPointLogic.convertToApiResponse(document)
-                ),
+            const responseBody = {
+                mapPoints: mapPoints.map((mapPoint) => this.visualMapPointLogic.convertToApiResponse(mapPoint)),
             };
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
@@ -202,7 +281,7 @@ export default class VisualMapPointController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -215,5 +294,26 @@ export default class VisualMapPointController extends VisualCommonController {
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualMapPointLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-map-point', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

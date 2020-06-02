@@ -1,6 +1,7 @@
 import { RequestPromiseOptions } from 'request-promise';
 import { Response } from 'request';
-import Request from '../request/request';
+import ResponseStatusCode from '@common/common.response-status.code';
+import { sendRequest } from '../request/request';
 import { BingMapGeocodeResponse } from './external-api.map.interface';
 
 const requestOptionsDefault: RequestPromiseOptions = {
@@ -47,7 +48,7 @@ export const getGeocode = async (
         'AtkJrHa-BZ4SIpfBu0rAbi8hIeiOErrfPomuLQ39WxJ78YBi6kgMvibUHJIW5901',
     ];
     let result: BingMapGeocodeResponse;
-    let apiKey: string | undefined = BING_API_KEYS.shift();
+    let apiKey = BING_API_KEYS.shift();
     requestOptionsDefault.qs = {
         key: apiKey,
         query: queryAddress,
@@ -55,17 +56,15 @@ export const getGeocode = async (
         maxResults: 1,
     };
     const endPoint = `https://dev.virtualearth.net/REST/v1/Locations`;
-    const SUCCESS_STATUS_CODE = 200;
-
-    result = ((await new Request(endPoint, requestOptions).send()) as unknown) as BingMapGeocodeResponse;
-    while (result.statusCode !== SUCCESS_STATUS_CODE) {
+    result = await sendRequest<BingMapGeocodeResponse>(endPoint, requestOptionsDefault);
+    while (result.statusCode !== ResponseStatusCode.OK) {
         apiKey = BING_API_KEYS.shift();
         if (!apiKey) {
             return undefined;
         }
 
         requestOptionsDefault.qs.key = apiKey;
-        result = ((await new Request(endPoint, requestOptions).send()) as unknown) as BingMapGeocodeResponse;
+        result = await sendRequest<BingMapGeocodeResponse>(endPoint, requestOptionsDefault);
     }
     return result;
 };

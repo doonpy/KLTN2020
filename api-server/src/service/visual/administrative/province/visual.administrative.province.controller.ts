@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import VisualCommonController from '../../visual.common.controller';
-import VisualCountryLogic from './visual.country.logic';
-import VisualizationCountryModel from './visual.country.model';
-import { VisualCountryApiModel, VisualCountryDocumentModel } from './visual.country.interface';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import ResponseStatusCode from '@common/common.response-status.code';
+import VisualCommonController from '../../visual.common.controller';
+import VisualAdministrativeProvinceLogic from './visual.administrative.province.logic';
 
-const commonPath = '/countries';
-const specifyIdPath = '/country/:id';
+const commonPath = '/administrative/provinces';
+const specifyIdPath = '/administrative/province/:id';
 
-export default class VisualCountryController extends VisualCommonController {
-    private static instance: VisualCountryController;
+export default class VisualAdministrativeProvinceController extends VisualCommonController {
+    private static instance: VisualAdministrativeProvinceController;
 
-    private visualCountryLogic: VisualCountryLogic = VisualCountryLogic.getInstance();
+    private visualAdministrativeProvinceLogic = VisualAdministrativeProvinceLogic.getInstance();
 
     constructor() {
         super();
@@ -24,9 +22,9 @@ export default class VisualCountryController extends VisualCommonController {
     /**
      * Get instance
      */
-    public static getInstance(): VisualCountryController {
+    public static getInstance(): VisualAdministrativeProvinceController {
         if (!this.instance) {
-            this.instance = new VisualCountryController();
+            this.instance = new VisualAdministrativeProvinceController();
         }
         return this.instance;
     }
@@ -62,12 +60,18 @@ export default class VisualCountryController extends VisualCommonController {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const documents: VisualCountryDocumentModel[] = await VisualizationCountryModel.find();
-            const responseBody: object = {
-                provinces: documents.map(
-                    (document): VisualCountryApiModel => this.visualCountryLogic.convertToApiResponse(document)
+            const { documents, hasNext } = await this.visualAdministrativeProvinceLogic.getAll({
+                limit: this.limit,
+                offset: this.offset,
+            });
+
+            const responseBody = {
+                provinces: documents.map((document) =>
+                    this.visualAdministrativeProvinceLogic.convertToApiResponse(document)
                 ),
+                hasNext,
             };
+
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
         } catch (error) {
             next(this.createError(error, this.language));
@@ -81,7 +85,7 @@ export default class VisualCountryController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -94,5 +98,26 @@ export default class VisualCountryController extends VisualCommonController {
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualAdministrativeProvinceLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-administrative-province', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

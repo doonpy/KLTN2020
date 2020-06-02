@@ -1,10 +1,7 @@
 version: '3'
 services:
   api-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: pk2020:latest
+    image: doonpy/kltn2020:latest
     container_name: api-server
     entrypoint:
       - /bin/sh
@@ -13,6 +10,9 @@ services:
     working_dir: /usr/src/app
     environment:
       - NODE_ENV=production
+      - PROD_SERVER_PROTOCOL=https
+      - PROD_SERVER_DOMAIN=pk2020.tk
+      - PROD_SERVER_PORT=3000
     tty: true
     ports:
       - 3000:3000
@@ -20,7 +20,7 @@ services:
       - database
 
   background-job:
-    image: pk2020:latest
+    image: doonpy/kltn2020:latest
     container_name: background-job
     entrypoint:
       - /bin/sh
@@ -31,10 +31,10 @@ services:
       - NODE_ENV=production
     tty: true
     depends_on:
-      - api-server
+      - database
 
   web-server:
-    image: pk2020:latest
+    image: doonpy/kltn2020:latest
     container_name: web-server
     entrypoint:
       - /bin/sh

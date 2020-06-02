@@ -1,18 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import VisualCommonController from '../../visual.common.controller';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import ResponseStatusCode from '@common/common.response-status.code';
-import { VisualDistrictApiModel, VisualDistrictDocumentModel } from './visual.district.interface';
-import VisualizationDistrictModel from './visual.district.model';
-import VisualDistrictLogic from './visual.district.logic';
+import VisualCommonController from '../../visual.common.controller';
+import VisualAdministrativeDistrictLogic from './visual.administrative.district.logic';
 
-const commonPath = '/districts';
-const specifyIdPath = '/district/:id';
+const commonPath = '/administrative/districts';
+const specifyIdPath = '/administrative/district/:id';
 
-export default class VisualDistrictController extends VisualCommonController {
-    private static instance: VisualDistrictController;
+export default class VisualAdministrativeDistrictController extends VisualCommonController {
+    private static instance: VisualAdministrativeDistrictController;
 
-    private visualDistrictLogic: VisualDistrictLogic = VisualDistrictLogic.getInstance();
+    private visualAdministrativeDistrictLogic = VisualAdministrativeDistrictLogic.getInstance();
 
     constructor() {
         super();
@@ -24,9 +22,9 @@ export default class VisualDistrictController extends VisualCommonController {
     /**
      * Get instance
      */
-    public static getInstance(): VisualDistrictController {
+    public static getInstance(): VisualAdministrativeDistrictController {
         if (!this.instance) {
-            this.instance = new VisualDistrictController();
+            this.instance = new VisualAdministrativeDistrictController();
         }
         return this.instance;
     }
@@ -62,17 +60,15 @@ export default class VisualDistrictController extends VisualCommonController {
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const documents: VisualDistrictDocumentModel[] = await VisualizationDistrictModel.find();
-            if (this.populate) {
-                for (const document of documents) {
-                    await this.visualDistrictLogic.populateDocument(document);
-                }
-            }
-
-            const responseBody: object = {
-                districts: documents.map(
-                    (document): VisualDistrictApiModel => this.visualDistrictLogic.convertToApiResponse(document)
+            const { documents, hasNext } = await this.visualAdministrativeDistrictLogic.getAll({
+                limit: this.limit,
+                offset: this.offset,
+            });
+            const responseBody = {
+                countries: documents.map((document) =>
+                    this.visualAdministrativeDistrictLogic.convertToApiResponse(document)
                 ),
+                hasNext,
             };
 
             CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
@@ -88,7 +84,7 @@ export default class VisualDistrictController extends VisualCommonController {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -101,5 +97,26 @@ export default class VisualDistrictController extends VisualCommonController {
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualAdministrativeDistrictLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-administrative-district', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import autoPopulate from 'mongoose-autopopulate';
 import CommonConstant from '@common/common.constant';
 import { VisualMapPointDocumentModel } from './visual.map-point.interface';
 
@@ -7,8 +8,8 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualMapPointSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district' },
-        wardId: { type: Schema.Types.Number, ref: 'visual_administrative_ward' },
+        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
+        wardId: { type: Schema.Types.Number, ref: 'visual_administrative_ward', autopopulate: true },
         lat: { type: Schema.Types.Number },
         lng: { type: Schema.Types.Number },
         points: [
@@ -40,6 +41,7 @@ VisualMapPointSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     incrementBy: 1,
 });
+VisualMapPointSchema.plugin(autoPopulate);
 
 VisualMapPointSchema.index(
     {
@@ -57,4 +59,6 @@ VisualMapPointSchema.index(
     }
 );
 
-export default mongoose.model<VisualMapPointDocumentModel>('visual_map_point', VisualMapPointSchema);
+const VisualMapPointModel = mongoose.model<VisualMapPointDocumentModel>('visual_map_point', VisualMapPointSchema);
+
+export default VisualMapPointModel;

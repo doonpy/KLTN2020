@@ -1,13 +1,18 @@
-import {
-    VisualSummaryDistrictApiModel,
-    VisualSummaryDistrictDocumentModel,
-    VisualSummaryDistrictLogicInterface,
-} from './visual.summary.district.interface';
-import { VisualDistrictApiModel } from '../../administrative/district/visual.district.interface';
-import VisualDistrictLogic from '../../administrative/district/visual.district.logic';
+import VisualSummaryDistrictModel from '@service/visual/summary/district/visual.summary.district.model';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
+import { VisualSummaryDistrictApiModel, VisualSummaryDistrictDocumentModel } from './visual.summary.district.interface';
+import { VisualAdministrativeDistrictApiModel } from '../../administrative/district/visual.administrative.district.interface';
+import VisualAdministrativeDistrictLogic from '../../administrative/district/visual.administrative.district.logic';
 
-export default class VisualSummaryDistrictLogic implements VisualSummaryDistrictLogicInterface {
+export default class VisualSummaryDistrictLogic extends CommonServiceLogicBase<
+    VisualSummaryDistrictDocumentModel,
+    VisualSummaryDistrictApiModel
+> {
     public static instance: VisualSummaryDistrictLogic;
+
+    constructor() {
+        super(VisualSummaryDistrictModel);
+    }
 
     /**
      * @return {VisualSummaryDistrictLogic}
@@ -17,17 +22,6 @@ export default class VisualSummaryDistrictLogic implements VisualSummaryDistrict
             this.instance = new VisualSummaryDistrictLogic();
         }
         return this.instance;
-    }
-
-    /**
-     * @param {VisualSummaryDistrictDocumentModel} document
-     *
-     * @return {VisualSummaryDistrictDocumentModel}
-     */
-    public async populateDocument(
-        document: VisualSummaryDistrictDocumentModel
-    ): Promise<VisualSummaryDistrictDocumentModel> {
-        return document.populate('districtId').execPopulate();
     }
 
     /**
@@ -43,11 +37,11 @@ export default class VisualSummaryDistrictLogic implements VisualSummaryDistrict
         cTime,
         mTime,
     }: VisualSummaryDistrictDocumentModel): VisualSummaryDistrictApiModel {
-        let district: VisualDistrictApiModel | number | null = null;
+        let district: VisualAdministrativeDistrictApiModel | number | null = null;
 
         if (districtId) {
             if (typeof districtId === 'object') {
-                district = VisualDistrictLogic.getInstance().convertToApiResponse(districtId);
+                district = VisualAdministrativeDistrictLogic.getInstance().convertToApiResponse(districtId);
             } else {
                 district = districtId;
             }

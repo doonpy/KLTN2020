@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import CommonServiceControllerBase from '@common/service/common.service.controller.base';
 import ResponseStatusCode from '@common/common.response-status.code';
-import VisualizationSummaryDistrictModel from './visual.summary.district.model';
-import { VisualSummaryDistrictApiModel, VisualSummaryDistrictDocumentModel } from './visual.summary.district.interface';
 import VisualSummaryDistrictLogic from './visual.summary.district.logic';
 import VisualCommonController from '../../visual.common.controller';
 
@@ -12,7 +10,7 @@ const specifyIdPath = '/summary-district/:id';
 export default class VisualSummaryDistrictController extends VisualCommonController {
     private static instance: VisualSummaryDistrictController;
 
-    private visualSummaryDistrictLogic: VisualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
+    private visualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
 
     constructor() {
         super();
@@ -62,18 +60,11 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      */
     protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const documents: VisualSummaryDistrictDocumentModel[] = await VisualizationSummaryDistrictModel.find();
+            const { documents } = await this.visualSummaryDistrictLogic.getAll({});
 
-            if (this.populate) {
-                for (const document of documents) {
-                    await this.visualSummaryDistrictLogic.populateDocument(document);
-                }
-            }
-
-            const responseBody: object = {
-                summaryDistrict: documents.map(
-                    (document): VisualSummaryDistrictApiModel =>
-                        this.visualSummaryDistrictLogic.convertToApiResponse(document)
+            const responseBody = {
+                summaryDistrict: documents.map((document) =>
+                    this.visualSummaryDistrictLogic.convertToApiResponse(document)
                 ),
             };
 
@@ -90,7 +81,7 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
     }
 
@@ -103,5 +94,26 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
      */
     protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
         next();
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const documentAmount = await this.visualSummaryDistrictLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'visual-summary-district', documentAmount },
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
     }
 }

@@ -1,9 +1,4 @@
-import { DocumentQuery } from 'mongoose';
-import {
-    CommonApiModel,
-    CommonDocumentModel,
-    CommonLogicBaseInterface,
-} from '@common/service/common.service.interface';
+import { CommonApiModel, CommonDocumentModel } from '@common/service/common.service.interface';
 import { PatternApiModel, PatternDocumentModel } from '../pattern/pattern.interface';
 import { HostApiModel, HostDocumentModel } from '../host/host.interface';
 
@@ -27,37 +22,4 @@ export interface CatalogDocumentModel extends CommonDocumentModel {
     };
     hostId: HostDocumentModel | number;
     patternId: PatternDocumentModel | number;
-}
-
-export interface CatalogLogicInterface extends CommonLogicBaseInterface {
-    /**
-     * @param {string} url
-     *
-     * @return {boolean}
-     */
-    isExistsWithUrl(url: string): Promise<boolean>;
-
-    /**
-     * @param {string} url
-     * @param {boolean | undefined} isNot
-     *
-     * @return {Promise<void>}
-     */
-    checkExistsWithUrl(url: string, isNot?: boolean): Promise<void>;
-
-    /**
-     * @param {DocumentQuery<CatalogDocumentModel | CatalogDocumentModel[] | null, CatalogDocumentModel, {}>} query
-     *
-     * @return {DocumentQuery<CatalogDocumentModel | CatalogDocumentModel[] | null, CatalogDocumentModel, {}>}
-     */
-    addPopulateQuery(
-        query: DocumentQuery<CatalogDocumentModel | CatalogDocumentModel[] | null, CatalogDocumentModel, {}>
-    ): DocumentQuery<CatalogDocumentModel | CatalogDocumentModel[] | null, CatalogDocumentModel, {}>;
-
-    /**
-     * @param {CatalogDocumentModel} document
-     *
-     * @return {Promise<CatalogDocumentModel>}
-     */
-    getPopulateDocument(document: CatalogDocumentModel): Promise<CatalogDocumentModel>;
 }

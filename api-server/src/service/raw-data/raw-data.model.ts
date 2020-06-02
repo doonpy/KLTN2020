@@ -1,7 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
-import { RawDataDocumentModel } from './raw-data.interface';
 import CommonConstant from '@common/common.constant';
+import autoPopulate from 'mongoose-autopopulate';
+import { RawDataDocumentModel } from './raw-data.interface';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -10,6 +11,7 @@ const rawDataSchema = new Schema(
         detailUrlId: {
             type: Schema.Types.Number,
             ref: 'detail_url',
+            autopopulate: true,
         },
         transactionType: {
             type: Schema.Types.Number,
@@ -39,7 +41,7 @@ const rawDataSchema = new Schema(
                 _id: false,
             },
         ],
-        coordinateId: { type: Schema.Types.Number, ref: 'coordinate', default: null },
+        coordinateId: { type: Schema.Types.Number, ref: 'coordinate', default: null, autopopulate: true },
         isGrouped: { type: Schema.Types.Boolean, default: false },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
@@ -50,6 +52,7 @@ rawDataSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     incrementBy: 1,
 });
+rawDataSchema.plugin(autoPopulate);
 
 rawDataSchema.index({ detailUrlId: 1 }, { name: 'idx_detailUrlId' });
 rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
@@ -62,4 +65,6 @@ rawDataSchema.index(
     { name: 'idx_transactionType_propertyType_isGrouped' }
 );
 
-export default mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);
+const RawDataModel = mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);
+
+export default RawDataModel;

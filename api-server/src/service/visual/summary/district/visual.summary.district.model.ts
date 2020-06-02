@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import autoPopulate from 'mongoose-autopopulate';
 import CommonConstant from '@common/common.constant';
 import { VisualSummaryDistrictDocumentModel } from './visual.summary.district.interface';
 
@@ -7,7 +8,7 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualSummaryDistrictSchema: Schema = new Schema(
     {
-        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district' },
+        districtId: { type: Schema.Types.Number, ref: 'visual_administrative_district', autopopulate: true },
         summaryAmount: { type: Schema.Types.Number },
         summary: [
             {
@@ -29,10 +30,13 @@ VisualSummaryDistrictSchema.plugin(autoIncrement.plugin, {
     startAt: 1,
     incrementBy: 1,
 });
+VisualSummaryDistrictSchema.plugin(autoPopulate);
 
 VisualSummaryDistrictSchema.index({ districtId: 1 }, { name: 'idx_districtId', unique: true });
 
-export default mongoose.model<VisualSummaryDistrictDocumentModel>(
+const VisualSummaryDistrictModel = mongoose.model<VisualSummaryDistrictDocumentModel>(
     'visual_summary_district',
     VisualSummaryDistrictSchema
 );
+
+export default VisualSummaryDistrictModel;

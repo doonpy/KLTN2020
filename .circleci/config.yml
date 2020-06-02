@@ -22,12 +22,9 @@ jobs:
       - deploy:
           name: Push application Docker image
           command: |
-            docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
             if [ "${CIRCLE_BRANCH}" == "KLTN2020" ]
             then
+              docker login -u "${DOCKERHUB_USERNAME}" -p "${DOCKERHUB_PASSWORD}"
               docker tag app "${DOCKERHUB_REPO}:latest"
               docker push "${DOCKERHUB_REPO}:latest"
-            else
-              docker tag app "${DOCKERHUB_REPO}:${CIRCLE_SHA1}"
-              docker push "${DOCKERHUB_REPO}:${CIRCLE_SHA1}"
             fi

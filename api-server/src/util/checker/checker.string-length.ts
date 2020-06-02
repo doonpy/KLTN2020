@@ -18,7 +18,7 @@ export default class CheckerStringLength extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: object): void {
-        const value: string | null = this.getValue(paramName, input);
+        const value = this.getValue(paramName, input);
 
         if (!value) {
             return;

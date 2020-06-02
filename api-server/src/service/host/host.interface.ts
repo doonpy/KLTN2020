@@ -14,26 +14,11 @@ export interface HostDocumentModel extends CommonDocumentModel {
     domain: string;
 }
 
-export interface HostLogicInterface extends CommonLogicBaseInterface {
+export interface HostLogicInterface extends CommonLogicBaseInterface<HostDocumentModel, HostApiModel> {
     /**
      * @param {string} domain
      *
      * @return {HostDocumentModel}
      */
     getByDomain(domain: string): Promise<HostDocumentModel>;
-
-    /**
-     * @param {string} domain
-     *
-     * @return {boolean}
-     */
-    isExistsWithDomain(domain: string): Promise<boolean>;
-
-    /**
-     * @param {string} domain
-     * @param {boolean | undefined} isNot
-     *
-     * @return {Promise<void>}
-     */
-    checkExistsWithDomain(domain: string, isNot?: boolean): Promise<void>;
 }

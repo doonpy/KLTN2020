@@ -1,11 +1,19 @@
-import { VisualCommonLogicInterface } from '@service/visual/visual.common.interface';
 import {
     VisualAnalysisApiModel,
     VisualAnalysisDocumentModel,
 } from '@service/visual/analysis/visual.analysis.interface';
+import CommonServiceLogicBase from '@common/service/common.service.logic.base';
+import VisualAnalysisModel from '@service/visual/analysis/visual.analysis.model';
 
-export default class VisualAnalysisLogic implements VisualCommonLogicInterface {
+export default class VisualAnalysisLogic extends CommonServiceLogicBase<
+    VisualAnalysisDocumentModel,
+    VisualAnalysisApiModel
+> {
     public static instance: VisualAnalysisLogic;
+
+    constructor() {
+        super(VisualAnalysisModel);
+    }
 
     /**
      * @return {VisualAnalysisLogic}
