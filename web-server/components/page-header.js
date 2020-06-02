@@ -16,7 +16,7 @@ const PageHeader = () => {
 
     return (
         <nav
-            className="w-full bg-white dark:bg-gray-900 bg-white border-b border-solid border-primay shadow-md block"
+            className="w-full bg-white dark:bg-gray-900 bg-white border-light-primary border-b border-solid border-light-primary dark:border-primary shadow-md block"
             style={{ height: '100px', minHeight: '100px', maxWidth: '100%' }}
         >
             <div className="absolute right-0 mr-4 flex items-center" style={{ height: '100px' }}>
@@ -43,10 +43,10 @@ const PageHeader = () => {
                     </div>
                 </div>
                 <div className="w-1/2">
-                    {saleAmount && rentAmount && (
+                    {saleAmount && rentAmount ? (
                         <div className="w-full flex justify-end py-2 ">
                             <div
-                                className="border border-solid border-primay flex p-2 justify-center items-center flex mx-3"
+                                className="border border-solid border-light-primary dark:border-primary flex p-2 justify-center items-center flex mx-3"
                                 style={{ color: '#CCFF33' }}
                             >
                                 <div>
@@ -58,14 +58,14 @@ const PageHeader = () => {
                                     <div>{`${calculatePercentage(saleAmount, saleAmount + rentAmount)} %`}</div>
                                 </div>
                             </div>
-                            <div className="dark:text-white text-gray-900 border border-solid border-primay flex p-2 justify-center items-center flex-col">
+                            <div className="dark:text-white text-gray-900 border border-solid border-light-primary dark:border-primary flex p-2 justify-center items-center flex-col">
                                 <div className="font-medium text-xs">Tổng dữ liệu bất động sản</div>
                                 <h1 className="dark:text-white text-gray-900 text-3xl font-bold">
                                     {numberWithCommas(saleAmount + rentAmount)}
                                 </h1>
                             </div>
                             <div
-                                className="border border-solid border-primay flex p-2 justify-center items-center flex mx-3"
+                                className="border border-solid border-light-primary dark:border-primary flex p-2 justify-center items-center flex mx-3"
                                 style={{ color: '#FF3300' }}
                             >
                                 <div className="flex flex-col items-center">
@@ -78,7 +78,7 @@ const PageHeader = () => {
                                 </div>
                             </div>
                         </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </nav>

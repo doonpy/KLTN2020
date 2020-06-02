@@ -6,21 +6,4 @@
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;
 }
-.bg-black-alt {
-    background: #191919;
-}
-.text-black-alt {
-    color: #191919;
-}
-
-.border-black-alt {
-    border-color: #191919;
-}
-.border-primay {
-    border-color: #707070;
-}
-
-.dark:bg-gray-900 bg-white {
-    @apply .bg-gray-900;
-}
 @tailwind utilities;
