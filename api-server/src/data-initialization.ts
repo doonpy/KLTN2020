@@ -9,12 +9,9 @@ import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/visual.administrative.ward.interface';
 import { VisualAdministrativeCountryDocumentModel } from '@service/visual/administrative/country/visual.administrative.country.interface';
-import VisualAdministrativeDistrictLogic
-    from '@service/visual/administrative/district/visual.administrative.district.logic';
-import VisualAdministrativeCountryLogic
-    from '@service/visual/administrative/country/visual.administrative.country.logic';
-import VisualAdministrativeProvinceLogic
-    from '@service/visual/administrative/province/visual.administrative.province.logic';
+import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeCountryLogic from '@service/visual/administrative/country/visual.administrative.country.logic';
+import VisualAdministrativeProvinceLogic from '@service/visual/administrative/province/visual.administrative.province.logic';
 import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
 import { VisualAdministrativeProvinceDocumentModel } from '@service/visual/administrative/province/visual.administrative.province.interface';
 import VisualSummaryDistrictLogic from '@service/visual/summary/district/visual.summary.district.logic';

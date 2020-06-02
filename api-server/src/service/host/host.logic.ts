@@ -1,6 +1,10 @@
 import CommonLogicBase from '@common/service/common.service.logic.base';
 import HostModel from './host.model';
-import { HostApiModel, HostDocumentModel, HostLogicInterface } from './host.interface';
+import {
+    HostApiModel,
+    HostDocumentModel,
+    HostLogicInterface,
+} from './host.interface';
 
 export default class HostLogic
     extends CommonLogicBase<HostDocumentModel, HostApiModel>

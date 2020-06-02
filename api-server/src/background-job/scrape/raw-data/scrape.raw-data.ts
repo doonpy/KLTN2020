@@ -1,5 +1,8 @@
 import RawDataLogic from '@service/raw-data/raw-data.logic';
-import { convertStringToDate, convertTotalSecondsToTime } from '@util/helper/datetime';
+import {
+    convertStringToDate,
+    convertTotalSecondsToTime,
+} from '@util/helper/datetime';
 import {
     removeBreakLineAndTrim,
     removeSpecialCharacterAtHeadAndTail,
@@ -15,8 +18,14 @@ import { HostDocumentModel } from '@service/host/host.interface';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import CommonConstant from '@common/common.constant';
 import ScrapeBase from '../scrape.base';
-import { convertAcreageValue, convertPriceValue } from './scrape.raw-data.helper';
-import { ScrapeRawDataConstant, ScrapeRawDataConstantChatBotMessage } from './scrape.raw-data.constant';
+import {
+    convertAcreageValue,
+    convertPriceValue,
+} from './scrape.raw-data.helper';
+import {
+    ScrapeRawDataConstant,
+    ScrapeRawDataConstantChatBotMessage,
+} from './scrape.raw-data.constant';
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic = DetailUrlLogic.getInstance();

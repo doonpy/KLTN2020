@@ -7,18 +7,23 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --no-cache \
-              py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
-            pip install --upgrade pip
-            pip install \
-              docker-compose
+#      - run:
+#          name: Install dependencies
+#          command: |
+#            apk add --no-cache \
+#              py-pip python-dev libffi-dev openssl-dev gcc libc-dev make
+#            pip install --upgrade pip
+#            pip install \
+#              docker-compose
       - run:
           name: Build application Docker image
           command: |
             docker build -t app .
+  deploy-docker-hub:
+    - docker:
+        - image: docker:17.05.0-ce-git
+    - steps:
+      - setup_remote_docker
       - deploy:
           name: Push application Docker image
           command: |
@@ -28,3 +33,10 @@ jobs:
               docker tag app "${DOCKERHUB_REPO}:latest"
               docker push "${DOCKERHUB_REPO}:latest"
             fi
+
+workflows:
+  version: 2
+  build-archive:
+    jobs:
+      - build-docker-image
+      - deploy-docker-hub

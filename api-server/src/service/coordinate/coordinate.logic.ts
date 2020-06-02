@@ -1,6 +1,10 @@
 import CommonServiceLogicBase from '@common/service/common.service.logic.base';
 import CoordinateModel from './coordinate.model';
-import { CoordinateApiModel, CoordinateDocumentModel, CoordinateLogicInterface } from './coordinate.interface';
+import {
+    CoordinateApiModel,
+    CoordinateDocumentModel,
+    CoordinateLogicInterface,
+} from './coordinate.interface';
 
 export default class CoordinateLogic
     extends CommonServiceLogicBase<CoordinateDocumentModel, CoordinateApiModel>

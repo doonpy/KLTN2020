@@ -8,7 +8,10 @@ import CoordinateLogic from '@service/coordinate/coordinate.logic';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import { CoordinateDocumentModel } from '@service/coordinate/coordinate.interface';
 import { getGeocode } from '@util/external-api/external-api.map';
-import { MapPoint, VisualMapPointDocumentModel } from '@service/visual/map-point/visual.map-point.interface';
+import {
+    MapPoint,
+    VisualMapPointDocumentModel,
+} from '@service/visual/map-point/visual.map-point.interface';
 import { VisualSummaryDistrictWardDocumentModel } from '@service/visual/summary/district-ward/visual.summary.district-ward.interface';
 import { VisualSummaryDistrictDocumentModel } from '@service/visual/summary/district/visual.summary.district.interface';
 import { removeSpecialCharacterAtHeadAndTail } from '@util/helper/string';
@@ -23,8 +26,7 @@ import VisualSummaryDistrictLogic from '@service/visual/summary/district/visual.
 import VisualSummaryDistrictWardLogic from '@service/visual/summary/district-ward/visual.summary.district-ward.logic';
 import VisualMapPointLogic from '@service/visual/map-point/visual.map-point.logic';
 import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
-import VisualAdministrativeDistrictLogic
-    from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
 import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
 import { convertTotalSecondsToTime } from '@util/helper/datetime';
 import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/visual.administrative.district.interface';
