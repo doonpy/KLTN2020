@@ -27,7 +27,4 @@ jobs:
             then
               docker tag app "${DOCKERHUB_REPO}:latest"
               docker push "${DOCKERHUB_REPO}:latest"
-            else
-              docker tag app "${DOCKERHUB_REPO}:${CIRCLE_SHA1}"
-              docker push "${DOCKERHUB_REPO}:${CIRCLE_SHA1}"
             fi
