@@ -15,9 +15,6 @@ export default {
     PROD_DB_USERNAME: 'alice',
     PROD_DB_PASS: '',
     PROD_DB_AUTH_DB: 'admin',
-    PROD_SERVER_PROTOCOL: 'https',
-    PROD_SERVER_DOMAIN: 'pk2020.tk',
-    PROD_SERVER_PORT: '3000',
 
     // Background jon config
     BGR_START_ON_SERVER_RUN: 1,
