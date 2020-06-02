@@ -4,7 +4,7 @@ const AnalystLeft = () => {
     return (
         <div>
             <div
-                className="bg-gray-900 border-r border-solid border-primay flex items-center flex-col sticky"
+                className="dark:bg-gray-900 bg-white border-r border-solid border-primay flex items-center flex-col sticky"
                 style={{ width: '64px', height: 'calc(100vh - 100px)' }}
             >
                 <div />

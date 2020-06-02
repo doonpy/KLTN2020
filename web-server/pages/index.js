@@ -34,23 +34,25 @@ export async function getStaticProps() {
  */
 
 const Home = ({ mapStaticJSON }) => {
+    const [tabMap, setTabmap] = useState(0);
     const [tabs, setTabs] = useState(2);
-
     const { data: dataDistrict } = useDistrict();
     const { data: dataWard } = useWard();
     const { mapKey } = useSelector((state) => state.mapKey);
-    console.log(mapKey);
     const summaryData = (key, tabKey) => {
         if (!summaryData.cache) {
             summaryData.cache = {};
         }
+        // handle Cache
         const _key = `${key}_${tabKey}`;
         const _synmetricKey = `${tabKey}_${key}`;
+        if (summaryData.cache[_key]) return summaryData.cache[_key];
+        if (summaryData.cache[_synmetricKey]) return summaryData.cache[_synmetricKey];
+
         if (key !== 'full') {
             const dataWardFilter = dataWard.summaryDistrictWard.filter((w) => w.district.code === key);
             const dataSummaryWard = dataWardFilter.map((w) => {
                 const summary = tabKey !== 2 ? w.summary.filter((sum) => sum.transactionType === tabKey) : w.summary;
-
                 return {
                     name: w.ward.name,
                     code: w.ward.code,
@@ -59,6 +61,8 @@ const Home = ({ mapStaticJSON }) => {
                     summary,
                 };
             });
+            summaryData.cache[_key] = dataSummaryWard;
+            summaryData.cache[_synmetricKey] = dataSummaryWard;
             return dataSummaryWard;
         }
         const dataSummaryDistrict = dataDistrict.summaryDistrict.map((w) => {
@@ -72,33 +76,42 @@ const Home = ({ mapStaticJSON }) => {
                 summary,
             };
         });
+        summaryData.cache[_key] = dataSummaryDistrict;
+        summaryData.cache[_synmetricKey] = dataSummaryDistrict;
         return dataSummaryDistrict;
     };
 
     return (
-        <PageLayout>
+        <>
             {dataDistrict && dataWard ? (
-                <main className="text-white block" style={{ height: 'calc(100vh - 100px)' }}>
-                    <div className="w-full flex h-full">
-                        <PageLeft />
-                        <div className="w-full flex">
-                            <div className="w-9/12 h-full">
-                                <div className="h-full flex flex-col">
-                                    <PageMap mapStaticJSON={mapStaticJSON} dataSummary={summaryData(mapKey, tabs)} />
+                <PageLayout>
+                    <main className="text-white block" style={{ height: 'calc(100vh - 100px)' }}>
+                        <div className="w-full flex h-full">
+                            <PageLeft setTabmap={setTabmap} />
+                            <div className="w-full flex">
+                                {/* <div className="text-ww text-6xl">sdsd</div> */}
+                                <div className="w-9/12 h-full">
+                                    <div className="h-full flex flex-col">
+                                        <PageMap
+                                            tabMap={tabMap}
+                                            mapStaticJSON={mapStaticJSON}
+                                            dataSummary={summaryData(mapKey, tabs)}
+                                        />
+                                    </div>
                                 </div>
+                                <PageRight dataSummary={summaryData(mapKey, tabs)} tabs={tabs} setTabs={setTabs} />
                             </div>
-                            <PageRight dataSummary={summaryData(mapKey, tabs)} tabs={tabs} setTabs={setTabs} />
                         </div>
-                    </div>
-                </main>
+                    </main>
+                </PageLayout>
             ) : (
-                <div className="w-full" style={{ height: 'calc(100vh - 100px)' }}>
+                <div className="w-full h-screen bg-black-alt max-h-screen">
                     <div className="flex justify-center items-center h-full">
                         <Loading />
                     </div>
                 </div>
             )}
-        </PageLayout>
+        </>
     );
 };
 

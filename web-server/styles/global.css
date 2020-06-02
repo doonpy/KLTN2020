@@ -1,7 +1,11 @@
+@import 'spinner.css';
+@import 'legend.css';
 @tailwind base;
 @tailwind components;
-@import 'spinner.css';
-/* Style Color Global */
+
+.dark-mode-transition * {
+    @apply transition duration-500 ease-in-out;
+}
 .bg-black-alt {
     background: #191919;
 }
@@ -16,4 +20,7 @@
     border-color: #707070;
 }
 
+.dark:bg-gray-900 bg-white {
+    @apply .bg-gray-900;
+}
 @tailwind utilities;

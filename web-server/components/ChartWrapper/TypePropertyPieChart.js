@@ -2,12 +2,9 @@ import React from 'react';
 
 import PieChart from '../charts/PieChart';
 
-const TypePropertyPieChart = ({ type, data }) => {
+const TypePropertyPieChart = ({ data }) => {
     return (
         <div className="m-0 m-auto h-full" style={{ maxWidth: '80%' }}>
-            {/* <div className="flex justify-center items-center flex-col">
-                <h1 className="font-bold text-center text-lg">Dữ liệu mua</h1>
-            </div> */}
             <PieChart data={data} />
         </div>
     );

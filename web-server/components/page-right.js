@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
 import TypeTransactionBox from './TypeTransactionBox';
 import TotalByDistrictBarChart from './ChartWrapper/TotalByDistrictBarChart';
 
@@ -20,14 +19,15 @@ const TabButton = ({ title, onClick, isActive }) => {
     );
 };
 const PageRight = ({ dataSummary, tabs, setTabs }) => {
+    console.log('Render');
     const dataChart = dataSummary.map((data) => {
         const dataFilter = [data.name, data.summaryAmount];
         return dataFilter;
     });
 
     return (
-        <div className="w-3/12 bg-gray-900 border-l border-solid border-primay h-full flex flex-col">
-            <div className="bg-gray-900 h-6">
+        <div className="w-3/12 dark:bg-gray-900 bg-white border-l border-solid border-primay h-full flex flex-col">
+            <div className="dark:bg-gray-900 bg-white h-6">
                 <div className="text-xs w-full flex justify-around">
                     <TabButton title="Bán" onClick={() => setTabs(0)} isActive={tabs === 0} />
                     <TabButton title="Tổng" onClick={() => setTabs(2)} isActive={tabs === 2} />
@@ -35,7 +35,7 @@ const PageRight = ({ dataSummary, tabs, setTabs }) => {
                 </div>
             </div>
             <div>
-                <TypeTransactionBox tabs={1} />
+                <TypeTransactionBox data={dataSummary} />
             </div>
             <div style={{ height: '50%' }}>
                 <TotalByDistrictBarChart data={dataChart} />

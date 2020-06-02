@@ -63,6 +63,9 @@ yarn.lock
 # build
 dist/
 
+# build-web
+web-server/.next
+
 # archive
 archive/
 

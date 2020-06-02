@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 
 function RenderCompleted() {
     const [mounted, setMounted] = useState(false);
-
     useEffect(() => {
         setMounted(true);
 
@@ -10,7 +9,6 @@ function RenderCompleted() {
             setMounted(false);
         };
     });
-
     return mounted;
 }
 
