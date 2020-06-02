@@ -87,7 +87,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 return;
             }
 
-            this.requestCounter += 1;
+            this.requestCounter++;
             const $ = await this.getStaticBody(
                 (this.catalog.hostId as HostDocumentModel).domain,
                 currentUrl
@@ -95,12 +95,12 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.scrapedPageNumber.push(currentUrl);
 
             if (!$) {
-                this.requestCounter -= 1;
+                this.requestCounter--;
                 return;
             }
 
             await this.handleSuccessRequest($);
-            this.requestCounter -= 1;
+            this.requestCounter--;
         }, this.REQUEST_DELAY);
     }
 

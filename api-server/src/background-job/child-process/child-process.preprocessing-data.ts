@@ -162,9 +162,9 @@ const updateAmount = (
             amount: 1,
         });
     } else {
-        summaryElement.amount += 1;
+        summaryElement.amount++;
     }
-    summaryDocument.summaryAmount += 1;
+    summaryDocument.summaryAmount++;
 };
 
 /**
@@ -329,7 +329,7 @@ const updateAnalysisData = <T extends AnalysisData>(
     { summary: desSummary, max: desMax, min: desMin }: T
 ): T => {
     srcData.summary = Math.round((srcData.summary + desSummary) * 100) / 100;
-    srcData.amount += 1;
+    srcData.amount++;
     srcData.average =
         Math.round((srcData.summary / srcData.amount) * 100) / 100;
     srcData.max = desMax > srcData.max ? desMax : srcData.max;

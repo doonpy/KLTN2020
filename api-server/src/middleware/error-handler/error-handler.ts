@@ -57,7 +57,7 @@ const convertToString = (
                 inputString.push(`'${key}' => '${value}'`);
             }
         }
-        index += 1;
+        index++;
     }
 
     return inputString.join(', ');

@@ -53,12 +53,7 @@
     "no-underscore-dangle": "off",
     "no-await-in-loop": "off",
     "no-restricted-syntax": "off",
-    "no-plusplus": [
-      "error",
-      {
-        "allowForLoopAfterthoughts": true
-      }
-    ],
+    "no-plusplus": "off",
     "no-continue": "off",
     "no-labels": "off",
     "class-methods-use-this": "off",

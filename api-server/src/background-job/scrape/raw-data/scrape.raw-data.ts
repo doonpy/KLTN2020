@@ -130,7 +130,7 @@ export default class ScrapeRawData extends ScrapeBase {
             const currentUrl = currentDetailUrlDocument.url;
             this.extractedDetailUrl.push(currentDetailUrlDocument.url);
 
-            this.requestCounter += 1;
+            this.requestCounter++;
             const $ = await this.getStaticBody(
                 (this.catalog.hostId as HostDocumentModel).domain,
                 currentUrl
@@ -141,7 +141,7 @@ export default class ScrapeRawData extends ScrapeBase {
             } else {
                 await this.handleSuccessRequest($, currentDetailUrlDocument);
             }
-            this.requestCounter -= 1;
+            this.requestCounter--;
         }, this.REQUEST_DELAY);
     }
 
@@ -216,7 +216,7 @@ export default class ScrapeRawData extends ScrapeBase {
             othersData
         );
         currentDetailUrlDocument.isExtracted = this.EXTRACTED;
-        currentDetailUrlDocument.requestRetries += 1;
+        currentDetailUrlDocument.requestRetries++;
 
         if (this.isHasEmptyProperty(rawData)) {
             try {
@@ -319,7 +319,7 @@ export default class ScrapeRawData extends ScrapeBase {
     protected async handleFailedRequest(
         currentDetailUrlDocument: DetailUrlDocumentModel
     ): Promise<void> {
-        currentDetailUrlDocument.requestRetries += 1;
+        currentDetailUrlDocument.requestRetries++;
         if (
             currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES
         ) {

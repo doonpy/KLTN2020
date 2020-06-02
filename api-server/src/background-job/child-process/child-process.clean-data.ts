@@ -67,7 +67,7 @@ const deleteDuplicateData = async (): Promise<void> => {
         if (!item) {
             return;
         }
-        processCount += 1;
+        processCount++;
 
         item.docList.shift();
         for (const doc of item.docList) {
@@ -105,7 +105,7 @@ const deleteDuplicateData = async (): Promise<void> => {
             }
         }
 
-        processCount -= 1;
+        processCount--;
     }, 0);
 };
 
@@ -169,7 +169,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
         if (!rawData) {
             return;
         }
-        processCount += 1;
+        processCount++;
 
         if (rawDataset.documents.length === 0) {
             offset += DOCUMENTS_LIMIT;
@@ -186,7 +186,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
         try {
             if (!validDistrictAndWardPattern.test(address)) {
                 await deleteAction(rawData);
-                processCount -= 1;
+                processCount--;
 
                 return;
             }
@@ -198,19 +198,19 @@ const deleteInvalidAddressData = async (): Promise<void> => {
                 );
                 if (address.length > 0 && !validCountryPattern.test(address)) {
                     await deleteAction(rawData);
-                    processCount -= 1;
+                    processCount--;
 
                     return;
                 }
             }
 
-            processCount -= 1;
+            processCount--;
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
                 `Clean data - Invalid address -> RID: ${rawData._id} - Error: ${error.message}`
             ).show();
-            processCount -= 1;
+            processCount--;
         }
     }, 0);
 };

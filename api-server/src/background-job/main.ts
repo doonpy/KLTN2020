@@ -75,7 +75,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
         childProcess.on(
             'exit',
             async (): Promise<void> => {
-                childProcessAmount -= 1;
+                childProcessAmount--;
                 childProcessSet.delete(childProcess);
             }
         );
@@ -84,7 +84,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
             transactionTypeId: currentTransactionTypeId,
             propertyTypeId: currentPropertyTypeId,
         });
-        childProcessAmount += 1;
+        childProcessAmount++;
     }, 0);
 };
 
@@ -148,10 +148,10 @@ const executeScrapeChildProcess = async (): Promise<void> => {
             path.join(__dirname, './child-process/child-process.scrape-data')
         );
         childProcess.on('exit', (): void => {
-            childProcessAmount -= 1;
+            childProcessAmount--;
         });
         childProcess.send({ catalogId });
-        childProcessAmount += 1;
+        childProcessAmount++;
     }, 0);
 };
 
