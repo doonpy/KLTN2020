@@ -18,9 +18,8 @@ export default class ScrapeDetailUrl extends ScrapeBase {
 
     private scrapedPageNumber: string[] = [];
 
-    private readonly MAX_REQUEST = parseInt(
-        process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1',
-        10
+    private readonly MAX_REQUEST = Number(
+        process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1'
     );
 
     private readonly ATTRIBUTE_TO_GET_DATA = 'href';

@@ -46,9 +46,8 @@ export default class ScrapeRawData extends ScrapeBase {
 
     private readonly MAX_REQUEST_RETRIES = 3;
 
-    private readonly MAX_REQUEST = parseInt(
-        process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1',
-        10
+    private readonly MAX_REQUEST = Number(
+        process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1'
     );
 
     constructor(catalog: CatalogDocumentModel) {
