@@ -1,3 +1,4 @@
+import CheckerDate from './checker.date';
 import CheckerDecimalRange from './checker.decimal-range';
 import CheckerDomain from './checker.domain';
 import CheckerIntegerRange from './checker.integer-range';
@@ -12,7 +13,7 @@ import CheckerTypeObject from './type/checker.type.object';
 import CheckerTypeString from './type/checker.type.string';
 import CheckerLanguage from './checker.language';
 
-export default {
+const Checker = {
     Type: {
         Array: CheckerTypeArray,
         Boolean: CheckerTypeBoolean,
@@ -28,4 +29,7 @@ export default {
     StringLength: CheckerStringLength,
     Url: CheckerUrl,
     Language: CheckerLanguage,
+    Date: CheckerDate,
 };
+
+export default Checker;

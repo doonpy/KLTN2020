@@ -1,11 +1,16 @@
-import { DocumentQuery } from 'mongoose';
 import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
-import { DetailUrlApiModel, DetailUrlDocumentModel } from '../detail-url/detail-url.interface';
-import { CoordinateApiModel, CoordinateDocumentModel } from '../coordinate/coordinate.interface';
+} from '@common/service/common.service.interface';
+import {
+    DetailUrlApiModel,
+    DetailUrlDocumentModel,
+} from '../detail-url/detail-url.interface';
+import {
+    CoordinateApiModel,
+    CoordinateDocumentModel,
+} from '../coordinate/coordinate.interface';
 
 export interface RawDataApiModel extends CommonApiModel {
     detailUrl: DetailUrlApiModel | number | null;
@@ -64,51 +69,14 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     isGrouped: boolean;
 }
 
-export interface RawDataLogicInterface extends CommonLogicBaseInterface {
+export interface RawDataLogicInterface
+    extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
     /**
      * @param {string} propertyTypeData
      *
      * @return {number} index
      */
     getPropertyTypeIndex(propertyTypeData: string): number;
-
-    /**
-     * @param {number | DetailUrlDocumentModel} detailUrlId
-     *
-     * @return {Promise<boolean >}
-     */
-    isExistsWithDetailUrlId(detailUrlId: number | DetailUrlDocumentModel): Promise<boolean>;
-
-    /**
-     * @param {number | DetailUrlDocumentModel} detailUrlId
-     * @param {boolean | undefined} isNot
-     *
-     * @return {Promise<void>}
-     */
-    checkExistsWithDetailUrlId(detailUrlId: DetailUrlDocumentModel | number, isNot?: boolean): Promise<void>;
-
-    /**
-     * @param {DocumentQuery<RawDataDocumentModel | RawDataDocumentModel[] | null, RawDataDocumentModel, {}>} query
-     *
-     * @return {DocumentQuery<RawDataDocumentModel | RawDataDocumentModel[] | null, RawDataDocumentModel, {}>}
-     */
-    addPopulateQuery(
-        query: DocumentQuery<RawDataDocumentModel | RawDataDocumentModel[] | null, RawDataDocumentModel, {}>
-    ): DocumentQuery<RawDataDocumentModel | RawDataDocumentModel[] | null, RawDataDocumentModel, {}>;
-
-    /**
-     * @param {RawDataDocumentModel} document
-     *
-     * @return {Promise<RawDataDocumentModel>}
-     */
-    getPopulateDocument(document: RawDataDocumentModel): Promise<RawDataDocumentModel>;
-
-    /**
-     * @param {object[]} aggregations
-     *
-     * @return {Promise<any[]>}
-     */
-    queryWithAggregation(aggregations: object[]): Promise<any[]>;
 
     /**
      * @param {object | undefined} conditions

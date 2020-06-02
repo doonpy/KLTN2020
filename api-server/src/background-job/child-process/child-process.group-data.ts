@@ -1,12 +1,13 @@
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
+import 'module-alias/register';
+import '@root/prepend';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
 import GroupData from '../group-data/group-data';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
 import { GroupedDataConstant } from './child-process.constant';
 
-const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-const groupDataInstance: GroupData = new GroupData();
+const telegramChatBotInstance = ChatBotTelegram.getInstance();
+const groupDataInstance = new GroupData();
 const { MESSAGE_TYPE } = GroupedDataConstant;
 
 process.on(
@@ -23,8 +24,6 @@ process.on(
         switch (messageType) {
             case MESSAGE_TYPE.START:
                 try {
-                    await DatabaseMongodb.getInstance().connect();
-
                     await telegramChatBotInstance.sendMessage(
                         `<b>🤖[Group data]🤖</b>\n📝 Start group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId}`
                     );
@@ -33,7 +32,10 @@ process.on(
                         `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Start`
                     ).show();
 
-                    await groupDataInstance.start(transactionTypeId, propertyTypeId);
+                    await groupDataInstance.start(
+                        transactionTypeId,
+                        propertyTypeId
+                    );
                 } catch (error) {
                     await telegramChatBotInstance.sendMessage(
                         `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
@@ -52,11 +54,18 @@ process.on(
                 groupDataInstance.continue();
                 break;
             case MESSAGE_TYPE.IS_SUSPENSE:
-                (process as any).send({ isSuspense: groupDataInstance.isProcessSuspense() });
+                (process as any).send({
+                    isSuspense: groupDataInstance.isProcessSuspense(),
+                });
                 break;
             default:
-                await ChatBotTelegram.getInstance().sendMessage(`<b>🤖[Group data]🤖</b>\nGroup data - Force stop...`);
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Group data - Force stop...`).show();
+                await ChatBotTelegram.getInstance().sendMessage(
+                    `<b>🤖[Group data]🤖</b>\nGroup data - Force stop...`
+                );
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `Group data - Force stop...`
+                ).show();
                 process.exit(0);
         }
     }

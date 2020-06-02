@@ -6,13 +6,11 @@ MONGO_USERNAME="alice"
 MONGO_PASSWORD="pkroot"
 MONGO_AUTHDB="admin"
 
-echo "Dumping data from $MONGO_HOST..."
+echo "=> Start clone data from $MONGO_HOST..."
 mongodump -h ${MONGO_HOST} -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase ${MONGO_AUTHDB} -d ${MONGO_DATABASE}
-
-echo "Restore data to local database..."
 mongorestore --drop -d kltn2020-dev dump/kltn2020
 
-echo "Remove dump folder..."
+echo "=> Remove dump folder..."
 rm -rf dump
 
-echo "Done"
+echo "=> Done"

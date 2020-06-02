@@ -5,7 +5,11 @@
  * @param {string} toUnit
  * @return {number} value
  */
-export const convertAcreageValue = (value: number, fromUnit: string, toUnit: string): number => {
+export const convertAcreageValue = (
+    value: number,
+    fromUnit: string,
+    toUnit: string
+): number => {
     if (!value) {
         return value;
     }
@@ -18,7 +22,7 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
         return value / 1000000;
     }
 
-    return Math.round(value);
+    return Math.round(value * 100) / 100;
 };
 
 /**
@@ -28,48 +32,51 @@ export const convertAcreageValue = (value: number, fromUnit: string, toUnit: str
  * @param {string} toUnitInput
  * @return {number} returnValue
  */
-export const convertPriceValue = (value: number, fromUnitInput: string, toUnitInput: string): number => {
+export const convertPriceValue = (
+    value: number,
+    fromUnitInput: string,
+    toUnitInput: string
+): number => {
     if (!value) {
         return value;
     }
 
     const CURRENCY_PATTERN = new RegExp(/tỷ|tỉ|triệu|nghìn|ngàn/);
-    const fromUnitArray: string[] | null = fromUnitInput.match(CURRENCY_PATTERN);
-    const toUnitArray: string[] | null = toUnitInput.match(CURRENCY_PATTERN);
-    const fromUnit: string = fromUnitArray ? fromUnitArray.shift() || '' : '';
-    const toUnit: string = toUnitArray ? toUnitArray.shift() || '' : '';
+    const fromUnitArray = fromUnitInput.match(CURRENCY_PATTERN);
+    const toUnitArray = toUnitInput.match(CURRENCY_PATTERN);
+    const fromUnit = fromUnitArray ? fromUnitArray.shift() || '' : '';
+    const toUnit = toUnitArray ? toUnitArray.shift() || '' : '';
 
     if (!fromUnit || !toUnit) {
         return value;
     }
 
-    let returnValue: number = value;
     switch (fromUnit) {
         case 'tỷ' || 'tỉ' || 'billion':
             if (toUnit === 'triệu' || toUnit === 'million') {
-                returnValue = value * 1000;
+                value *= 1000;
             } else {
                 // 'nghìn' || 'ngàn':
-                returnValue = value * 1000000000;
+                value *= 1000000000;
             }
             break;
         case 'triệu' || 'million':
             if (toUnit === 'tỷ' || toUnit === 'tỉ' || toUnit === 'billion') {
-                returnValue = value / 1000;
+                value /= 1000;
             } else {
                 // 'nghìn' || 'ngàn':
-                returnValue = value * 1000000;
+                value *= 1000000;
             }
             break;
         default:
             if (toUnit === 'tỷ' || toUnit === 'tỉ' || toUnit === 'billion') {
-                returnValue = value / 1000000000;
+                value /= 1000000000;
             } else {
                 // triệu
-                returnValue = value / 1000000;
+                value /= 1000000;
             }
             break;
     }
 
-    return Math.round(returnValue);
+    return Math.round(value);
 };

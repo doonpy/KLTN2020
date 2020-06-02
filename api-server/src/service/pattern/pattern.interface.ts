@@ -1,8 +1,7 @@
 import {
     CommonApiModel,
     CommonDocumentModel,
-    CommonLogicBaseInterface,
-} from '../../common/service/common.service.interface';
+} from '@common/service/common.service.interface';
 
 export interface PatternApiModel extends CommonApiModel {
     sourceUrl: string | null;
@@ -51,21 +50,4 @@ export interface PatternDocumentModel extends CommonDocumentModel {
             value: string;
         }
     ];
-}
-
-export interface PatternLogicInterface extends CommonLogicBaseInterface {
-    /**
-     * @param {string} sourceUrl
-     *
-     * @return {boolean}
-     */
-    isExistsWithSourceUrl(sourceUrl: string): Promise<boolean>;
-
-    /**
-     * @param {string} sourceUrl
-     * @param {boolean | undefined} isNot
-     *
-     * @return {Promise<void>}
-     */
-    checkExistsWithSourceUrl(sourceUrl: string, isNot?: boolean): Promise<void>;
 }

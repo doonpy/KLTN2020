@@ -2,17 +2,20 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "lib": [
-      "es6",
-      "dom"
-    ],
-    "allowJs": true,
+    "sourceMap": true,
     "outDir": "../dist/api-bgr-job",
     "resolveJsonModule": true,
-    "rootDir": "src",
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "baseUrl": "src",
+    "paths": {
+      "@root/*": ["./*"],
+      "@background-job/*": ["background-job/*"],
+      "@common/*": ["common/*"],
+      "@middleware/*": ["middleware/*"],
+      "@service/*": ["service/*"],
+      "@util/*": ["util/*"]
+    }
   }
 }

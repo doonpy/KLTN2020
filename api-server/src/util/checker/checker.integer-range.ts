@@ -1,6 +1,6 @@
+import ResponseStatusCode from '@common/common.response-status.code';
 import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
-import ResponseStatusCode from '../../common/common.response-status.code';
 
 export default class CheckerIntegerRange extends CheckerBase {
     private readonly minRange: number;
@@ -18,27 +18,31 @@ export default class CheckerIntegerRange extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: object): void {
-        let value: string | null | number = this.getValue(paramName, input);
+        let value = this.getValue(paramName, input);
 
         if (!value) {
             return;
         }
 
-        value = Number(value);
-
-        if (!this.checkMinRange(value)) {
+        if (!this.checkMinRange(Number(value))) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_3, value: [paramName, this.minRange, value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_3,
+                    value: [paramName, this.minRange, value],
+                },
             };
         }
 
-        if (!this.checkMaxRange(value)) {
+        if (!this.checkMaxRange(Number(value))) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },
-                message: { wording: CheckerWording.MESSAGE.MSG_CHK_4, value: [paramName, this.maxRange, value] },
+                message: {
+                    wording: CheckerWording.MESSAGE.MSG_CHK_4,
+                    value: [paramName, this.maxRange, value],
+                },
             };
         }
     }

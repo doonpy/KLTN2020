@@ -1,32 +1,31 @@
+import { CatalogDocumentModel } from '@service/catalog/catalog.interface';
+import { replaceMetaDataString } from '@util/helper/string';
+import { sanitizeUrl } from '@util/helper/url';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import DetailUrlLogic from '@service/detail-url/detail-url.logic';
+import { HostDocumentModel } from '@service/host/host.interface';
+import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
+import { convertTotalSecondsToTime } from '@util/helper/datetime';
 import ScrapeBase from '../scrape.base';
-import { CatalogDocumentModel } from '../../../service/catalog/catalog.interface';
-import StringHandler from '../../../util/helper/string-handler';
-import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
-import UrlHandler from '../../../util/url-handler/url-handler';
-import ConsoleLog from '../../../util/console/console.log';
-import ConsoleConstant from '../../../util/console/console.constant';
-import DetailUrlLogic from '../../../service/detail-url/detail-url.logic';
-import { HostDocumentModel } from '../../../service/host/host.interface';
-import { DetailUrlDocumentModel } from '../../../service/detail-url/detail-url.interface';
 import ScrapeRawData from '../raw-data/scrape.raw-data';
-import DateTime from '../../../util/datetime/datetime';
+import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
-    private detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
-
-    private readonly catalog: CatalogDocumentModel;
+    private detailUrlLogic = DetailUrlLogic.getInstance();
 
     private pageNumberQueue: string[] = [];
 
     private scrapedPageNumber: string[] = [];
 
-    private readonly MAX_REQUEST: number = parseInt(process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1', 10);
+    private readonly MAX_REQUEST = Number(
+        process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1'
+    );
 
-    private readonly ATTRIBUTE_TO_GET_DATA: string = 'href';
+    private readonly ATTRIBUTE_TO_GET_DATA = 'href';
 
-    constructor(catalog: CatalogDocumentModel) {
+    constructor(private readonly catalog: CatalogDocumentModel) {
         super();
-        this.catalog = catalog;
     }
 
     /**
@@ -37,18 +36,24 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             this.startTime = process.hrtime();
             this.isRunning = true;
 
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Scrape detail URL -> CID: ${this.catalog._id} - Start`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape detail URL -> CID: ${this.catalog._id} - Start`
+            ).show();
             await this.telegramChatBotInstance.sendMessage(
-                StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.START, [
-                    this.catalog.title,
-                    this.catalog.id,
-                ])
+                replaceMetaDataString(
+                    ScrapeDetailUrlConstantChatBotMessage.START,
+                    [this.catalog.title, this.catalog.id]
+                )
             );
 
             this.scrapeAction();
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
-                StringHandler.replaceString(error.message, [this.catalog._id, error.message])
+                replaceMetaDataString(error.message, [
+                    this.catalog._id,
+                    error.message,
+                ])
             );
             this.isRunning = false;
             throw new Error(
@@ -63,8 +68,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     private scrapeAction(): void {
         this.pageNumberQueue = [this.catalog.url];
 
-        const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
-            if (this.pageNumberQueue.length === 0 && this.requestCounter === 0) {
+        const loop = setInterval(async (): Promise<void> => {
+            if (
+                this.pageNumberQueue.length === 0 &&
+                this.requestCounter === 0
+            ) {
                 clearInterval(loop);
                 await this.finishAction(this.catalog);
             }
@@ -73,25 +81,25 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 return;
             }
 
-            const currentUrl: string | undefined = this.pageNumberQueue.shift();
+            const currentUrl = this.pageNumberQueue.shift();
             if (!currentUrl) {
                 return;
             }
 
-            this.requestCounter += 1;
-            const $: CheerioStatic | undefined = await this.getStaticBody(
+            this.requestCounter++;
+            const $ = await this.getStaticBody(
                 (this.catalog.hostId as HostDocumentModel).domain,
                 currentUrl
             );
             this.scrapedPageNumber.push(currentUrl);
 
             if (!$) {
-                this.requestCounter -= 1;
+                this.requestCounter--;
                 return;
             }
 
             await this.handleSuccessRequest($);
-            this.requestCounter -= 1;
+            this.requestCounter--;
         }, this.REQUEST_DELAY);
     }
 
@@ -99,23 +107,25 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      * @param $
      */
     private async handleSuccessRequest($: CheerioStatic): Promise<void> {
-        let newDetailUrlList: string[] = ScrapeBase.extractData(
+        let newDetailUrlList = ScrapeBase.extractData(
             $,
             this.catalog.locator.detailUrl,
             this.ATTRIBUTE_TO_GET_DATA
         );
 
-        newDetailUrlList = newDetailUrlList.map((url): string => UrlHandler.sanitizeUrl(url));
+        newDetailUrlList = newDetailUrlList.map((url) => sanitizeUrl(url));
         for (const newDetailUrl of newDetailUrlList) {
-            if (!(await this.detailUrlLogic.isExistsWithUrl(newDetailUrl))) {
+            if (!(await this.detailUrlLogic.isExisted({ url: newDetailUrl }))) {
                 try {
-                    const createdDoc: DetailUrlDocumentModel = await this.detailUrlLogic.create(({
+                    const createdDoc = await this.detailUrlLogic.create(({
                         catalogId: this.catalog._id,
                         url: newDetailUrl,
                     } as unknown) as DetailUrlDocumentModel);
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
-                        `Scrape detail URL -> DID: ${createdDoc ? createdDoc._id : 'N/A'}`
+                        `Scrape detail URL -> DID: ${
+                            createdDoc ? createdDoc._id : 'N/A'
+                        }`
                     ).show();
                 } catch (error) {
                     new ConsoleLog(
@@ -126,13 +136,13 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             }
         }
 
-        let newPageNumberUrls: string[] = ScrapeBase.extractData(
+        let newPageNumberUrls = ScrapeBase.extractData(
             $,
             this.catalog.locator.pageNumber,
             this.ATTRIBUTE_TO_GET_DATA
         );
 
-        newPageNumberUrls = newPageNumberUrls.map((url): string => UrlHandler.sanitizeUrl(url));
+        newPageNumberUrls = newPageNumberUrls.map((url) => sanitizeUrl(url));
         for (const newPageNumberUrl of newPageNumberUrls) {
             if (
                 this.pageNumberQueue.indexOf(newPageNumberUrl) < 0 &&
@@ -148,10 +158,15 @@ export default class ScrapeDetailUrl extends ScrapeBase {
      */
     protected async finishAction(catalog: CatalogDocumentModel): Promise<void> {
         await this.telegramChatBotInstance.sendMessage(
-            StringHandler.replaceString(ScrapeDetailUrlConstantChatBotMessage.FINISH, [catalog.title, catalog.id])
+            replaceMetaDataString(
+                ScrapeDetailUrlConstantChatBotMessage.FINISH,
+                [catalog.title, catalog.id]
+            )
         );
         this.isRunning = false;
-        const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(this.startTime)[0]);
+        const executeTime = convertTotalSecondsToTime(
+            process.hrtime(this.startTime)[0]
+        );
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
             `Scrape detail URL -> CID: ${catalog._id} - Execute time: ${executeTime} - Complete`

@@ -1,4 +1,4 @@
-export default {
+const ConsoleConstant = {
     Type: {
         INFO: 0,
         DEBUG: 1,
@@ -8,3 +8,5 @@ export default {
 
     Tag: ['[INFO]', '[DEBUG]', '[ERROR]', '[UNKNOWN]'],
 };
+
+export default ConsoleConstant;

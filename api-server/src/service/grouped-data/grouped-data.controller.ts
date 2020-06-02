@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '../../common/service/common.service.controller.base';
+import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import Validator from '@util/validator/validator';
+import Checker from '@util/checker/checker.index';
+import ResponseStatusCode from '@common/common.response-status.code';
 import GroupedDataLogic from './grouped-data.logic';
-import Validator from '../../util/validator/validator';
-import Checker from '../../util/checker/checker.index';
-import { GroupedDataApiModel, GroupedDataDocumentModel } from './grouped-data.interface';
-import ResponseStatusCode from '../../common/common.response-status.code';
+import { GroupedDataDocumentModel } from './grouped-data.interface';
 import RawDataLogic from '../raw-data/raw-data.logic';
 
 const commonPath = '/grouped-dataset';
@@ -13,9 +13,9 @@ const specifyIdPath = '/grouped-data/:id';
 export default class GroupedDataController extends CommonServiceControllerBase {
     private static instance: GroupedDataController;
 
-    private groupedDataLogic: GroupedDataLogic = new GroupedDataLogic();
+    private groupedDataLogic = new GroupedDataLogic();
 
-    private readonly PARAM_ITEMS: string = 'items';
+    private readonly PARAM_ITEMS = 'items';
 
     constructor() {
         super();
@@ -42,7 +42,11 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getAllRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getAllRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
@@ -52,32 +56,40 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             } else {
                 items = this.requestQuery[this.PARAM_ITEMS] as string[];
                 items.forEach((item, index): void => {
-                    this.validator.addParamValidator(index.toString(), new Checker.Type.Integer());
-                    this.validator.addParamValidator(index.toString(), new Checker.IntegerRange(1, null));
+                    this.validator.addParamValidator(
+                        index.toString(),
+                        new Checker.Type.Integer()
+                    );
+                    this.validator.addParamValidator(
+                        index.toString(),
+                        new Checker.IntegerRange(1, null)
+                    );
                 });
             }
 
             this.validator.validate(items as string[]);
 
-            const {
-                documents,
-                hasNext,
-            }: { documents: GroupedDataDocumentModel[]; hasNext: boolean } = await this.groupedDataLogic.getAll(
-                this.limit,
-                this.offset,
-                this.buildQueryConditions([{ paramName: this.PARAM_ITEMS, isString: false }]),
-                this.populate
-            );
-            const groupedDataList: GroupedDataApiModel[] = documents.map(
-                (groupedData: GroupedDataDocumentModel): GroupedDataApiModel =>
+            const { documents, hasNext } = await this.groupedDataLogic.getAll({
+                limit: this.limit,
+                offset: this.offset,
+                conditions: this.buildQueryConditions([
+                    { paramName: this.PARAM_ITEMS, isString: false },
+                ]),
+            });
+            const groupedDataList = documents.map(
+                (groupedData: GroupedDataDocumentModel) =>
                     this.groupedDataLogic.convertToApiResponse(groupedData)
             );
-            const responseBody: object = {
+            const responseBody = {
                 groupedDataset: groupedDataList,
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -90,23 +102,38 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async getWithIdRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async getByIdRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.groupedDataLogic.checkExistsWithId(idBody);
-            const groupedData: GroupedDataDocumentModel = await this.groupedDataLogic.getById(idBody, true);
-            const responseBody: object = {
-                groupedData: this.groupedDataLogic.convertToApiResponse(groupedData),
+            const groupedData = await this.groupedDataLogic.getById(idBody);
+            const responseBody = {
+                groupedData: this.groupedDataLogic.convertToApiResponse(
+                    groupedData
+                ),
             };
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.OK, responseBody, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                responseBody,
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }
@@ -119,21 +146,30 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async createRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async createRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
+            this.validator.addParamValidator(
+                this.PARAM_ITEMS,
+                new Checker.Type.Array()
+            );
 
             this.validator.validate(this.requestBody);
 
-            const groupedDataBody: GroupedDataDocumentModel = (this.requestBody as unknown) as GroupedDataDocumentModel;
+            const groupedDataBody = (this
+                .requestBody as unknown) as GroupedDataDocumentModel;
             for (const item of groupedDataBody.items) {
-                await RawDataLogic.getInstance().checkExistsWithId(item);
+                await RawDataLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: item,
+                });
             }
-            const createdGroupedData: GroupedDataDocumentModel = await this.groupedDataLogic.create(
-                groupedDataBody,
-                true
+            const createdGroupedData = await this.groupedDataLogic.create(
+                groupedDataBody
             );
 
             CommonServiceControllerBase.sendResponse(
@@ -153,28 +189,43 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async updateRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async updateRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
-            this.validator.addParamValidator(this.PARAM_ITEMS, new Checker.Type.Array());
+            this.validator.addParamValidator(
+                this.PARAM_ITEMS,
+                new Checker.Type.Array()
+            );
 
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const groupedDataBody: GroupedDataDocumentModel = (this.requestBody as unknown) as GroupedDataDocumentModel;
-            await this.groupedDataLogic.checkExistsWithId(idBody);
+            const groupedDataBody = (this
+                .requestBody as unknown) as GroupedDataDocumentModel;
             for (const item of groupedDataBody.items) {
-                await RawDataLogic.getInstance().checkExistsWithId(item);
+                await RawDataLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: item,
+                });
             }
-            const editedGroupedData: GroupedDataDocumentModel = await this.groupedDataLogic.update(
+            const editedGroupedData = await this.groupedDataLogic.update(
                 idBody,
                 groupedDataBody,
-                true
+                [{ [this.PARAM_DOCUMENT_ID]: idBody }]
             );
 
             CommonServiceControllerBase.sendResponse(
@@ -194,20 +245,58 @@ export default class GroupedDataController extends CommonServiceControllerBase {
      *
      * @return {Promise<void>}
      */
-    protected async deleteRoute(req: Request, res: Response, next: NextFunction): Promise<void> {
+    protected async deleteRoute(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
         try {
             this.validator = new Validator();
 
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.Type.Integer());
-            this.validator.addParamValidator(this.PARAM_ID, new Checker.IntegerRange(1, null));
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_ID,
+                new Checker.IntegerRange(1, null)
+            );
 
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.groupedDataLogic.checkExistsWithId(idBody);
             await this.groupedDataLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(ResponseStatusCode.NO_CONTENT, {}, res);
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.NO_CONTENT,
+                {},
+                res
+            );
+        } catch (error) {
+            next(this.createError(error, this.language));
+        }
+    }
+
+    /**
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     *
+     * @return {Promise<void>}
+     */
+    protected async getDocumentAmount(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const documentAmount = await this.groupedDataLogic.getDocumentAmount();
+
+            CommonServiceControllerBase.sendResponse(
+                ResponseStatusCode.OK,
+                { schema: 'grouped-data', documentAmount },
+                res
+            );
         } catch (error) {
             next(this.createError(error, this.language));
         }

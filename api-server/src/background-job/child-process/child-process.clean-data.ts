@@ -1,14 +1,17 @@
-import ConsoleLog from '../../util/console/console.log';
-import ConsoleConstant from '../../util/console/console.constant';
-import ChatBotTelegram from '../../util/chatbot/chatBotTelegram';
-import DetailUrlLogic from '../../service/detail-url/detail-url.logic';
-import RawDataLogic from '../../service/raw-data/raw-data.logic';
-import DatabaseMongodb from '../../service/database/mongodb/database.mongodb';
-import { RawDataDocumentModel } from '../../service/raw-data/raw-data.interface';
-import { DetailUrlDocumentModel } from '../../service/detail-url/detail-url.interface';
-import DateTime from '../../util/datetime/datetime';
-import VisualizationDistrictModel from '../../service/visualization/district/visualization.district.model';
-import VisualizationWardModel from '../../service/visualization/ward/visualization.ward.model';
+import 'module-alias/register';
+import '@root/prepend';
+import ConsoleLog from '@util/console/console.log';
+import ConsoleConstant from '@util/console/console.constant';
+import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
+import DetailUrlLogic from '@service/detail-url/detail-url.logic';
+import RawDataLogic from '@service/raw-data/raw-data.logic';
+import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
+import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface';
+import VisualAdministrativeCountryLogic from '@service/visual/administrative/country/visual.administrative.country.logic';
+import VisualAdministrativeProvinceLogic from '@service/visual/administrative/province/visual.administrative.province.logic';
+import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
+import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
+import { convertTotalSecondsToTime } from '@util/helper/datetime';
 import { CleanDataConstant } from './child-process.constant';
 
 type AggregationGroupDataResult = {
@@ -17,43 +20,63 @@ type AggregationGroupDataResult = {
     docSize: number;
 };
 
-const PROCESS_LIMIT = 10;
+const detailUrlLogic = DetailUrlLogic.getInstance();
+const rawDataLogic = RawDataLogic.getInstance();
+const PROCESSES_LIMIT = 30;
+
 let script: AsyncGenerator;
+
+/**
+ * Delete raw data have invalid address
+ *
+ * @param {RawDataDocumentModel} rawData
+ */
+const deleteAction = async (rawData: RawDataDocumentModel): Promise<void> => {
+    await rawDataLogic.delete(rawData._id);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
+    ).show();
+};
 
 /**
  * Delete duplicate detail URL and raw data which scraped from that.
  */
 const deleteDuplicateData = async (): Promise<void> => {
-    const detailUrlLogic: DetailUrlLogic = DetailUrlLogic.getInstance();
-    const aggregationResult: AggregationGroupDataResult[] = ((await detailUrlLogic.aggregationQuery(
-        CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS
-    )) as unknown) as AggregationGroupDataResult[];
-    const rawDataLogic: RawDataLogic = RawDataLogic.getInstance();
+    const aggregationResult = await detailUrlLogic.getWithAggregation<
+        AggregationGroupDataResult
+    >(CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS);
     let processCount = 0;
 
-    const loop: NodeJS.Timeout = setInterval(async (): Promise<void> => {
+    const loop = setInterval(async (): Promise<void> => {
         if (aggregationResult.length === 0) {
             clearInterval(loop);
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete duplicate - Complete`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Clean data - Delete duplicate - Complete`
+            ).show();
             script.next();
             return;
         }
 
-        if (processCount > PROCESS_LIMIT) {
+        if (processCount > PROCESSES_LIMIT) {
             return;
         }
 
-        const item: AggregationGroupDataResult | undefined = aggregationResult.shift();
+        const item = aggregationResult.shift();
         if (!item) {
             return;
         }
-        processCount += 1;
+        processCount++;
 
         item.docList.shift();
         for (const doc of item.docList) {
             try {
                 await detailUrlLogic.delete(doc._id);
-                new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Duplicate data -> DID:${doc._id}`).show();
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `Clean data - Duplicate data -> DID:${doc._id}`
+                ).show();
             } catch (error) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
@@ -63,13 +86,9 @@ const deleteDuplicateData = async (): Promise<void> => {
 
             if (doc.isExtracted) {
                 try {
-                    const { documents }: { documents: RawDataDocumentModel[] } = await rawDataLogic.getAll(
-                        undefined,
-                        undefined,
-                        {
-                            detailUrlId: doc._id,
-                        }
-                    );
+                    const { documents } = await rawDataLogic.getAll({
+                        conditions: { detailUrlId: doc._id },
+                    });
                     for (const document of documents) {
                         await rawDataLogic.delete(document._id);
                         new ConsoleLog(
@@ -86,7 +105,7 @@ const deleteDuplicateData = async (): Promise<void> => {
             }
         }
 
-        processCount -= 1;
+        processCount--;
     }, 0);
 };
 
@@ -94,26 +113,55 @@ const deleteDuplicateData = async (): Promise<void> => {
  * Delete data which have address not contain district or ward
  */
 const deleteInvalidAddressData = async (): Promise<void> => {
-    const rawDataLogic = RawDataLogic.getInstance();
-    const limit = 1000;
-    const districtPattern: string = (await VisualizationDistrictModel.find())
+    const countryPattern = (
+        await VisualAdministrativeCountryLogic.getInstance().getAll({})
+    ).documents
+        .map((country) => country.name)
+        .join('|');
+    const provincePattern = (
+        await VisualAdministrativeProvinceLogic.getInstance().getAll({})
+    ).documents
+        .map((province) => province.name)
+        .join('|');
+    const districtPattern = (
+        await VisualAdministrativeDistrictLogic.getInstance().getAll({})
+    ).documents
         .map((district) => district.name)
         .join('|');
-    const wards: string[] = (await VisualizationWardModel.find()).map((ward) => ward.name);
-    const wardPattern: string = wards.filter((ward, index) => wards.lastIndexOf(ward) === index).join('|');
-    const addressPattern = new RegExp(`(?:${wardPattern}).*(?:${districtPattern})`, 'i');
+    const wards: string[] = (
+        await VisualAdministrativeWardLogic.getInstance().getAll({})
+    ).documents.map((ward) => ward.name);
+    const wardPattern = wards
+        .filter((ward, index) => wards.lastIndexOf(ward) === index)
+        .join('|');
+    const validDistrictAndWardPattern = new RegExp(
+        `(${wardPattern}).*(${districtPattern})`,
+        'i'
+    );
+    const validProvincePattern = new RegExp(`(${provincePattern})`, 'i');
+    const validCountryPattern = new RegExp(`(${countryPattern})$`, 'i');
+    const DOCUMENTS_LIMIT = 1000;
     let processCount = 0;
     let offset = 0;
-    let rawDataset = await rawDataLogic.getAll(limit, offset);
+    let rawDataset = await rawDataLogic.getAll({
+        limit: DOCUMENTS_LIMIT,
+        offset,
+        conditions: {
+            coordinateId: null,
+        },
+    });
     const loop = setInterval(async () => {
         if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
             clearInterval(loop);
-            new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete invalid address - Complete`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Clean data - Delete invalid address - Complete`
+            ).show();
             script.next();
             return;
         }
 
-        if (processCount > PROCESS_LIMIT) {
+        if (processCount > PROCESSES_LIMIT) {
             return;
         }
 
@@ -121,29 +169,49 @@ const deleteInvalidAddressData = async (): Promise<void> => {
         if (!rawData) {
             return;
         }
-        processCount += 1;
+        processCount++;
 
         if (rawDataset.documents.length === 0) {
-            offset += limit;
-            rawDataset = await rawDataLogic.getAll(limit, offset);
+            offset += DOCUMENTS_LIMIT;
+            rawDataset = await rawDataLogic.getAll({
+                limit: DOCUMENTS_LIMIT,
+                offset,
+                conditions: {
+                    coordinateId: null,
+                },
+            });
         }
 
-        if (!addressPattern.test(rawData.address)) {
-            try {
-                await rawDataLogic.delete(rawData._id);
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Clean data - Invalid address -> RID: ${rawData._id} - Error: ${error.message}`
-                ).show();
+        let { address } = rawData;
+        try {
+            if (!validDistrictAndWardPattern.test(address)) {
+                await deleteAction(rawData);
+                processCount--;
+
+                return;
             }
-        }
 
-        processCount -= 1;
+            if (validProvincePattern.test(address)) {
+                address = address.replace(
+                    RegExp(`.*(${provincePattern})`, 'i'),
+                    ''
+                );
+                if (address.length > 0 && !validCountryPattern.test(address)) {
+                    await deleteAction(rawData);
+                    processCount--;
+
+                    return;
+                }
+            }
+
+            processCount--;
+        } catch (error) {
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Clean data - Invalid address -> RID: ${rawData._id} - Error: ${error.message}`
+            ).show();
+            processCount--;
+        }
     }, 0);
 };
 
@@ -151,24 +219,34 @@ const deleteInvalidAddressData = async (): Promise<void> => {
  * Generate script of process
  */
 async function* generateScript() {
-    const startTime: [number, number] = process.hrtime();
-    const telegramChatBotInstance: ChatBotTelegram = ChatBotTelegram.getInstance();
-    await DatabaseMongodb.getInstance().connect();
-    await telegramChatBotInstance.sendMessage(`<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`);
+    const startTime = process.hrtime();
+    const telegramChatBotInstance = ChatBotTelegram.getInstance();
+    await telegramChatBotInstance.sendMessage(
+        `<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`
+    );
 
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete duplicate - Start`).show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Delete duplicate - Start`
+    ).show();
     await deleteDuplicateData();
     yield 'Step 1: Delete duplicate';
 
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Delete invalid address - Start`).show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Delete invalid address - Start`
+    ).show();
     await deleteInvalidAddressData();
     yield 'Step 1: Delete invalid address';
 
-    const executeTime: string = DateTime.convertTotalSecondsToTime(process.hrtime(startTime)[0]);
+    const executeTime = convertTotalSecondsToTime(process.hrtime(startTime)[0]);
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Clean data]🤖</b>\n✅ Clean data complete. Execute time: ${executeTime}`
     );
-    new ConsoleLog(ConsoleConstant.Type.INFO, `Clean data - Execute time: ${executeTime} - Complete`).show();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Execute time: ${executeTime} - Complete`
+    ).show();
     process.exit(0);
     return 'Done';
 }
@@ -186,7 +264,10 @@ process.on(
             await ChatBotTelegram.getInstance().sendMessage(
                 `<b>🤖[Clean data]🤖</b>\n❌ Clean data failed.\nError:<code>${error.message}</code>`
             );
-            new ConsoleLog(ConsoleConstant.Type.ERROR, `Clean data - Error: ${error.message}`).show();
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Clean data - Error: ${error.message}`
+            ).show();
             process.exit(1);
         }
     }
