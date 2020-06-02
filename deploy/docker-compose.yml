@@ -52,7 +52,7 @@ services:
     env_file:
       - database.config.env
     volumes:
-      - ./mongo-volume:/data/db
+      - ./mongo-volume:/data/db # mongodb volume
     ports:
       - '27017-27019:27017-27019'
     tty: true
