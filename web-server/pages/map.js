@@ -6,7 +6,9 @@ const Page = ({ mapData }) => {
 };
 
 export async function getServerSideProps() {
-    const response = await fetch(`http://localhost:3001/geojson/hcm/full.geo.json`);
+    const response = await fetch(
+        `http://localhost:3001/geojson/hcm/full.geo.json`
+    );
     const mapData = await response.json();
     return {
         props: { mapData },

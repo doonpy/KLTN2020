@@ -6,7 +6,10 @@ const Nav = () => (
     <nav id="header" className="bg-gray-900 fixed w-full z-10 top-0 shadow">
         <div className="w-full container mx-auto flex flex-wrap items-center mt-0 pt-3 pb-3 md:pb-0">
             <div className="w-1/2 pl-2 md:pl-0">
-                <a className="text-gray-100 text-base xl:text-xl no-underline hover:no-underline font-bold" href="/#">
+                <a
+                    className="text-gray-100 text-base xl:text-xl no-underline hover:no-underline font-bold"
+                    href="/#"
+                >
                     Real Estate
                 </a>
             </div>
@@ -51,7 +54,9 @@ const Nav = () => (
                             className="block py-1 md:py-3 pl-1 align-middle text-gray-500 no-underline hover:text-gray-100 border-b-2 border-gray-900  hover:border-green-400"
                         >
                             <i className="fas fa-chart-area fa-fw mr-3" />
-                            <span className="pb-1 md:pb-0 text-sm">Analytics</span>
+                            <span className="pb-1 md:pb-0 text-sm">
+                                Analytics
+                            </span>
                         </a>
                     </li>
                 </ul>
