@@ -1,10 +1,7 @@
 version: '3'
 services:
   api-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: pk2020:latest
+    image: doonpy/kltn2020:latest
     container_name: api-server
     entrypoint:
       - /bin/sh
@@ -20,7 +17,7 @@ services:
       - database
 
   background-job:
-    image: pk2020:latest
+    image: doonpy/kltn2020:latest
     container_name: background-job
     entrypoint:
       - /bin/sh
@@ -31,10 +28,10 @@ services:
       - NODE_ENV=production
     tty: true
     depends_on:
-      - api-server
+      - database
 
   web-server:
-    image: pk2020:latest
+    image: doonpy/kltn2020:latest
     container_name: web-server
     entrypoint:
       - /bin/sh

@@ -429,17 +429,26 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
             }
 
             rawData.coordinateId = coordinate._id;
-            await rawData.save();
 
-            await handleVisualizationSummaryDistrictData(districtId, rawData.transactionType, rawData.propertyType);
-            await handleVisualizationSummaryDistrictWardData(
-                districtId,
-                wardId,
-                rawData.transactionType,
-                rawData.propertyType
-            );
-            await handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData);
-            await handleVisualizationAnalysis(rawData.postDate, rawData);
+            try {
+                await Promise.all([
+                    rawData.save(),
+                    handleVisualizationSummaryDistrictData(districtId, rawData.transactionType, rawData.propertyType),
+                    handleVisualizationSummaryDistrictWardData(
+                        districtId,
+                        wardId,
+                        rawData.transactionType,
+                        rawData.propertyType
+                    ),
+                    handleVisualizationMapPoint(districtId, wardId, coordinate.lat, coordinate.lng, rawData),
+                    handleVisualizationAnalysis(rawData.postDate, rawData),
+                ]);
+            } catch (error) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Preprocessing data - RID: ${rawData._id} - Error: ${rawData.address}`
+                ).show();
+            }
         }
 
         rawDataset = await rawDataLogic.getAll({

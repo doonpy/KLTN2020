@@ -1,7 +1,7 @@
 {
-  "name": "gt2020-serverside",
+  "name": "kltn2020",
   "version": "1.0.0",
-  "description": "Graduation thesis 2020 - server side",
+  "description": "Graduation thesis 2020",
   "scripts": {
     "clean": "rimraf dist",
     "tsc:api": "tsc -w -p api-server",
