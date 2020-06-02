@@ -19,7 +19,6 @@ const TabButton = ({ title, onClick, isActive }) => {
     );
 };
 const PageRight = ({ dataSummary, tabs, setTabs }) => {
-    console.log('Render');
     const dataChart = dataSummary.map((data) => {
         const dataFilter = [data.name, data.summaryAmount];
         return dataFilter;

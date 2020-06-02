@@ -9,7 +9,7 @@ module.exports = (phase) => {
     const env = {
         API_URI: (() => {
             if (isDev) return 'http://localhost:3000';
-            if (isProd) return 'http://localhost:3000';
+            if (isProd) return 'http://pk2020.tk:3000';
             return 'API_SERVER_PROTOCO:not (isDev,isProd)';
         })(),
     };
