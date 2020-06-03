@@ -27,7 +27,7 @@ const rawDataSchema = new Schema(
         price: {
             value: { type: Schema.Types.Number },
             currency: { type: Schema.Types.String },
-            timeUnit: { type: Schema.Types.String },
+            timeUnit: { type: Schema.Types.Number },
         },
         acreage: {
             value: { type: Schema.Types.Number },

@@ -71,7 +71,7 @@ VisualMapPointSchema.index(
     },
     {
         name:
-            'idx_lat_lon_transactionType_propertyType_points.rawDataset.acreage_points.transactionType_points.propertyType',
+            'idx_lat_lon_points.rawDataset.acreage_points.transactionType_points.propertyType',
     }
 );
 

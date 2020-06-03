@@ -1,4 +1,8 @@
-import { GET_PATTERNS, GET_PATTERNS_ERROR, LOADING_GET_PATTERNS } from './actions';
+import {
+    GET_PATTERNS,
+    GET_PATTERNS_ERROR,
+    LOADING_GET_PATTERNS,
+} from './actions';
 
 const initialState = {
     loading: false,

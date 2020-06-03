@@ -1,4 +1,8 @@
-import { GET_GROUP_DATA_ERROR, GET_GROUP_DATA, LOADING_GROUP_DATA } from './actions';
+import {
+    GET_GROUP_DATA_ERROR,
+    GET_GROUP_DATA,
+    LOADING_GROUP_DATA,
+} from './actions';
 
 const initialState = {
     loading: false,

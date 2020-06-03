@@ -75,7 +75,8 @@ const getOptions = (mapData, rawDataset) => {
         },
         tooltip: {
             headerFormat: '',
-            pointFormat: '<b>{point.title}</b><br><b>{point.address}</b><br>Lat: {point.lat}, Lon: {point.lon}',
+            pointFormat:
+                '<b>{point.title}</b><br><b>{point.address}</b><br>Lat: {point.lat}, Lon: {point.lon}',
         },
         colorAxis: {
             min: 0,
@@ -154,7 +155,13 @@ const getOptions = (mapData, rawDataset) => {
 
 const MapChartDetail = ({ mapData, rawDataset }) => {
     const mapOptions = getOptions(mapData, rawDataset);
-    return <HighchartsReact constructorType="mapChart" highcharts={Highcharts} options={mapOptions} />;
+    return (
+        <HighchartsReact
+            constructorType="mapChart"
+            highcharts={Highcharts}
+            options={mapOptions}
+        />
+    );
 };
 
 export default MapChartDetail;

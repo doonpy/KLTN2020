@@ -2,7 +2,7 @@ import ResponseStatusCode from '@common/common.response-status.code';
 import CheckerTypeBase from './checker.type.base';
 import CheckerWording from '../checker.wording';
 
-const NUMERIC_CHARACTER_PATTERN = new RegExp(/^-?\d+$/);
+const NUMERIC_CHARACTER_PATTERN = RegExp(/^-?\d+$/);
 
 export default class CheckerTypeInteger extends CheckerTypeBase {
     /**

@@ -4,13 +4,13 @@
   "description": "Graduation thesis 2020",
   "scripts": {
     "clean": "rimraf dist",
-    "tsc:api": "tsc -w -p api-server",
+    "tsc:api": "tsc -p api-server",
     "watcher:api": "nodemon -w dist/api-bgr-job --exec 'ts-node -P api-server/tsconfig.json api-server/src/server.ts'",
     "watcher:bgr-job": "nodemon -w api-server/src -e ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/background-job/main.ts'",
     "watcher:init-data": "nodemon -w api-server/src -e ts --exec 'ts-node -P api-server/tsconfig.json api-server/src/data-initialization.ts'",
     "dev:api": "npm-run-all -p tsc:api watcher:api --print-label",
-    "dev:bgr-job": "npm-run-all -p tsc:api watcher:bgr-job --print-label",
-    "dev:init-data": "npm-run-all -p tsc:api watcher:init-data --print-label",
+    "dev:bgr-job": "npm-run-all -s tsc:api watcher:bgr-job --print-label",
+    "dev:init-data": "npm-run-all -s tsc:api watcher:init-data --print-label",
     "dev:web": "next web-server -p 3001",
     "start:initialize-data": "node dist/api-bgr-job/data-initialization.js",
     "start:api": "node dist/api-bgr-job/server.js",
@@ -66,8 +66,7 @@
     "redux-thunk": "^2.3.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
-    "swr": "^0.2.0",
-    "ts-node": "^8.10.1"
+    "swr": "^0.2.0"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.2.0",
@@ -75,7 +74,7 @@
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.6",
     "@types/lodash": "^4.14.150",
-    "@types/mongoose": "^5.7.16",
+    "@types/mongoose": "^5.7.21",
     "@types/mongoose-auto-increment": "^5.0.33",
     "@types/mongoose-autopopulate": "^0.10.1",
     "@types/node": "^13.13.5",
@@ -101,6 +100,7 @@
     "redux-devtools-extension": "^2.13.8",
     "rimraf": "^3.0.2",
     "tailwindcss": "^1.4.6",
+    "ts-node": "^8.10.2",
     "typescript": "^3.8.3"
   },
   "_moduleAliases": {
