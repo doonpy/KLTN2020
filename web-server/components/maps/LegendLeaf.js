@@ -9,7 +9,15 @@ const LegendLeaf = () => {
     useEffect(() => {
         // get color depending on population density value
         const getColor = (d) => {
-            return d > 50000 ? 'red' : d > 5000 ? '#3388ff' : d > 1000 ? 'green' : d > 100 ? 'white' : d > 0;
+            return d > 50000
+                ? 'red'
+                : d > 5000
+                ? '#3388ff'
+                : d > 1000
+                ? 'green'
+                : d > 100
+                ? 'white'
+                : d > 0;
         };
 
         const legend = L.control({ position: 'bottomright' });

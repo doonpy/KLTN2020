@@ -32,7 +32,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
         .filter((item) => item.value > 0);
 
     const onClickProperty = (index) => {
-        setProperty(index);
+        setProperty(index + 1);
     };
     return (
         <div className="flex-1 flex relative">

@@ -1,5 +1,8 @@
 import React, { useRef, useState } from 'react';
-import Highcharts, { DrilldownEventObject, DrillupAllEventObject } from 'highcharts/highmaps';
+import Highcharts, {
+    DrilldownEventObject,
+    DrillupAllEventObject,
+} from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';

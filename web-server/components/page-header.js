@@ -9,11 +9,11 @@ import MenuItemHeader from './MenuItemHeader';
 const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 const PageHeader = () => {
     const { data: sale } = useSWR(
-        `/api/v1/vi/raw-dataset/count-document?transactionType=0`,
+        `/api/v1/vi/raw-dataset/document-amount?transactionType=1`,
         fetcher
     );
     const { data: rent } = useSWR(
-        `/api/v1/vi/raw-dataset/count-document?transactionType=1`,
+        `/api/v1/vi/raw-dataset/document-amount?transactionType=2`,
         fetcher
     );
 
@@ -36,7 +36,7 @@ const PageHeader = () => {
                     <div className="flex flex-col">
                         <div className="dark:text-gray-100 text-gray-900 text-base xl:text-xl no-underline hover:no-underline font-bold flex items-center pt-4">
                             <FaChartArea className="mr-2" size={32} />
-                            Analysis of Real Estate data HoChiMinh City
+                            Analysis of Real Estate data Ho Chi Minh City
                         </div>
 
                         <ul className="list-reset lg:flex flex-1 items-center px-4 md:px-0">

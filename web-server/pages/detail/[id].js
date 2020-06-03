@@ -29,10 +29,15 @@ const DetailRealEstate = ({ id, initialData }) => {
     return (
         <PageLayout>
             <div className="m-0 m-auto max-w-screen-xl pt-12">
-                <div className="text-white w-full flex" style={{ height: 'calc(100vh - 100px)' }}>
+                <div
+                    className="text-white w-full flex"
+                    style={{ height: 'calc(100vh - 100px)' }}
+                >
                     <div className="w-1/2">
                         <div>
-                            <h1 className="uppercase font-semibold text-xl">{data.rawData.title}</h1>
+                            <h1 className="uppercase font-semibold text-xl">
+                                {data.rawData.title}
+                            </h1>
                             <div className="flex">
                                 <span className="text-blue-600">Địa chỉ: </span>
                                 <p className="pl-2">{data.rawData.address}</p>
@@ -40,7 +45,12 @@ const DetailRealEstate = ({ id, initialData }) => {
                         </div>
                     </div>
                     <div className="w-1/2">
-                        <MapItem position={[data.rawData.coordinate.lat, data.rawData.coordinate.lng]} />
+                        <MapItem
+                            position={[
+                                data.rawData.coordinate.lat,
+                                data.rawData.coordinate.lng,
+                            ]}
+                        />
                     </div>
                 </div>
             </div>
@@ -48,7 +58,9 @@ const DetailRealEstate = ({ id, initialData }) => {
     );
 };
 export async function getServerSideProps({ query }) {
-    const res = await fetch(`http://localhost:3000/api/v1/vi/raw-data/${query.id}?populate=1`);
+    const res = await fetch(
+        `http://localhost:3000/api/v1/vi/raw-data/${query.id}?populate=1`
+    );
     const data = await res.json();
     return {
         props: { initialData: data, id: query.id }, // will be passed to the page component as props

@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Map, TileLayer, Tooltip, CircleMarker, Marker, GeoJSON } from 'react-leaflet';
+import {
+    Map,
+    TileLayer,
+    Tooltip,
+    CircleMarker,
+    Marker,
+    GeoJSON,
+} from 'react-leaflet';
 import Router from 'next/router';
 import debounce from 'lodash.debounce';
 import LegendLeaf from './LegendLeaf';
@@ -51,7 +58,7 @@ export default function MapLeaf({ mapData, property }) {
             maxLat: latlngBounds.maxLat,
             minLng: latlngBounds.minLng,
             maxLng: latlngBounds.maxLng,
-            // propertyType: property,
+            propertyType: property,
         },
     });
 
@@ -104,26 +111,35 @@ export default function MapLeaf({ mapData, property }) {
                 />
 
                 {dataMap?.data &&
-                    dataMap.data.map((c) => {
-                        return c.rawDataList.map((item, index) => {
-                            return (
-                                <CircleMarker
-                                    color={setColorByArea(item.acreage)}
-                                    // eslint-disable-next-line react/no-array-index-key
-                                    key={index}
-                                    fillOpacity={0.5}
-                                    // stroke={false}
-                                    center={[c.lat, c.lng]}
-                                    onclick={() => {
-                                        routerToDetail(item.rawDataId);
-                                    }}
-                                    radius={Math.sqrt(item.acreage / Math.PI) / 20}
-                                >
-                                    <Tooltip>
-                                        <span>{`Diện tích: ${item.acreage} m2`}</span>
-                                        <div className="text-blue-800 underline">Ân để xem chi tiết</div>
-                                    </Tooltip>
-                                </CircleMarker>
+                    dataMap.data.map(({ points, lat, lng }) => {
+                        return points.map(({ rawDataset }) => {
+                            return rawDataset.map(
+                                ({ rawDataId, acreage }, index) => {
+                                    return (
+                                        <CircleMarker
+                                            color={setColorByArea(acreage)}
+                                            // eslint-disable-next-line react/no-array-index-key
+                                            key={index}
+                                            fillOpacity={0.5}
+                                            // stroke={false}
+                                            center={[lat, lng]}
+                                            onclick={() => {
+                                                routerToDetail(rawDataId);
+                                            }}
+                                            radius={
+                                                Math.sqrt(acreage / Math.PI) /
+                                                20
+                                            }
+                                        >
+                                            <Tooltip>
+                                                <span>{`Diện tích: ${acreage} m2`}</span>
+                                                <div className="text-blue-800 underline">
+                                                    Ân để xem chi tiết
+                                                </div>
+                                            </Tooltip>
+                                        </CircleMarker>
+                                    );
+                                }
                             );
                         });
                     })}

@@ -37,23 +37,35 @@ const request = {
         return params;
     },
     delete: async (url) => {
-        const response = await request.call(url, request.parameters(METHOD.DELETE));
+        const response = await request.call(
+            url,
+            request.parameters(METHOD.DELETE)
+        );
 
         return response;
     },
     get: async (url, body = {}) => {
-        const response = await request.call(url, request.parameters(METHOD.GET, body));
+        const response = await request.call(
+            url,
+            request.parameters(METHOD.GET, body)
+        );
 
         return response.json();
     },
 
     patch: async (url, body = {}) => {
-        const response = await request.call(url, request.parameters(METHOD.PATCH, body));
+        const response = await request.call(
+            url,
+            request.parameters(METHOD.PATCH, body)
+        );
 
         return response;
     },
     put: async (url, body = {}) => {
-        const response = await request.call(url, request.parameters(METHOD.PUT, body));
+        const response = await request.call(
+            url,
+            request.parameters(METHOD.PUT, body)
+        );
 
         return response;
     },
