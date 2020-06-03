@@ -16,5 +16,5 @@ jobs:
       - uses: rlespinasse/github-slug-action@master
       - name: Build the Docker image
         run: |
-          export BUILD_TAG=${GITHUB_REF_SLUG##*/}-$(date +%s)
+          export BUILD_TAG=${GITHUB_REF_SLUG}-$(date +%s)
           docker build . --file Dockerfile --tag doonpy/kltn2020:${BUILD_TAG}
