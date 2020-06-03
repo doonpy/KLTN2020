@@ -12,7 +12,7 @@
     "dev:bgr-job": "npm-run-all -p tsc:api watcher:bgr-job --print-label",
     "dev:init-data": "npm-run-all -p tsc:api watcher:init-data --print-label",
     "dev:web": "next web-server -p 3001",
-    "start:initialize-data": "NODE_ENV=production node dist/api-bgr-job/data-initialization.js",
+    "start:initialize-data": "node dist/api-bgr-job/data-initialization.js",
     "start:api": "node dist/api-bgr-job/server.js",
     "start:bgr-job": "node dist/api-bgr-job/background-job/main.js",
     "start:web": "next start dist/web -p 3001",
