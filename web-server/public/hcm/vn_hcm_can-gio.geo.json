@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7468178,
         "name": "Xã An Thới Đông",
-        "hc-key": "vn-hcm_can-gio_an-thoi-dong"
+        "hc-key": "vn_hcm_can-gio_an-thoi-dong"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -919,7 +919,7 @@
       "properties": {
         "osm-relation-id": 7468177,
         "name": "Thị trấn Cần Thạnh",
-        "hc-key": "vn-hcm_can-gio_can-thanh"
+        "hc-key": "vn_hcm_can-gio_can-thanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2148,7 +2148,7 @@
       "properties": {
         "osm-relation-id": 7468179,
         "name": "Xã Bình Khánh",
-        "hc-key": "vn-hcm_can-gio_binh-khanh"
+        "hc-key": "vn_hcm_can-gio_binh-khanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2673,7 +2673,7 @@
       "properties": {
         "osm-relation-id": 7468180,
         "name": "Xã Long Hòa",
-        "hc-key": "vn-hcm_can-gio_long-hoa"
+        "hc-key": "vn_hcm_can-gio_long-hoa"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4050,7 +4050,7 @@
       "properties": {
         "osm-relation-id": 7468245,
         "name": "Xã Lý Nhơn",
-        "hc-key": "vn-hcm_can-gio_ly-nhon"
+        "hc-key": "vn_hcm_can-gio_ly-nhon"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4635,7 +4635,7 @@
       "properties": {
         "osm-relation-id": 7468246,
         "name": "Xã Tam Thôn Hiệp",
-        "hc-key": "vn-hcm_can-gio_tam-thon-hiep"
+        "hc-key": "vn_hcm_can-gio_tam-thon-hiep"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -5564,7 +5564,7 @@
       "properties": {
         "osm-relation-id": 7468247,
         "name": "Xã Thạnh An",
-        "hc-key": "vn-hcm_can-gio_thanh-an"
+        "hc-key": "vn_hcm_can-gio_thanh-an"
       },
       "geometry": {
         "type": "MultiPolygon",

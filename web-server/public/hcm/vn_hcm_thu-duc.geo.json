@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7138135,
         "name": "Phường Bình Chiểu",
-        "hc-key": "vn-hcm_thu-duc_phuong-binh-chieu"
+        "hc-key": "vn_hcm_thu-duc_binh-chieu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -727,7 +727,7 @@
       "properties": {
         "osm-relation-id": 7138136,
         "name": "Phường Bình Thọ",
-        "hc-key": "vn-hcm_thu-duc_phuong-binh-tho"
+        "hc-key": "vn_hcm_thu-duc_binh-tho"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -896,7 +896,7 @@
       "properties": {
         "osm-relation-id": 7138137,
         "name": "Phường Hiệp Bình Chánh",
-        "hc-key": "vn-hcm_thu-duc_phuong-hiep-binh-chanh"
+        "hc-key": "vn_hcm_thu-duc_hiep-binh-chanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1333,7 +1333,7 @@
       "properties": {
         "osm-relation-id": 7138138,
         "name": "Phường Hiệp Bình Phước",
-        "hc-key": "vn-hcm_thu-duc_phuong-hiep-binh-phuoc"
+        "hc-key": "vn_hcm_thu-duc_hiep-binh-phuoc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1906,7 +1906,7 @@
       "properties": {
         "osm-relation-id": 7138166,
         "name": "Phường Linh Chiểu",
-        "hc-key": "vn-hcm_thu-duc_phuong-linh-chieu"
+        "hc-key": "vn_hcm_thu-duc_linh-chieu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2195,7 +2195,7 @@
       "properties": {
         "osm-relation-id": 7138167,
         "name": "Phường Linh Đông",
-        "hc-key": "vn-hcm_thu-duc_phuong-linh-dong"
+        "hc-key": "vn_hcm_thu-duc_linh-dong"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2704,7 +2704,7 @@
       "properties": {
         "osm-relation-id": 7144130,
         "name": "Phường Linh Tây",
-        "hc-key": "vn-hcm_thu-duc_phuong-linh-tay"
+        "hc-key": "vn_hcm_thu-duc_linh-tay"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3045,7 +3045,7 @@
       "properties": {
         "osm-relation-id": 7144131,
         "name": "Phường Linh Trung",
-        "hc-key": "vn-hcm_thu-duc_phuong-linh-trung"
+        "hc-key": "vn_hcm_thu-duc_linh-trung"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3622,7 +3622,7 @@
       "properties": {
         "osm-relation-id": 7144243,
         "name": "Phường Tam Bình",
-        "hc-key": "vn-hcm_thu-duc_phuong-tam-binh"
+        "hc-key": "vn_hcm_thu-duc_tam-binh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4103,7 +4103,7 @@
       "properties": {
         "osm-relation-id": 7144244,
         "name": "Phường Tam Phú",
-        "hc-key": "vn-hcm_thu-duc_phuong-tam-phu"
+        "hc-key": "vn_hcm_thu-duc_tam-phu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4632,7 +4632,7 @@
       "properties": {
         "osm-relation-id": 7144245,
         "name": "Phường Trường Thọ",
-        "hc-key": "vn-hcm_thu-duc_phuong-truong-tho"
+        "hc-key": "vn_hcm_thu-duc_truong-tho"
       },
       "geometry": {
         "type": "MultiPolygon",

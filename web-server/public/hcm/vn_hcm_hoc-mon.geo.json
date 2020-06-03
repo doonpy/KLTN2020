@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7638093,
         "name": "Thị trấn Hóc Môn",
-        "hc-key": "vn-hcm_hoc-mon_hoc-mon"
+        "hc-key": "vn_hcm_hoc-mon_hoc-mon"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -395,7 +395,7 @@
       "properties": {
         "osm-relation-id": 7638094,
         "name": "Xã Bà Điểm",
-        "hc-key": "vn-hcm_hoc-mon_ba-diem"
+        "hc-key": "vn_hcm_hoc-mon_ba-diem"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -764,7 +764,7 @@
       "properties": {
         "osm-relation-id": 7638095,
         "name": "Xã Đông Thạnh",
-        "hc-key": "vn-hcm_hoc-mon_dong-thanh"
+        "hc-key": "vn_hcm_hoc-mon_dong-thanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1381,7 +1381,7 @@
       "properties": {
         "osm-relation-id": 7638199,
         "name": "Xã Nhị Bình",
-        "hc-key": "vn-hcm_hoc-mon_nhi-binh"
+        "hc-key": "vn_hcm_hoc-mon_nhi-binh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1730,7 +1730,7 @@
       "properties": {
         "osm-relation-id": 7638200,
         "name": "Xã Tân Hiệp",
-        "hc-key": "vn-hcm_hoc-mon_tan-hiep"
+        "hc-key": "vn_hcm_hoc-mon_tan-hiep"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2095,7 +2095,7 @@
       "properties": {
         "osm-relation-id": 7638201,
         "name": "Xã Tân Thới Nhì",
-        "hc-key": "vn-hcm_hoc-mon_tan-thoi-nhi"
+        "hc-key": "vn_hcm_hoc-mon_tan-thoi-nhi"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2460,7 +2460,7 @@
       "properties": {
         "osm-relation-id": 7638202,
         "name": "Xã Tân Xuân",
-        "hc-key": "vn-hcm_hoc-mon_tan-xuan"
+        "hc-key": "vn_hcm_hoc-mon_tan-xuan"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2781,7 +2781,7 @@
       "properties": {
         "osm-relation-id": 7638203,
         "name": "Xã Thới Tam Thôn",
-        "hc-key": "vn-hcm_hoc-mon_thoi-tam-thon"
+        "hc-key": "vn_hcm_hoc-mon_thoi-tam-thon"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3302,7 +3302,7 @@
       "properties": {
         "osm-relation-id": 7638251,
         "name": "Xã Trung Chánh",
-        "hc-key": "vn-hcm_hoc-mon_trung-chanh"
+        "hc-key": "vn_hcm_hoc-mon_trung-chanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3527,7 +3527,7 @@
       "properties": {
         "osm-relation-id": 7638252,
         "name": "Xã Xuân Thới Đông",
-        "hc-key": "vn-hcm_hoc-mon_xuan-thoi-dong"
+        "hc-key": "vn_hcm_hoc-mon_xuan-thoi-dong"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3788,7 +3788,7 @@
       "properties": {
         "osm-relation-id": 7638253,
         "name": "Xã Xuân Thới Sơn",
-        "hc-key": "vn-hcm_hoc-mon_xuan-thoi-son"
+        "hc-key": "vn_hcm_hoc-mon_xuan-thoi-son"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4209,7 +4209,7 @@
       "properties": {
         "osm-relation-id": 7638254,
         "name": "Xã Xuân Thới Thượng",
-        "hc-key": "vn-hcm_hoc-mon_xuan-thoi-thuong"
+        "hc-key": "vn_hcm_hoc-mon_xuan-thoi-thuong"
       },
       "geometry": {
         "type": "MultiPolygon",

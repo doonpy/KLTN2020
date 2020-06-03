@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 2587255,
         "name": "Phường Bến Nghé",
-        "hc-key": "vn-hcm_quan-1_phuong-ben-nghe"
+        "hc-key": "vn_hcm_quan-1_ben-nghe"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -151,7 +151,7 @@
       "properties": {
         "osm-relation-id": 2561568,
         "name": "Phường Cầu Ông Lãnh",
-        "hc-key": "vn-hcm_quan-1_phuong-cau-ong-lanh"
+        "hc-key": "vn_hcm_quan-1_cau-ong-lanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -292,7 +292,7 @@
       "properties": {
         "osm-relation-id": 2587350,
         "name": "Phường Nguyễn Cư Trinh",
-        "hc-key": "vn-hcm_quan-1_phuong-nguyen-cu-trinh"
+        "hc-key": "vn_hcm_quan-1_nguyen-cu-trinh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -525,7 +525,7 @@
       "properties": {
         "osm-relation-id": 2561570,
         "name": "Phường Phạm Ngũ Lão",
-        "hc-key": "vn-hcm_quan-1_phuong-pham-ngu-lao"
+        "hc-key": "vn_hcm_quan-1_pham-ngu-lao"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -602,7 +602,7 @@
       "properties": {
         "osm-relation-id": 2587288,
         "name": "Phường Tân Định",
-        "hc-key": "vn-hcm_quan-1_phuong-tan-dinh"
+        "hc-key": "vn_hcm_quan-1_tan-dinh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -799,7 +799,7 @@
       "properties": {
         "osm-relation-id": 2561569,
         "name": "Phường Nguyễn Thái Bình",
-        "hc-key": "vn-hcm_quan-1_phuong-nguyen-thai-binh"
+        "hc-key": "vn_hcm_quan-1_nguyen-thai-binh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -924,7 +924,7 @@
       "properties": {
         "osm-relation-id": 2559086,
         "name": "Phường Cầu Kho",
-        "hc-key": "vn-hcm_quan-1_phuong-cau-kho"
+        "hc-key": "vn_hcm_quan-1_cau-kho"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1077,7 +1077,7 @@
       "properties": {
         "osm-relation-id": 2587245,
         "name": "Phường Bến Thành",
-        "hc-key": "vn-hcm_quan-1_phuong-ben-thanh"
+        "hc-key": "vn_hcm_quan-1_ben-thanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1210,7 +1210,7 @@
       "properties": {
         "osm-relation-id": 2561415,
         "name": "Phường Cô Giang",
-        "hc-key": "vn-hcm_quan-1_phuong-co-giang"
+        "hc-key": "vn_hcm_quan-1_co-giang"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1363,7 +1363,7 @@
       "properties": {
         "osm-relation-id": 2587289,
         "name": "Phường Đa Kao",
-        "hc-key": "vn-hcm_quan-1_phuong-da-kao"
+        "hc-key": "vn_hcm_quan-1_da-kao"
       },
       "geometry": {
         "type": "MultiPolygon",

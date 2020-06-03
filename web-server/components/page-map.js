@@ -30,7 +30,6 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
             };
         })
         .filter((item) => item.value > 0);
-
     const onClickProperty = (index) => {
         setProperty(index);
     };
@@ -70,12 +69,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
             {tabMap === 0 ? (
                 <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
-                        {isMounted && (
-                            <MapLeaf
-                                mapData={mapData}
-                                property={propertyStatge}
-                            />
-                        )}
+                        {isMounted && <MapLeaf property={propertyStatge} />}
                     </div>
                 </div>
             ) : (

@@ -31,17 +31,14 @@ export async function getStaticProps() {
     };
 }
 
-/**
- * @param {number} tabs 0: Sale , 1: Rent, 2: Total
- * @param {string} mapKey vn-hcm_cuchi, ...
- */
-
 const Home = ({ mapStaticJSON }) => {
     const [tabMap, setTabmap] = useState(0);
-    const [tabs, setTabs] = useState(2);
+    const [tabs, setTabs] = useState(0);
+    const { mapKey } = useSelector((state) => state.mapKey);
+
     const { data: dataDistrict } = useDistrict();
     const { data: dataWard } = useWard();
-    const { mapKey } = useSelector((state) => state.mapKey);
+
     const summaryData = (key, tabKey) => {
         if (!summaryData.cache) {
             summaryData.cache = {};
@@ -54,34 +51,36 @@ const Home = ({ mapStaticJSON }) => {
             return summaryData.cache[_synmetricKey];
 
         if (key !== 'full') {
-            const dataWardFilter = dataWard.summaryDistrictWard.filter(
+            const dataWardFilter = dataWard?.summaryDistrictWard.filter(
                 (w) => w.district.code === key
             );
-            const dataSummaryWard = dataWardFilter.map((w) => {
-                const summary =
-                    tabKey !== 2
-                        ? w.summary.filter(
-                              (sum) => sum.transactionType === tabKey
-                          )
-                        : w.summary;
-                return {
-                    name: w.ward.name,
-                    code: w.ward.code,
-                    summaryAmount: summary.reduce(
-                        (sum, p) => sum + p.amount,
-                        0
-                    ),
-                    acreage: 1,
-                    summary,
-                };
-            });
+            const dataSummaryWard =
+                dataWardFilter &&
+                dataWardFilter.map((w) => {
+                    const summary =
+                        tabKey !== 0
+                            ? w.summary.filter(
+                                  (sum) => sum.transactionType === tabKey
+                              )
+                            : w.summary;
+                    return {
+                        name: w.ward.name,
+                        code: w.ward.code,
+                        summaryAmount: summary.reduce(
+                            (sum, p) => sum + p.amount,
+                            0
+                        ),
+                        acreage: 1,
+                        summary,
+                    };
+                });
             summaryData.cache[_key] = dataSummaryWard;
             summaryData.cache[_synmetricKey] = dataSummaryWard;
             return dataSummaryWard;
         }
-        const dataSummaryDistrict = dataDistrict.summaryDistrict.map((w) => {
+        const dataSummaryDistrict = dataDistrict?.summaryDistrict.map((w) => {
             const summary =
-                tabKey !== 2
+                tabKey !== 0
                     ? w.summary.filter((sum) => sum.transactionType === tabKey)
                     : w.summary;
             return {

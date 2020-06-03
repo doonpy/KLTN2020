@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import Highcharts, { DrilldownEventObject, DrillupAllEventObject } from 'highcharts/highmaps';
+import Highcharts from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
@@ -100,7 +100,7 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
         ],
     };
 
-    return (
+    return dataMap ? (
         <HighchartsReact
             ref={chartRef}
             containerProps={{ style: { height: 'calc(100vh - 100px)' } }}
@@ -108,7 +108,7 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
             highcharts={Highcharts}
             options={mapOptions}
         />
-    );
+    ) : null;
 };
 
 export default MapOverview;

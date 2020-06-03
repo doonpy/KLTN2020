@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7650792,
         "name": "Thị trấn Nhà Bè",
-        "hc-key": "vn-hcm_nha-be_nha-be"
+        "hc-key": "vn_hcm_nha-be_nha-be"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -411,7 +411,7 @@
       "properties": {
         "osm-relation-id": 7650793,
         "name": "Xã Hiệp Phước",
-        "hc-key": "vn-hcm_nha-be_hiep-phuoc"
+        "hc-key": "vn_hcm_nha-be_hiep-phuoc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2172,7 +2172,7 @@
       "properties": {
         "osm-relation-id": 7650794,
         "name": "Xã Long Thới",
-        "hc-key": "vn-hcm_nha-be_long-thoi"
+        "hc-key": "vn_hcm_nha-be_long-thoi"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2661,7 +2661,7 @@
       "properties": {
         "osm-relation-id": 7650795,
         "name": "Xã Nhơn Đức",
-        "hc-key": "vn-hcm_nha-be_nhon-duc"
+        "hc-key": "vn_hcm_nha-be_nhon-duc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3230,7 +3230,7 @@
       "properties": {
         "osm-relation-id": 7650796,
         "name": "Xã Phú Xuân",
-        "hc-key": "vn-hcm_nha-be_phu-xuan"
+        "hc-key": "vn_hcm_nha-be_phu-xuan"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3559,7 +3559,7 @@
       "properties": {
         "osm-relation-id": 7650797,
         "name": "Xã Phước Kiển",
-        "hc-key": "vn-hcm_nha-be_phuoc-kien"
+        "hc-key": "vn_hcm_nha-be_phuoc-kien"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4232,7 +4232,7 @@
       "properties": {
         "osm-relation-id": 7650798,
         "name": "Xã Phước Lộc",
-        "hc-key": "vn-hcm_nha-be_phuoc-loc"
+        "hc-key": "vn_hcm_nha-be_phuoc-loc"
       },
       "geometry": {
         "type": "MultiPolygon",

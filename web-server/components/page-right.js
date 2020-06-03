@@ -1,4 +1,5 @@
 import React from 'react';
+import sortBy from 'lodash.sortby';
 import TypeTransactionBox from './TypeTransactionBox';
 import TotalByDistrictBarChart from './ChartWrapper/TotalByDistrictBarChart';
 
@@ -32,18 +33,18 @@ const PageRight = ({ dataSummary, tabs, setTabs }) => {
                 <div className="text-xs w-full flex justify-around">
                     <TabButton
                         title="Bán"
+                        onClick={() => setTabs(1)}
+                        isActive={tabs === 1}
+                    />
+                    <TabButton
+                        title="Tổng"
                         onClick={() => setTabs(0)}
                         isActive={tabs === 0}
                     />
                     <TabButton
-                        title="Tổng"
+                        title="Thuê"
                         onClick={() => setTabs(2)}
                         isActive={tabs === 2}
-                    />
-                    <TabButton
-                        title="Thuê"
-                        onClick={() => setTabs(1)}
-                        isActive={tabs === 1}
                     />
                 </div>
             </div>

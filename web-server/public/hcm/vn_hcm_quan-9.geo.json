@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7342306,
         "name": "Phường Hiệp Phú",
-        "hc-key": "vn-hcm_quan-9_phuong-hiep-phu"
+        "hc-key": "vn_hcm_quan-9_hiep-phu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -247,7 +247,7 @@
       "properties": {
         "osm-relation-id": 7342307,
         "name": "Phường Long Bình",
-        "hc-key": "vn-hcm_quan-9_phuong-long-binh"
+        "hc-key": "vn_hcm_quan-9_long-binh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1320,7 +1320,7 @@
       "properties": {
         "osm-relation-id": 7342308,
         "name": "Phường Long Phước",
-        "hc-key": "vn-hcm_quan-9_phuong-long-phuoc"
+        "hc-key": "vn_hcm_quan-9_long-phuoc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1853,7 +1853,7 @@
       "properties": {
         "osm-relation-id": 7342510,
         "name": "Phường Long Thạnh Mỹ",
-        "hc-key": "vn-hcm_quan-9_phuong-long-thanh-my"
+        "hc-key": "vn_hcm_quan-9_long-thanh-my"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2598,7 +2598,7 @@
       "properties": {
         "osm-relation-id": 7342511,
         "name": "Phường Long Trường",
-        "hc-key": "vn-hcm_quan-9_phuong-long-truong"
+        "hc-key": "vn_hcm_quan-9_long-truong"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3203,7 +3203,7 @@
       "properties": {
         "osm-relation-id": 7342566,
         "name": "Phường Phú Hữu",
-        "hc-key": "vn-hcm_quan-9_phuong-phu-huu"
+        "hc-key": "vn_hcm_quan-9_phu-huu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3912,7 +3912,7 @@
       "properties": {
         "osm-relation-id": 7342567,
         "name": "Phường Phước Bình",
-        "hc-key": "vn-hcm_quan-9_phuong-phuoc-binh"
+        "hc-key": "vn_hcm_quan-9_phuoc-binh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4077,7 +4077,7 @@
       "properties": {
         "osm-relation-id": 7342568,
         "name": "Phường Phước Long A",
-        "hc-key": "vn-hcm_quan-9_phuong-phuoc-long-a"
+        "hc-key": "vn_hcm_quan-9_phuoc-long-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4406,7 +4406,7 @@
       "properties": {
         "osm-relation-id": 7342569,
         "name": "Phường Phước Long B",
-        "hc-key": "vn-hcm_quan-9_phuong-phuoc-long-b"
+        "hc-key": "vn_hcm_quan-9_phuoc-long-b"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4959,7 +4959,7 @@
       "properties": {
         "osm-relation-id": 7343270,
         "name": "Phường Tân Phú",
-        "hc-key": "vn-hcm_quan-9_phuong-tan-phu"
+        "hc-key": "vn_hcm_quan-9_tan-phu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -5180,7 +5180,7 @@
       "properties": {
         "osm-relation-id": 7343271,
         "name": "Phường Tăng Nhơn Phú A",
-        "hc-key": "vn-hcm_quan-9_phuong-tang-nhon-phu-a"
+        "hc-key": "vn_hcm_quan-9_tang-nhon-phu-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -5717,7 +5717,7 @@
       "properties": {
         "osm-relation-id": 7343272,
         "name": "Phường Tăng Nhơn Phú B",
-        "hc-key": "vn-hcm_quan-9_phuong-tang-nhon-phu-b"
+        "hc-key": "vn_hcm_quan-9_tang-nhon-phu-b"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -6202,7 +6202,7 @@
       "properties": {
         "osm-relation-id": 7343273,
         "name": "Phường Trường Thạnh",
-        "hc-key": "vn-hcm_quan-9_phuong-truong-thanh"
+        "hc-key": "vn_hcm_quan-9_truong-thanh"
       },
       "geometry": {
         "type": "MultiPolygon",

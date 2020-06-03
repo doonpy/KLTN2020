@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 6228112,
         "name": "Phường 1",
-        "hc-key": "vn-hcm_quan-10_phuong-1"
+        "hc-key": "vn_hcm_quan-10_phuong-1"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -99,7 +99,7 @@
       "properties": {
         "osm-relation-id": 6228113,
         "name": "Phường 2",
-        "hc-key": "vn-hcm_quan-10_phuong-2"
+        "hc-key": "vn_hcm_quan-10_phuong-2"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -212,7 +212,7 @@
       "properties": {
         "osm-relation-id": 6228114,
         "name": "Phường 3",
-        "hc-key": "vn-hcm_quan-10_phuong-3"
+        "hc-key": "vn_hcm_quan-10_phuong-3"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -289,7 +289,7 @@
       "properties": {
         "osm-relation-id": 6228115,
         "name": "Phường 4",
-        "hc-key": "vn-hcm_quan-10_phuong-4"
+        "hc-key": "vn_hcm_quan-10_phuong-4"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -374,7 +374,7 @@
       "properties": {
         "osm-relation-id": 6228116,
         "name": "Phường 5",
-        "hc-key": "vn-hcm_quan-10_phuong-5"
+        "hc-key": "vn_hcm_quan-10_phuong-5"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -459,7 +459,7 @@
       "properties": {
         "osm-relation-id": 6228117,
         "name": "Phường 6",
-        "hc-key": "vn-hcm_quan-10_phuong-6"
+        "hc-key": "vn_hcm_quan-10_phuong-6"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -580,7 +580,7 @@
       "properties": {
         "osm-relation-id": 6228118,
         "name": "Phường 7",
-        "hc-key": "vn-hcm_quan-10_phuong-7"
+        "hc-key": "vn_hcm_quan-10_phuong-7"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -665,7 +665,7 @@
       "properties": {
         "osm-relation-id": 6228119,
         "name": "Phường 8",
-        "hc-key": "vn-hcm_quan-10_phuong-8"
+        "hc-key": "vn_hcm_quan-10_phuong-8"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -750,7 +750,7 @@
       "properties": {
         "osm-relation-id": 6228120,
         "name": "Phường 9",
-        "hc-key": "vn-hcm_quan-10_phuong-9"
+        "hc-key": "vn_hcm_quan-10_phuong-9"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -851,7 +851,7 @@
       "properties": {
         "osm-relation-id": 6228786,
         "name": "Phường 10",
-        "hc-key": "vn-hcm_quan-10_phuong-10"
+        "hc-key": "vn_hcm_quan-10_phuong-10"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -932,7 +932,7 @@
       "properties": {
         "osm-relation-id": 6228787,
         "name": "Phường 11",
-        "hc-key": "vn-hcm_quan-10_phuong-11"
+        "hc-key": "vn_hcm_quan-10_phuong-11"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1097,7 +1097,7 @@
       "properties": {
         "osm-relation-id": 6228788,
         "name": "Phường 12",
-        "hc-key": "vn-hcm_quan-10_phuong-12"
+        "hc-key": "vn_hcm_quan-10_phuong-12"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1302,7 +1302,7 @@
       "properties": {
         "osm-relation-id": 6228789,
         "name": "Phường 13",
-        "hc-key": "vn-hcm_quan-10_phuong-13"
+        "hc-key": "vn_hcm_quan-10_phuong-13"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1407,7 +1407,7 @@
       "properties": {
         "osm-relation-id": 6228790,
         "name": "Phường 14",
-        "hc-key": "vn-hcm_quan-10_phuong-14"
+        "hc-key": "vn_hcm_quan-10_phuong-14"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1552,7 +1552,7 @@
       "properties": {
         "osm-relation-id": 6228791,
         "name": "Phường 15",
-        "hc-key": "vn-hcm_quan-10_phuong-15"
+        "hc-key": "vn_hcm_quan-10_phuong-15"
       },
       "geometry": {
         "type": "MultiPolygon",

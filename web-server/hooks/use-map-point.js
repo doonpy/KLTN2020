@@ -14,9 +14,7 @@ export default function useMapPoint({
     },
 }) {
     return useSWR(
-        propertyType
-            ? `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}&maxAcreage=${maxAcreage}`
-            : `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}&maxAcreage=${maxAcreage}&propertyType=${propertyType}`,
+        `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}&maxAcreage=${maxAcreage}`,
         fetcher
     );
 }

@@ -54,8 +54,6 @@ const PieChart = ({ data }) => {
             {
                 name: 'Tỷ lệ',
                 colorByPoint: true,
-                // data in props
-                // data,
             },
         ],
     });
@@ -79,4 +77,4 @@ const PieChart = ({ data }) => {
     );
 };
 
-export default React.memo(PieChart);
+export default PieChart;

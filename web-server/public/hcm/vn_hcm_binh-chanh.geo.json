@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7462672,
         "name": "Thị trấn Tân Túc",
-        "hc-key": "vn-hcm_binh-chanh_tan-tuc"
+        "hc-key": "vn_hcm_binh-chanh_tan-tuc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -775,7 +775,7 @@
       "properties": {
         "osm-relation-id": 7462673,
         "name": "Xã An Phú Tây",
-        "hc-key": "vn-hcm_binh-chanh_an-phu-tay"
+        "hc-key": "vn_hcm_binh-chanh_an-phu-tay"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1404,7 +1404,7 @@
       "properties": {
         "osm-relation-id": 7462674,
         "name": "Xã Bình Chánh",
-        "hc-key": "vn-hcm_binh-chanh_binh-chanh"
+        "hc-key": "vn_hcm_binh-chanh_binh-chanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2749,7 +2749,7 @@
       "properties": {
         "osm-relation-id": 7462675,
         "name": "Xã Bình Hưng",
-        "hc-key": "vn-hcm_binh-chanh_binh-hung"
+        "hc-key": "vn_hcm_binh-chanh_binh-hung"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3598,7 +3598,7 @@
       "properties": {
         "osm-relation-id": 7462677,
         "name": "Xã Đa Phước",
-        "hc-key": "vn-hcm_binh-chanh_da-phuoc"
+        "hc-key": "vn_hcm_binh-chanh_da-phuoc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4195,7 +4195,7 @@
       "properties": {
         "osm-relation-id": 7462678,
         "name": "Xã Hưng Long",
-        "hc-key": "vn-hcm_binh-chanh_hung-long"
+        "hc-key": "vn_hcm_binh-chanh_hung-long"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -4944,7 +4944,7 @@
       "properties": {
         "osm-relation-id": 7462676,
         "name": "Xã Bình Lợi",
-        "hc-key": "vn-hcm_binh-chanh_binh-loi"
+        "hc-key": "vn_hcm_binh-chanh_binh-loi"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -5361,7 +5361,7 @@
       "properties": {
         "osm-relation-id": 7462679,
         "name": "Xã Lê Minh Xuân",
-        "hc-key": "vn-hcm_binh-chanh_le-minh-xuan"
+        "hc-key": "vn_hcm_binh-chanh_le-minh-xuan"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -5826,7 +5826,7 @@
       "properties": {
         "osm-relation-id": 7463540,
         "name": "Xã Phạm Văn Hai",
-        "hc-key": "vn-hcm_binh-chanh_pham-van-hai"
+        "hc-key": "vn_hcm_binh-chanh_pham-van-hai"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -6219,7 +6219,7 @@
       "properties": {
         "osm-relation-id": 7463541,
         "name": "Xã Phong Phú",
-        "hc-key": "vn-hcm_binh-chanh_phong-phu"
+        "hc-key": "vn_hcm_binh-chanh_phong-phu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -6964,7 +6964,7 @@
       "properties": {
         "osm-relation-id": 7463542,
         "name": "Xã Quy Đức",
-        "hc-key": "vn-hcm_binh-chanh_quy-duc"
+        "hc-key": "vn_hcm_binh-chanh_quy-duc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -7761,7 +7761,7 @@
       "properties": {
         "osm-relation-id": 7463543,
         "name": "Xã Tân Kiên",
-        "hc-key": "vn-hcm_binh-chanh_tan-kien"
+        "hc-key": "vn_hcm_binh-chanh_tan-kien"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -8318,7 +8318,7 @@
       "properties": {
         "osm-relation-id": 7463544,
         "name": "Xã Tân Nhựt",
-        "hc-key": "vn-hcm_binh-chanh_tan-nhut"
+        "hc-key": "vn_hcm_binh-chanh_tan-nhut"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -9023,7 +9023,7 @@
       "properties": {
         "osm-relation-id": 7463545,
         "name": "Xã Tân Quý Tây",
-        "hc-key": "vn-hcm_binh-chanh_tan-quy-tay"
+        "hc-key": "vn_hcm_binh-chanh_tan-quy-tay"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -9884,7 +9884,7 @@
       "properties": {
         "osm-relation-id": 7463546,
         "name": "Xã Vĩnh Lộc A",
-        "hc-key": "vn-hcm_binh-chanh_vinh-loc-a"
+        "hc-key": "vn_hcm_binh-chanh_vinh-loc-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -10185,7 +10185,7 @@
       "properties": {
         "osm-relation-id": 7463547,
         "name": "Xã Vĩnh Lộc B",
-        "hc-key": "vn-hcm_binh-chanh_vinh-loc-b"
+        "hc-key": "vn_hcm_binh-chanh_vinh-loc-b"
       },
       "geometry": {
         "type": "MultiPolygon",

@@ -3,13 +3,18 @@ import TypePropertyPieChart from './ChartWrapper/TypePropertyPieChart';
 import { PROPERTY_TYPE } from '../util/constants';
 
 const TypeTransactionBox = ({ data }) => {
+    // console.log(data);
     const resultPropertyData = () => {
         const dataSummary = [];
         data.forEach((item) => {
             const sumArray = {};
             item.summary.forEach((j) => {
-                // eslint-disable-next-line no-prototype-builtins
-                if (!sumArray.hasOwnProperty(j.propertyType)) {
+                if (
+                    !Object.prototype.hasOwnProperty.call(
+                        sumArray,
+                        j.propertyType
+                    )
+                ) {
                     sumArray[j.propertyType] = j.amount;
                     return;
                 }
@@ -18,25 +23,26 @@ const TypeTransactionBox = ({ data }) => {
             dataSummary.push(sumArray);
         });
         const propertyData = [];
+
         dataSummary.forEach((item) => {
             for (const key of Object.keys(item)) {
                 if (!propertyData[key]) {
                     propertyData[key] = item[key];
                     continue;
                 }
-
                 propertyData[key] += item[key];
             }
         });
 
         const totalPropertyData = propertyData.reduce((sum, p) => sum + p, 0);
+
         const dataPieChart = PROPERTY_TYPE.map((w, index) => [
             w[0],
-            (propertyData[index] / totalPropertyData) * 100,
-        ]);
+            Number((propertyData[index + 1] / totalPropertyData) * 100),
+        ]).filter((c) => !Number.isNaN(c[1]));
+
         return dataPieChart;
     };
-
     return (
         <div className="m-0 m-auto h-full mt-4" style={{ maxWidth: '90%' }}>
             <div className="dark:bg-gray-900 bg-white border border-light-primary dark:border-primary border-solid">

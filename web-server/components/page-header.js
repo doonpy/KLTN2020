@@ -1,22 +1,14 @@
 import React from 'react';
 import { FaChartBar, FaHome, FaChartArea } from 'react-icons/fa';
-import useSWR from 'swr';
 import dynamic from 'next/dynamic';
-import fetcher from '../util/api/fetcher';
 import { numberWithCommas, calculatePercentage } from '../util/services/helper';
+import useCountDocument from '../hooks/use-countdocument';
 import MenuItemHeader from './MenuItemHeader';
 
 const ThemeSwitch = dynamic(() => import('./ThemeSwitch'), { ssr: false });
 const PageHeader = () => {
-    const { data: sale } = useSWR(
-        `/api/v1/vi/raw-dataset/count-document?transactionType=0`,
-        fetcher
-    );
-    const { data: rent } = useSWR(
-        `/api/v1/vi/raw-dataset/count-document?transactionType=1`,
-        fetcher
-    );
-
+    const { data: sale } = useCountDocument(1);
+    const { data: rent } = useCountDocument(2);
     const saleAmount = sale?.documentAmount;
     const rentAmount = rent?.documentAmount;
 
@@ -56,7 +48,7 @@ const PageHeader = () => {
                     </div>
                 </div>
                 <div className="w-1/2">
-                    {saleAmount && rentAmount ? (
+                    {saleAmount >= 0 && rentAmount >= 0 ? (
                         <div className="w-full flex justify-end py-2 ">
                             <div
                                 className="border border-solid border-light-primary dark:border-primary flex p-2 justify-center items-center flex mx-3"

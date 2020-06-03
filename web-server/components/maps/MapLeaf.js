@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Map, TileLayer, Tooltip, CircleMarker, Marker, GeoJSON } from 'react-leaflet';
+import {
+    Map,
+    TileLayer,
+    Tooltip,
+    CircleMarker,
+    Marker,
+    GeoJSON,
+} from 'react-leaflet';
 import Router from 'next/router';
 import debounce from 'lodash.debounce';
 import LegendLeaf from './LegendLeaf';
@@ -8,21 +15,21 @@ import useMapPoint from '../../hooks/use-map-point';
 
 export default function MapLeaf({ mapData, property }) {
     const map = useRef();
-    const setColorByArea = (area) => {
-        if (area >= 50000) {
-            return 'red';
-        }
-        if (area >= 5000 && area < 49999) {
-            return '#3388ff';
-        }
-        if (area >= 1000 && area < 5000) {
-            return 'green';
-        }
-        if (area >= 800 && area < 1000) {
-            return 'white';
-        }
-        return 'white';
-    };
+    // const setColorByArea = (area) => {
+    //     if (area >= 50000) {
+    //         return 'red';
+    //     }
+    //     if (area >= 5000 && area < 49999) {
+    //         return '#3388ff';
+    //     }
+    //     if (area >= 1000 && area < 5000) {
+    //         return 'green';
+    //     }
+    //     if (area >= 800 && area < 1000) {
+    //         return 'white';
+    //     }
+    //     return 'white';
+    // };
     const [state, setState] = useState({
         center: {
             lat: 10.753715262326807,
@@ -51,7 +58,6 @@ export default function MapLeaf({ mapData, property }) {
             maxLat: latlngBounds.maxLat,
             minLng: latlngBounds.minLng,
             maxLng: latlngBounds.maxLng,
-            // propertyType: property,
         },
     });
 
@@ -103,7 +109,7 @@ export default function MapLeaf({ mapData, property }) {
                     url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 />
 
-                {dataMap?.data &&
+                {/* {dataMap?.data &&
                     dataMap.data.map((c) => {
                         return c.rawDataList.map((item, index) => {
                             return (
@@ -117,18 +123,22 @@ export default function MapLeaf({ mapData, property }) {
                                     onclick={() => {
                                         routerToDetail(item.rawDataId);
                                     }}
-                                    radius={Math.sqrt(item.acreage / Math.PI) / 20}
+                                    radius={
+                                        Math.sqrt(item.acreage / Math.PI) / 20
+                                    }
                                 >
                                     <Tooltip>
                                         <span>{`Diện tích: ${item.acreage} m2`}</span>
-                                        <div className="text-blue-800 underline">Ân để xem chi tiết</div>
+                                        <div className="text-blue-800 underline">
+                                            Ân để xem chi tiết
+                                        </div>
                                     </Tooltip>
                                 </CircleMarker>
                             );
                         });
-                    })}
+                    })} */}
 
-                <LegendLeaf />
+                {/* <LegendLeaf /> */}
                 {/* <GeoJSON data={mapData} style={{ fillColor: 'rgba(0,0,0,0)', weight: 0.5 }} /> */}
             </Map>
         </div>

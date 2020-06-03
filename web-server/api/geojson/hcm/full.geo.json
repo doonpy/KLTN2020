@@ -6,7 +6,7 @@
             "properties": {
                 "osm-relation-id": "2587287",
                 "name": "Quận 1",
-                "hc-key": "vn-hcm_quan-1"
+                "hc-key": "vn_hcm_quan-1"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -174,7 +174,7 @@
             "properties": {
                 "osm-relation-id": "6923167",
                 "name": "Quận 12",
-                "hc-key": "vn-hcm_quan-12"
+                "hc-key": "vn_hcm_quan-12"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -597,7 +597,7 @@
             "properties": {
                 "osm-relation-id": "6941055",
                 "name": "Quận Thủ Đức",
-                "hc-key": "vn-hcm_thu-duc"
+                "hc-key": "vn_hcm_thu-duc"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -1158,7 +1158,7 @@
             "properties": {
                 "osm-relation-id": "7144246",
                 "name": "Quận 9",
-                "hc-key": "vn-hcm_quan-9"
+                "hc-key": "vn_hcm_quan-9"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -1602,7 +1602,7 @@
             "properties": {
                 "osm-relation-id": "6908316",
                 "name": "Quận Gò Vấp",
-                "hc-key": "vn-hcm_go-vap"
+                "hc-key": "vn_hcm_go-vap"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -2016,7 +2016,7 @@
             "properties": {
                 "osm-relation-id": "3797166",
                 "name": "Quận Bình Thạnh",
-                "hc-key": "vn-hcm_binh-thanh"
+                "hc-key": "vn_hcm_binh-thanh"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -2334,7 +2334,7 @@
             "properties": {
                 "osm-relation-id": "6846177",
                 "name": "Quận Tân Bình",
-                "hc-key": "vn-hcm_tan-binh"
+                "hc-key": "vn_hcm_tan-binh"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -2666,7 +2666,7 @@
             "properties": {
                 "osm-relation-id": "6846128",
                 "name": "Quận Tân Phú",
-                "hc-key": "vn-hcm_tan-phu"
+                "hc-key": "vn_hcm_tan-phu"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -2929,7 +2929,7 @@
             "properties": {
                 "osm-relation-id": "3851694",
                 "name": "Quận Phú Nhuận",
-                "hc-key": "vn-hcm_phu-nhuan"
+                "hc-key": "vn_hcm_phu-nhuan"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -3266,7 +3266,7 @@
             "properties": {
                 "osm-relation-id": "3799817",
                 "name": "Quận 2",
-                "hc-key": "vn-hcm_quan-2"
+                "hc-key": "vn_hcm_quan-2"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -3554,7 +3554,7 @@
             "properties": {
                 "osm-relation-id": "3819816",
                 "name": "Quận 3",
-                "hc-key": "vn-hcm_quan-3"
+                "hc-key": "vn_hcm_quan-3"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -3799,7 +3799,7 @@
             "properties": {
                 "osm-relation-id": "6228121",
                 "name": "Quận 10",
-                "hc-key": "vn-hcm_quan-10"
+                "hc-key": "vn_hcm_quan-10"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -3921,7 +3921,7 @@
             "properties": {
                 "osm-relation-id": "6846181",
                 "name": "Quận 11",
-                "hc-key": "vn-hcm_quan-11"
+                "hc-key": "vn_hcm_quan-11"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -4079,7 +4079,7 @@
             "properties": {
                 "osm-relation-id": "2778323",
                 "name": "Quận 4",
-                "hc-key": "vn-hcm_quan-4"
+                "hc-key": "vn_hcm_quan-4"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -4178,7 +4178,7 @@
             "properties": {
                 "osm-relation-id": "3820432",
                 "name": "Quận 5",
-                "hc-key": "vn-hcm_quan-5"
+                "hc-key": "vn_hcm_quan-5"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -4344,7 +4344,7 @@
             "properties": {
                 "osm-relation-id": "6228792",
                 "name": "Quận 6",
-                "hc-key": "vn-hcm_quan-6"
+                "hc-key": "vn_hcm_quan-6"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -4549,7 +4549,7 @@
             "properties": {
                 "osm-relation-id": "6888445",
                 "name": "Quận 8",
-                "hc-key": "vn-hcm_quan-8"
+                "hc-key": "vn_hcm_quan-8"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -4899,7 +4899,7 @@
             "properties": {
                 "osm-relation-id": "6909710",
                 "name": "Quận Bình Tân",
-                "hc-key": "vn-hcm_binh-tan"
+                "hc-key": "vn_hcm_binh-tan"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -5212,7 +5212,7 @@
             "properties": {
                 "osm-relation-id": "2764875",
                 "name": "Quận 7",
-                "hc-key": "vn-hcm_quan-7"
+                "hc-key": "vn_hcm_quan-7"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -5511,7 +5511,7 @@
             "properties": {
                 "osm-relation-id": "7157220",
                 "name": "Huyện Củ Chi",
-                "hc-key": "vn-hcm_cu-chi"
+                "hc-key": "vn_hcm_cu-chi"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -6209,7 +6209,7 @@
             "properties": {
                 "osm-relation-id": "7157219",
                 "name": "Huyện Hóc Môn",
-                "hc-key": "vn-hcm_hoc-mon"
+                "hc-key": "vn_hcm_hoc-mon"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -6485,7 +6485,7 @@
             "properties": {
                 "osm-relation-id": "7157268",
                 "name": "Huyện Bình Chánh",
-                "hc-key": "vn-hcm_binh-chanh"
+                "hc-key": "vn_hcm_binh-chanh"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -7666,7 +7666,7 @@
             "properties": {
                 "osm-relation-id": "7157197",
                 "name": "Huyện Nhà Bè",
-                "hc-key": "vn-hcm_nha-be"
+                "hc-key": "vn_hcm_nha-be"
             },
             "geometry": {
                 "type": "MultiPolygon",
@@ -8431,7 +8431,7 @@
             "properties": {
                 "osm-relation-id": "7157255",
                 "name": "Huyện Cần Giờ",
-                "hc-key": "vn-hcm_can-gio"
+                "hc-key": "vn_hcm_can-gio"
             },
             "geometry": {
                 "type": "MultiPolygon",

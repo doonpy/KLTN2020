@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 7346816,
         "name": "Phường An Khánh",
-        "hc-key": "vn-hcm_quan-2_an-khanh"
+        "hc-key": "vn_hcm_quan-2_an-khanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -215,7 +215,7 @@
       "properties": {
         "osm-relation-id": 7346817,
         "name": "Phường An Lợi Đông",
-        "hc-key": "vn-hcm_quan-2_an-loi-dong"
+        "hc-key": "vn_hcm_quan-2_an-loi-dong"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -492,7 +492,7 @@
       "properties": {
         "osm-relation-id": 7351896,
         "name": "Phường Bình An",
-        "hc-key": "vn-hcm_quan-2_binh-an"
+        "hc-key": "vn_hcm_quan-2_binh-an"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -685,7 +685,7 @@
       "properties": {
         "osm-relation-id": 7351897,
         "name": "Phường Bình Khánh",
-        "hc-key": "vn-hcm_quan-2_binh-khanh"
+        "hc-key": "vn_hcm_quan-2_binh-khanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -866,7 +866,7 @@
       "properties": {
         "osm-relation-id": 7364738,
         "name": "Phường Bình Trưng Đông",
-        "hc-key": "vn-hcm_quan-2_binh-trung-dong"
+        "hc-key": "vn_hcm_quan-2_binh-trung-dong"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1319,7 +1319,7 @@
       "properties": {
         "osm-relation-id": 7364739,
         "name": "Phường Bình Trưng Tây",
-        "hc-key": "vn-hcm_quan-2_binh-trung-tay"
+        "hc-key": "vn_hcm_quan-2_binh-trung-tay"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1676,7 +1676,7 @@
       "properties": {
         "osm-relation-id": 7346818,
         "name": "Phường An Phú",
-        "hc-key": "vn-hcm_quan-2_an-phu"
+        "hc-key": "vn_hcm_quan-2_an-phu"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2253,7 +2253,7 @@
       "properties": {
         "osm-relation-id": 7370760,
         "name": "Phường Cát Lái",
-        "hc-key": "vn-hcm_quan-2_cat-lai"
+        "hc-key": "vn_hcm_quan-2_cat-lai"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2826,7 +2826,7 @@
       "properties": {
         "osm-relation-id": 7370761,
         "name": "Phường Thạnh Mỹ Lợi",
-        "hc-key": "vn-hcm_quan-2_thanh-my-loi"
+        "hc-key": "vn_hcm_quan-2_thanh-my-loi"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3259,7 +3259,7 @@
       "properties": {
         "osm-relation-id": 7370763,
         "name": "Phường Thủ Thiêm",
-        "hc-key": "vn-hcm_quan-2_thu-thiem"
+        "hc-key": "vn_hcm_quan-2_thu-thiem"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3540,7 +3540,7 @@
       "properties": {
         "osm-relation-id": 7370762,
         "name": "Phường Thảo Điền",
-        "hc-key": "vn-hcm_quan-2_thao-dien"
+        "hc-key": "vn_hcm_quan-2_thao-dien"
       },
       "geometry": {
         "type": "MultiPolygon",

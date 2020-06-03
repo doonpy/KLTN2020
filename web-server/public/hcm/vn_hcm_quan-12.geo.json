@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 6928028,
         "name": "Phường Tân Thới Nhất",
-        "hc-key": "vn-hcm_quan-12_phuong-tan-thoi-nhat"
+        "hc-key": "vn_hcm_quan-12_phuong-tan-thoi-nhat"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -251,7 +251,7 @@
       "properties": {
         "osm-relation-id": 6928029,
         "name": "Phường Tân Hưng Thuận",
-        "hc-key": "vn-hcm_quan-12_phuong-tan-hung-thuan"
+        "hc-key": "vn_hcm_quan-12_phuong-tan-hung-thuan"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -476,7 +476,7 @@
       "properties": {
         "osm-relation-id": 6928030,
         "name": "Phường Trung Mỹ Tây",
-        "hc-key": "vn-hcm_quan-12_phuong-trung-my-tay"
+        "hc-key": "vn_hcm_quan-12_phuong-trung-my-tay"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -689,7 +689,7 @@
       "properties": {
         "osm-relation-id": 6928153,
         "name": "Phường Đông Hưng Thuận",
-        "hc-key": "vn-hcm_quan-12_phuong-dong-hung-thuan"
+        "hc-key": "vn_hcm_quan-12_phuong-dong-hung-thuan"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1110,7 +1110,7 @@
       "properties": {
         "osm-relation-id": 6928154,
         "name": "Phường Tân Chánh Hiệp",
-        "hc-key": "vn-hcm_quan-12_phuong-tan-chanh-hiep"
+        "hc-key": "vn_hcm_quan-12_phuong-tan-chanh-hiep"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1359,7 +1359,7 @@
       "properties": {
         "osm-relation-id": 6928155,
         "name": "Phường Tân Thới Hiệp",
-        "hc-key": "vn-hcm_quan-12_phuong-tan-thoi-hiep"
+        "hc-key": "vn_hcm_quan-12_phuong-tan-thoi-hiep"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1636,7 +1636,7 @@
       "properties": {
         "osm-relation-id": 6928156,
         "name": "Phường Hiệp Thành",
-        "hc-key": "vn-hcm_quan-12_phuong-hiep-thanh"
+        "hc-key": "vn_hcm_quan-12_phuong-hiep-thanh"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1873,7 +1873,7 @@
       "properties": {
         "osm-relation-id": 6941014,
         "name": "Phường Thới An",
-        "hc-key": "vn-hcm_quan-12_phuong-thoi-an"
+        "hc-key": "vn_hcm_quan-12_phuong-thoi-an"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2402,7 +2402,7 @@
       "properties": {
         "osm-relation-id": 6941015,
         "name": "Phường Thạnh Xuân",
-        "hc-key": "vn-hcm_quan-12_phuong-thanh-xuan"
+        "hc-key": "vn_hcm_quan-12_phuong-thanh-xuan"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3099,7 +3099,7 @@
       "properties": {
         "osm-relation-id": 6941016,
         "name": "Phường Thạnh Lộc",
-        "hc-key": "vn-hcm_quan-12_phuong-thanh-loc"
+        "hc-key": "vn_hcm_quan-12_phuong-thanh-loc"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3584,7 +3584,7 @@
       "properties": {
         "osm-relation-id": 6941018,
         "name": "Phường An Phú Đông",
-        "hc-key": "vn-hcm_quan-12_phuong-an-phu-dong"
+        "hc-key": "vn_hcm_quan-12_phuong-an-phu-dong"
       },
       "geometry": {
         "type": "MultiPolygon",

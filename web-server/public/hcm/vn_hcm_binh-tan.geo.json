@@ -6,7 +6,7 @@
       "properties": {
         "osm-relation-id": 6915821,
         "name": "Phường An Lạc",
-        "hc-key": "vn-hcm_binh-tan_an-lac"
+        "hc-key": "vn_hcm_binh-tan_an-lac"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -547,7 +547,7 @@
       "properties": {
         "osm-relation-id": 6915822,
         "name": "Phường An Lạc A",
-        "hc-key": "vn-hcm_binh-tan_an-lac-a"
+        "hc-key": "vn_hcm_binh-tan_an-lac-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -804,7 +804,7 @@
       "properties": {
         "osm-relation-id": 6915823,
         "name": "Phường Bình Hưng Hòa",
-        "hc-key": "vn-hcm_binh-tan_binh-hung-hoa"
+        "hc-key": "vn_hcm_binh-tan_binh-hung-hoa"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1045,7 +1045,7 @@
       "properties": {
         "osm-relation-id": 6915824,
         "name": "Phường Bình Hưng Hòa A",
-        "hc-key": "vn-hcm_binh-tan_binh-hung-hoa-a"
+        "hc-key": "vn_hcm_binh-tan_binh-hung-hoa-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1250,7 +1250,7 @@
       "properties": {
         "osm-relation-id": 6915940,
         "name": "Phường Bình Hưng Hòa B",
-        "hc-key": "vn-hcm_binh-tan_binh-hung-hoa-b"
+        "hc-key": "vn_hcm_binh-tan_binh-hung-hoa-b"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1535,7 +1535,7 @@
       "properties": {
         "osm-relation-id": 6915942,
         "name": "Phường Bình Trị Đông A",
-        "hc-key": "vn-hcm_binh-tan_binh-tri-dong-a"
+        "hc-key": "vn_hcm_binh-tan_binh-tri-dong-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1824,7 +1824,7 @@
       "properties": {
         "osm-relation-id": 6915943,
         "name": "Phường Bình Trị Đông B",
-        "hc-key": "vn-hcm_binh-tan_binh-tri-dong-b"
+        "hc-key": "vn_hcm_binh-tan_binh-tri-dong-b"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2397,7 +2397,7 @@
       "properties": {
         "osm-relation-id": 6915944,
         "name": "Phường Tân Tạo",
-        "hc-key": "vn-hcm_binh-tan_tan-tao"
+        "hc-key": "vn_hcm_binh-tan_tan-tao"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -2762,7 +2762,7 @@
       "properties": {
         "osm-relation-id": 6915945,
         "name": "Phường Tân Tạo A",
-        "hc-key": "vn-hcm_binh-tan_tan-tao-a"
+        "hc-key": "vn_hcm_binh-tan_tan-tao-a"
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -3291,7 +3291,7 @@
       "properties": {
         "osm-relation-id": 6915941,
         "name": "Phường Bình Trị Đông",
-        "hc-key": "vn-hcm_binh-tan_binh-tri-dong"
+        "hc-key": "vn_hcm_binh-tan_binh-tri-dong"
       },
       "geometry": {
         "type": "MultiPolygon",
