@@ -1,4 +1,4 @@
 #!/bin/bash
 
-npm run start:initialize-data
+npm run start:init-data
 npm run start:api
