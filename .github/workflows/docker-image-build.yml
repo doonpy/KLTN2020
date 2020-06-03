@@ -1,0 +1,20 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ KLTN2020 ]
+  pull_request:
+    branches: [ KLTN2020 ]
+
+jobs:
+  build-docker-image:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: rlespinasse/github-slug-action@master
+      - name: Build the Docker image
+        run: |
+          export BUILD_TAG=${GITHUB_REF_SLUG##*/}-$(date +%s)
+          docker build . --file Dockerfile --tag doonpy/kltn2020:${BUILD_TAG}
