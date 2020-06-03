@@ -9,6 +9,7 @@ import { VisualMapPointDocumentModel } from './visual.map-point.interface';
 import VisualCommonController from '../visual.common.controller';
 import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
 import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/visual.administrative.ward.interface';
+import { getAggregationForGetAll } from '@service/visual/map-point/visual.map-point.aggregations';
 
 const commonPath = '/map-points';
 const specifyIdPath = '/map-points/:id';
@@ -224,105 +225,17 @@ export default class VisualMapPointController extends VisualCommonController {
                         : {},
                 ],
             };
-            const aggregations = [
-                {
-                    $match: {
-                        $and: [
-                            {
-                                lat: {
-                                    $gte: minLat,
-                                },
-                            },
-                            {
-                                lat: {
-                                    $lte: maxLat,
-                                },
-                            },
-                            {
-                                lng: {
-                                    $gte: minLng,
-                                },
-                            },
-                            {
-                                lng: {
-                                    $lte: maxLng,
-                                },
-                            },
-                        ],
-                    },
-                },
-                {
-                    $project: {
-                        districtId: 1,
-                        wardId: 1,
-                        lat: 1,
-                        lng: 1,
-                        points: {
-                            $filter: {
-                                input: '$points',
-                                as: 'point',
-                                cond: transactionTypeAndPropertyTypeAggregations,
-                            },
-                        },
-                        cTime: 1,
-                        mTime: 1,
-                    },
-                },
-                {
-                    $project: {
-                        districtId: 1,
-                        wardId: 1,
-                        lat: 1,
-                        lng: 1,
-                        points: {
-                            $map: {
-                                input: '$points',
-                                as: 'point',
-                                in: {
-                                    rawDataset: {
-                                        $filter: {
-                                            input: '$$point.rawDataset',
-                                            as: 'rawData',
-                                            cond: {
-                                                $and: [
-                                                    {
-                                                        $gte: [
-                                                            '$$rawData.acreage',
-                                                            minAcreage,
-                                                        ],
-                                                    },
-                                                    {
-                                                        $lte: [
-                                                            '$$rawData.acreage',
-                                                            maxAcreage,
-                                                        ],
-                                                    },
-                                                    {
-                                                        $gte: [
-                                                            '$$rawData.price',
-                                                            minPrice,
-                                                        ],
-                                                    },
-                                                    {
-                                                        $lte: [
-                                                            '$$rawData.price',
-                                                            maxPrice,
-                                                        ],
-                                                    },
-                                                ],
-                                            },
-                                        },
-                                    },
-                                    transactionType: '$$point.transactionType',
-                                    propertyType: '$$point.propertyType',
-                                },
-                            },
-                        },
-                        cTime: 1,
-                        mTime: 1,
-                    },
-                },
-            ];
+            const aggregations = getAggregationForGetAll(
+                minLat,
+                maxLat,
+                minLng,
+                maxLng,
+                minAcreage,
+                maxAcreage,
+                minPrice,
+                maxPrice,
+                transactionTypeAndPropertyTypeAggregations
+            );
             const [
                 documents,
                 { documents: visualAdministrativeWards },

@@ -252,7 +252,7 @@ export default class RawDataController extends CommonServiceControllerBase {
                 this.PARAM_TRANSACTION_TYPE,
                 new Checker.IntegerRange(
                     1,
-                    Object.keys(CommonConstant.TRANSACTION_TYPE).length
+                    CommonConstant.TRANSACTION_TYPE.length
                 )
             );
 
@@ -262,10 +262,7 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(
-                    1,
-                    Object.keys(CommonConstant.PROPERTY_TYPE).length
-                )
+                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
             this.bodyValidator.addParamValidator(
@@ -448,10 +445,7 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
             this.bodyValidator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(
-                    1,
-                    Object.keys(CommonConstant.PROPERTY_TYPE).length
-                )
+                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
             this.bodyValidator.addParamValidator(
@@ -460,10 +454,7 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
             this.bodyValidator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(
-                    1,
-                    Object.keys(CommonConstant.PROPERTY_TYPE).length
-                )
+                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
             this.bodyValidator.addParamValidator(
@@ -529,7 +520,10 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
             this.priceValidator.addParamValidator(
                 this.PARAM_PRICE_TIME_UNIT,
-                new Checker.IntegerRange(0, 2)
+                new Checker.IntegerRange(
+                    1,
+                    CommonConstant.PRICE_TIME_UNIT.length
+                )
             );
 
             this.priceValidator.addParamValidator(
@@ -675,7 +669,10 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
             this.validator.addParamValidator(
                 this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(0, null)
+                new Checker.IntegerRange(
+                    1,
+                    CommonConstant.TRANSACTION_TYPE.length
+                )
             );
 
             this.validator.addParamValidator(
@@ -684,7 +681,7 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
             this.validator.addParamValidator(
                 this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(0, null)
+                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
             this.validator.validate(this.requestQuery);
