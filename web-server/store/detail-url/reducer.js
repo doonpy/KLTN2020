@@ -1,4 +1,8 @@
-import { GET_DETAIL_ERROR, GET_DETAIL_URLS, LOADING_DETAIL_URL } from './actions';
+import {
+    GET_DETAIL_ERROR,
+    GET_DETAIL_URLS,
+    LOADING_DETAIL_URL,
+} from './actions';
 
 const initialState = {
     loading: false,

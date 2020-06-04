@@ -1,5 +1,8 @@
 import React from 'react';
-import Highcharts, { DrilldownEventObject, DrillupAllEventObject } from 'highcharts/highmaps';
+import Highcharts, {
+    DrilldownEventObject,
+    DrillupAllEventObject,
+} from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
@@ -179,7 +182,13 @@ const getOptions = (mapData) => {
 
 const MapChartOverview = ({ mapData }) => {
     const mapOptions = getOptions(mapData);
-    return <HighchartsReact constructorType="mapChart" highcharts={Highcharts} options={mapOptions} />;
+    return (
+        <HighchartsReact
+            constructorType="mapChart"
+            highcharts={Highcharts}
+            options={mapOptions}
+        />
+    );
 };
 
 export default MapChartOverview;

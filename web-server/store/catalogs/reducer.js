@@ -1,4 +1,8 @@
-import { GET_CATALOG_DATA, LOADING_CATALOG_DATA, GET_CATALOG_ERROR } from './actions';
+import {
+    GET_CATALOG_DATA,
+    LOADING_CATALOG_DATA,
+    GET_CATALOG_ERROR,
+} from './actions';
 
 const initialState = {
     loading: false,

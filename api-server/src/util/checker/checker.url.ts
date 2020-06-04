@@ -3,7 +3,7 @@ import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
 
 export default class CheckerUrl extends CheckerBase {
-    private VALID_URL = new RegExp(
+    private VALID_URL = RegExp(
         /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/
     );
 

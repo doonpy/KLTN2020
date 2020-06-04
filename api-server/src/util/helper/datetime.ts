@@ -8,6 +8,10 @@ export const convertStringToDate = (
     format: string,
     delimiter: '/' | '-' | '.' | string
 ): Date | undefined => {
+    if (!value) {
+        return undefined;
+    }
+
     format = format.toLowerCase();
     const separatedFormat = format.split(delimiter);
     const separatedValue = value.split(delimiter);

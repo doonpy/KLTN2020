@@ -1,6 +1,4 @@
-import 'module-alias/register';
-import '@root/prepend';
-import App from '@root/app';
+import './prepend';
 import * as bodyParser from 'body-parser';
 import cors from 'cors';
 import requestLogger from '@middleware/request-logger/request-logger';
@@ -18,6 +16,7 @@ import VisualAdministrativeWardController from '@service/visual/administrative/w
 import VisualSummaryDistrictWardController from '@service/visual/summary/district-ward/visual.summary.district-ward.controller';
 import VisualMapPointController from '@service/visual/map-point/visual.map-point.controller';
 import VisualAnalysisController from '@service/visual/analysis/visual.analysis.controller';
+import App from './app';
 
 /**
  * Main

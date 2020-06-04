@@ -67,6 +67,16 @@ const CommonConstant = {
             wording: ['ngày', 'day'],
         },
     ],
+    PRICE_CURRENCY: [
+        {
+            id: 1,
+            wording: 'vnd',
+        },
+        {
+            id: 2,
+            wording: 'usd',
+        },
+    ],
 };
 
 export default CommonConstant;

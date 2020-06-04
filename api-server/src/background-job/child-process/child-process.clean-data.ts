@@ -1,5 +1,4 @@
-import 'module-alias/register';
-import '@root/prepend';
+import '../../prepend';
 import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
@@ -134,12 +133,12 @@ const deleteInvalidAddressData = async (): Promise<void> => {
     const wardPattern = wards
         .filter((ward, index) => wards.lastIndexOf(ward) === index)
         .join('|');
-    const validDistrictAndWardPattern = new RegExp(
+    const validDistrictAndWardPattern = RegExp(
         `(${wardPattern}).*(${districtPattern})`,
         'i'
     );
-    const validProvincePattern = new RegExp(`(${provincePattern})`, 'i');
-    const validCountryPattern = new RegExp(`(${countryPattern})$`, 'i');
+    const validProvincePattern = RegExp(`(${provincePattern})`, 'i');
+    const validCountryPattern = RegExp(`(${countryPattern})$`, 'i');
     const DOCUMENTS_LIMIT = 1000;
     let processCount = 0;
     let offset = 0;

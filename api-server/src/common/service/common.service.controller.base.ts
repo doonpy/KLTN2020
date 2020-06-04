@@ -362,7 +362,7 @@ export default abstract class CommonServiceControllerBase
                     } else {
                         pattern = value;
                     }
-                    conditions[key] = { $regex: new RegExp(pattern, 'i') };
+                    conditions[key] = { $regex: RegExp(pattern, 'i') };
                 } else {
                     conditions[key] = value;
                 }

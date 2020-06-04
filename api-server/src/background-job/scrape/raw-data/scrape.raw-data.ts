@@ -19,8 +19,10 @@ import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import CommonConstant from '@common/common.constant';
 import ScrapeBase from '../scrape.base';
 import {
-    convertAcreageValue,
-    convertPriceValue,
+    acreageHandler,
+    convertAcreageValueToMeter,
+    convertPriceValueToK,
+    priceHandler,
 } from './scrape.raw-data.helper';
 import {
     ScrapeRawDataConstant,
@@ -377,10 +379,9 @@ export default class ScrapeRawData extends ScrapeBase {
         );
 
         const postDateString =
-            (
-                postDateData.match(ScrapeRawDataConstant.POST_DATE_PATTERN) ||
-                []
-            ).shift() || '';
+            postDateData
+                .match(ScrapeRawDataConstant.POST_DATE_PATTERN)
+                ?.shift() || '';
         let postDate = convertStringToDate(
             postDateString,
             this.pattern.mainLocator.postDate.format,
@@ -390,96 +391,8 @@ export default class ScrapeRawData extends ScrapeBase {
             postDate = new Date();
         }
 
-        let priceString = '';
-        let priceTimeUnit = '';
-        if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
-            priceString =
-                (
-                    priceData.match(ScrapeRawDataConstant.SALE_PRICE_PATTERN) ||
-                    []
-                ).shift() || '';
-        } else {
-            priceString =
-                (
-                    priceData.match(ScrapeRawDataConstant.RENT_PRICE_PATTERN) ||
-                    []
-                ).shift() || '';
-            priceTimeUnit =
-                (
-                    priceData.match(
-                        ScrapeRawDataConstant.PRICE_TIME_UNIT_PATTERN
-                    ) || []
-                ).shift() || '';
-        }
-        const priceUnit =
-            (
-                priceString.match(
-                    ScrapeRawDataConstant.PRICE_VALUE_UNIT_PATTERN
-                ) || []
-            ).shift() || '';
-        const priceValue = convertPriceValue(
-            Number(
-                (
-                    priceString.match(ScrapeRawDataConstant.VALUE_PATTERN) || []
-                ).shift()
-            ),
-            priceUnit,
-            'nghìn'
-        );
-        const priceCurrency = (priceString.match(/$/) || []).shift()
-            ? 'usd'
-            : 'vnd';
-        const price = {
-            value: priceValue,
-            currency: priceCurrency,
-            timeUnit:
-                CommonConstant.PRICE_TIME_UNIT.find(
-                    (item): boolean =>
-                        item.wording.indexOf(priceTimeUnit) !== -1
-                )?.id || -1,
-        };
-        if (price.timeUnit === -1) {
-            if (transactionType === CommonConstant.TRANSACTION_TYPE[0].id) {
-                delete price.timeUnit;
-            } else {
-                price.timeUnit = CommonConstant.PRICE_TIME_UNIT[1].id;
-            }
-        }
-
-        const acreageString =
-            (
-                acreageData.match(ScrapeRawDataConstant.ACREAGE_PATTERN) || []
-            ).shift() || '';
-        const acreageMeasureUnit =
-            (
-                acreageString.match(
-                    ScrapeRawDataConstant.ACREAGE_MEASURE_UNIT_PATTERN
-                ) || []
-            ).shift() || '';
-        const acreageValue =
-            acreageMeasureUnit === 'km²' || acreageMeasureUnit === 'km2'
-                ? convertAcreageValue(
-                      Number(
-                          (
-                              acreageString.match(
-                                  ScrapeRawDataConstant.VALUE_PATTERN
-                              ) || []
-                          ).shift()
-                      ),
-                      'km²',
-                      'm²'
-                  )
-                : Number(
-                      (
-                          acreageString.match(
-                              ScrapeRawDataConstant.VALUE_PATTERN
-                          ) || []
-                      ).shift()
-                  );
-        const acreage = {
-            value: acreageValue,
-            measureUnit: 'm²',
-        };
+        const acreage = acreageHandler(acreageData);
+        const price = priceHandler(priceData, transactionType, acreage.value);
 
         return ({
             detailUrlId,

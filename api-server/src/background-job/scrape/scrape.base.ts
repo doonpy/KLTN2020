@@ -41,7 +41,7 @@ export default class ScrapeBase {
         domain: string,
         path: string
     ): Promise<CheerioStatic | undefined> {
-        const DOMAIN_PATTERN = new RegExp(
+        const DOMAIN_PATTERN = RegExp(
             /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
         );
         domain = domain.replace(/\/{2,}$/, '');
