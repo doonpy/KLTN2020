@@ -20,7 +20,7 @@ jobs:
         env:
           DOCKER_ID: ${{ secrets.DOCKER_ID }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-        run: |
+        run:
           if [ "${GITHUB_REF}" == "refs/heads/KLTN2020" ]; then
             docker login -u $DOCKER_ID -p $DOCKER_TOKEN
             export BUILD_TAG=${GITHUB_HEAD_REF}-${GITHUB_RUN_NUMBER}-$(date +%s)
