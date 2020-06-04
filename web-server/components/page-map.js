@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import RenderCompleted from '../hooks/use-mounted';
 import LoadingIcon from './LoadingIcon';
-import { PROPERTY_TYPE } from '../util/constants';
+import { PROPERTY_TYPE_NUMBER } from '../util/constants';
 
 const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
@@ -14,9 +14,9 @@ const MapWard = dynamic(() => import('./maps/MapWard'), {
     loading: () => <LoadingIcon />,
 });
 
-const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
+const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
     const [stage, setStage] = useState(0);
-    const [propertyStatge, setProperty] = useState(12);
+    const [propertyStage, setProperty] = useState(PROPERTY_TYPE_NUMBER[0].id);
     const mapData = mapStaticJSON[0].content;
     const isMounted = RenderCompleted();
     const dataMap = dataSummary
@@ -41,27 +41,22 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
                         ? `bottom-0 left-0 w-full  border border-solid border-light-primary dark:border-primary absolute dark:bg-gray-900 bg-white`
                         : 'hidden'
                 }
-                style={{ height: '35px' }}
+                style={{ height: '40px' }}
             >
                 <div className="flex items-center justify-around pt-1">
-                    <div
-                        className="mx-2 border-b-2 border-blue-400 py-1 cursor-pointer"
-                        role="presentation"
-                        style={{ fontSize: '10px' }}
-                        onClick={() => onClickProperty(12)}
-                    >
-                        Chung
-                    </div>
-                    {PROPERTY_TYPE.map((w, index) => (
+                    {PROPERTY_TYPE_NUMBER.map((property) => (
                         <div
-                            className="mx-2 cursor-pointer"
-                            // eslint-disable-next-line react/no-array-index-key
-                            key={index}
-                            style={{ fontSize: '10px' }}
+                            className={`mx-2 py-1 cursor-pointer text-center ${
+                                propertyStage === property.id
+                                    ? 'font-extrabold text-blue-400'
+                                    : ''
+                            }`}
+                            key={property.id}
+                            style={{ fontSize: '9px' }}
                             role="presentation"
-                            onClick={() => onClickProperty(index)}
+                            onClick={() => onClickProperty(property.id)}
                         >
-                            {w[0]}
+                            {property.wording[0]}
                         </div>
                     ))}
                 </div>
@@ -69,7 +64,12 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap }) => {
             {tabMap === 0 ? (
                 <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
-                        {isMounted && <MapLeaf property={propertyStatge} />}
+                        {isMounted && (
+                            <MapLeaf
+                                propertyStage={propertyStage}
+                                transactionStage={transactionStage}
+                            />
+                        )}
                     </div>
                 </div>
             ) : (

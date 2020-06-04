@@ -25,7 +25,6 @@ const MapWard = ({ dataWard, setStage }) => {
     useEffect(() => {
         fetchData();
     }, []);
-
     const backToMapDistrict = async () => {
         await dispatch(action.fetchMapKey('full'));
         setStage(0);

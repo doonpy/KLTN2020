@@ -1,16 +1,56 @@
-export const PROPERTY_TYPE = [
-    ['Căn hộ chung cư', 'apartments'],
-    ['Nhà riêng', 'individual houses'],
-    ['Biệt thự', 'villas'],
-    ['Nhà mặt phố', 'townhouses'],
-    ['Đất nền dự án', 'project lands'],
-    ['Đất', 'lands'],
-    ['Trang trại, khu nghỉ dưỡng', 'farms, resorts'],
-    ['Nhà kho', 'warehouse'],
-    ['Nhà trọ, phòng trọ', 'rooms'],
-    ['Văn phòng', 'offices'],
-    ['Cửa hàng', 'shops'],
-    ['Các loại bất động sản khác', 'others'],
+export const PROPERTY_TYPE_NUMBER = [
+    {
+        id: 0,
+        wording: ['Tổng hợp', 'Total RealEstate'],
+    },
+    {
+        id: 1,
+        wording: ['Căn hộ, chung cư', 'apartment'],
+    },
+    {
+        id: 2,
+        wording: ['Nhà, nhà riêng, nhà nguyên căn', 'individual house'],
+    },
+    {
+        id: 3,
+        wording: ['Biệt thự, nhà liền kề', 'villa'],
+    },
+    {
+        id: 4,
+        wording: ['Nhà mặt tiền, nhà mặt phố, nhà phố', 'townhouse'],
+    },
+    {
+        id: 5,
+        wording: ['Đất nền dự án', 'project land'],
+    },
+    {
+        id: 6,
+        wording: ['Đất', 'land'],
+    },
+    {
+        id: 7,
+        wording: ['Trang trại, khu nghỉ dưỡng', 'farm, resort'],
+    },
+    {
+        id: 8,
+        wording: ['Kho, nhà xưởng', 'warehouse, factory'],
+    },
+    {
+        id: 9,
+        wording: ['Nhà trọ, phòng trọ', 'room'],
+    },
+    {
+        id: 10,
+        wording: ['Văn phòng, mặt bằng', 'office, ground'],
+    },
+    {
+        id: 11,
+        wording: ['Cửa hàng, bán lẻ, ki ốt', 'shop'],
+    },
+    {
+        id: 12,
+        wording: ['Nhà hàng, khách sạn, nhà nghỉ', 'restaurant, hotel'],
+    },
 ];
 export const MODEL_URL = {
     RAWDATA: 'raw-dataset',
@@ -20,13 +60,14 @@ export const MODEL_URL = {
 };
 
 export const TRANSATION_TYPE = {
-    SALE: 'Bán',
-    RENT: 'Thuê',
+    TOTAL: 0,
+    SALE: 1,
+    RENT: 2,
 };
 export const ACREAGE_BY_ZOOM_LEVEL = [
     {
         zoom: 10,
-        minArea: 1000,
+        minArea: 50000,
         maxArea: 200000,
     },
     {
@@ -37,7 +78,7 @@ export const ACREAGE_BY_ZOOM_LEVEL = [
     {
         zoom: 12,
         minArea: 1000,
-        maxArea: 200000,
+        maxArea: 5000,
     },
     {
         zoom: 13,

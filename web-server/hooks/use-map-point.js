@@ -11,10 +11,13 @@ export default function useMapPoint({
         minLng,
         maxLng,
         propertyType,
+        transactionType,
     },
 }) {
     return useSWR(
-        `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}&maxAcreage=${maxAcreage}`,
+        `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}&maxAcreage=${maxAcreage}${
+            propertyType !== 0 ? `&propertyType=${propertyType}` : ''
+        }${transactionType !== 0 ? `&transactionType=${transactionType}` : ''}`,
         fetcher
     );
 }

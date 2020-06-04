@@ -14,7 +14,7 @@ const PageHeader = () => {
 
     return (
         <nav
-            className="w-full bg-white dark:bg-gray-900 bg-white border-light-primary border-b border-solid border-light-primary dark:border-primary shadow-md block"
+            className="w-full bg-white dark:bg-gray-900 bg-white border-light-primary border-b border-solid border-light-primary dark:border-primary shadow block relative"
             style={{ height: '100px', minHeight: '100px', maxWidth: '100%' }}
         >
             <div

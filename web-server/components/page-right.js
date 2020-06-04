@@ -1,7 +1,7 @@
 import React from 'react';
-import sortBy from 'lodash.sortby';
 import TypeTransactionBox from './TypeTransactionBox';
 import TotalByDistrictBarChart from './ChartWrapper/TotalByDistrictBarChart';
+import { TRANSATION_TYPE } from '../util/constants';
 
 const TabButton = ({ title, onClick, isActive }) => {
     return (
@@ -21,7 +21,7 @@ const TabButton = ({ title, onClick, isActive }) => {
         </>
     );
 };
-const PageRight = ({ dataSummary, tabs, setTabs }) => {
+const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
     const dataChart = dataSummary.map((data) => {
         const dataFilter = [data.name, data.summaryAmount];
         return dataFilter;
@@ -33,18 +33,18 @@ const PageRight = ({ dataSummary, tabs, setTabs }) => {
                 <div className="text-xs w-full flex justify-around">
                     <TabButton
                         title="Bán"
-                        onClick={() => setTabs(1)}
-                        isActive={tabs === 1}
+                        onClick={() => setTransaction(TRANSATION_TYPE.SALE)}
+                        isActive={transactionStage === TRANSATION_TYPE.SALE}
                     />
                     <TabButton
                         title="Tổng"
-                        onClick={() => setTabs(0)}
-                        isActive={tabs === 0}
+                        onClick={() => setTransaction(TRANSATION_TYPE.TOTAL)}
+                        isActive={transactionStage === TRANSATION_TYPE.TOTAL}
                     />
                     <TabButton
                         title="Thuê"
-                        onClick={() => setTabs(2)}
-                        isActive={tabs === 2}
+                        onClick={() => setTransaction(TRANSATION_TYPE.RENT)}
+                        isActive={transactionStage === TRANSATION_TYPE.RENT}
                     />
                 </div>
             </div>

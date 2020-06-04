@@ -1,9 +1,8 @@
 import React from 'react';
 import TypePropertyPieChart from './ChartWrapper/TypePropertyPieChart';
-import { PROPERTY_TYPE } from '../util/constants';
+import { PROPERTY_TYPE_NUMBER } from '../util/constants';
 
 const TypeTransactionBox = ({ data }) => {
-    // console.log(data);
     const resultPropertyData = () => {
         const dataSummary = [];
         data.forEach((item) => {
@@ -36,9 +35,9 @@ const TypeTransactionBox = ({ data }) => {
 
         const totalPropertyData = propertyData.reduce((sum, p) => sum + p, 0);
 
-        const dataPieChart = PROPERTY_TYPE.map((w, index) => [
-            w[0],
-            Number((propertyData[index + 1] / totalPropertyData) * 100),
+        const dataPieChart = PROPERTY_TYPE_NUMBER.map((w) => [
+            w.wording[0],
+            Number((propertyData[w.id] / totalPropertyData) * 100),
         ]).filter((c) => !Number.isNaN(c[1]));
 
         return dataPieChart;

@@ -10,6 +10,7 @@ import PageLeft from '../components/page-left';
 import PageRight from '../components/page-right';
 import useDistrict from '../hooks/use-district';
 import useWard from '../hooks/use-ward';
+import { TRANSATION_TYPE } from '../util/constants';
 
 export async function getStaticProps() {
     const postsDirectory = path.join(
@@ -33,7 +34,7 @@ export async function getStaticProps() {
 
 const Home = ({ mapStaticJSON }) => {
     const [tabMap, setTabmap] = useState(0);
-    const [tabs, setTabs] = useState(0);
+    const [transactionStage, setTransaction] = useState(TRANSATION_TYPE.TOTAL);
     const { mapKey } = useSelector((state) => state.mapKey);
 
     const { data: dataDistrict } = useDistrict();
@@ -114,17 +115,21 @@ const Home = ({ mapStaticJSON }) => {
                                         <PageMap
                                             tabMap={tabMap}
                                             mapStaticJSON={mapStaticJSON}
+                                            transactionStage={transactionStage}
                                             dataSummary={summaryData(
                                                 mapKey,
-                                                tabs
+                                                transactionStage
                                             )}
                                         />
                                     </div>
                                 </div>
                                 <PageRight
-                                    dataSummary={summaryData(mapKey, tabs)}
-                                    tabs={tabs}
-                                    setTabs={setTabs}
+                                    dataSummary={summaryData(
+                                        mapKey,
+                                        transactionStage
+                                    )}
+                                    transactionStage={transactionStage}
+                                    setTransaction={setTransaction}
                                 />
                             </div>
                         </div>

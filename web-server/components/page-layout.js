@@ -4,7 +4,7 @@ import PageHeader from './page-header';
 
 const PageLayout = (props) => {
     return (
-        <div className="max-h-screen bg-gray-100 dark:bg-dark">
+        <div className="max-h-screen bg-gray-200 dark:bg-dark">
             <PageHeader />
             {props.children}
         </div>
