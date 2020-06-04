@@ -7,19 +7,21 @@ on:
     branches: [ KLTN2020 ]
 
 jobs:
-  build-docker-image:
+  build:
 
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       - name: Build the Docker image
+        run: |
+          docker build -t app .
+      - name: Push to Docker Hub
         env:
           DOCKER_ID: ${{ secrets.DOCKER_ID }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
-          docker build -t app .
-          if [ "${GITHUB_HEAD_REF}" == "KLTN2020" ]; then
+          if [ "${GITHUB_REF}" == "refs/heads/KLTN2020" ]; then
             docker login -u $DOCKER_ID -p $DOCKER_TOKEN
             export BUILD_TAG=${GITHUB_HEAD_REF}-${GITHUB_RUN_NUMBER}-$(date +%s)
             docker tag app doonpy/kltn2020:${BUILD_TAG}
