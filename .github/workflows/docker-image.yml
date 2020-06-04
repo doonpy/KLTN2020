@@ -7,16 +7,20 @@ on:
     branches: [ KLTN2020 ]
 
 jobs:
-  build-docker-image:
+  create-image:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [node-10, node-12, node-14]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Build the Docker image
         run: |
-          docker build -t app .
+          docker build -f ${{ matrix.node-version }}.dockerfile -t app .
 
       - name: Push to Docker Hub
         env:
@@ -30,6 +34,6 @@ jobs:
             docker login -u ${DOCKER_ID} -p ${DOCKER_TOKEN}
             docker tag app doonpy/kltn2020:${BUILD_TAG}
             docker push doonpy/kltn2020:${BUILD_TAG}
-            docker tag app doonpy/kltn2020:latest
-            docker push doonpy/kltn2020:latest
+            docker tag app doonpy/kltn2020:latest-${{ matrix.node-version }}
+            docker push doonpy/kltn2020:latest-${{ matrix.node-version }}
           fi
