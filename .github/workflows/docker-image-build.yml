@@ -23,12 +23,11 @@ jobs:
           DOCKER_ID: ${{ secrets.DOCKER_ID }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
-          # Strip git ref prefix from version
-          VERSION=$(echo "${GITHUB_REF}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF:11}"
+          BUILD_TAG="${VERSION}_${GITHUB_RUN_NUMBER}"
 
           if [ "${VERSION}" == "KLTN2020" ]; then
-            docker login -u $DOCKER_ID -p $DOCKER_TOKEN
-            BUILD_TAG=${VESION}-${GITHUB_RUN_NUMBER}-$(date +%s)
+            docker login -u ${DOCKER_ID} -p ${DOCKER_TOKEN}
             docker tag app doonpy/kltn2020:${BUILD_TAG}
             docker push doonpy/kltn2020:${BUILD_TAG}
             docker tag app doonpy/kltn2020:latest
