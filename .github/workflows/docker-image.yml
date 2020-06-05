@@ -29,7 +29,7 @@ jobs:
         run: |
           BRANCH_NAME="${GITHUB_REF:11}"
           NORMAL_BUILD_TAG="${BRANCH_NAME}_${{ matrix.node-version }}_${GITHUB_RUN_NUMBER}"
-          LATEST_VERSION="node-12"
+          LATEST_VERSION=node-12
 
 
           if [ "${BRANCH_NAME}" == "KLTN2020" ]; then
@@ -37,7 +37,7 @@ jobs:
             docker tag app doonpy/kltn2020:${NORMAL_BUILD_TAG}
             docker push doonpy/kltn2020:${NORMAL_BUILD_TAG}
 
-            if ["${{ matrix.node-version }}" == "${LATEST_VERSION}" ]; then
+            if [ "${{ matrix.node-version }}" == "${LATEST_VERSION}" ]; then
               docker tag app doonpy/kltn2020:latest
               docker push doonpy/kltn2020:latest
             fi
