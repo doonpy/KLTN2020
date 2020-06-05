@@ -1,5 +1,6 @@
 # Graduation thesis 2020 Project
-![Build + ESLint Checking CI](https://github.com/doonpy/KLTN2020/workflows/Node.js%20CI/badge.svg?branch=KLTN2020&event=push)
+![Checking CI](https://github.com/doonpy/KLTN2020/workflows/Checking%20CI/badge.svg?branch=KLTN2020)
+![Docker Image CI](https://github.com/doonpy/KLTN2020/workflows/Docker%20Image%20CI/badge.svg?branch=KLTN2020)
 ## Overview
 ### Topic
 Research about Visualization Data and build demo application with real estate data.

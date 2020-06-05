@@ -46,7 +46,7 @@ export default class RawDataLogic
         const propertyType:
             | number
             | undefined = CommonConstant.PROPERTY_TYPE.find(({ wording }) =>
-            new RegExp(wording.join(', ').replace(', ', '|'), 'i').test(
+            RegExp(wording.join(', ').replace(', ', '|'), 'i').test(
                 propertyTypeData
             )
         )?.id;

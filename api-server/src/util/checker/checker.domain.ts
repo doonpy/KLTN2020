@@ -3,7 +3,7 @@ import CheckerBase from './checker.base';
 import CheckerWording from './checker.wording';
 
 export default class CheckerDomain extends CheckerBase {
-    private VALID_DOMAIN = new RegExp(
+    private VALID_DOMAIN = RegExp(
         /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+$/
     );
 

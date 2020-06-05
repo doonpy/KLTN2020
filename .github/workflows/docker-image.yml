@@ -1,0 +1,44 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ KLTN2020 ]
+  pull_request:
+    branches: [ KLTN2020 ]
+
+jobs:
+  create-image:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [node-10, node-12, node-14]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build the Docker image
+        run: |
+          docker build -f ${{ matrix.node-version }}.dockerfile -t app .
+
+      - name: Push to Docker Hub
+        env:
+          DOCKER_ID: ${{ secrets.DOCKER_ID }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: |
+          BRANCH_NAME="${GITHUB_REF:11}"
+          NORMAL_BUILD_TAG="${BRANCH_NAME}_${{ matrix.node-version }}_${GITHUB_RUN_NUMBER}"
+          LATEST_VERSION=node-12
+
+
+          if [ "${BRANCH_NAME}" == "KLTN2020" ]; then
+            docker login -u ${DOCKER_ID} -p ${DOCKER_TOKEN}
+            docker tag app doonpy/kltn2020:${NORMAL_BUILD_TAG}
+            docker push doonpy/kltn2020:${NORMAL_BUILD_TAG}
+
+            if [ "${{ matrix.node-version }}" == "${LATEST_VERSION}" ]; then
+              docker tag app doonpy/kltn2020:latest
+              docker push doonpy/kltn2020:latest
+            fi
+          fi

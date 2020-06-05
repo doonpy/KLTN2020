@@ -1,5 +1,4 @@
-import 'module-alias/register';
-import '@root/prepend';
+import './prepend';
 import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/visual.administrative.district.interface';
 import countryData from '@util/data-initialization/countries.json';
 import provinceData from '@util/data-initialization/provinces.json';

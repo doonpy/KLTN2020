@@ -1,5 +1,5 @@
 import 'module-alias/register';
-import '@root/prepend';
+import '../../prepend';
 import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import CatalogLogic from '@service/catalog/catalog.logic';

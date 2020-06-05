@@ -1,5 +1,4 @@
-import 'module-alias/register';
-import '@root/prepend';
+import '../prepend';
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
 import ChatBotTelegram from '@util/chatbot/chatBotTelegram';

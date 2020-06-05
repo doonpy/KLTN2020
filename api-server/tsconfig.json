@@ -10,12 +10,27 @@
     "esModuleInterop": true,
     "baseUrl": "src",
     "paths": {
-      "@root/*": ["./*"],
-      "@background-job/*": ["background-job/*"],
-      "@common/*": ["common/*"],
-      "@middleware/*": ["middleware/*"],
-      "@service/*": ["service/*"],
-      "@util/*": ["util/*"]
+      "@root/*": [
+        "./*"
+      ],
+      "@background-job/*": [
+        "background-job/*"
+      ],
+      "@common/*": [
+        "common/*"
+      ],
+      "@database/*": [
+        "database/*"
+      ],
+      "@middleware/*": [
+        "middleware/*"
+      ],
+      "@service/*": [
+        "service/*"
+      ],
+      "@util/*": [
+        "util/*"
+      ]
     }
   }
 }

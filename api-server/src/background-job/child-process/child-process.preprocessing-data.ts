@@ -1,5 +1,4 @@
-import 'module-alias/register';
-import '@root/prepend';
+import '../../prepend';
 import ConsoleLog from '@util/console/console.log';
 import ConsoleConstant from '@util/console/console.constant';
 import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
@@ -463,7 +462,7 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
             const districtId:
                 | number
                 | undefined = districtList.filter(({ name: districtName }) =>
-                new RegExp(`${districtName}$`, 'i').test(
+                RegExp(`${districtName}$`, 'i').test(
                     addressProperties?.district || ''
                 )
             )[0]?._id;
@@ -480,7 +479,7 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
                 ({ name: wardName, districtId: wardDistrictId }) =>
                     (wardDistrictId as VisualAdministrativeDistrictDocumentModel)
                         ._id === districtId &&
-                    new RegExp(`${wardName}$`, 'i').test(
+                    RegExp(`${wardName}$`, 'i').test(
                         addressProperties?.ward || ''
                     )
             )[0]?._id;
