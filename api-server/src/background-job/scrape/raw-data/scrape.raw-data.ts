@@ -137,10 +137,22 @@ export default class ScrapeRawData extends ScrapeBase {
                 currentUrl
             );
 
-            if (!$) {
-                await this.handleFailedRequest(currentDetailUrlDocument);
-            } else {
-                await this.handleSuccessRequest($, currentDetailUrlDocument);
+            try {
+                if (!$) {
+                    await this.handleFailedRequest(currentDetailUrlDocument);
+                } else {
+                    await this.handleSuccessRequest(
+                        $,
+                        currentDetailUrlDocument
+                    );
+                }
+            } catch (error) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape raw data - DID: ${
+                        currentDetailUrlDocument._id
+                    } - Error: ${error.cause || error.message}`
+                ).show();
             }
             this.requestCounter--;
         }, this.REQUEST_DELAY);
@@ -382,14 +394,11 @@ export default class ScrapeRawData extends ScrapeBase {
             postDateData
                 .match(ScrapeRawDataConstant.POST_DATE_PATTERN)
                 ?.shift() || '';
-        let postDate = convertStringToDate(
+        const postDate = convertStringToDate(
             postDateString,
             this.pattern.mainLocator.postDate.format,
             this.pattern.mainLocator.postDate.delimiter
         );
-        if (!postDate) {
-            postDate = new Date();
-        }
 
         const acreage = acreageHandler(acreageData);
         const price = priceHandler(priceData, transactionType, acreage.value);
@@ -398,7 +407,7 @@ export default class ScrapeRawData extends ScrapeBase {
             detailUrlId,
             transactionType,
             propertyType,
-            postDate: postDate.toISOString(),
+            postDate,
             title: titleData,
             describe: describeData,
             price,

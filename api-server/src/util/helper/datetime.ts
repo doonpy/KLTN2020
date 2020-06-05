@@ -19,13 +19,13 @@ export const convertStringToDate = (
     const monthIndex = separatedFormat.indexOf('mm');
     const yearIndex = separatedFormat.indexOf('yyyy');
 
-    if (!separatedValue[dayIndex] || !Number(!separatedValue[dayIndex])) {
+    if (!separatedValue[dayIndex] || !Number(separatedValue[dayIndex])) {
         return undefined;
     }
-    if (!separatedValue[monthIndex] || !Number(!separatedValue[monthIndex])) {
+    if (!separatedValue[monthIndex] || !Number(separatedValue[monthIndex])) {
         return undefined;
     }
-    if (!separatedValue[yearIndex] || !Number(!separatedValue[yearIndex])) {
+    if (!separatedValue[yearIndex] || !Number(separatedValue[yearIndex])) {
         return undefined;
     }
 
