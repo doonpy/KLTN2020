@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaMapMarkedAlt, FaMap, FaHandHoldingUsd } from 'react-icons/fa';
+import { MAP_MODE } from '../util/constants';
 
 const PageLeft = ({ setTabmap, tabMap }) => {
     return (
@@ -9,17 +10,17 @@ const PageLeft = ({ setTabmap, tabMap }) => {
         >
             <FaMapMarkedAlt
                 className={`mt-8 cursor-pointer shadow-sm ${
-                    tabMap === 0 ? 'text-blue-600' : ''
+                    tabMap === MAP_MODE.AREA_MODE ? 'text-blue-600' : ''
                 }`}
                 size={24}
-                onClick={() => setTabmap(0)}
+                onClick={() => setTabmap(MAP_MODE.AREA_MODE)}
             />
             <FaMap
                 size={24}
                 className={`mt-8 cursor-pointer shadow-sm ${
-                    tabMap === 1 ? 'text-blue-600' : ''
+                    tabMap === MAP_MODE.DENSITY_MODE ? 'text-blue-600' : ''
                 }`}
-                onClick={() => setTabmap(1)}
+                onClick={() => setTabmap(MAP_MODE.DENSITY_MODE)}
             />
             <FaHandHoldingUsd size={24} className="mt-8 cursor-pointer" />
             <div />

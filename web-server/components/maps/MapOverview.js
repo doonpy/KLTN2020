@@ -55,15 +55,16 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
                 verticalAlign: 'bottom',
             },
         },
-        plotOptions: {
-            map: {
-                states: {
-                    hover: {
-                        color: '#EEDD66',
-                    },
-                },
-            },
-        },
+        // plotOptions: {
+        //     map: {
+        //         states: {
+        //             hover: {
+        //                 borderColor: '#EEDD66',
+        //                 borderWidth: 3,
+        //             },
+        //         },
+        //     },
+        // },
         legend: {
             layout: 'vertical',
             align: 'right',
@@ -71,14 +72,6 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
             backgroundColor: 'rgba(0,0,0,0)',
             y: 35,
         },
-        // legend: {
-        //     layout: 'horizontal',
-        //     borderWidth: 0,
-        //     backgroundColor: 'rgba(0,0,0,0)',
-        //     floating: true,
-        //     verticalAlign: 'top',
-        //     // y: 25,
-        // },
         series: [
             {
                 mapData,

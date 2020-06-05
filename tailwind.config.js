@@ -1,6 +1,9 @@
 module.exports = {
   important: true,
-  purge: ['./web-server/pages/**/*.js','./web-server/components/**/*.js'],
+  purge: {
+    enabled: true,
+    content: ['./web-server/pages/**/*.js','./web-server/components/**/*.js'],
+  },
   theme: {
     darkSelector: '.dark-mode',
     backgroundColor: (theme) => ({
@@ -22,11 +25,8 @@ module.exports = {
      backgroundColor: ['dark', 'responsive', 'hover', 'focus'],
      borderColor: [
       'dark',
-      'dark-focus-within',
       'responsive',
       'hover',
-      'focus',
-      'focus-within',
     ],
     textColor: ['dark', 'responsive', 'hover', 'focus'],
     borderWidth: ['dark', 'responsive'],

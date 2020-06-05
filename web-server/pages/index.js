@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-one-expression-per-line */
 import React, { useState } from 'react';
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +9,7 @@ import PageLeft from '../components/page-left';
 import PageRight from '../components/page-right';
 import useDistrict from '../hooks/use-district';
 import useWard from '../hooks/use-ward';
-import { TRANSATION_TYPE } from '../util/constants';
+import { TRANSATION_TYPE, MAP_MODE } from '../util/constants';
 
 export async function getStaticProps() {
     const postsDirectory = path.join(
@@ -33,7 +32,7 @@ export async function getStaticProps() {
 }
 
 const Home = ({ mapStaticJSON }) => {
-    const [tabMap, setTabmap] = useState(0);
+    const [tabMap, setTabmap] = useState(MAP_MODE.AREA_MODE);
     const [transactionStage, setTransaction] = useState(TRANSATION_TYPE.TOTAL);
     const { mapKey } = useSelector((state) => state.mapKey);
 
@@ -44,7 +43,6 @@ const Home = ({ mapStaticJSON }) => {
         if (!summaryData.cache) {
             summaryData.cache = {};
         }
-        // handle Cache
         const _key = `${key}_${tabKey}`;
         const _synmetricKey = `${tabKey}_${key}`;
         if (summaryData.cache[_key]) return summaryData.cache[_key];
@@ -109,7 +107,6 @@ const Home = ({ mapStaticJSON }) => {
                         <div className="w-full flex h-full">
                             <PageLeft setTabmap={setTabmap} tabMap={tabMap} />
                             <div className="w-full flex">
-                                {/* <div className="text-ww text-6xl">sdsd</div> */}
                                 <div className="w-9/12 h-full">
                                     <div className="h-full flex flex-col">
                                         <PageMap

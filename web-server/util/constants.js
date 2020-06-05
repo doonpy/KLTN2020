@@ -116,3 +116,10 @@ export const ACREAGE_BY_ZOOM_LEVEL = [
         maxArea: 500,
     },
 ];
+
+export const MAP_MODE = {
+    AREA_MODE: 'Xem Diện tích',
+    PRICE_MODE: 'Xem Giá',
+    DENSITY_MODE: 'Xem mật độ',
+    POSITION_MODE: 'Xem vị trí',
+};

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import RenderCompleted from '../hooks/use-mounted';
 import LoadingIcon from './LoadingIcon';
-import { PROPERTY_TYPE_NUMBER } from '../util/constants';
+import { PROPERTY_TYPE_NUMBER, MAP_MODE } from '../util/constants';
 
-const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
+const MapLeaf = dynamic(() => import('./Maps/MapLeaf'), {
     ssr: false,
 });
-const MapOverview = dynamic(() => import('./maps/MapOverview'), {
+const MapOverview = dynamic(() => import('./Maps/MapOverview'), {
     loading: () => <LoadingIcon />,
 });
-const MapWard = dynamic(() => import('./maps/MapWard'), {
+const MapWard = dynamic(() => import('./Maps/MapWard'), {
     loading: () => <LoadingIcon />,
 });
 
@@ -37,7 +37,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
         <div className="flex-1 flex relative">
             <div
                 className={
-                    tabMap === 0
+                    tabMap === MAP_MODE.AREA_MODE
                         ? `bottom-0 left-0 w-full  border border-solid border-light-primary dark:border-primary absolute dark:bg-gray-900 bg-white`
                         : 'hidden'
                 }
@@ -61,11 +61,12 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
                     ))}
                 </div>
             </div>
-            {tabMap === 0 ? (
+            {tabMap === MAP_MODE.AREA_MODE ? (
                 <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
                         {isMounted && (
                             <MapLeaf
+                                tabMap={tabMap}
                                 propertyStage={propertyStage}
                                 transactionStage={transactionStage}
                             />

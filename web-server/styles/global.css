@@ -1,7 +1,7 @@
-@import 'spinner.css';
-@import 'legend.css';
 @tailwind base;
 @tailwind components;
+@import 'spinner.css';
+@import 'legend.css';
 
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
 import LoadingIcon from '../LoadingIcon';
-import { fetchMapData } from '../../lib/map-chart/helper';
+import { fetchMapData } from '../../util/api/fetchMapJson';
 import * as action from '../../store/map-key/actions';
 
 if (typeof Highcharts === 'object') {
@@ -29,6 +29,7 @@ const MapWard = ({ dataWard, setStage }) => {
         await dispatch(action.fetchMapKey('full'));
         setStage(0);
     };
+
     const mapOptions = {
         chart: {
             type: 'map',
