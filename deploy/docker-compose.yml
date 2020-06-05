@@ -1,7 +1,7 @@
 version: '3'
 services:
   api-server:
-    image: doonpy/kltn2020:node-12_latest
+    image: doonpy/kltn2020:latest
     container_name: kltn2020_api-server
     entrypoint:
       - /bin/sh
@@ -18,7 +18,7 @@ services:
       - app-network
 
   background-job:
-    image: doonpy/kltn2020:node-12_latest
+    image: doonpy/kltn2020:latest
     container_name: kltn2020_background-job
     entrypoint:
       - /bin/sh
@@ -33,7 +33,7 @@ services:
       - app-network
 
   web-server:
-    image: doonpy/kltn2020:node-12_latest
+    image: doonpy/kltn2020:latest
     container_name: kltn2020_web-server
     entrypoint:
       - /bin/sh
