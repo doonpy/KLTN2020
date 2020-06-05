@@ -60,6 +60,10 @@ VisualMapPointSchema.plugin(autoIncrement.plugin, {
 VisualMapPointSchema.plugin(autoPopulate);
 
 VisualMapPointSchema.index(
+    { lat: 1, lng: 1 },
+    { name: 'idx_lat_lon', unique: true }
+);
+VisualMapPointSchema.index(
     {
         lat: 1,
         lng: 1,
@@ -71,7 +75,7 @@ VisualMapPointSchema.index(
     },
     {
         name:
-            'idx_lat_lon_points.rawDataset.acreage_points.transactionType_points.propertyType',
+            'idx_points.rawDataset.acreage_points.transactionType_points.propertyType',
     }
 );
 

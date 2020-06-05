@@ -213,12 +213,7 @@ const handleVisualizationSummaryDistrictWardData = async (
     propertyType: number
 ): Promise<void> => {
     const visualSummaryDistrictWardDocument = await visualSummaryDistrictWardLogic.getOne(
-        {
-            conditions: {
-                districtId,
-                wardId,
-            },
-        }
+        { districtId, wardId }
     );
 
     if (!visualSummaryDistrictWardDocument) {
@@ -259,10 +254,8 @@ const handleVisualizationMapPoint = async (
     { _id, acreage, price, transactionType, propertyType }: RawDataDocumentModel
 ): Promise<void> => {
     const visualMapPointDocument = await visualMapPointLogic.getOne({
-        conditions: {
-            lat,
-            lng,
-        },
+        lat,
+        lng,
     });
 
     const newPoint: MapPoint = {
@@ -373,9 +366,7 @@ const handleVisualizationAnalysis = async (
     };
 
     const visualAnalysisDocument = await visualAnalysisLogic.getOne({
-        conditions: {
-            referenceDate,
-        },
+        referenceDate,
     });
     if (!visualAnalysisDocument) {
         await visualAnalysisLogic.create(({
@@ -530,7 +521,7 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
             } catch (error) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - RID: ${rawData._id} - Error: ${rawData.address}`
+                    `Preprocessing data - RID: ${rawData._id} - Error: ${error.message}`
                 ).show();
             }
         }
