@@ -255,6 +255,12 @@ export default class VisualMapPointController extends VisualCommonController {
                         ({ _id }) => document.wardId === _id
                     )[0] || null;
                 document.districtId = document.wardId.districtId;
+                document.points.forEach((point) => {
+                    point.rawDataset = point.rawDataset.sort(
+                        ({ acreage: first }, { acreage: second }) =>
+                            second - first
+                    );
+                });
 
                 return document;
             });
