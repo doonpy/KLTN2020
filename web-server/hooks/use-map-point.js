@@ -5,7 +5,7 @@ import fetcher from '../util/api/fetcher';
 export default function useMapPoint({
     variables: {
         minAcreage,
-        maxAcreage,
+        minPrice,
         minLat,
         maxLat,
         minLng,
@@ -15,9 +15,11 @@ export default function useMapPoint({
     },
 }) {
     return useSWR(
-        `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}&maxAcreage=${maxAcreage}${
-            propertyType !== 0 ? `&propertyType=${propertyType}` : ''
-        }${transactionType !== 0 ? `&transactionType=${transactionType}` : ''}`,
+        `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}${
+            minPrice !== 1 ? `&minPrice=${minPrice}` : ''
+        }${propertyType !== 0 ? `&propertyType=${propertyType}` : ''}${
+            transactionType !== 0 ? `&transactionType=${transactionType}` : ''
+        }`,
         fetcher
     );
 }

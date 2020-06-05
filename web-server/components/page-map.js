@@ -37,7 +37,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
         <div className="flex-1 flex relative">
             <div
                 className={
-                    tabMap === MAP_MODE.AREA_MODE
+                    tabMap !== MAP_MODE.DENSITY_MODE
                         ? `bottom-0 left-0 w-full  border border-solid border-light-primary dark:border-primary absolute dark:bg-gray-900 bg-white`
                         : 'hidden'
                 }
@@ -61,7 +61,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
                     ))}
                 </div>
             </div>
-            {tabMap === MAP_MODE.AREA_MODE ? (
+            {tabMap !== MAP_MODE.DENSITY_MODE ? (
                 <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
                         {isMounted && (

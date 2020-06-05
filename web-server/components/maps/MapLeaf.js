@@ -21,13 +21,12 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         maxLng: 107.42156982421876,
     });
     const [zoomLevel, setZoomLevel] = useState(10);
-    const [dataMap, setDataMap] = useState({ zoom: zoomLevel, data: [] });
-    const area = ACREAGE_BY_ZOOM_LEVEL.find((w) => w.zoom === zoomLevel);
 
+    const area = ACREAGE_BY_ZOOM_LEVEL.find((w) => w.zoom === zoomLevel);
     const { data, isValidating } = useMapPoint({
         variables: {
-            minAcreage: area.minArea,
-            maxAcreage: area.maxArea,
+            minAcreage: tabMap === MAP_MODE.AREA_MODE ? area.minArea : 1,
+            minPrice: tabMap === MAP_MODE.PRICE_MODE ? area.minPrice : 1,
             minLat: latlngBounds.minLat,
             maxLat: latlngBounds.maxLat,
             minLng: latlngBounds.minLng,
@@ -37,6 +36,7 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         },
     });
 
+    // console.log(data);
     const onMove = debounce((event) => {
         const bound = event.target.getBounds();
         setBounds({
@@ -47,17 +47,6 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         });
         setZoomLevel(event.target.getZoom());
     }, 500);
-
-    useEffect(() => {
-        setDataMap({
-            zoomLevel,
-            data: data?.mapPoints,
-        });
-    }, [data, window.localStorage]);
-
-    const routerToDetail = (id) => {
-        Router.push(`/detail/${id}`);
-    };
 
     return (
         <div className="relative" style={{ height: 'calc(100vh - 135px)' }}>
@@ -87,12 +76,16 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                     />
                 )}
 
-                {dataMap?.data &&
-                    dataMap.data.map((c) => {
+                {data?.mapPoints &&
+                    data.mapPoints.map((c) => {
                         return c.points.map((point, index) => {
                             return (
                                 <CircleMarker
-                                    color="red"
+                                    color={
+                                        tabMap === MAP_MODE.AREA_MODE
+                                            ? 'red'
+                                            : 'blue'
+                                    }
                                     // eslint-disable-next-line react/no-array-index-key
                                     key={index}
                                     fillOpacity={0.8}
@@ -102,7 +95,7 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                                         Math.sqrt(
                                             point.rawDataset[0].acreage /
                                                 Math.PI
-                                        ) / 10
+                                        ) / 20
                                     }
                                 >
                                     <Tooltip>
@@ -110,7 +103,7 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                                             {point.rawDataset.map((a) => {
                                                 return (
                                                     <span key={a.rawDataId}>
-                                                        {`Diện tích: ${a.acreage} m2 + ${a.rawDataId}`}
+                                                        {`Diện tích: ${a.acreage} m2 + ${a.rawDataId} + `}
                                                     </span>
                                                 );
                                             })}
