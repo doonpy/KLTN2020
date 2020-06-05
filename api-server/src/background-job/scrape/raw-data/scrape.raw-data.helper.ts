@@ -187,9 +187,10 @@ export const priceHandler = (
 
     let timeUnit = NaN;
     if (transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
-        timeUnit = CommonConstant.PRICE_TIME_UNIT.filter(({ wording }) =>
-            RegExp(wording.join('|'), 'i').test(perTime)
-        )[0].id;
+        timeUnit =
+            CommonConstant.PRICE_TIME_UNIT.filter(({ wording }) =>
+                RegExp(wording.join('|'), 'i').test(perTime)
+            )[0]?.id || NaN;
     }
 
     const priceCurrency = priceData.match(/$/)?.shift()
