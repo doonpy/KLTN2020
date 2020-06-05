@@ -6,7 +6,7 @@ import NProgress from 'nprogress';
 import useRawDataDetail from '../../hooks/use-raw-data-detail';
 import PageLayout from '../../components/page-layout';
 
-const MapItem = dynamic(() => import('../../components/Maps/MapItem'), {
+const MapItem = dynamic(() => import('../../components/maps/MapItem'), {
     ssr: false,
 });
 

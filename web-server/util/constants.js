@@ -68,52 +68,52 @@ export const ACREAGE_BY_ZOOM_LEVEL = [
     {
         zoom: 10,
         minArea: 50000,
-        maxArea: 200000,
+        minPrice: 392000000000,
     },
     {
         zoom: 11,
-        minArea: 5000,
-        maxArea: 49999,
+        minArea: 10000,
+        minPrice: 39200000000,
     },
     {
         zoom: 12,
-        minArea: 1000,
-        maxArea: 5000,
+        minArea: 5000,
+        minPrice: 3920000000,
     },
     {
         zoom: 13,
         minArea: 1000,
-        maxArea: 200000,
+        minPrice: 3920000000,
     },
     {
         zoom: 14,
-        minArea: 1000,
-        maxArea: 200000,
+        minArea: 800,
+        minPrice: 3920000000,
     },
     {
         zoom: 14,
-        minArea: 1,
-        maxArea: 500,
+        minArea: 500,
+        minPrice: 3920000000,
     },
     {
         zoom: 15,
-        minArea: 1,
-        maxArea: 500,
+        minArea: 100,
+        minPrice: 3920000000,
     },
     {
         zoom: 16,
         minArea: 1,
-        maxArea: 500,
+        minPrice: 3920000000,
     },
     {
         zoom: 17,
         minArea: 1,
-        maxArea: 500,
+        minPrice: 3920000000,
     },
     {
         zoom: 18,
         minArea: 1,
-        maxArea: 500,
+        minPrice: 3920000000,
     },
 ];
 
