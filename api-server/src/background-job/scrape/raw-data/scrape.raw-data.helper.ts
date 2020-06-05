@@ -24,7 +24,7 @@ const PRICE_UNIT_PATTERN = {
 };
 
 /**
- * Convert acreage value by measure unit
+ * Convert acreage value to meter
  * @param {number} value
  * @param {string} fromUnit
  * @return {number} value
@@ -41,11 +41,44 @@ export const convertAcreageValueToMeter = (
         return NaN;
     }
 
-    if (fromUnit === MeasureUnit.KILOMETER) {
-        return Math.round((value * 100000 * 100) / 100);
+    if (fromUnit === MeasureUnit.METER) {
+        return Math.round(value * 100) / 100;
     }
 
-    return Math.round(value * 100) / 100;
+    if (fromUnit === MeasureUnit.KILOMETER) {
+        return Math.round((value * 1000 * 100) / 100);
+    }
+
+    return NaN;
+};
+
+/**
+ * Convert acreage value to kilometer
+ * @param {number} value
+ * @param {string} fromUnit
+ * @return {number} value
+ */
+export const convertAcreageValueToKilometer = (
+    value: number,
+    fromUnit: MeasureUnit
+): number => {
+    if (!value) {
+        return NaN;
+    }
+
+    if (!(fromUnit in MeasureUnit)) {
+        return NaN;
+    }
+
+    if (fromUnit === MeasureUnit.KILOMETER) {
+        return Math.round(value * 100) / 100;
+    }
+
+    if (fromUnit === MeasureUnit.METER) {
+        return Math.round((value / 1000) * 100) / 100;
+    }
+
+    return NaN;
 };
 
 /**
@@ -182,11 +215,24 @@ export const priceHandler = (
     }
 
     if (perAcreage) {
+        const acreageUnit: MeasureUnit = convertToEnum(
+            getValidDataFromPatterns(perAcreage, [
+                MEASURE_UNIT_PATTERN.KILOMETER,
+                MEASURE_UNIT_PATTERN.METER,
+            ]),
+            'acreage'
+        );
+        if (acreageUnit === MeasureUnit.KILOMETER) {
+            acreageValue = convertAcreageValueToKilometer(
+                acreageValue,
+                MeasureUnit.KILOMETER
+            );
+        }
         value *= acreageValue;
     }
 
     let timeUnit = NaN;
-    if (transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
+    if (perTime && transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
         timeUnit =
             CommonConstant.PRICE_TIME_UNIT.filter(({ wording }) =>
                 RegExp(wording.join('|'), 'i').test(perTime)
