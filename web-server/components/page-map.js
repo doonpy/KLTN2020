@@ -4,13 +4,13 @@ import RenderCompleted from '../hooks/use-mounted';
 import LoadingIcon from './LoadingIcon';
 import { PROPERTY_TYPE_NUMBER, MAP_MODE } from '../util/constants';
 
-const MapLeaf = dynamic(() => import('./Maps/MapLeaf'), {
+const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
 });
-const MapOverview = dynamic(() => import('./Maps/MapOverview'), {
+const MapOverview = dynamic(() => import('./maps/MapOverview'), {
     loading: () => <LoadingIcon />,
 });
-const MapWard = dynamic(() => import('./Maps/MapWard'), {
+const MapWard = dynamic(() => import('./maps/MapWard'), {
     loading: () => <LoadingIcon />,
 });
 

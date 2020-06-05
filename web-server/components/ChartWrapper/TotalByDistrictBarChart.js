@@ -1,5 +1,5 @@
 import React from 'react';
-import BarChart from '../Charts/BarChart';
+import BarChart from '../charts/BarChart';
 
 const TotalByDistrictBarChart = ({ data }) => {
     return (
