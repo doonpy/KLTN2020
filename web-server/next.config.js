@@ -23,10 +23,6 @@ module.exports = (phase) => {
 
     const config = {
         webpack: function (config, { dev }) {
-            config.resolve.alias[package.name] = path.resolve(
-                __dirname,
-                'web-server'
-            );
             config.module.rules.push({
                 test: /\.(eot|woff|woff2|ttf|svg|png|jpg|gif)$/,
                 use: {
