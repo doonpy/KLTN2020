@@ -16,22 +16,20 @@ export interface VisualSummaryDistrictWardDocumentModel
     districtId: number | VisualAdministrativeDistrictDocumentModel;
     wardId: number | VisualAdministrativeWardDocumentModel;
     summaryAmount: number;
-    summary: {
+    summary: Array<{
         transactionType: number;
         propertyType: number;
         amount: number;
-    }[];
+    }>;
 }
 
 export interface VisualSummaryDistrictWardApiModel extends CommonApiModel {
     district: VisualAdministrativeDistrictApiModel | number | null;
     ward: VisualAdministrativeWardApiModel | number | null;
     summaryAmount: number | null;
-    summary:
-        | {
-              transactionType: number;
-              propertyType: number;
-              amount: number;
-          }[]
-        | null;
+    summary: Array<{
+        transactionType: number;
+        propertyType: number;
+        amount: number;
+    }> | null;
 }

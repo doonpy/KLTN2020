@@ -31,5 +31,5 @@ module.exports = {
     textColor: ['dark', 'responsive', 'hover', 'focus'],
     borderWidth: ['dark', 'responsive'],
   },
-  plugins: [require('tailwindcss-dark-mode')()],
+  plugins: [...require('tailwindcss-dark-mode')()],
 }

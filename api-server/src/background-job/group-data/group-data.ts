@@ -38,10 +38,7 @@ export default class GroupData {
         propertyType: number
     ): Promise<void> {
         const startTime = process.hrtime();
-        const limit = 1000;
-        let isCompareDone = true;
-        let rawDataset = await this.rawDataLogic.getAll({
-            limit,
+        const rawDataset = await this.rawDataLogic.getAll({
             conditions: {
                 isGrouped: false,
                 transactionType,
@@ -49,137 +46,111 @@ export default class GroupData {
             },
         });
 
-        const loop = setInterval(async (): Promise<void> => {
-            if (this.isSuspense || !isCompareDone) {
-                return;
-            }
+        rawDataLoop: for (const rawData of rawDataset.documents) {
+            rawData.isGrouped = true;
+            const aggregations = [
+                {
+                    $lookup: {
+                        from: 'raw_datas',
+                        localField: 'items',
+                        foreignField: '_id',
+                        as: 'items',
+                    },
+                },
+                {
+                    $project: {
+                        represent: { $arrayElemAt: ['$items', 0] },
+                    },
+                },
+                {
+                    $match: {
+                        $and: [
+                            {
+                                'represent.transactionType': transactionType,
+                            },
+                            { 'represent.propertyType': propertyType },
+                        ],
+                    },
+                },
+            ];
+            const representOfGroupedDataset = await this.groupedDataLogic.getWithAggregation<
+                AggregationGroupDataResult
+            >(aggregations);
 
-            if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
-                clearInterval(loop);
-                const executeTime = convertTotalSecondsToTime(
-                    process.hrtime(startTime)[0]
+            for (const item of representOfGroupedDataset) {
+                const similarScore = this.getSimilarScore(
+                    rawData,
+                    item.represent
                 );
-                await ChatBotTelegram.getInstance().sendMessage(
-                    `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
-                );
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Group data - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime} - Complete`
-                ).show();
-                process.exit(0);
-            }
 
-            isCompareDone = false;
-            const { documents } = rawDataset;
-            rawDataLoop: for (const document of documents) {
-                document.isGrouped = true;
-                const aggregations = [
-                    {
-                        $lookup: {
-                            from: 'raw_datas',
-                            localField: 'items',
-                            foreignField: '_id',
-                            as: 'items',
-                        },
-                    },
-                    {
-                        $project: {
-                            represent: { $arrayElemAt: ['$items', 0] },
-                        },
-                    },
-                    {
-                        $match: {
-                            $and: [
-                                {
-                                    'represent.transactionType': transactionType,
-                                },
-                                { 'represent.propertyType': propertyType },
-                            ],
-                        },
-                    },
-                ];
-                const representOfGroupedDataset = await this.groupedDataLogic.getWithAggregation<
-                    AggregationGroupDataResult
-                >(aggregations);
-
-                for (const item of representOfGroupedDataset) {
-                    const similarScore = this.getSimilarScore(
-                        document,
-                        item.represent
-                    );
-
-                    if (similarScore >= this.OVER_FITTING_SCORE) {
-                        new ConsoleLog(
-                            ConsoleConstant.Type.ERROR,
-                            `Group data -> RID: ${document._id} -> GID: ${item._id} - Error: Over fitting.`
-                        ).show();
-                        await this.rawDataLogic.update(document._id, document);
-                        continue rawDataLoop;
-                    }
-
-                    if (similarScore >= this.EXPECTED_SCORE) {
-                        const groupData = await this.groupedDataLogic.getById(
-                            item._id
-                        );
-
-                        groupData.items.push(document._id);
-                        try {
-                            await Promise.all([
-                                this.groupedDataLogic.update(
-                                    item._id,
-                                    groupData
-                                ),
-                                this.rawDataLogic.update(
-                                    document._id,
-                                    document
-                                ),
-                            ]);
-                            new ConsoleLog(
-                                ConsoleConstant.Type.INFO,
-                                `Group data -> RID: ${document._id} -> GID: ${item._id}`
-                            ).show();
-                        } catch (error) {
-                            await ChatBotTelegram.getInstance().sendMessage(
-                                `Error:\n<code>${
-                                    error.cause || error.message
-                                }</code>`
-                            );
-                            new ConsoleLog(
-                                ConsoleConstant.Type.ERROR,
-                                `Group data -> RID: ${document._id} -> GID: ${
-                                    item._id
-                                } - Error: ${error.cause || error.message}`
-                            ).show();
-                        }
-
-                        continue rawDataLoop;
-                    }
+                if (similarScore >= this.OVER_FITTING_SCORE) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Group data -> RID: ${rawData._id} -> GID: ${item._id} - Error: Over fitting.`
+                    ).show();
+                    await this.rawDataLogic.update(rawData._id, rawData);
+                    continue rawDataLoop;
                 }
 
-                const groupedDataCreated = (
-                    await Promise.all([
-                        this.groupedDataLogic.create(({
-                            items: [document._id],
-                        } as unknown) as GroupedDataDocumentModel),
-                        this.rawDataLogic.update(document._id, document),
-                    ])
-                )[0];
+                if (similarScore >= this.EXPECTED_SCORE) {
+                    const groupData = await this.groupedDataLogic.getById(
+                        item._id
+                    );
 
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Group data -> RID: ${document._id} -> GID: ${groupedDataCreated?._id}`
-                ).show();
+                    groupData.items.push(rawData._id);
+                    try {
+                        await Promise.all([
+                            this.groupedDataLogic.update(item._id, groupData),
+                            this.rawDataLogic.update(rawData._id, rawData),
+                        ]);
+                        new ConsoleLog(
+                            ConsoleConstant.Type.INFO,
+                            `Group data -> RID: ${rawData._id} -> GID: ${item._id}`
+                        ).show();
+                    } catch (error) {
+                        await ChatBotTelegram.getInstance().sendMessage(
+                            `Error:\n<code>${
+                                error.cause || error.message
+                            }</code>`
+                        );
+                        new ConsoleLog(
+                            ConsoleConstant.Type.ERROR,
+                            `Group data -> RID: ${rawData._id} -> GID: ${
+                                item._id
+                            } - Error: ${error.cause || error.message}`
+                        ).show();
+                    }
+
+                    continue rawDataLoop;
+                }
             }
-            rawDataset = await this.rawDataLogic.getAll({
-                limit,
-                conditions: {
-                    isGrouped: false,
-                    transactionType,
-                    propertyType,
-                },
-            });
-            isCompareDone = true;
-        }, 0);
+
+            const groupedDataCreated = (
+                await Promise.all([
+                    this.groupedDataLogic.create(({
+                        items: [rawData._id],
+                    } as unknown) as GroupedDataDocumentModel),
+                    this.rawDataLogic.update(rawData._id, rawData),
+                ])
+            )[0];
+
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Group data -> RID: ${rawData._id} -> GID: ${groupedDataCreated?._id}`
+            ).show();
+        }
+
+        const executeTime = convertTotalSecondsToTime(
+            process.hrtime(startTime)[0]
+        );
+        await ChatBotTelegram.getInstance().sendMessage(
+            `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
+        );
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Group data - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime} - Complete`
+        ).show();
+        process.exit(0);
     }
 
     /**

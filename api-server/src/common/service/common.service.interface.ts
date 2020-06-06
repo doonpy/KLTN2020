@@ -50,8 +50,8 @@ export interface CommonLogicBaseInterface<
      */
     getOne(
         conditions: object,
-        validateExistedProperties?: { [key: string]: any }[],
-        validateNotExistedProperties?: { [key: string]: any }[]
+        validateExistedProperties?: Array<{ [key: string]: any }>,
+        validateNotExistedProperties?: Array<{ [key: string]: any }>
     ): Promise<T | null>;
 
     /**
@@ -63,8 +63,8 @@ export interface CommonLogicBaseInterface<
      */
     create(
         input: T,
-        validateExistedProperties?: { [key: string]: any }[],
-        validateNotExistedProperties?: { [key: string]: any }[]
+        validateExistedProperties?: Array<{ [key: string]: any }>,
+        validateNotExistedProperties?: Array<{ [key: string]: any }>
     ): Promise<T>;
 
     /**
@@ -78,8 +78,8 @@ export interface CommonLogicBaseInterface<
     update(
         id: number,
         input: T,
-        validateExistedProperties?: { [key: string]: any }[],
-        validateNotExistedProperties?: { [key: string]: any }[]
+        validateExistedProperties?: Array<{ [key: string]: any }>,
+        validateNotExistedProperties?: Array<{ [key: string]: any }>
     ): Promise<T>;
 
     /**

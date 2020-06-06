@@ -86,7 +86,6 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                                             ? 'red'
                                             : 'blue'
                                     }
-                                    // eslint-disable-next-line react/no-array-index-key
                                     key={index}
                                     fillOpacity={0.8}
                                     stroke={false}

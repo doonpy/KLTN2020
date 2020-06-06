@@ -109,9 +109,9 @@ export default class CatalogController extends CommonServiceControllerBase {
                 hasNext,
             };
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -151,9 +151,9 @@ export default class CatalogController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -255,9 +255,9 @@ export default class CatalogController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.CREATED,
-                this.catalogLogic.convertToApiResponse(createdCatalog),
-                res
+                this.catalogLogic.convertToApiResponse(createdCatalog)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -368,9 +368,9 @@ export default class CatalogController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                this.catalogLogic.convertToApiResponse(editedCatalog),
-                res
+                this.catalogLogic.convertToApiResponse(editedCatalog)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -407,9 +407,9 @@ export default class CatalogController extends CommonServiceControllerBase {
             await this.catalogLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.NO_CONTENT,
-                {},
-                res
+                {}
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -432,9 +432,9 @@ export default class CatalogController extends CommonServiceControllerBase {
             const documentAmount = await this.catalogLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'catalog', documentAmount },
-                res
+                { schema: 'catalog', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

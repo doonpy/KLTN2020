@@ -14,7 +14,7 @@ import ErrorHandlerWording from './error-handler.wording';
  * @return {string} inputString
  */
 const convertToString = (
-    input: { [key: string]: string | number }[]
+    input: Array<{ [key: string]: string | number }>
 ): string => {
     const inputString: string[] = [];
 
@@ -122,7 +122,7 @@ export const errorHandler = (
                 ),
                 message: upperCaseFirstCharacter(message),
                 input: convertToString(
-                    input as { [key: string]: string | number }[]
+                    input as Array<{ [key: string]: string | number }>
                 ),
             },
         };
@@ -137,7 +137,7 @@ export const errorHandler = (
                 ),
                 message: upperCaseFirstCharacter(message),
                 input: convertToString(
-                    input as { [key: string]: string | number }[]
+                    input as Array<{ [key: string]: string | number }>
                 ),
                 stack,
             },

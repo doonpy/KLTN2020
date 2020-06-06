@@ -46,7 +46,6 @@ export default class ConsoleLog {
                 break;
         }
 
-        // eslint-disable-next-line no-console
         console.log(`${prefix} ${this.msgContent}`);
     }
 }

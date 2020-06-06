@@ -271,9 +271,9 @@ export default class VisualMapPointController extends VisualCommonController {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -326,9 +326,9 @@ export default class VisualMapPointController extends VisualCommonController {
             const documentAmount = await this.visualMapPointLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-map-point', documentAmount },
-                res
+                { schema: 'visual-map-point', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

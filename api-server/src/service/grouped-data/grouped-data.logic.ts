@@ -42,20 +42,20 @@ export default class GroupedDataLogic extends CommonServiceLogicBase<
         cTime,
         mTime,
     }: GroupedDataDocumentModel): GroupedDataApiModel {
-        const itemsConverted: (RawDataApiModel | number | null)[] = items.map(
-            (item): RawDataApiModel | number | null => {
-                if (item) {
-                    if (typeof item === 'object') {
-                        return RawDataLogic.getInstance().convertToApiResponse(
-                            item as RawDataDocumentModel
-                        );
-                    }
-                    return item as number;
+        const itemsConverted: Array<
+            RawDataApiModel | number | null
+        > = items.map((item): RawDataApiModel | number | null => {
+            if (item) {
+                if (typeof item === 'object') {
+                    return RawDataLogic.getInstance().convertToApiResponse(
+                        item as RawDataDocumentModel
+                    );
                 }
-
-                return null;
+                return item as number;
             }
-        );
+
+            return null;
+        });
 
         return {
             id: _id ?? null,

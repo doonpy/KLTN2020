@@ -1,10 +1,10 @@
 import { GET_MAP_KEY } from './actions';
 
-const inititalState = {
+const initialState = {
     mapKey: 'full',
 };
 
-export const mapKeyReducer = (state = inititalState, action) => {
+export const mapKeyReducer = (state = initialState, action) => {
     switch (action.type) {
         case GET_MAP_KEY:
             return {

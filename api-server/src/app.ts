@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Application } from 'express';
 import path from 'path';
 import ConsoleLog from '@util/console/console.log';
@@ -45,7 +44,7 @@ export default class App {
      * @param controllerArray
      */
     public start(
-        middlewareArray: Array<any>,
+        middlewareArray: any[],
         controllerArray: CommonServiceControllerBase[]
     ): void {
         this.setAssets();
@@ -59,7 +58,7 @@ export default class App {
      *
      * @param middlewareArray
      */
-    private bindMiddleware(middlewareArray: Array<any>): void {
+    private bindMiddleware(middlewareArray: any[]): void {
         middlewareArray.forEach((middleware: any): void => {
             this.app.use(middleware);
         });

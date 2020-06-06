@@ -8,8 +8,8 @@ import { BINDING_OPTIONS } from '../../util/bindingOptions';
 import * as action from '../../store/map-key/actions';
 
 if (typeof Highcharts === 'object') {
-    HighchartsExporting(Highcharts);
-    HighchartsDrilldown(Highcharts);
+    new HighchartsExporting(Highcharts);
+    new HighchartsDrilldown(Highcharts);
 }
 
 const MapOverview = ({ mapData, dataMap, setStage }) => {

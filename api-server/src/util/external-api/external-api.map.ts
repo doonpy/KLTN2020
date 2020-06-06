@@ -4,17 +4,6 @@ import ResponseStatusCode from '@common/common.response-status.code';
 import { sendRequest } from '../request/request';
 import { BingMapGeocodeResponse } from './external-api.map.interface';
 
-const requestOptionsDefault: RequestPromiseOptions = {
-    method: 'GET',
-    headers: {
-        headers: {
-            'User-Agent':
-                'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-        },
-    },
-    json: true,
-};
-
 /**
  * @param {string} queryAddress
  * @param {object} requestOptions
@@ -23,8 +12,22 @@ const requestOptionsDefault: RequestPromiseOptions = {
  */
 export const getGeocode = async (
     queryAddress: string,
-    requestOptions: object = requestOptionsDefault
+    requestOptions?: RequestPromiseOptions
 ): Promise<BingMapGeocodeResponse | undefined> => {
+    let requestOptionsDefault: RequestPromiseOptions = {
+        method: 'GET',
+        headers: {
+            headers: {
+                'User-Agent':
+                    'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+            },
+        },
+        json: true,
+    };
+    if (requestOptions) {
+        requestOptionsDefault = requestOptions;
+    }
+
     const BING_API_KEYS = [
         'ApMeVn2de85sCgrhbvSG99dRStsusJyOmUePGowvPzJdEWjsIkEWP0Y1Jz__FZ_h',
         'Ahk4IGiU-0Qm-DTdqSh7ZbpEjK8su_dwM3OjNOZH4LTyxeQCeoIUwIaHkHhOKy4I',
@@ -66,7 +69,6 @@ export const getGeocode = async (
         if (!apiKey) {
             return undefined;
         }
-
         requestOptionsDefault.qs.key = apiKey;
         result = await sendRequest<BingMapGeocodeResponse>(
             endPoint,

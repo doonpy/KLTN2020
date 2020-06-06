@@ -130,21 +130,14 @@ export const getSimilarRate = (
         return 1;
     }
 
-    const cleanRegExp = RegExp(
-        /[^a-z0-9A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+/g
+    return calculateSimilarRate(
+        removeBreakLineAndTrim(
+            removeSpecialCharacter(firstString.toLowerCase())
+        ),
+        removeBreakLineAndTrim(
+            removeSpecialCharacter(secondString.toLowerCase())
+        )
     );
-    firstString = firstString
-        .replace(cleanRegExp, ' ')
-        .replace(/\s{2,}/g, ' ')
-        .trim()
-        .toLowerCase();
-    secondString = secondString
-        .replace(cleanRegExp, ' ')
-        .replace(/\s{2,}/g, ' ')
-        .trim()
-        .toLowerCase();
-
-    return calculateSimilarRate(firstString, secondString);
 };
 
 /**
@@ -178,9 +171,23 @@ export const removeBreakLineAndTrim = (str: string): string => {
  */
 export const removeSpecialCharacterAtHeadAndTail = (str: string): string => {
     const STANDARD_ADDRESS_PATTERN = RegExp(
-        `^[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+|[^\\d\\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+$`,
-        'ig'
+        /^[^\d\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+|[^\d\wÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+$/gi
     );
 
     return str.replace(STANDARD_ADDRESS_PATTERN, '');
+};
+
+/**
+ * Remove special character exits at any position
+ * @param {string} str
+ *
+ * @return {string}
+ */
+export const removeSpecialCharacter = (str: string): string => {
+    return str.replace(
+        RegExp(
+            /[^a-z0-9A-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]+/g
+        ),
+        ' '
+    );
 };

@@ -33,7 +33,7 @@ const LegendLeaf = () => {
                 from = grades[i];
                 to = grades[i + 1];
                 labels.push(
-                    `<i style="background:${getColor(from + 1)}"></i> ${from}${
+                    `<i style="background:${getColor(from + 1)}"/> ${from}${
                         to ? `&ndash;${to} m<sup>2</sup>` : ' m<sup>2</sup> +'
                     }`
                 );
@@ -44,7 +44,7 @@ const LegendLeaf = () => {
         };
 
         legend.addTo(map);
-    }, []);
+    }, [map]);
     return null;
 };
 

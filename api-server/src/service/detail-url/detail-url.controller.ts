@@ -110,9 +110,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -152,9 +152,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -209,9 +209,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.CREATED,
-                this.detailUrlLogic.convertToApiResponse(createdDetailUrl),
-                res
+                this.detailUrlLogic.convertToApiResponse(createdDetailUrl)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -291,9 +291,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                this.detailUrlLogic.convertToApiResponse(editedDetailUrl),
-                res
+                this.detailUrlLogic.convertToApiResponse(editedDetailUrl)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -330,9 +330,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             await this.detailUrlLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.NO_CONTENT,
-                {},
-                res
+                {}
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -355,9 +355,9 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             const documentAmount = await this.detailUrlLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'detail-url', documentAmount },
-                res
+                { schema: 'detail-url', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

@@ -6,8 +6,8 @@ import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import { BINDING_OPTIONS } from '../../util/bindingOptions';
 
 if (typeof Highcharts === 'object') {
-    HighchartsExporting(Highcharts);
-    HighchartsDrilldown(Highcharts);
+    new HighchartsExporting(Highcharts);
+    new HighchartsDrilldown(Highcharts);
 }
 
 const PieChart = ({ data }) => {
@@ -69,7 +69,7 @@ const PieChart = ({ data }) => {
                 },
             ],
         });
-    }, [data]);
+    }, [chartOptions, data]);
     return (
         <div className="relative z-1000">
             <HighchartsReact highcharts={Highcharts} options={chartOptions} />

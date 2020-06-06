@@ -44,10 +44,10 @@ export default class ScrapeBase {
         const DOMAIN_PATTERN = RegExp(
             /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
         );
-        domain = domain.replace(/\/{2,}$/, '');
+        const originDomain = domain.replace(/\/{2,}$/, '');
         const url = DOMAIN_PATTERN.test(path)
             ? path
-            : domain + (/^\//.test(path) ? path : `/${path}`);
+            : originDomain + (/^\//.test(path) ? path : `/${path}`);
 
         try {
             const response = await sendRequest<RequestResponse>(
