@@ -512,13 +512,6 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
         }
     }
 
-    // rawDataset = await rawDataLogic.getAll({
-    //     limit: DOCUMENTS_LIMIT,
-    //     conditions: {
-    //         coordinateId: null,
-    //     },
-    // });
-
     script.next();
 };
 
