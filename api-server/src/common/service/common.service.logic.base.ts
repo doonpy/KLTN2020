@@ -5,7 +5,7 @@ import {
     CommonOptions,
     GetAllReturnData,
 } from '@common/service/common.service.interface';
-import { Model } from 'mongoose';
+import { CreateQuery, Model } from 'mongoose';
 import ResponseStatusCode from '@common/common.response-status.code';
 import CommonServiceWording from '@common/service/common.service.wording';
 
@@ -25,10 +25,10 @@ export default abstract class CommonServiceLogicBase<
      * @param {ValidateType} type
      */
     private async validate(
-        properties: { [key: string]: any }[],
+        properties: Array<{ [key: string]: any }>,
         type: ValidateType
     ): Promise<void> {
-        const promise: Promise<void>[] = [];
+        const promise: Array<Promise<void>> = [];
         properties.forEach((prop) => {
             if (type === ValidateType.EXISTED) {
                 promise.push(this.checkExisted(prop));
@@ -100,8 +100,8 @@ export default abstract class CommonServiceLogicBase<
      */
     public async create(
         input: T,
-        validateExistedProperties?: { [key: string]: any }[],
-        validateNotExistedProperties?: { [key: string]: any }[]
+        validateExistedProperties?: Array<{ [key: string]: any }>,
+        validateNotExistedProperties?: Array<{ [key: string]: any }>
     ): Promise<T> {
         if (validateExistedProperties) {
             await this.validate(
@@ -117,7 +117,7 @@ export default abstract class CommonServiceLogicBase<
             );
         }
 
-        return this.model.create(input);
+        return this.model.create(input as CreateQuery<T>);
     }
 
     /**
@@ -131,8 +131,8 @@ export default abstract class CommonServiceLogicBase<
     public async update(
         id: number,
         input: T,
-        validateExistedProperties?: { [key: string]: any }[],
-        validateNotExistedProperties?: { [key: string]: any }[]
+        validateExistedProperties?: Array<{ [key: string]: any }>,
+        validateNotExistedProperties?: Array<{ [key: string]: any }>
     ): Promise<T | never> {
         await this.checkExisted({ _id: id });
 

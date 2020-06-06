@@ -85,9 +85,9 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -140,9 +140,9 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
             const documentAmount = await this.visualSummaryDistrictLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-summary-district', documentAmount },
-                res
+                { schema: 'visual-summary-district', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

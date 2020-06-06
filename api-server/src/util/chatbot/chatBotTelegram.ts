@@ -37,7 +37,6 @@ export default class ChatBotTelegram {
                 receiver,
                 `<b>[PID: ${process.pid}]</b>\n${message}`,
                 {
-                    // eslint-disable-next-line @typescript-eslint/camelcase
                     parse_mode: 'HTML',
                 }
             );

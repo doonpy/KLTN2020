@@ -12,8 +12,7 @@ export const convertStringToDate = (
         return undefined;
     }
 
-    format = format.toLowerCase();
-    const separatedFormat = format.split(delimiter);
+    const separatedFormat = format.toLowerCase().split(delimiter);
     const separatedValue = value.split(delimiter);
     const dayIndex = separatedFormat.indexOf('dd');
     const monthIndex = separatedFormat.indexOf('mm');
@@ -75,12 +74,13 @@ export const isExactTime = (expectTime: Date, isUtcTime = false): boolean => {
  * @return string
  */
 export const convertTotalSecondsToTime = (totalSeconds: number): string => {
-    const days = Math.floor(totalSeconds / 86400);
-    totalSeconds %= 86400;
-    const hours = Math.floor(totalSeconds / 3600);
-    totalSeconds %= 3600;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
+    let totalSecondsClone = totalSeconds;
+    const days = Math.floor(totalSecondsClone / 86400);
+    totalSecondsClone %= 86400;
+    const hours = Math.floor(totalSecondsClone / 3600);
+    totalSecondsClone %= 3600;
+    const minutes = Math.floor(totalSecondsClone / 60);
+    const seconds = totalSecondsClone % 60;
 
     return `${days} day(s) - ${hours < 9 ? `0${hours}` : hours}:${
         minutes < 9 ? `0${minutes}` : minutes

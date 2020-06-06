@@ -3,7 +3,7 @@ export default {
     DB_HOST: '127.0.0.1',
     DB_PORT: '27017',
     DB_NAME: 'kltn2020-dev',
-    DB_DEBUG_MODE: 1,
+    DB_DEBUG_MODE: 0,
     SERVER_PROTOCOL: 'http',
     SERVER_DOMAIN: 'localhost',
     SERVER_PORT: '3000',

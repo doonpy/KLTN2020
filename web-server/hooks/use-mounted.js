@@ -8,7 +8,7 @@ function RenderCompleted() {
         return () => {
             setMounted(false);
         };
-    });
+    }, []);
     return mounted;
 }
 

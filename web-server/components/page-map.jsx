@@ -18,7 +18,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
     const [stage, setStage] = useState(0);
     const [propertyStage, setProperty] = useState(PROPERTY_TYPE_NUMBER[0].id);
     const mapData = mapStaticJSON[0].content;
-    const isMounted = RenderCompleted();
+    const isMounted = new RenderCompleted();
     const dataMap = dataSummary
         .map((w) => {
             const realEstateDensity = w.summaryAmount / w.acreage;

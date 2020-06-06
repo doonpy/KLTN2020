@@ -34,9 +34,8 @@ export default class CoordinateLogic
     public async getByLocation(
         location: string
     ): Promise<CoordinateDocumentModel> {
-        location = location.trim();
         return (await CoordinateModel.findOne({
-            location,
+            location: location.trim(),
         }).exec()) as CoordinateDocumentModel;
     }
 

@@ -165,9 +165,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -207,9 +207,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -393,9 +393,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.CREATED,
-                this.rawDataLogic.convertToApiResponse(createdRawData),
-                res
+                this.rawDataLogic.convertToApiResponse(createdRawData)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -600,9 +600,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             }
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                this.rawDataLogic.convertToApiResponse(editedRawData),
-                res
+                this.rawDataLogic.convertToApiResponse(editedRawData)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -639,9 +639,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             await this.rawDataLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.NO_CONTENT,
-                {},
-                res
+                {}
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -694,9 +694,9 @@ export default class RawDataController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'raw-data', documentAmount },
-                res
+                { schema: 'raw-data', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

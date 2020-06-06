@@ -378,7 +378,7 @@ export default class ScrapeRawData extends ScrapeBase {
         priceData: string,
         acreageData: string,
         addressData: string,
-        othersData: { name: string; value: string }[]
+        othersData: Array<{ name: string; value: string }>
     ): RawDataDocumentModel {
         const transactionType = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(
             propertyTypeData

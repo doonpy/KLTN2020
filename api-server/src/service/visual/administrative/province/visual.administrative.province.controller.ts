@@ -90,9 +90,9 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -145,9 +145,9 @@ export default class VisualAdministrativeProvinceController extends VisualCommon
             const documentAmount = await this.visualAdministrativeProvinceLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-administrative-province', documentAmount },
-                res
+                { schema: 'visual-administrative-province', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

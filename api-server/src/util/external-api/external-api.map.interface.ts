@@ -2,9 +2,9 @@ export interface BingMapGeocodeResponse {
     authenticationResultCode: string;
     brandLogoUri: string;
     copyright: string;
-    resourceSets: {
+    resourceSets: Array<{
         estimatedTotal: number;
-        resources: {
+        resources: Array<{
             __type: string;
             bbox: [number, number, number, number];
             name: string;
@@ -32,8 +32,8 @@ export interface BingMapGeocodeResponse {
                 }
             ];
             matchCodes: string[];
-        }[];
-    }[];
+        }>;
+    }>;
     statusCode: 200 | 400 | 401 | 404 | 429 | 500 | 503;
     statusDescription: string;
     traceId: string;

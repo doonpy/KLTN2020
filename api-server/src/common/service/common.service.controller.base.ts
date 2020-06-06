@@ -255,9 +255,9 @@ export default abstract class CommonServiceControllerBase
      * @param {Response} res
      */
     static sendResponse(
+        res: Response,
         statusCode: number = ResponseStatusCode.INTERNAL_SERVER_ERROR,
-        body: object = {},
-        res: Response
+        body: object = {}
     ): void {
         if (statusCode === ResponseStatusCode.NO_CONTENT) {
             res.status(statusCode).json();
@@ -280,10 +280,10 @@ export default abstract class CommonServiceControllerBase
         }: {
             statusCode?: number;
             cause?:
-                | { wording: string[]; value: (string[] | number)[] }
+                | { wording: string[]; value: Array<string[] | number> }
                 | string;
             message:
-                | { wording: string[]; value: (string[] | number)[] }
+                | { wording: string[]; value: Array<string[] | number> }
                 | string;
         },
         languageIndex: number
@@ -342,7 +342,7 @@ export default abstract class CommonServiceControllerBase
      * @return {object}
      */
     protected buildQueryConditions(
-        queryParams: { paramName: string; isString: boolean }[]
+        queryParams: Array<{ paramName: string; isString: boolean }>
     ): object {
         const conditions: { [key: string]: any } = {};
 

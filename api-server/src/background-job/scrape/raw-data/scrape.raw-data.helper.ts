@@ -180,6 +180,7 @@ export const priceHandler = (
     const PER_MONTH_PATTERN = RegExp(/\/(month|tháng)/, 'gi');
     const PER_DAY_PATTERN = RegExp(/\/(day|ngày)/, 'gi');
 
+    let acreage = acreageValue;
     const unit = getValidDataFromPatterns(priceData, [
         PRICE_UNIT_PATTERN.BILLION,
         PRICE_UNIT_PATTERN.MILLION,
@@ -223,12 +224,12 @@ export const priceHandler = (
             'acreage'
         );
         if (acreageUnit === MeasureUnit.KILOMETER) {
-            acreageValue = convertAcreageValueToKilometer(
-                acreageValue,
+            acreage = convertAcreageValueToKilometer(
+                acreage,
                 MeasureUnit.KILOMETER
             );
         }
-        value *= acreageValue;
+        value *= acreage;
     }
 
     let timeUnit = NaN;
