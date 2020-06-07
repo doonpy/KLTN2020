@@ -31,13 +31,11 @@ jobs:
           NORMAL_BUILD_TAG="${BRANCH_NAME}_${{ matrix.node-version }}_${GITHUB_RUN_NUMBER}"
           LATEST_VERSION=node-12
 
-          if [ "${BRANCH_NAME}" == "KLTN2020" ]; then
+          if [ "${BRANCH_NAME}" == "KLTN2020" && "${{ matrix.node-version }}" == "${LATEST_VERSION}" ]; then
             docker login -u ${DOCKER_ID} -p ${DOCKER_TOKEN}
             docker tag app doonpy/kltn2020:${NORMAL_BUILD_TAG}
             docker push doonpy/kltn2020:${NORMAL_BUILD_TAG}
 
-            if [ "${{ matrix.node-version }}" == "${LATEST_VERSION}" ]; then
-              docker tag app doonpy/kltn2020:latest
-              docker push doonpy/kltn2020:latest
-            fi
+            docker tag app doonpy/kltn2020:latest
+            docker push doonpy/kltn2020:latest
           fi

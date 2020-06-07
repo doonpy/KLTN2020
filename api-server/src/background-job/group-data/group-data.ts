@@ -13,22 +13,30 @@ interface AggregationGroupDataResult {
     represent: RawDataDocumentModel;
 }
 
+const EXPECTED_SCORE = Number(process.env.BGR_GROUP_DATA_EXPECTED_SCORE || '8');
+const ATTR_TITLE_SCORE = Number(
+    process.env.BGR_GROUP_DATA_ATTR_TITLE_SCORE || '4'
+);
+const ATTR_PRICE_SCORE = Number(
+    process.env.BGR_GROUP_DATA_ATTR_PRICE_SCORE || '3'
+);
+const ATTR_ADDRESS_SCORE = Number(
+    process.env.BGR_GROUP_DATA_ATTR_ADDRESS_SCORE || '3'
+);
+const OVER_FITTING_SCORE = Number(
+    process.env.BGR_GROUP_DATA_OVER_FITTING_SCORE || '9'
+);
+enum FinishActionType {
+    COMPLETE = 1,
+    SUSPEND,
+}
+
 export default class GroupData {
     private isSuspense = false;
 
     private rawDataLogic = RawDataLogic.getInstance();
 
     private groupedDataLogic = GroupedDataLogic.getInstance();
-
-    private readonly EXPECTED_SCORE = 8;
-
-    private readonly ATTR_TITLE_SCORE = 4;
-
-    private readonly ATTR_PRICE_SCORE = 3;
-
-    private readonly ATTR_ADDRESS_SCORE = 3;
-
-    private readonly OVER_FITTING_SCORE = 9;
 
     /**
      * Start
@@ -37,7 +45,7 @@ export default class GroupData {
         transactionType: number,
         propertyType: number
     ): Promise<void> {
-        const startTime = process.hrtime();
+        const startTime: [number, number] = process.hrtime();
         const rawDataset = await this.rawDataLogic.getAll({
             conditions: {
                 isGrouped: false,
@@ -47,6 +55,15 @@ export default class GroupData {
         });
 
         rawDataLoop: for (const rawData of rawDataset.documents) {
+            if (this.isSuspense) {
+                await this.finishAction(
+                    startTime,
+                    transactionType,
+                    propertyType,
+                    FinishActionType.SUSPEND
+                );
+                return;
+            }
             rawData.isGrouped = true;
             const aggregations = [
                 {
@@ -83,7 +100,7 @@ export default class GroupData {
                     item.represent
                 );
 
-                if (similarScore >= this.OVER_FITTING_SCORE) {
+                if (similarScore >= OVER_FITTING_SCORE) {
                     new ConsoleLog(
                         ConsoleConstant.Type.ERROR,
                         `Group data -> RID: ${rawData._id} -> GID: ${item._id} - Error: Over fitting.`
@@ -92,7 +109,7 @@ export default class GroupData {
                     continue rawDataLoop;
                 }
 
-                if (similarScore >= this.EXPECTED_SCORE) {
+                if (similarScore >= EXPECTED_SCORE) {
                     const groupData = await this.groupedDataLogic.getById(
                         item._id
                     );
@@ -140,17 +157,12 @@ export default class GroupData {
             ).show();
         }
 
-        const executeTime = convertTotalSecondsToTime(
-            process.hrtime(startTime)[0]
+        await this.finishAction(
+            startTime,
+            transactionType,
+            propertyType,
+            FinishActionType.COMPLETE
         );
-        await ChatBotTelegram.getInstance().sendMessage(
-            `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
-        );
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Group data - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime} - Complete`
-        ).show();
-        process.exit(0);
     }
 
     /**
@@ -200,7 +212,7 @@ export default class GroupData {
             firstRawData.price.currency === secondRawData.price.currency &&
             firstRawData.price.timeUnit === secondRawData.price.timeUnit
         ) {
-            return this.OVER_FITTING_SCORE;
+            return OVER_FITTING_SCORE;
         }
 
         let totalPoint = 0;
@@ -249,7 +261,7 @@ export default class GroupData {
             return 0;
         }
 
-        return (1 - differenceRate) * this.ATTR_PRICE_SCORE;
+        return (1 - differenceRate) * ATTR_PRICE_SCORE;
     }
 
     /**
@@ -270,15 +282,50 @@ export default class GroupData {
             case 'title':
                 return (
                     getSimilarRate(firstTarget.title, secondTarget.title) *
-                    this.ATTR_TITLE_SCORE
+                    ATTR_TITLE_SCORE
                 );
             case 'address':
                 return (
                     getSimilarRate(firstTarget.address, secondTarget.address) *
-                    this.ATTR_ADDRESS_SCORE
+                    ATTR_ADDRESS_SCORE
                 );
             default:
                 return 0;
         }
+    }
+
+    /**
+     * @param startTime
+     * @param transactionType
+     * @param propertyType
+     * @param type
+     */
+    private async finishAction(
+        startTime: [number, number],
+        transactionType: number,
+        propertyType: number,
+        type: FinishActionType
+    ): Promise<void> {
+        const executeTime = convertTotalSecondsToTime(
+            process.hrtime(startTime)[0]
+        );
+        if (type === FinishActionType.COMPLETE) {
+            await ChatBotTelegram.getInstance().sendMessage(
+                `<b>🤖[Group data]🤖</b>\n✅Group data complete - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
+            );
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Group data - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime} - Complete`
+            ).show();
+        } else {
+            await ChatBotTelegram.getInstance().sendMessage(
+                `<b>🤖[Group data]🤖</b>\n✅Group data suspended - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime}`
+            );
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Group data - TID: ${transactionType} - PID: ${propertyType} - Execute time: ${executeTime} - Suspended`
+            ).show();
+        }
+        process.exit(0);
     }
 }

@@ -21,8 +21,6 @@ type AggregationGroupDataResult = {
 
 const detailUrlLogic = DetailUrlLogic.getInstance();
 const rawDataLogic = RawDataLogic.getInstance();
-const PROCESSES_LIMIT = 30;
-
 let script: AsyncGenerator;
 
 /**
@@ -175,7 +173,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
  * Generate script of process
  */
 async function* generateScript() {
-    const startTime = process.hrtime();
+    const startTime: [number, number] = process.hrtime();
     const telegramChatBotInstance = ChatBotTelegram.getInstance();
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`

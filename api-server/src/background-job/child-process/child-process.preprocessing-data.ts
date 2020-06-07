@@ -519,7 +519,7 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
  * Script of preprocessing data
  */
 async function* generateScript() {
-    const startTime = process.hrtime();
+    const startTime: [number, number] = process.hrtime();
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Preprocessing data]🤖</b>\n📝 Start preprocessing data...`
     );
