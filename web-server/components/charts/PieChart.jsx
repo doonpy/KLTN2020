@@ -69,7 +69,7 @@ const PieChart = ({ data }) => {
                 },
             ],
         });
-    }, [chartOptions, data]);
+    }, [data]);
     return (
         <div className="relative z-1000">
             <HighchartsReact highcharts={Highcharts} options={chartOptions} />
