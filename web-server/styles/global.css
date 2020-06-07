@@ -6,4 +6,5 @@
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;
 }
+
 @tailwind utilities;

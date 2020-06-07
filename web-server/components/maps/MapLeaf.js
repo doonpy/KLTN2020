@@ -1,14 +1,52 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Map, TileLayer, Tooltip, CircleMarker } from 'react-leaflet';
-import Router from 'next/router';
+import React, { useState, useRef } from 'react';
+import Link from 'next/link';
+import {
+    Map,
+    TileLayer,
+    CircleMarker,
+    Popup,
+    Tooltip,
+    ZoomControl,
+} from 'react-leaflet';
+import Control from 'react-leaflet-control';
 import debounce from 'lodash.debounce';
 import useDarkMode from 'use-dark-mode';
-import LegendLeaf from './LegendLeaf';
-import { ACREAGE_BY_ZOOM_LEVEL, MAP_MODE } from '../../util/constants';
+import { FaRegListAlt } from 'react-icons/fa';
+import LegendMap from './LegendMap';
+import LoadingIcon from '../LoadingIcon';
+import { ZOOM_LEVEL, MAP_MODE } from '../../util/constants';
 import useMapPoint from '../../hooks/use-map-point';
+import {
+    numberWithCommas,
+    setRadiusByArea,
+    setRadiusByPrice,
+    setColorByArea,
+    setColorByPrice,
+} from '../../util/services/helper';
 
+const TitleTypeMap = ({ type }) => {
+    return (
+        <h1
+            className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400, text-xs"
+            style={{ zIndex: 9999, left: '35px', padding: '10px' }}
+        >
+            {` Bản đồ thể hiện ${type} bất động sản`}
+        </h1>
+    );
+};
+const LoadingMap = ({ isLoading }) => {
+    return isLoading ? (
+        <div
+            className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400 h-full"
+            style={{ zIndex: 9999, left: '35px', padding: '10px' }}
+        >
+            <LoadingIcon />
+        </div>
+    ) : null;
+};
 export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
     const { value: hasActiveDarkMode } = useDarkMode();
+
     const map = useRef();
     const centerPosition = {
         lat: 10.753715262326807,
@@ -21,8 +59,9 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         maxLng: 107.42156982421876,
     });
     const [zoomLevel, setZoomLevel] = useState(10);
+    const [onLegend, setOnLegend] = useState(false);
 
-    const area = ACREAGE_BY_ZOOM_LEVEL.find((w) => w.zoom === zoomLevel);
+    const area = ZOOM_LEVEL.find((w) => w.zoom === zoomLevel);
     const { data, isValidating } = useMapPoint({
         variables: {
             minAcreage: tabMap === MAP_MODE.AREA_MODE ? area.minArea : 1,
@@ -36,7 +75,6 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         },
     });
 
-    // console.log(data);
     const onMove = debounce((event) => {
         const bound = event.target.getBounds();
         setBounds({
@@ -50,6 +88,8 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
 
     return (
         <div className="relative" style={{ height: 'calc(100vh - 135px)' }}>
+            <TitleTypeMap type={tabMap} />
+            <LoadingMap isLoading={!data && isValidating} />
             <Map
                 ref={map}
                 onmoveend={onMove}
@@ -64,6 +104,24 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                     height: '100%',
                 }}
             >
+                <Control>
+                    {onLegend ? (
+                        <LegendMap
+                            zoomLevel={zoomLevel}
+                            typeLegend={tabMap}
+                            setOnLegend={setOnLegend}
+                        />
+                    ) : null}
+                </Control>
+                <Control position="bottomright">
+                    <FaRegListAlt
+                        size={24}
+                        className="cursor-pointer text-gray-400 relative"
+                        onClick={() => setOnLegend(!onLegend)}
+                        style={{ zIndex: 99999 }}
+                    />
+                </Control>
+
                 {!hasActiveDarkMode ? (
                     <TileLayer
                         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -78,46 +136,71 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
 
                 {data?.mapPoints &&
                     data.mapPoints.map((c) => {
-                        return c.points.map((point, index) => {
+                        return c.points.map((point) => {
                             return (
                                 <CircleMarker
                                     color={
                                         tabMap === MAP_MODE.AREA_MODE
-                                            ? 'red'
-                                            : 'blue'
+                                            ? setColorByArea(
+                                                  point.rawDataset[0].acreage
+                                              )
+                                            : setColorByPrice(
+                                                  point.rawDataset[0].price
+                                              )
                                     }
-                                    // eslint-disable-next-line react/no-array-index-key
-                                    key={index}
-                                    fillOpacity={0.8}
+                                    key={point.rawDataset[0].rawDataId}
+                                    fillOpacity={0.7}
                                     stroke={false}
                                     center={[c.lat, c.lng]}
                                     radius={
-                                        Math.sqrt(
-                                            point.rawDataset[0].acreage /
-                                                Math.PI
-                                        ) / 20
+                                        tabMap === MAP_MODE.AREA_MODE
+                                            ? setRadiusByArea(
+                                                  point.rawDataset[0].acreage
+                                              ) *
+                                              ((zoomLevel * 10) / 200)
+                                            : setRadiusByPrice(
+                                                  point.rawDataset[0].price
+                                              )
                                     }
                                 >
-                                    <Tooltip>
-                                        <div className="flex flex-col">
-                                            {point.rawDataset.map((a) => {
+                                    <Tooltip>Ấn để xem chi tiết</Tooltip>
+                                    <Popup closeButton>
+                                        <div className="flex flex-col cursor-pointer">
+                                            {point.rawDataset.map((rawdata) => {
                                                 return (
-                                                    <span key={a.rawDataId}>
-                                                        {`Diện tích: ${a.acreage} m2 + ${a.rawDataId} + `}
-                                                    </span>
+                                                    <div
+                                                        key={rawdata.rawDataId}
+                                                    >
+                                                        <Link
+                                                            href="/detail/[id]"
+                                                            as={`/detail/${rawdata.rawDataId}`}
+                                                        >
+                                                            <ul className="list-inside list-disc">
+                                                                {tabMap ===
+                                                                MAP_MODE.AREA_MODE ? (
+                                                                    <li className="text-blue-400 py-2 hover:text-blue-600">
+                                                                        {`Diện tích: ${numberWithCommas(
+                                                                            rawdata.acreage
+                                                                        )} m2 `}
+                                                                    </li>
+                                                                ) : (
+                                                                    <li className="text-blue-400 py-2">
+                                                                        {`Giá: ${numberWithCommas(
+                                                                            rawdata.price
+                                                                        )} vnđ `}
+                                                                    </li>
+                                                                )}
+                                                            </ul>
+                                                        </Link>
+                                                    </div>
                                                 );
                                             })}
                                         </div>
-                                        <div className="text-blue-800 underline">
-                                            Ân để xem chi tiết
-                                        </div>
-                                    </Tooltip>
+                                    </Popup>
                                 </CircleMarker>
                             );
                         });
                     })}
-
-                {/* <LegendLeaf /> */}
             </Map>
         </div>
     );

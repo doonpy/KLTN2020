@@ -19,6 +19,7 @@ const PieChart = ({ data }) => {
             height: '100%',
         },
         legend: {
+            enabled: true,
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle',
@@ -50,6 +51,7 @@ const PieChart = ({ data }) => {
                 // },
             },
         },
+
         series: [
             {
                 name: 'Tỷ lệ',
@@ -77,4 +79,4 @@ const PieChart = ({ data }) => {
     );
 };
 
-export default PieChart;
+export default React.memo(PieChart);

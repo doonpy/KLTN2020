@@ -64,7 +64,8 @@
         "no-throw-literal": "off",
         "no-console": "error",
         "import/no-unresolved": "off",
-        "no-useless-constructor": "off"
+        "no-useless-constructor": "off",
+        "jsx-a11y/mouse-events-have-key-events": "off"
     },
     "settings": {
         "import/resolver": {

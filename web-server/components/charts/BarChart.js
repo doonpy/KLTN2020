@@ -10,13 +10,13 @@ if (typeof Highcharts === 'object') {
     HighchartsDrilldown(Highcharts);
 }
 
-const BarChart = ({ data, mapKey }) => {
+const BarChart = ({ data }) => {
     const [barChartOption, setBarChartOption] = useState({
         ...BINDING_OPTIONS,
         chart: {
-            type: 'column',
+            type: 'bar',
             backgroundColor: 'rgba(0,0,0,0)',
-            height: '70%',
+            height: '75%',
         },
         title: {
             text: 'Tổng bất động sản',
@@ -39,7 +39,7 @@ const BarChart = ({ data, mapKey }) => {
             title: {
                 text: 'Số lượng (bất động sản)',
                 style: {
-                    fontSize: '6px',
+                    fontSize: '9px',
                     color: '#ffffff',
                 },
             },
@@ -85,7 +85,15 @@ const BarChart = ({ data, mapKey }) => {
     }, [data]);
     return (
         <div>
-            <HighchartsReact highcharts={Highcharts} options={barChartOption} />
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={barChartOption}
+                containerProps={{
+                    style: {
+                        maxHeight: '100%',
+                    },
+                }}
+            />
         </div>
     );
 };

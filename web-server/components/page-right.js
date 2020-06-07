@@ -48,11 +48,13 @@ const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
                     />
                 </div>
             </div>
-            <div>
-                <TypeTransactionBox data={dataSummary} />
-            </div>
-            <div style={{ height: '50%' }}>
-                <TotalByDistrictBarChart data={dataChart} />
+            <div style={{ height: 'calc(100vh - 140px)' }}>
+                <div style={{ height: '50%' }}>
+                    <TypeTransactionBox data={dataSummary} />
+                </div>
+                <div>
+                    <TotalByDistrictBarChart data={dataChart} />
+                </div>
             </div>
         </div>
     );

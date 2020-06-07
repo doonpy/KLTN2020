@@ -2,7 +2,7 @@ import React from 'react';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import PageLayout from '../components/page-layout';
-import AnalystLeft from '../components/Analyst/analyst-left';
+import AnalystLeft from '../components/analytics/analyst-left';
 
 NProgress.configure({
     minimum: 0.3,
