@@ -31,7 +31,6 @@ jobs:
           NORMAL_BUILD_TAG="${BRANCH_NAME}_${{ matrix.node-version }}_${GITHUB_RUN_NUMBER}"
           LATEST_VERSION=node-12
 
-
           if [ "${BRANCH_NAME}" == "KLTN2020" ]; then
             docker login -u ${DOCKER_ID} -p ${DOCKER_TOKEN}
             docker tag app doonpy/kltn2020:${NORMAL_BUILD_TAG}
