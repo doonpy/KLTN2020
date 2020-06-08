@@ -130,7 +130,7 @@ const MapWard = ({ dataWard, setStage }) => {
                     />
                 </div>
             ) : (
-                <LoadingIcon/>
+                <LoadingIcon />
             )}
         </>
     );

@@ -21,22 +21,7 @@ type AggregationGroupDataResult = {
 
 const detailUrlLogic = DetailUrlLogic.getInstance();
 const rawDataLogic = RawDataLogic.getInstance();
-const PROCESSES_LIMIT = 30;
-
 let script: AsyncGenerator;
-
-/**
- * Delete raw data have invalid address
- *
- * @param {RawDataDocumentModel} rawData
- */
-const deleteAction = async (rawData: RawDataDocumentModel): Promise<void> => {
-    await rawDataLogic.delete(rawData._id);
-    new ConsoleLog(
-        ConsoleConstant.Type.INFO,
-        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
-    ).show();
-};
 
 /**
  * @param _id
@@ -102,6 +87,21 @@ const deleteDuplicateData = async (): Promise<void> => {
 };
 
 /**
+ * Delete raw data have invalid address
+ *
+ * @param {RawDataDocumentModel} rawData
+ */
+const _deleteInvalidAddressData = async (
+    rawData: RawDataDocumentModel
+): Promise<void> => {
+    await rawDataLogic.delete(rawData._id);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
+    ).show();
+};
+
+/**
  * Delete data which have address not contain district or ward
  */
 const deleteInvalidAddressData = async (): Promise<void> => {
@@ -142,8 +142,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
         let { address } = rawData;
         try {
             if (!validDistrictAndWardPattern.test(address)) {
-                await deleteAction(rawData);
-
+                await _deleteInvalidAddressData(rawData);
                 continue;
             }
 
@@ -153,7 +152,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
                     ''
                 );
                 if (address.length > 0 && !validCountryPattern.test(address)) {
-                    await deleteAction(rawData);
+                    await _deleteInvalidAddressData(rawData);
                 }
             }
         } catch (error) {
@@ -175,7 +174,7 @@ const deleteInvalidAddressData = async (): Promise<void> => {
  * Generate script of process
  */
 async function* generateScript() {
-    const startTime = process.hrtime();
+    const startTime: [number, number] = process.hrtime();
     const telegramChatBotInstance = ChatBotTelegram.getInstance();
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`

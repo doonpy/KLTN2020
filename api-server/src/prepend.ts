@@ -1,17 +1,11 @@
 import 'module-alias/register';
 import DatabaseMongodb from '@database/mongodb/database.mongodb';
-import EnvironmentVariables from './env';
+import { config as dotEnvConfig } from 'dotenv';
 
 const initEnvironmentVariables = (): void => {
-    if (process.env.NODE_ENV === 'production') {
-        return;
+    if (process.env.NODE_ENV !== 'production') {
+        dotEnvConfig({ path: process.cwd() + '/api-server/src/dev.env' });
     }
-
-    Object.keys(EnvironmentVariables).forEach((key): void => {
-        process.env[key] = (EnvironmentVariables as { [key: string]: any })[
-            key
-        ] as string;
-    });
 };
 
 (async (): Promise<void> => {

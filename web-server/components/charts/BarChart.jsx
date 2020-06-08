@@ -82,7 +82,7 @@ const BarChart = ({ data, mapKey }) => {
                 },
             ],
         });
-    }, [barChartOption, data]);
+    }, [data]);
     return (
         <div>
             <HighchartsReact highcharts={Highcharts} options={barChartOption} />
