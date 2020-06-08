@@ -1,5 +1,12 @@
 module.exports = {
     important: true,
+    purge: {
+        enabled: true,
+        content: [
+            './web-server/pages/**/*.jsx',
+            './web-server/components/**/*.jsx',
+        ],
+    },
     theme: {
         darkSelector: '.dark-mode',
         backgroundColor: (theme) => ({
@@ -23,5 +30,5 @@ module.exports = {
         textColor: ['dark', 'responsive', 'hover', 'focus'],
         borderWidth: ['dark', 'responsive'],
     },
-    plugins: [...require('tailwindcss-dark-mode')()],
+    plugins: [require('tailwindcss-dark-mode')()],
 };

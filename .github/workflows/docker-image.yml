@@ -39,16 +39,3 @@ jobs:
             docker tag app doonpy/kltn2020:latest
             docker push doonpy/kltn2020:latest
           fi
-
-      - name: Restart services on the deploy server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.SERVER_PORT }}
-          script: |
-            if [ "${BRANCH_NAME}" == "KLTN2020" && "${{ matrix.node-version }}" == "${LATEST_VERSION}" ]; then
-              cd ${{ secrets.SERVER_WORKDIR }}
-              sh restart.sh
-            fi
