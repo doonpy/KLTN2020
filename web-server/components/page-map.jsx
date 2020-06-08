@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
+import PropTypes from 'prop-types';
 import RenderCompleted from '../hooks/use-mounted';
 import LoadingIcon from './LoadingIcon';
 import { PROPERTY_TYPE_NUMBER, MAP_MODE } from '../util/constants';
@@ -75,12 +76,12 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
                 </div>
             ) : (
                 <div className="w-full h-full relative">
-                    <div
+                    {/* <div
                         className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400, text-xs"
                         style={{ zIndex: 9999, left: '35px', padding: '10px' }}
                     >
                         {` Bản đồ thể hiện ${tabMap} bất động sản`}
-                    </div>
+                    </div> */}
                     {dataSummary &&
                         (stage === 0 ? (
                             <MapOverview
@@ -99,5 +100,10 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
         </div>
     );
 };
-
+PageMap.propTypes = {
+    mapStaticJSON: PropTypes.isRequired,
+    dataSummary: PropTypes.isRequired,
+    tabMap: PropTypes.isRequired,
+    transactionStage: PropTypes.isRequired,
+};
 export default PageMap;

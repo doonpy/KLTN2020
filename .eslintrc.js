@@ -5,6 +5,9 @@ module.exports = {
     ],
     rules: {
         'prefer-const': 'warn',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+        'react/display-name': 'off',
+        '@typescript-eslint/ban-types': 'off',
     },
     overrides: [
         // DO NOT ADD MORE FILES TO THE IGNORE LIST

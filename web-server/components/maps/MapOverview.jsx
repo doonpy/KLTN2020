@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Highcharts from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';

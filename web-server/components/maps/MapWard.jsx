@@ -4,6 +4,7 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch, useSelector } from 'react-redux';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
+import PropTypes from 'prop-types';
 import LoadingIcon from '../LoadingIcon';
 import { fetchMapData } from '../../util/api/fetchMapJson';
 import * as action from '../../store/map-key/actions';
@@ -13,18 +14,22 @@ if (typeof Highcharts === 'object') {
     new HighchartsDrilldown(Highcharts);
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const MapWard = ({ dataWard, setStage }) => {
     const [wardMap, setWardMap] = useState(null);
     const { mapKey } = useSelector((state) => state.mapKey);
     const dispatch = useDispatch();
 
-    const fetchData = async () => {
-        const res = await fetchMapData(mapKey);
-        setWardMap(res);
-    };
     useEffect(() => {
+        async function fetchData() {
+            if (mapKey !== 'full') {
+                const response = await fetchMapData(mapKey);
+                setWardMap(response);
+            }
+        }
         fetchData();
-    }, [fetchData]);
+    }, []);
+
     const backToMapDistrict = async () => {
         await dispatch(action.fetchMapKey('full'));
         setStage(0);
@@ -135,5 +140,8 @@ const MapWard = ({ dataWard, setStage }) => {
         </>
     );
 };
-
+MapWard.propTypes = {
+    dataWard: PropTypes.array.isRequired,
+    setStage: PropTypes.func.isRequired,
+};
 export default MapWard;

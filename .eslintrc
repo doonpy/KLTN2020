@@ -65,7 +65,8 @@
         "no-console": "error",
         "import/no-unresolved": "off",
         "no-useless-constructor": "off",
-        "jsx-a11y/mouse-events-have-key-events": "off"
+        "jsx-a11y/mouse-events-have-key-events": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off"
     },
     "settings": {
         "import/resolver": {
