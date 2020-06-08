@@ -18,39 +18,29 @@ import { HostDocumentModel } from '@service/host/host.interface';
 import { RawDataDocumentModel } from '@service/raw-data/raw-data.interface';
 import CommonConstant from '@common/common.constant';
 import ScrapeBase from '../scrape.base';
-import {
-    acreageHandler,
-    convertAcreageValueToMeter,
-    convertPriceValueToK,
-    priceHandler,
-} from './scrape.raw-data.helper';
+import { acreageHandler, priceHandler } from './scrape.raw-data.helper';
 import {
     ScrapeRawDataConstant,
     ScrapeRawDataConstantChatBotMessage,
 } from './scrape.raw-data.constant';
+
+const NOT_EXTRACTED = false;
+const EXTRACTED = true;
+const MAX_REQUEST_RETRIES = Number(
+    process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST_RETRIES || '3'
+);
+const MAX_REQUEST = Number(process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1');
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic = DetailUrlLogic.getInstance();
 
     private readonly rawDataLogic = RawDataLogic.getInstance();
 
-    private extractedDetailUrl: string[] = [];
-
     private readonly catalog: CatalogDocumentModel;
 
     private detailUrls: DetailUrlDocumentModel[] = [];
 
     private pattern: PatternDocumentModel;
-
-    private readonly NOT_EXTRACTED = false;
-
-    private readonly EXTRACTED = true;
-
-    private readonly MAX_REQUEST_RETRIES = 3;
-
-    private readonly MAX_REQUEST = Number(
-        process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1'
-    );
 
     constructor(catalog: CatalogDocumentModel) {
         super();
@@ -81,8 +71,8 @@ export default class ScrapeRawData extends ScrapeBase {
 
             const conditions = {
                 catalogId: this.catalog._id,
-                isExtracted: this.NOT_EXTRACTED,
-                requestRetries: { $lt: this.MAX_REQUEST_RETRIES },
+                isExtracted: NOT_EXTRACTED,
+                requestRetries: { $lt: MAX_REQUEST_RETRIES },
             };
             this.detailUrls = (
                 await this.detailUrlLogic.getAll({ conditions })
@@ -93,7 +83,32 @@ export default class ScrapeRawData extends ScrapeBase {
                 return;
             }
 
-            this.scrapeAction();
+            while (this.detailUrls.length > 0) {
+                const detailUrlList: DetailUrlDocumentModel[] = this.detailUrls.splice(
+                    0,
+                    MAX_REQUEST
+                );
+                if (detailUrlList.length === 0) {
+                    continue;
+                }
+
+                const promises: Array<Promise<void>> = [];
+                detailUrlList.forEach((detailUrl) => {
+                    promises.push(this.scrapeAction(detailUrl));
+                });
+
+                try {
+                    await Promise.all(promises);
+                } catch (error) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Scrape raw data - Error: ${
+                            error.cause || error.message
+                        }`
+                    ).show();
+                }
+            }
+            await this.finishAction();
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
                 replaceMetaDataString(error.message, [
@@ -112,50 +127,20 @@ export default class ScrapeRawData extends ScrapeBase {
      *
      * @return {void}
      */
-    private scrapeAction(): void {
-        const loop = setInterval(async (): Promise<void> => {
-            if (this.detailUrls.length === 0 && this.requestCounter === 0) {
-                clearInterval(loop);
-                await this.finishAction();
-            }
+    private async scrapeAction(
+        detailUrl: DetailUrlDocumentModel
+    ): Promise<void> {
+        const url: string = detailUrl.url;
+        const $ = await this.getStaticBody(
+            (this.catalog.hostId as HostDocumentModel).domain,
+            url
+        );
 
-            if (this.requestCounter > this.MAX_REQUEST) {
-                return;
-            }
-
-            const currentDetailUrlDocument = this.detailUrls.shift();
-            if (!currentDetailUrlDocument) {
-                return;
-            }
-
-            const currentUrl = currentDetailUrlDocument.url;
-            this.extractedDetailUrl.push(currentDetailUrlDocument.url);
-
-            this.requestCounter++;
-            const $ = await this.getStaticBody(
-                (this.catalog.hostId as HostDocumentModel).domain,
-                currentUrl
-            );
-
-            try {
-                if (!$) {
-                    await this.handleFailedRequest(currentDetailUrlDocument);
-                } else {
-                    await this.handleSuccessRequest(
-                        $,
-                        currentDetailUrlDocument
-                    );
-                }
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Scrape raw data - DID: ${
-                        currentDetailUrlDocument._id
-                    } - Error: ${error.cause || error.message}`
-                ).show();
-            }
-            this.requestCounter--;
-        }, this.REQUEST_DELAY);
+        if (!$) {
+            await this.handleFailedRequest(detailUrl);
+        } else {
+            await this.handleSuccessRequest($, detailUrl);
+        }
     }
 
     /**
@@ -228,7 +213,7 @@ export default class ScrapeRawData extends ScrapeBase {
             addressData,
             othersData
         );
-        currentDetailUrlDocument.isExtracted = this.EXTRACTED;
+        currentDetailUrlDocument.isExtracted = EXTRACTED;
         currentDetailUrlDocument.requestRetries++;
 
         if (this.isHasEmptyProperty(rawData)) {
@@ -333,9 +318,7 @@ export default class ScrapeRawData extends ScrapeBase {
         currentDetailUrlDocument: DetailUrlDocumentModel
     ): Promise<void> {
         currentDetailUrlDocument.requestRetries++;
-        if (
-            currentDetailUrlDocument.requestRetries < this.MAX_REQUEST_RETRIES
-        ) {
+        if (currentDetailUrlDocument.requestRetries < MAX_REQUEST_RETRIES) {
             this.detailUrls.push(currentDetailUrlDocument);
         } else {
             try {
@@ -378,7 +361,7 @@ export default class ScrapeRawData extends ScrapeBase {
         priceData: string,
         acreageData: string,
         addressData: string,
-        othersData: { name: string; value: string }[]
+        othersData: Array<{ name: string; value: string }>
     ): RawDataDocumentModel {
         const transactionType = ScrapeRawDataConstant.RENT_TRANSACTION_PATTERN.test(
             propertyTypeData
@@ -436,19 +419,5 @@ export default class ScrapeRawData extends ScrapeBase {
             `Scrape raw data -> CID: ${this.catalog._id} - Execute time: ${executeTime} - Complete`
         ).show();
         process.exit(0);
-    }
-
-    /**
-     * Get page number scraped
-     */
-    public getTargetList(): string[] {
-        return this.extractedDetailUrl;
-    }
-
-    /**
-     * Get catalog target
-     */
-    public getCatalog(): CatalogDocumentModel {
-        return this.catalog;
     }
 }

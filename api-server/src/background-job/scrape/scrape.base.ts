@@ -10,15 +10,9 @@ import { RequestResponse } from 'request';
 export default class ScrapeBase {
     protected startTime: [number, number] | undefined;
 
-    protected requestCounter = 0;
-
     protected isRunning = false;
 
     protected telegramChatBotInstance = ChatBotTelegram.getInstance();
-
-    protected readonly REQUEST_DELAY = Number(
-        process.env.BGR_SCRAPE_REQUEST_DELAY || '100'
-    );
 
     private readonly requestOptions: RequestPromiseOptions = {
         headers: {
@@ -44,10 +38,10 @@ export default class ScrapeBase {
         const DOMAIN_PATTERN = RegExp(
             /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
         );
-        domain = domain.replace(/\/{2,}$/, '');
+        const originDomain = domain.replace(/\/{2,}$/, '');
         const url = DOMAIN_PATTERN.test(path)
             ? path
-            : domain + (/^\//.test(path) ? path : `/${path}`);
+            : originDomain + (/^\//.test(path) ? path : `/${path}`);
 
         try {
             const response = await sendRequest<RequestResponse>(
@@ -121,12 +115,5 @@ export default class ScrapeBase {
         }
 
         return data;
-    }
-
-    /**
-     * Check is task running
-     */
-    public isTaskRunning(): boolean {
-        return this.isRunning;
     }
 }

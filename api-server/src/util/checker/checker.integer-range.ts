@@ -18,7 +18,7 @@ export default class CheckerIntegerRange extends CheckerBase {
      * @param input
      */
     public check(paramName: string, input: object): void {
-        let value = this.getValue(paramName, input);
+        const value = this.getValue(paramName, input);
 
         if (!value) {
             return;

@@ -86,9 +86,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -130,9 +130,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -173,9 +173,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.CREATED,
-                this.groupedDataLogic.convertToApiResponse(createdGroupedData),
-                res
+                this.groupedDataLogic.convertToApiResponse(createdGroupedData)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -229,9 +229,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                this.groupedDataLogic.convertToApiResponse(editedGroupedData),
-                res
+                this.groupedDataLogic.convertToApiResponse(editedGroupedData)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -268,9 +268,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             await this.groupedDataLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.NO_CONTENT,
-                {},
-                res
+                {}
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -293,9 +293,9 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             const documentAmount = await this.groupedDataLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'grouped-data', documentAmount },
-                res
+                { schema: 'grouped-data', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

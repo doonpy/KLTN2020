@@ -83,9 +83,9 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
                 ),
             };
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -138,9 +138,9 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
             const documentAmount = await this.visualSummaryDistrictWardLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-summary-district-ward', documentAmount },
-                res
+                { schema: 'visual-summary-district-ward', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

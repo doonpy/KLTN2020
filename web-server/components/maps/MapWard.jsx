@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Highcharts from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,8 +9,8 @@ import { fetchMapData } from '../../util/api/fetchMapJson';
 import * as action from '../../store/map-key/actions';
 
 if (typeof Highcharts === 'object') {
-    HighchartsExporting(Highcharts);
-    HighchartsDrilldown(Highcharts);
+    new HighchartsExporting(Highcharts);
+    new HighchartsDrilldown(Highcharts);
 }
 
 const MapWard = ({ dataWard, setStage }) => {
@@ -24,7 +24,7 @@ const MapWard = ({ dataWard, setStage }) => {
     };
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
     const backToMapDistrict = async () => {
         await dispatch(action.fetchMapKey('full'));
         setStage(0);
@@ -76,8 +76,8 @@ const MapWard = ({ dataWard, setStage }) => {
             buttons: [
                 {
                     text: 'Back to HCM',
-                    onclick() {
-                        backToMapDistrict();
+                    onclick: async () => {
+                        await backToMapDistrict();
                     },
                     theme: {
                         'stroke-width': 1,

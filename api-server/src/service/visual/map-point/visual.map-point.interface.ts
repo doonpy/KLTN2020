@@ -24,11 +24,11 @@ export interface VisualMapPointDocumentModel extends CommonDocumentModel {
     wardId: number | VisualAdministrativeWardDocumentModel;
     lat: number;
     lng: number;
-    points: {
+    points: Array<{
         rawDataset: MapPoint[];
         transactionType: number;
         propertyType: number;
-    }[];
+    }>;
 }
 
 export interface VisualMapPointApiModel extends CommonApiModel {
@@ -36,11 +36,9 @@ export interface VisualMapPointApiModel extends CommonApiModel {
     ward: number | VisualAdministrativeWardApiModel | null;
     lat: number | null;
     lng: number | null;
-    points:
-        | {
-              rawDataset: MapPoint[];
-              transactionType: number;
-              propertyType: number;
-          }[]
-        | null;
+    points: Array<{
+        rawDataset: MapPoint[];
+        transactionType: number;
+        propertyType: number;
+    }> | null;
 }

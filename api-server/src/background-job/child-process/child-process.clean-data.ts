@@ -21,21 +21,41 @@ type AggregationGroupDataResult = {
 
 const detailUrlLogic = DetailUrlLogic.getInstance();
 const rawDataLogic = RawDataLogic.getInstance();
-const PROCESSES_LIMIT = 30;
-
 let script: AsyncGenerator;
 
 /**
- * Delete raw data have invalid address
- *
- * @param {RawDataDocumentModel} rawData
+ * @param _id
+ * @param isExtracted
+ * @private
  */
-const deleteAction = async (rawData: RawDataDocumentModel): Promise<void> => {
-    await rawDataLogic.delete(rawData._id);
-    new ConsoleLog(
-        ConsoleConstant.Type.INFO,
-        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
-    ).show();
+const _deleteDuplicateData = async ({
+    _id,
+    isExtracted,
+}: DetailUrlDocumentModel) => {
+    await detailUrlLogic.delete(_id);
+
+    if (isExtracted) {
+        const idList = (
+            await rawDataLogic.getAll({
+                conditions: { detailUrlId: _id },
+            })
+        ).documents.map(({ _id: rawDataId }) => rawDataId);
+        const promises = idList.map((rawDataId) =>
+            rawDataLogic.delete(rawDataId)
+        );
+        await Promise.all(promises);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Clean data - Duplicate data -> DID: ${_id} - RID: ${
+                idList[0] ?? NaN
+            }`
+        ).show();
+    } else {
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Clean data - Duplicate data -> DID: ${_id}`
+        ).show();
+    }
 };
 
 /**
@@ -45,67 +65,40 @@ const deleteDuplicateData = async (): Promise<void> => {
     const aggregationResult = await detailUrlLogic.getWithAggregation<
         AggregationGroupDataResult
     >(CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS);
-    let processCount = 0;
-
-    const loop = setInterval(async (): Promise<void> => {
-        if (aggregationResult.length === 0) {
-            clearInterval(loop);
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Clean data - Delete duplicate - Complete`
-            ).show();
-            script.next();
-            return;
+    try {
+        for (const item of aggregationResult) {
+            const promises = item.docList.map((doc) =>
+                _deleteDuplicateData(doc)
+            );
+            await Promise.all(promises);
         }
+    } catch (error) {
+        new ConsoleLog(
+            ConsoleConstant.Type.ERROR,
+            `Clean data - Duplicate data - Error: ${error.message}`
+        ).show();
+    }
 
-        if (processCount > PROCESSES_LIMIT) {
-            return;
-        }
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Delete duplicate - Complete`
+    ).show();
+    script.next();
+};
 
-        const item = aggregationResult.shift();
-        if (!item) {
-            return;
-        }
-        processCount++;
-
-        item.docList.shift();
-        for (const doc of item.docList) {
-            try {
-                await detailUrlLogic.delete(doc._id);
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Clean data - Duplicate data -> DID:${doc._id}`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Clean data - Duplicate data -> DID: ${doc._id}) - Error: ${error.message}`
-                ).show();
-            }
-
-            if (doc.isExtracted) {
-                try {
-                    const { documents } = await rawDataLogic.getAll({
-                        conditions: { detailUrlId: doc._id },
-                    });
-                    for (const document of documents) {
-                        await rawDataLogic.delete(document._id);
-                        new ConsoleLog(
-                            ConsoleConstant.Type.INFO,
-                            `Clean data - Duplicate data -> RID:${doc._id}`
-                        ).show();
-                    }
-                } catch (error) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Clean data - Duplicate data -> Raw data of DID: ${doc._id} - Error: ${error.message}`
-                    ).show();
-                }
-            }
-        }
-
-        processCount--;
-    }, 0);
+/**
+ * Delete raw data have invalid address
+ *
+ * @param {RawDataDocumentModel} rawData
+ */
+const _deleteInvalidAddressData = async (
+    rawData: RawDataDocumentModel
+): Promise<void> => {
+    await rawDataLogic.delete(rawData._id);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
+    ).show();
 };
 
 /**
@@ -139,55 +132,18 @@ const deleteInvalidAddressData = async (): Promise<void> => {
     );
     const validProvincePattern = RegExp(`(${provincePattern})`, 'i');
     const validCountryPattern = RegExp(`(${countryPattern})$`, 'i');
-    const DOCUMENTS_LIMIT = 1000;
-    let processCount = 0;
-    let offset = 0;
-    let rawDataset = await rawDataLogic.getAll({
-        limit: DOCUMENTS_LIMIT,
-        offset,
+    const rawDataset = await rawDataLogic.getAll({
         conditions: {
             coordinateId: null,
         },
     });
-    const loop = setInterval(async () => {
-        if (!rawDataset.hasNext && rawDataset.documents.length === 0) {
-            clearInterval(loop);
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Clean data - Delete invalid address - Complete`
-            ).show();
-            script.next();
-            return;
-        }
 
-        if (processCount > PROCESSES_LIMIT) {
-            return;
-        }
-
-        const rawData = rawDataset.documents.shift();
-        if (!rawData) {
-            return;
-        }
-        processCount++;
-
-        if (rawDataset.documents.length === 0) {
-            offset += DOCUMENTS_LIMIT;
-            rawDataset = await rawDataLogic.getAll({
-                limit: DOCUMENTS_LIMIT,
-                offset,
-                conditions: {
-                    coordinateId: null,
-                },
-            });
-        }
-
+    for (const rawData of rawDataset.documents) {
         let { address } = rawData;
         try {
             if (!validDistrictAndWardPattern.test(address)) {
-                await deleteAction(rawData);
-                processCount--;
-
-                return;
+                await _deleteInvalidAddressData(rawData);
+                continue;
             }
 
             if (validProvincePattern.test(address)) {
@@ -196,29 +152,29 @@ const deleteInvalidAddressData = async (): Promise<void> => {
                     ''
                 );
                 if (address.length > 0 && !validCountryPattern.test(address)) {
-                    await deleteAction(rawData);
-                    processCount--;
-
-                    return;
+                    await _deleteInvalidAddressData(rawData);
                 }
             }
-
-            processCount--;
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
                 `Clean data - Invalid address -> RID: ${rawData._id} - Error: ${error.message}`
             ).show();
-            processCount--;
         }
-    }, 0);
+    }
+
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Clean data - Delete invalid address - Complete`
+    ).show();
+    script.next();
 };
 
 /**
  * Generate script of process
  */
 async function* generateScript() {
-    const startTime = process.hrtime();
+    const startTime: [number, number] = process.hrtime();
     const telegramChatBotInstance = ChatBotTelegram.getInstance();
     await telegramChatBotInstance.sendMessage(
         `<b>🤖[Clean data]🤖</b>\n📝 Start clean data...`
@@ -247,7 +203,6 @@ async function* generateScript() {
         `Clean data - Execute time: ${executeTime} - Complete`
     ).show();
     process.exit(0);
-    return 'Done';
 }
 
 /**

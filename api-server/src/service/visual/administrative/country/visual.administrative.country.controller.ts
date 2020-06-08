@@ -88,9 +88,9 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
                 hasNext,
             };
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -143,9 +143,9 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
             const documentAmount = await this.visualAdministrativeCountryLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-administrative-country', documentAmount },
-                res
+                { schema: 'visual-administrative-country', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

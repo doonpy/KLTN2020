@@ -175,11 +175,11 @@ const initializeVisualData = async (): Promise<void> => {
         'Initialize visualization data...'
     ).show();
 
-    const summaryDefault: {
+    const summaryDefault: Array<{
         transactionType: number;
         propertyType: number;
         amount: number;
-    }[] = [];
+    }> = [];
     for (let i = 1; i < TRANSACTION_TYPE_AMOUNT; i++) {
         for (let j = 1; j < PROPERTY_TYPE_AMOUNT; j++) {
             summaryDefault.push({

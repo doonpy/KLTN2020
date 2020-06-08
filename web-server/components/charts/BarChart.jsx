@@ -6,8 +6,8 @@ import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import { BINDING_OPTIONS } from '../../util/bindingOptions';
 
 if (typeof Highcharts === 'object') {
-    HighchartsExporting(Highcharts);
-    HighchartsDrilldown(Highcharts);
+    new HighchartsExporting(Highcharts);
+    new HighchartsDrilldown(Highcharts);
 }
 
 const BarChart = ({ data }) => {

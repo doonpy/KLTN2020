@@ -76,12 +76,12 @@ export default class HostController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
                 {
                     hosts,
                     hasNext,
-                },
-                res
+                }
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -121,9 +121,9 @@ export default class HostController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -177,9 +177,9 @@ export default class HostController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.CREATED,
-                this.hostLogic.convertToApiResponse(createdHost),
-                res
+                this.hostLogic.convertToApiResponse(createdHost)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -245,9 +245,9 @@ export default class HostController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                this.hostLogic.convertToApiResponse(editedHost),
-                res
+                this.hostLogic.convertToApiResponse(editedHost)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -284,9 +284,9 @@ export default class HostController extends CommonServiceControllerBase {
             await this.hostLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.NO_CONTENT,
-                {},
-                res
+                {}
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -309,9 +309,9 @@ export default class HostController extends CommonServiceControllerBase {
             const documentAmount = await this.hostLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'host', documentAmount },
-                res
+                { schema: 'host', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

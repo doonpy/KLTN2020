@@ -89,9 +89,9 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -144,9 +144,9 @@ export default class VisualAdministrativeDistrictController extends VisualCommon
             const documentAmount = await this.visualAdministrativeDistrictLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-administrative-district', documentAmount },
-                res
+                { schema: 'visual-administrative-district', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

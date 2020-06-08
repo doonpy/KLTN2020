@@ -9,6 +9,32 @@ const telegramChatBotInstance = ChatBotTelegram.getInstance();
 const groupDataInstance = new GroupData();
 const { MESSAGE_TYPE } = GroupedDataConstant;
 
+const start = async (
+    transactionTypeId: number,
+    propertyTypeId: number
+): Promise<void> => {
+    try {
+        await telegramChatBotInstance.sendMessage(
+            `<b>🤖[Group data]🤖</b>\n📝 Start group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId}`
+        );
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Start`
+        ).show();
+
+        await groupDataInstance.start(transactionTypeId, propertyTypeId);
+    } catch (error) {
+        await telegramChatBotInstance.sendMessage(
+            `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
+        );
+        new ConsoleLog(
+            ConsoleConstant.Type.ERROR,
+            `Group data - Error: ${error.cause || error.message}`
+        ).show();
+    }
+    process.exit(0);
+};
+
 process.on(
     'message',
     async ({
@@ -22,29 +48,7 @@ process.on(
     }): Promise<void> => {
         switch (messageType) {
             case MESSAGE_TYPE.START:
-                try {
-                    await telegramChatBotInstance.sendMessage(
-                        `<b>🤖[Group data]🤖</b>\n📝 Start group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId}`
-                    );
-                    new ConsoleLog(
-                        ConsoleConstant.Type.INFO,
-                        `Group data -> TID: ${transactionTypeId} - PID: ${propertyTypeId} - Start`
-                    ).show();
-
-                    await groupDataInstance.start(
-                        transactionTypeId,
-                        propertyTypeId
-                    );
-                } catch (error) {
-                    await telegramChatBotInstance.sendMessage(
-                        `<b>🤖[Group data]🤖</b>\n❌ Group data failed.\nError: <code>${error.message}</code>`
-                    );
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Group data - Error: ${error.cause || error.message}`
-                    ).show();
-                    process.exit(1);
-                }
+                await start(transactionTypeId, propertyTypeId);
                 break;
             case MESSAGE_TYPE.SUSPENSE:
                 groupDataInstance.suspense();

@@ -84,9 +84,9 @@ export default class VisualAdministrativeWardController extends VisualCommonCont
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -139,9 +139,9 @@ export default class VisualAdministrativeWardController extends VisualCommonCont
             const documentAmount = await this.visualWardLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-administrative-ward', documentAmount },
-                res
+                { schema: 'visual-administrative-ward', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

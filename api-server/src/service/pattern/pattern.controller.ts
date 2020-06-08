@@ -90,12 +90,12 @@ export default class PatternController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
                 {
                     patterns,
                     hasNext,
-                },
-                res
+                }
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -135,9 +135,9 @@ export default class PatternController extends CommonServiceControllerBase {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -262,9 +262,9 @@ export default class PatternController extends CommonServiceControllerBase {
             );
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.CREATED,
-                this.patternLogic.convertToApiResponse(createdPattern),
-                res
+                this.patternLogic.convertToApiResponse(createdPattern)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -411,9 +411,9 @@ export default class PatternController extends CommonServiceControllerBase {
             }
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                this.patternLogic.convertToApiResponse(editedPattern),
-                res
+                this.patternLogic.convertToApiResponse(editedPattern)
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -450,9 +450,9 @@ export default class PatternController extends CommonServiceControllerBase {
             await this.patternLogic.delete(idBody);
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.NO_CONTENT,
-                {},
-                res
+                {}
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -475,9 +475,9 @@ export default class PatternController extends CommonServiceControllerBase {
             const documentAmount = await this.patternLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'pattern', documentAmount },
-                res
+                { schema: 'pattern', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

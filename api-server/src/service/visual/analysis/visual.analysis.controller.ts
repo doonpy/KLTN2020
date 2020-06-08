@@ -229,9 +229,9 @@ export default class VisualAnalysisController extends VisualCommonController {
             };
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                responseBody,
-                res
+                responseBody
             );
         } catch (error) {
             next(this.createError(error, this.language));
@@ -284,9 +284,9 @@ export default class VisualAnalysisController extends VisualCommonController {
             const documentAmount = await this.visualAnalysisLogic.getDocumentAmount();
 
             CommonServiceControllerBase.sendResponse(
+                res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-analysis', documentAmount },
-                res
+                { schema: 'visual-analysis', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));
