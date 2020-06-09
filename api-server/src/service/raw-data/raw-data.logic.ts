@@ -87,7 +87,6 @@ export default class RawDataLogic
         address,
         others,
         coordinateId,
-        isGrouped,
         cTime,
         mTime,
     }: RawDataDocumentModel): RawDataApiModel {
@@ -138,7 +137,6 @@ export default class RawDataLogic
             address: address ?? null,
             others: others ?? null,
             coordinate,
-            isGrouped: isGrouped ?? null,
             createAt: cTime ?? null,
             updateAt: mTime ?? null,
         };

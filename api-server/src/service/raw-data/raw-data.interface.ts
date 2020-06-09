@@ -39,7 +39,6 @@ export interface RawDataApiModel extends CommonApiModel {
         | []
         | null;
     coordinate: CoordinateApiModel | number | null;
-    isGrouped: boolean | null;
 }
 
 export interface RawDataDocumentModel extends CommonDocumentModel {
@@ -66,6 +65,10 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
         }
     ];
     coordinateId: CoordinateDocumentModel | number;
+    status: {
+        isSummary: boolean;
+        isAnalysis: boolean;
+    };
     isGrouped: boolean;
 }
 

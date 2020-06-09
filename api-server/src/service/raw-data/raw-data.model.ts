@@ -47,7 +47,12 @@ const rawDataSchema = new Schema(
             default: null,
             autopopulate: true,
         },
-        isGrouped: { type: Schema.Types.Boolean, default: false },
+        status: {
+            _id: false,
+            isSummary: { type: Schema.Types.Boolean, default: false },
+            isAnalysis: { type: Schema.Types.Boolean, default: false },
+            isGrouped: { type: Schema.Types.Boolean, default: false },
+        },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
@@ -64,10 +69,21 @@ rawDataSchema.index({ propertyType: 1 }, { name: 'idx_propertyType' });
 rawDataSchema.index({ title: 1 }, { name: 'idx_title' });
 rawDataSchema.index({ coordinateId: 1 }, { name: 'idx_coordinateId' });
 rawDataSchema.index({ address: 1 }, { name: 'idx_address' });
-rawDataSchema.index({ isGrouped: 1 }, { name: 'idx_isGrouped' });
 rawDataSchema.index(
     { transactionType: 1, propertyType: 1, isGrouped: 1 },
     { name: 'idx_transactionType_propertyType_isGrouped' }
+);
+rawDataSchema.index(
+    { 'status.isSummary': 1 },
+    { name: 'idx_status.isSummary' }
+);
+rawDataSchema.index(
+    { 'status.isAnalysis': 1 },
+    { name: 'idx_status.isAnalysis' }
+);
+rawDataSchema.index(
+    { 'status.isGrouped': 1 },
+    { name: 'idx_status.isGrouped' }
 );
 
 const RawDataModel = mongoose.model<RawDataDocumentModel>(
