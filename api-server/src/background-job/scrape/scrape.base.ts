@@ -1,8 +1,6 @@
 import cherrio from 'cheerio';
 import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
 import { sendRequest } from '@util/request/request';
-import ConsoleLog from '@util/console/console.log';
-import ConsoleConstant from '@util/console/console.constant';
 import ResponseStatusCode from '@common/common.response-status.code';
 import { RequestPromiseOptions } from 'request-promise';
 import { RequestResponse } from 'request';
@@ -48,12 +46,6 @@ export default class ScrapeBase {
                 url,
                 this.requestOptions
             );
-            const { statusCode } = response;
-
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Send request -> ${response.request.uri.href} - ${statusCode} - ${response.elapsedTime}ms`
-            ).show();
 
             if (
                 response.statusCode !== ResponseStatusCode.OK ||
@@ -64,10 +56,6 @@ export default class ScrapeBase {
 
             return cherrio.load(response.body);
         } catch (error) {
-            new ConsoleLog(
-                ConsoleConstant.Type.ERROR,
-                `Send request -> ${url} - Error: ${error.message}`
-            ).show();
             return undefined;
         }
     }

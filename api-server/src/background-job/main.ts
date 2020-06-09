@@ -178,10 +178,10 @@ async function* generateScript() {
     if (isGrouperRunning) {
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
-            `Suspend group child process...`
+            `Gracefully suspend group child process...`
         ).show();
         await ChatBotTelegram.getInstance().sendMessage(
-            `<b>🤖[Background Job]🤖</b>\nSuspend group child process.`
+            `<b>🤖[Background Job]🤖</b>\nGracefully suspend group child process.`
         );
         childProcessSet.forEach((childProcess): void => {
             childProcess.send({

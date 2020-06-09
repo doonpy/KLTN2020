@@ -83,32 +83,27 @@ export default class ScrapeRawData extends ScrapeBase {
                 return;
             }
 
-            while (this.detailUrls.length > 0) {
-                const detailUrlList: DetailUrlDocumentModel[] = this.detailUrls.splice(
-                    0,
-                    MAX_REQUEST
-                );
-                if (detailUrlList.length === 0) {
-                    continue;
+            let requestCounter = 0;
+            const loop = setInterval(async (): Promise<void> => {
+                if (this.detailUrls.length === 0 && requestCounter === 0) {
+                    clearInterval(loop);
+                    await this.finishAction();
+                    return;
                 }
 
-                const promises: Array<Promise<void>> = [];
-                detailUrlList.forEach((detailUrl) => {
-                    promises.push(this.scrapeAction(detailUrl));
-                });
-
-                try {
-                    await Promise.all(promises);
-                } catch (error) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Scrape raw data - Error: ${
-                            error.cause || error.message
-                        }`
-                    ).show();
+                if (requestCounter > MAX_REQUEST) {
+                    return;
                 }
-            }
-            await this.finishAction();
+
+                const targetDetailUrl = this.detailUrls.shift();
+                if (!targetDetailUrl) {
+                    return;
+                }
+
+                requestCounter++;
+                await this.scrapeAction(targetDetailUrl);
+                requestCounter--;
+            }, 0);
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
                 replaceMetaDataString(error.message, [

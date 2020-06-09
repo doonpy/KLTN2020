@@ -40,7 +40,6 @@ const visualMapPointLogic = VisualMapPointLogic.getInstance();
 const visualAnalysisLogic = VisualAnalysisLogic.getInstance();
 const visualAdministrativeDistrictLogic = VisualAdministrativeDistrictLogic.getInstance();
 const visualAdministrativeWardLogic = VisualAdministrativeWardLogic.getInstance();
-const MAX_PROCESSING_DOCUMENTS = 10;
 let script: AsyncGenerator;
 let districtPattern = '';
 
@@ -124,7 +123,6 @@ const getCoordinate = async (
     let coordinateDoc = await coordinateLogic.getByLocation(address);
     if (!coordinateDoc) {
         const apiResponse = await getGeocode(address);
-        console.log(apiResponse);
         if (!apiResponse) {
             return undefined;
         }
@@ -495,6 +493,10 @@ const _addCoordinateAndSummaryVisualizationData = async (
             ),
             handleVisualizationAnalysis(rawData.postDate, rawData),
         ]);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Preprocessing data - RID: ${rawData._id}`
+        ).show();
     } catch (error) {
         new ConsoleLog(
             ConsoleConstant.Type.ERROR,
@@ -517,6 +519,8 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
         .filter((name, index) => index === districtNames.lastIndexOf(name))
         .join('|');
     const DOCUMENT_LIMIT = 1000;
+    const MAX_PROCESS = 10;
+    let processCounter = 0;
     let documents: RawDataDocumentModel[] = (
         await rawDataLogic.getAll({
             limit: DOCUMENT_LIMIT,
@@ -525,24 +529,21 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
             },
         })
     ).documents;
+    const loop = setInterval(async (): Promise<void> => {
+        if (documents.length === 0 && processCounter === 0) {
+            clearInterval(loop);
+            script.next();
+            return;
+        }
 
-    while (documents.length > 0) {
-        const targetRawDataList: RawDataDocumentModel[] = documents.splice(
-            0,
-            MAX_PROCESSING_DOCUMENTS
-        );
-        const promises: Array<Promise<
-            void
-        >> = targetRawDataList.map((targetRawData) =>
-            _addCoordinateAndSummaryVisualizationData(targetRawData)
-        );
-        await Promise.all(promises);
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Preprocessing data - RID: ${targetRawDataList
-                .map(({ _id }) => _id)
-                .join(', ')}`
-        ).show();
+        if (processCounter > MAX_PROCESS) {
+            return;
+        }
+
+        const targetRawData = documents.shift();
+        if (!targetRawData) {
+            return;
+        }
         if (documents.length === 0) {
             documents = (
                 await rawDataLogic.getAll({
@@ -553,9 +554,11 @@ const addCoordinateAndSummaryVisualizationData = async (): Promise<void> => {
                 })
             ).documents;
         }
-    }
 
-    script.next();
+        processCounter++;
+        await _addCoordinateAndSummaryVisualizationData(targetRawData);
+        processCounter--;
+    }, 0);
 };
 
 /**

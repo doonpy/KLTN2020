@@ -5,6 +5,7 @@ module.exports = {
     ],
     rules: {
         'prefer-const': 'warn',
+        '@typescript-eslint/array-type': 'off',
     },
     overrides: [
         // DO NOT ADD MORE FILES TO THE IGNORE LIST
