@@ -50,7 +50,7 @@ const rawDataSchema = new Schema(
         status: {
             _id: false,
             isSummary: { type: Schema.Types.Boolean, default: false },
-            isAnalysis: { type: Schema.Types.Boolean, default: false },
+            isAnalytics: { type: Schema.Types.Boolean, default: false },
             isGrouped: { type: Schema.Types.Boolean, default: false },
         },
     },
@@ -78,8 +78,8 @@ rawDataSchema.index(
     { name: 'idx_status.isSummary' }
 );
 rawDataSchema.index(
-    { 'status.isAnalysis': 1 },
-    { name: 'idx_status.isAnalysis' }
+    { 'status.isAnalytics': 1 },
+    { name: 'idx_status.isAnalytics' }
 );
 rawDataSchema.index(
     { 'status.isGrouped': 1 },
