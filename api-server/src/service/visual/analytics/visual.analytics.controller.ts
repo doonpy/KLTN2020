@@ -5,9 +5,9 @@ import Validator from '@util/validator/validator';
 import Checker from '@util/checker/checker.index';
 import CommonConstant from '@common/common.constant';
 import VisualCommonController from '@service/visual/visual.common.controller';
-import VisualAnalysisLogic from '@service/visual/analysis/visual.analysis.logic';
+import VisualAnalyticsLogic from '@service/visual/analytics/visual.analytics.logic';
 import { convertStringToDate } from '@util/helper/datetime';
-import { VisualAnalysisDocumentModel } from '@service/visual/analysis/visual.analysis.interface';
+import { VisualAnalyticsDocumentModel } from '@service/visual/analytics/visual.analytics.interface';
 
 const commonPath = '/analyses';
 const specifyIdPath = '/analysis/:id';
@@ -15,14 +15,18 @@ const DATE_FORMAT = 'dd-mm-yyyy';
 const DATE_DELIMITER = '-';
 const MIN_FROM_DATE = new Date(-8640000000000000);
 
-export default class VisualAnalysisController extends VisualCommonController {
-    private static instance: VisualAnalysisController;
+export default class VisualAnalyticsController extends VisualCommonController {
+    private static instance: VisualAnalyticsController;
 
-    private visualAnalysisLogic = VisualAnalysisLogic.getInstance();
+    private visualAnalysisLogic = VisualAnalyticsLogic.getInstance();
 
-    private readonly PARAM_FROM_DATE = 'fromDate';
+    private readonly PARAM_FROM_MONTH = 'fromMonth';
 
-    private readonly PARAM_TO_DATE = 'toDate';
+    private readonly PARAM_TO_MONTH = 'toYear';
+
+    private readonly PARAM_FROM_YEAR = 'fromYear';
+
+    private readonly PARAM_TO_YEAR = 'toYear';
 
     private readonly PARAM_TRANSACTION_TYPE = 'transactionType';
 
@@ -38,9 +42,9 @@ export default class VisualAnalysisController extends VisualCommonController {
     /**
      * Get instance
      */
-    public static getInstance(): VisualAnalysisController {
+    public static getInstance(): VisualAnalyticsController {
         if (!this.instance) {
-            this.instance = new VisualAnalysisController();
+            this.instance = new VisualAnalyticsController();
         }
         return this.instance;
     }
@@ -91,21 +95,39 @@ export default class VisualAnalysisController extends VisualCommonController {
             this.validator = new Validator();
 
             this.validator.addParamValidator(
-                this.PARAM_FROM_DATE,
-                new Checker.Type.String()
+                this.PARAM_FROM_MONTH,
+                new Checker.Type.Integer()
             );
             this.validator.addParamValidator(
-                this.PARAM_FROM_DATE,
-                new Checker.Date(DATE_FORMAT, DATE_DELIMITER)
+                this.PARAM_FROM_MONTH,
+                new Checker.IntegerRange(1, 12)
             );
 
             this.validator.addParamValidator(
-                this.PARAM_TO_DATE,
-                new Checker.Type.String()
+                this.PARAM_TO_MONTH,
+                new Checker.Type.Integer()
             );
             this.validator.addParamValidator(
-                this.PARAM_TO_DATE,
-                new Checker.Date(DATE_FORMAT, DATE_DELIMITER)
+                this.PARAM_TO_MONTH,
+                new Checker.IntegerRange(1, 12)
+            );
+
+            this.validator.addParamValidator(
+                this.PARAM_FROM_YEAR,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_FROM_YEAR,
+                new Checker.IntegerRange(0, new Date().getFullYear())
+            );
+
+            this.validator.addParamValidator(
+                this.PARAM_TO_YEAR,
+                new Checker.Type.Integer()
+            );
+            this.validator.addParamValidator(
+                this.PARAM_TO_YEAR,
+                new Checker.IntegerRange(0, new Date().getFullYear())
             );
 
             this.validator.addParamValidator(
@@ -130,98 +152,30 @@ export default class VisualAnalysisController extends VisualCommonController {
             );
 
             this.validator.validate(this.requestQuery);
-            const fromDateQuery =
-                (this.requestQuery[this.PARAM_FROM_DATE] as string) ?? '';
-            const toDateQuery =
-                (this.requestQuery[this.PARAM_TO_DATE] as string) ?? '';
 
-            let fromDate = convertStringToDate(
-                fromDateQuery,
-                DATE_FORMAT,
-                DATE_DELIMITER
-            );
-            fromDate = !fromDate ? MIN_FROM_DATE : fromDate;
-
-            let toDate = convertStringToDate(
-                toDateQuery,
-                DATE_FORMAT,
-                DATE_DELIMITER
-            );
-            toDate = !toDate ? new Date() : toDate;
-
+            const fromMonth = Number(this.requestQuery[this.PARAM_FROM_MONTH]);
+            const toMonth = Number(this.requestQuery[this.PARAM_TO_MONTH]);
+            const fromYear = Number(this.requestQuery[this.PARAM_FROM_YEAR]);
+            const toYear = Number(this.requestQuery[this.PARAM_TO_YEAR]);
             const transactionType =
                 Number(this.requestQuery[this.PARAM_TRANSACTION_TYPE]) ||
                 undefined;
             const propertyType =
                 Number(this.requestQuery[this.PARAM_PROPERTY_TYPE]) ||
                 undefined;
-            const transactionTypeAndPropertyTypeAggregations = {
+            const conditions = {
                 $and: [
-                    transactionType
-                        ? {
-                              $eq: [
-                                  '$$analysisItem.transactionType',
-                                  transactionType,
-                              ],
-                          }
-                        : {},
-                    propertyType
-                        ? {
-                              $eq: [
-                                  '$$analysisItem.propertyType',
-                                  propertyType,
-                              ],
-                          }
-                        : {},
+                    { month: { $gte: fromMonth } },
+                    { month: { $lte: toMonth } },
+                    { year: { $gte: fromYear } },
+                    { year: { $lte: toYear } },
+                    { transactionType: transactionType || { $gte: 1 } },
+                    { propertyType: propertyType || { $gte: 1 } },
                 ],
             };
-            const aggregations = [
-                {
-                    $match: {
-                        $and: [
-                            {
-                                referenceDate: {
-                                    $gte: fromDate,
-                                },
-                            },
-                            {
-                                referenceDate: {
-                                    $lte: toDate,
-                                },
-                            },
-                        ],
-                    },
-                },
-                {
-                    $project: {
-                        referenceDate: 1,
-                        priceAnalysisData: {
-                            $filter: {
-                                input: '$priceAnalysisData',
-                                as: 'analysisItem',
-                                cond: transactionTypeAndPropertyTypeAggregations,
-                            },
-                        },
-                        acreageAnalysisData: {
-                            $filter: {
-                                input: '$acreageAnalysisData',
-                                as: 'analysisItem',
-                                cond: transactionTypeAndPropertyTypeAggregations,
-                            },
-                        },
-                    },
-                },
-            ];
             const documents = (
-                await this.visualAnalysisLogic.getWithAggregation<
-                    VisualAnalysisDocumentModel
-                >(aggregations)
-            ).filter(
-                ({ priceAnalysisData, acreageAnalysisData }) =>
-                    priceAnalysisData.length > 0 ||
-                    acreageAnalysisData.length > 0
-            );
-
+                await this.visualAnalysisLogic.getAll({ conditions })
+            ).documents;
             const responseBody = {
                 analyses: documents.map((document) =>
                     this.visualAnalysisLogic.convertToApiResponse(document)
@@ -286,7 +240,7 @@ export default class VisualAnalysisController extends VisualCommonController {
             CommonServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
-                { schema: 'visual-analysis', documentAmount }
+                { schema: 'visual-analytics', documentAmount }
             );
         } catch (error) {
             next(this.createError(error, this.language));

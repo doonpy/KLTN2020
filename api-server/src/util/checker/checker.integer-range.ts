@@ -7,9 +7,9 @@ export default class CheckerIntegerRange extends CheckerBase {
 
     private readonly maxRange: number;
 
-    constructor(minRange: number, maxRange: number | null) {
+    constructor(minRange: number | null, maxRange: number | null) {
         super();
-        this.minRange = minRange;
+        this.minRange = minRange || Number.MIN_SAFE_INTEGER;
         this.maxRange = maxRange || Number.MAX_SAFE_INTEGER;
     }
 

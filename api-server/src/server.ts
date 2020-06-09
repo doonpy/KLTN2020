@@ -15,7 +15,7 @@ import VisualAdministrativeDistrictController from '@service/visual/administrati
 import VisualAdministrativeWardController from '@service/visual/administrative/ward/visual.administrative.ward.controller';
 import VisualSummaryDistrictWardController from '@service/visual/summary/district-ward/visual.summary.district-ward.controller';
 import VisualMapPointController from '@service/visual/map-point/visual.map-point.controller';
-import VisualAnalysisController from '@service/visual/analysis/visual.analysis.controller';
+import VisualAnalyticsController from '@service/visual/analytics/visual.analytics.controller';
 import App from './app';
 
 /**
@@ -43,7 +43,7 @@ import App from './app';
             VisualSummaryDistrictController.getInstance(),
             VisualSummaryDistrictWardController.getInstance(),
             VisualMapPointController.getInstance(),
-            VisualAnalysisController.getInstance(),
+            VisualAnalyticsController.getInstance(),
         ]
     );
 })();
