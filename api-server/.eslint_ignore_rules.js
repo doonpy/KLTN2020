@@ -318,4 +318,10 @@ module.exports = [
         rules: { 'no-invalid-this': 'off' },
         files: ['api-server/src/service/catalog/catalog.controller.ts'],
     },
+    {
+        rules: { 'require-atomic-updates': 'off' },
+        files: [
+            'api-server/src/background-job/child-process/child-process.preprocessing-data.ts',
+        ],
+    },
 ];

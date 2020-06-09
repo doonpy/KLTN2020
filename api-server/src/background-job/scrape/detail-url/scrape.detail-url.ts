@@ -9,6 +9,7 @@ import { DetailUrlDocumentModel } from '@service/detail-url/detail-url.interface
 import { convertTotalSecondsToTime } from '@util/helper/datetime';
 import ScrapeBase from '../scrape.base';
 import { ScrapeDetailUrlConstantChatBotMessage } from './scrape.detail-url.constant';
+import ScrapeRawData from '@background-job/scrape/raw-data/scrape.raw-data';
 
 const MAX_REQUEST = Number(
     process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1'
@@ -46,24 +47,29 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 )
             );
 
+            let requestCounter = 0;
             this.pageNumberQueue = [this.catalog.url];
-            while (this.pageNumberQueue.length > 0) {
-                const urlList: string[] = this.pageNumberQueue.splice(
-                    0,
-                    MAX_REQUEST
-                );
-
-                if (urlList.length === 0) {
-                    continue;
+            const loop = setInterval(async (): Promise<void> => {
+                if (this.pageNumberQueue.length === 0 && requestCounter === 0) {
+                    clearInterval(loop);
+                    await this.finishAction();
+                    return;
                 }
 
-                const promises: Array<Promise<void>> = [];
-                urlList.forEach((url) => {
-                    this.scrapedPageNumber.push(url);
-                    promises.push(this.scrapeAction(url));
-                });
+                if (requestCounter > MAX_REQUEST) {
+                    return;
+                }
+
+                const targetUrl = this.pageNumberQueue.shift();
+                if (!targetUrl) {
+                    return;
+                }
+
                 try {
-                    await Promise.all(promises);
+                    requestCounter++;
+                    this.scrapedPageNumber.push(targetUrl);
+                    await this.scrapeAction(targetUrl);
+                    requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
                         ConsoleConstant.Type.ERROR,
@@ -72,9 +78,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                         }`
                     ).show();
                 }
-            }
-
-            await this.finishAction();
+            }, 0);
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
                 replaceMetaDataString(error.message, [
@@ -176,5 +180,6 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             ConsoleConstant.Type.INFO,
             `Scrape detail URL -> CID: ${this.catalog._id} - Execute time: ${executeTime} - Complete`
         ).show();
+        await new ScrapeRawData(this.catalog).start();
     }
 }
