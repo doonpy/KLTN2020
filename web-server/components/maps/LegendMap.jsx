@@ -8,11 +8,6 @@ import {
 } from '../../util/services/helper';
 import { MAP_MODE } from '../../util/constants';
 
-LegendArea.propTypes = {
-    zoomLevel: PropTypes.number,
-    typeLegend: PropTypes.isRequired,
-    setOnLegend: PropTypes.isRequired,
-};
 const LegendArea = ({ zoomLevel, typeLegend, setOnLegend }) => {
     const grades =
         typeLegend === MAP_MODE.AREA_MODE
