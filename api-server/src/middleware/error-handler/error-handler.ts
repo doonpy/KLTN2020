@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import ResponseStatusCode from '@common/common.response-status.code';
-import ExceptionCustomize from '@util/exception/exception.customize';
+import ResponseStatusCode from '@common/response-status-code';
+import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import {
     replaceMetaDataString,
     upperCaseFirstCharacter,
 } from '@util/helper/string';
-import CommonLanguage from '@common/common.language';
-import ErrorHandlerWording from './error-handler.wording';
+import CommonLanguage from '@common/language';
+import Wording from './wording';
 
 /**
  * @param input
@@ -81,14 +81,12 @@ export const notFoundRoute = (
         new ExceptionCustomize(
             ResponseStatusCode.NOT_FOUND,
             replaceMetaDataString(
-                ErrorHandlerWording.CAUSE.CAU_ERR_1[
+                Wording.CAUSE.CAU_ERR_1[
                     CommonLanguage[req.params.language] || 0
                 ],
                 [req.path]
             ),
-            ErrorHandlerWording.MESSAGE.MSG_ERR_1[
-                CommonLanguage[req.params.language] || 0
-            ]
+            Wording.MESSAGE.MSG_ERR_1[CommonLanguage[req.params.language] || 0]
         )
     );
 };
@@ -116,7 +114,7 @@ export const errorHandler = (
             error: {
                 cause: upperCaseFirstCharacter(
                     cause ||
-                        ErrorHandlerWording.CAUSE.CAU_ERR_2[
+                        Wording.CAUSE.CAU_ERR_2[
                             CommonLanguage[req.params.language] || 0
                         ]
                 ),
@@ -131,7 +129,7 @@ export const errorHandler = (
             error: {
                 cause: upperCaseFirstCharacter(
                     cause ||
-                        ErrorHandlerWording.CAUSE.CAU_ERR_2[
+                        Wording.CAUSE.CAU_ERR_2[
                             CommonLanguage[req.params.language] || 0
                         ]
                 ),

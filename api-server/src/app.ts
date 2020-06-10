@@ -1,12 +1,12 @@
 import express, { Application } from 'express';
 import path from 'path';
-import ConsoleLog from '@util/console/console.log';
-import ConsoleConstant from '@util/console/console.constant';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
 import {
     errorHandler,
     notFoundRoute,
 } from '@middleware/error-handler/error-handler';
-import CommonServiceControllerBase from '@common/service/common.service.controller.base';
+import CommonServiceControllerBase from '@common/service/CommonServiceControllerBase';
 
 export default class App {
     private static instance: App | undefined;

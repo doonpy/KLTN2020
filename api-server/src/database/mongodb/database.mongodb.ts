@@ -1,6 +1,6 @@
 import { connect, Mongoose, set, ConnectionOptions } from 'mongoose';
-import ConsoleLog from '@util/console/console.log';
-import ConsoleConstant from '@util/console/console.constant';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
 import DatabaseWording from '@database/database.wording';
 import { upperCaseFirstCharacter } from '@util/helper/string';
 

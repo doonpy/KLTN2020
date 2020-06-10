@@ -1,13 +1,13 @@
 import '../prepend';
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
-import ChatBotTelegram from '@util/chatbot/chatBotTelegram';
-import ConsoleLog from '@util/console/console.log';
-import ConsoleConstant from '@util/console/console.constant';
-import CatalogLogic from '@service/catalog/catalog.logic';
+import ChatBotTelegram from '@util/chatbot/ChatBotTelegram';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
+import CatalogLogic from '@service/catalog/CatalogLogic';
 import { isExactTime } from '@util/helper/datetime';
-import CommonConstant from '@common/common.constant';
-import { GroupedDataConstant } from './child-process/child-process.constant';
+import CommonConstant from '@common/constant';
+import { GroupedDataConstant } from './child-processes/constant';
 
 let isCrawlerRunning = false;
 let isGrouperRunning = false;
@@ -78,7 +78,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
         ] = currentProcessCase;
 
         const childProcess = fork(
-            path.join(__dirname, './child-process/child-process.group-data')
+            path.join(__dirname, './child-process/group-data/main')
         );
         childProcessSet.add(childProcess);
         childProcess.on(
@@ -102,7 +102,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
  */
 const executePreprocessingDataChildProcess = (): void => {
     const childProcess = fork(
-        path.join(__dirname, './child-process/child-process.preprocessing-data')
+        path.join(__dirname, './child-process/preprocessing-data/main')
     );
     childProcess.on('exit', (): void => {
         script.next();
@@ -115,7 +115,7 @@ const executePreprocessingDataChildProcess = (): void => {
  */
 const executeCleanDataChildProcess = (): void => {
     const childProcess = fork(
-        path.join(__dirname, './child-process/child-process.clean-data')
+        path.join(__dirname, './child-process/clean-data/main')
     );
     childProcess.on(
         'exit',
@@ -153,7 +153,7 @@ const executeScrapeChildProcess = async (): Promise<void> => {
         }
 
         const childProcess = fork(
-            path.join(__dirname, './child-process/child-process.scrape-data')
+            path.join(__dirname, './child-process/scrape-data/main')
         );
         childProcess.on('exit', (): void => {
             childProcessAmount--;
