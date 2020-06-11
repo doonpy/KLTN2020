@@ -48,7 +48,7 @@ export default class GroupData {
         const startTime: [number, number] = process.hrtime();
         const rawDataset = await this.rawDataLogic.getAll({
             conditions: {
-                isGrouped: false,
+                'status.isGrouped': false,
                 transactionType,
                 propertyType,
             },
