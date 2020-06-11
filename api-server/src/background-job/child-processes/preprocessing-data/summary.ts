@@ -2,6 +2,13 @@ import VisualSummaryDistrictLogic from '@service/visual/summary/district/VisualS
 import VisualSummaryDistrictWardLogic from '@service/visual/summary/district-ward/VisualSummaryDistrictWardLogic';
 import { VisualSummaryDistrictWardDocumentModel } from '@service/visual/summary/district-ward/interface';
 import { VisualSummaryDistrictDocumentModel } from '@service/visual/summary/district/interface';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
+import { DOCUMENT_LIMIT } from '@background-job/child-processes/preprocessing-data/constant';
+import RawDataLogic from '@service/raw-data/RawDataLogic';
+import { getAddressProperties } from '@background-job/child-processes/preprocessing-data/helper';
+
+const rawDataLogic = RawDataLogic.getInstance();
 
 type SummaryElement = {
     transactionType: number;
@@ -45,7 +52,7 @@ const updateAmount = (
  * @param {number} transactionType
  * @param {number} propertyType
  */
-export const handleVisualSummaryDistrictData = async (
+const handleVisualSummaryDistrictData = async (
     districtId: number,
     transactionType: number,
     propertyType: number
@@ -109,4 +116,82 @@ export const handleVisualSummaryDistrictWardData = async (
         visualSummaryDistrictWardDocument._id,
         visualSummaryDistrictWardDocument
     );
+};
+
+/**
+ * Summary phase
+ */
+export const summaryPhase = async (script: AsyncGenerator): Promise<void> => {
+    let documents = (
+        await rawDataLogic.getAll({
+            limit: DOCUMENT_LIMIT,
+            conditions: {
+                'status.isSummary': false,
+            },
+        })
+    ).documents;
+
+    while (documents.length > 0) {
+        for (const rawData of documents) {
+            try {
+                const addressProperties = await getAddressProperties(
+                    rawData.address
+                );
+
+                const districtId: number | undefined =
+                    addressProperties.district?._id;
+                if (!districtId) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
+                    ).show();
+                    await rawDataLogic.delete(rawData._id);
+                    return;
+                }
+
+                const wardId: number | undefined = addressProperties.ward?._id;
+                if (!wardId) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
+                    ).show();
+                    await rawDataLogic.delete(rawData._id);
+                    return;
+                }
+                rawData.status.isSummary = true;
+                await Promise.all([
+                    handleVisualSummaryDistrictWardData(
+                        districtId,
+                        wardId,
+                        rawData.transactionType,
+                        rawData.propertyType
+                    ),
+                    handleVisualSummaryDistrictData(
+                        districtId,
+                        rawData.transactionType,
+                        rawData.propertyType
+                    ),
+                    rawDataLogic.update(rawData._id, rawData),
+                ]);
+                new ConsoleLog(
+                    ConsoleConstant.Type.INFO,
+                    `Preprocessing data - Summary - RID: ${rawData._id}`
+                ).show();
+            } catch (error) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Preprocessing data - Summary - RID: ${rawData._id} - Error: ${error.message}`
+                ).show();
+            }
+        }
+        documents = (
+            await rawDataLogic.getAll({
+                limit: DOCUMENT_LIMIT,
+                conditions: {
+                    'status.isSummary': false,
+                },
+            })
+        ).documents;
+    }
+    script.next();
 };

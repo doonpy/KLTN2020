@@ -50,6 +50,7 @@ const rawDataSchema = new Schema(
         status: {
             _id: false,
             isSummary: { type: Schema.Types.Boolean, default: false },
+            isMapPoint: { type: Schema.Types.Boolean, default: false },
             isAnalytics: { type: Schema.Types.Boolean, default: false },
             isGrouped: { type: Schema.Types.Boolean, default: false },
         },
@@ -84,6 +85,10 @@ rawDataSchema.index(
 rawDataSchema.index(
     { 'status.isGrouped': 1 },
     { name: 'idx_status.isGrouped' }
+);
+rawDataSchema.index(
+    { 'status.isMapPoint': 1 },
+    { name: 'idx_status.isMapPoint' }
 );
 
 const Model = mongoose.model<RawDataDocumentModel>('raw_data', rawDataSchema);

@@ -242,9 +242,10 @@ async function* generateScript() {
         }, 1000);
 
         if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
-            await executeGroupDataChildProcess();
-            script = generateScript();
-            script.next();
+            // await executeGroupDataChildProcess();
+            // script = generateScript();
+            // script.next();
+            executePreprocessingDataChildProcess();
         }
     } catch (error) {
         await ChatBotTelegram.getInstance().sendMessage(

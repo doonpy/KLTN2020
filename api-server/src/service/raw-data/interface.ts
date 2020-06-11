@@ -67,6 +67,7 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     coordinateId: CoordinateDocumentModel | number;
     status: {
         isSummary: boolean;
+        isMapPoint: boolean;
         isAnalytics: boolean;
         isGrouped: boolean;
     };

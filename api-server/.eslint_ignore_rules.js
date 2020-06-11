@@ -56,7 +56,7 @@ module.exports = [
     {
         rules: { 'require-atomic-updates': 'off' },
         files: [
-            'api-server/src/background-job/child-processes/preprocessing-data/main.ts',
+            'api-server/src/background-job/child-processes/preprocessing-data/add-coordinate.ts',
         ],
     },
     {
