@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/interface';
+import { CommonApiModel, CommonDocumentModel } from '@service/interface';
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/interface';
 
 export interface GroupedDataApiModel extends CommonApiModel {

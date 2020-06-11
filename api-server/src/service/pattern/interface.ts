@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/interface';
+import { CommonApiModel, CommonDocumentModel } from '@service/interface';
 
 export interface PatternApiModel extends CommonApiModel {
     sourceUrl: string | null;

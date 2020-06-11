@@ -2,7 +2,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '@common/service/interface';
+} from '@service/interface';
 import {
     DetailUrlApiModel,
     DetailUrlDocumentModel,

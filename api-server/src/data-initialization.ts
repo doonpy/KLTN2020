@@ -39,7 +39,7 @@ const importData = async (): Promise<void> => {
     ).show();
     for (const item of countryData) {
         if (
-            !(await visualAdministrativeCountryLogic.isExisted({
+            !(await visualAdministrativeCountryLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -73,7 +73,7 @@ const importData = async (): Promise<void> => {
         )?._id;
 
         if (
-            !(await visualAdministrativeProvinceLogic.isExisted({
+            !(await visualAdministrativeProvinceLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -109,7 +109,7 @@ const importData = async (): Promise<void> => {
         )?._id;
 
         if (
-            !(await visualAdministrativeDistrictLogic.isExisted({
+            !(await visualAdministrativeDistrictLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -143,7 +143,7 @@ const importData = async (): Promise<void> => {
         )?._id;
 
         if (
-            !(await visualAdministrativeWardLogic.isExisted({
+            !(await visualAdministrativeWardLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -194,7 +194,7 @@ const initializeVisualData = async (): Promise<void> => {
         .documents;
     for (const district of districtList) {
         if (
-            !(await visualSummaryDistrictLogic.isExisted({
+            !(await visualSummaryDistrictLogic.isExists({
                 districtId: district._id,
             }))
         ) {
@@ -218,7 +218,7 @@ const initializeVisualData = async (): Promise<void> => {
         ).documents;
         for (const ward of wardList) {
             if (
-                !(await visualSummaryDistrictWardLogic.isExisted({
+                !(await visualSummaryDistrictWardLogic.isExists({
                     districtId: district._id,
                     wardId: ward._id,
                 }))

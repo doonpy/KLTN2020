@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
-import CommonServiceControllerBase from '@common/service/CommonServiceControllerBase';
+import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
 import { CatalogDocumentModel } from './interface';
 import CatalogLogic from './CatalogLogic';
 import HostLogic from '../host/HostLogic';

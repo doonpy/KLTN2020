@@ -6,7 +6,7 @@ import {
     errorHandler,
     notFoundRoute,
 } from '@middleware/error-handler/error-handler';
-import CommonServiceControllerBase from '@common/service/CommonServiceControllerBase';
+import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
 
 export default class App {
     private static instance: App | undefined;

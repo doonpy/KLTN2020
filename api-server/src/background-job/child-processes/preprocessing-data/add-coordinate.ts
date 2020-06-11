@@ -107,6 +107,7 @@ export const addCoordinatePhase = async (
             },
         })
     ).documents;
+
     const loop = setInterval(async (): Promise<void> => {
         if (documents.length === 0 && processCounter === 0) {
             clearInterval(loop);

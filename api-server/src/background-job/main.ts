@@ -78,7 +78,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
         ] = currentProcessCase;
 
         const childProcess = fork(
-            path.join(__dirname, './child-process/group-data/main')
+            path.join(__dirname, './child-processes/group-data/main')
         );
         childProcessSet.add(childProcess);
         childProcess.on(
@@ -102,7 +102,7 @@ export const executeGroupDataChildProcess = async (): Promise<void> => {
  */
 const executePreprocessingDataChildProcess = (): void => {
     const childProcess = fork(
-        path.join(__dirname, './child-process/preprocessing-data/main')
+        path.join(__dirname, './child-processes/preprocessing-data/main')
     );
     childProcess.on('exit', (): void => {
         script.next();
@@ -115,7 +115,7 @@ const executePreprocessingDataChildProcess = (): void => {
  */
 const executeCleanDataChildProcess = (): void => {
     const childProcess = fork(
-        path.join(__dirname, './child-process/clean-data/main')
+        path.join(__dirname, './child-processes/clean-data/main')
     );
     childProcess.on(
         'exit',
@@ -153,7 +153,7 @@ const executeScrapeChildProcess = async (): Promise<void> => {
         }
 
         const childProcess = fork(
-            path.join(__dirname, './child-process/scrape-data/main')
+            path.join(__dirname, './child-processes/scrape-data/main')
         );
         childProcess.on('exit', (): void => {
             childProcessAmount--;
@@ -242,10 +242,9 @@ async function* generateScript() {
         }, 1000);
 
         if (Number(process.env.BGR_START_ON_SERVER_RUN) && !isCrawlerRunning) {
-            // await executeGroupDataChildProcess();
-            // script = generateScript();
-            // script.next();
-            executePreprocessingDataChildProcess();
+            await executeGroupDataChildProcess();
+            script = generateScript();
+            script.next();
         }
     } catch (error) {
         await ChatBotTelegram.getInstance().sendMessage(

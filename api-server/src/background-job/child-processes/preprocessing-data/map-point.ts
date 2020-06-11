@@ -123,7 +123,7 @@ export const mapPointPhase = async (script: AsyncGenerator): Promise<void> => {
             } catch (error) {
                 new ConsoleLog(
                     ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - Summary - RID: ${rawData._id} - Error: ${error.message}`
+                    `Preprocessing data - Map point - RID: ${rawData._id} - Error: ${error.message}`
                 ).show();
             }
         }
@@ -131,7 +131,7 @@ export const mapPointPhase = async (script: AsyncGenerator): Promise<void> => {
             await rawDataLogic.getAll({
                 limit: DOCUMENT_LIMIT,
                 conditions: {
-                    'status.isSummary': false,
+                    'status.isMapPoint': false,
                 },
             })
         ).documents;

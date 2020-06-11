@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, FilterQuery } from 'mongoose';
 import { Router } from 'express';
 
 export interface CommonDocumentModel extends Document {
@@ -49,7 +49,7 @@ export interface CommonLogicBaseInterface<
      * @return {Promise<T | null>}
      */
     getOne(
-        conditions: object,
+        conditions: FilterQuery<T>,
         validateExistedProperties?: Array<{ [key: string]: any }>,
         validateNotExistedProperties?: Array<{ [key: string]: any }>
     ): Promise<T | null>;
@@ -94,21 +94,21 @@ export interface CommonLogicBaseInterface<
      *
      * @return {Promise<boolean>}
      */
-    isExisted(conditions: object): Promise<boolean>;
+    isExists(conditions: FilterQuery<T>): Promise<boolean>;
 
     /**
      * @param {object} conditions
      *
      * @return {Promise<void>}
      */
-    checkExisted(conditions: object): Promise<void>;
+    checkExisted(conditions: FilterQuery<T>): Promise<void>;
 
     /**
      * @param {object} conditions
      *
      * @return {Promise<void>}
      */
-    checkNotExisted(conditions: object): Promise<void>;
+    checkNotExisted(conditions: FilterQuery<T>): Promise<void>;
 
     /**
      * @param {T} input
@@ -120,7 +120,7 @@ export interface CommonLogicBaseInterface<
     /**
      * Get current amount document
      */
-    getDocumentAmount(conditions?: object): Promise<number>;
+    getDocumentAmount(conditions?: FilterQuery<T>): Promise<number>;
 
     /**
      * @param {object[]} aggregations

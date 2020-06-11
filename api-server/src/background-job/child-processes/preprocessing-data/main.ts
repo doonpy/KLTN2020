@@ -3,10 +3,10 @@ import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
 import ChatBotTelegram from '@util/chatbot/ChatBotTelegram';
 import { convertTotalSecondsToTime } from '@util/helper/datetime';
-import { analyticsPhase } from '@background-job/child-processes/preprocessing-data/analytics';
-import { addCoordinatePhase } from '@background-job/child-processes/preprocessing-data/add-coordinate';
-import { summaryPhase } from '@background-job/child-processes/preprocessing-data/summary';
-import { mapPointPhase } from '@background-job/child-processes/preprocessing-data/map-point';
+import { analyticsPhase } from './analytics';
+import { addCoordinatePhase } from './add-coordinate';
+import { summaryPhase } from './summary';
+import { mapPointPhase } from './map-point';
 
 const telegramChatBotInstance = ChatBotTelegram.getInstance();
 let script: AsyncGenerator;
@@ -55,7 +55,7 @@ process.on(
     'message',
     async (): Promise<void> => {
         try {
-            script = generateScript();
+            script = await generateScript();
             script.next();
         } catch (error) {
             await telegramChatBotInstance.sendMessage(

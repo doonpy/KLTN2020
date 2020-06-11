@@ -1,5 +1,5 @@
 import Model from '@service/visual/summary/district-ward/model';
-import CommonServiceLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
 import {
     VisualSummaryDistrictWardApiModel,
     VisualSummaryDistrictWardDocumentModel,

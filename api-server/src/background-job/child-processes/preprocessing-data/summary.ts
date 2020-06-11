@@ -58,8 +58,8 @@ const handleVisualSummaryDistrictData = async (
     propertyType: number
 ): Promise<void> => {
     const visualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
-    const visualSummaryDistrictDocument = await visualSummaryDistrictLogic.getById(
-        districtId
+    const visualSummaryDistrictDocument = await visualSummaryDistrictLogic.getOne(
+        { districtId }
     );
 
     if (!visualSummaryDistrictDocument) {

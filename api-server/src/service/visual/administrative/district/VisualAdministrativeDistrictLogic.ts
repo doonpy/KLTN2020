@@ -1,5 +1,5 @@
 import Model from '@service/visual/administrative/district/model';
-import CommonServiceLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
 import { VisualAdministrativeProvinceApiModel } from '../province/interface';
 import {
     VisualAdministrativeDistrictApiModel,

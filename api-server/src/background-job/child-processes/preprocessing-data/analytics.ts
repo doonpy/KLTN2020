@@ -25,8 +25,9 @@ const handleVisualizationAnalytics = async ({
     const visualAnalyticsLogic = VisualAnalyticsLogic.getInstance();
     const month = new Date(postDate).getMonth() + 1;
     const year = new Date(postDate).getFullYear();
-    const priceConverted = price.value / 1000000;
-    const newAverage = Math.round((priceConverted / acreage.value) * 100) / 100;
+    const priceValue = price.value;
+    const acreageValue = acreage.value;
+    const newAverage = Math.round((priceValue / acreageValue) * 100) / 100;
     const visualAnalyticsDocument = await visualAnalyticsLogic.getOne({
         month,
         year,
@@ -43,8 +44,8 @@ const handleVisualizationAnalytics = async ({
             amount: 1,
             sumAverage: newAverage,
             average: newAverage,
-            max: priceConverted,
-            min: priceConverted,
+            max: priceValue,
+            min: priceValue,
             maxAverage: newAverage,
             minAverage: newAverage,
         } as VisualAnalyticsDocumentModel);
@@ -52,7 +53,9 @@ const handleVisualizationAnalytics = async ({
         return;
     }
     visualAnalyticsDocument.amount++;
-    visualAnalyticsDocument.sumAverage += newAverage;
+    visualAnalyticsDocument.sumAverage =
+        Math.round((visualAnalyticsDocument.sumAverage + newAverage) * 100) /
+        100;
     visualAnalyticsDocument.average =
         Math.round(
             (visualAnalyticsDocument.sumAverage /
@@ -60,12 +63,12 @@ const handleVisualizationAnalytics = async ({
                 100
         ) / 100;
     visualAnalyticsDocument.max =
-        priceConverted > visualAnalyticsDocument.max
-            ? priceConverted
+        priceValue > visualAnalyticsDocument.max
+            ? priceValue
             : visualAnalyticsDocument.max;
     visualAnalyticsDocument.min =
-        priceConverted < visualAnalyticsDocument.min
-            ? priceConverted
+        priceValue < visualAnalyticsDocument.min
+            ? priceValue
             : visualAnalyticsDocument.min;
     visualAnalyticsDocument.maxAverage =
         newAverage > visualAnalyticsDocument.maxAverage

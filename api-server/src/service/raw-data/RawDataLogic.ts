@@ -1,4 +1,4 @@
-import CommonServiceLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
 import CommonConstant from '@common/constant';
 import Model from './model';
 import {
