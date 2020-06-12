@@ -66,20 +66,19 @@ const getCoordinate = async (
 const _addCoordinatePhase = async (
     rawData: RawDataDocumentModel
 ): Promise<void> => {
-    const coordinate = await getCoordinate(rawData.address);
-    if (!coordinate) {
-        new ConsoleLog(
-            ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Add coordinate - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
-        ).show();
-        await rawDataLogic.delete(rawData._id);
-        return;
-    }
-
     try {
-        await rawDataLogic.update(rawData._id, {
-            coordinateId: coordinate._id,
-        } as RawDataDocumentModel);
+        const coordinate = await getCoordinate(rawData.address);
+        if (!coordinate) {
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Preprocessing data - Add coordinate - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
+            ).show();
+            await rawDataLogic.delete(rawData._id);
+            return;
+        }
+
+        rawData.coordinateId = coordinate._id;
+        await rawData.save();
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
             `Preprocessing data - Add coordinate - RID: ${rawData._id}`

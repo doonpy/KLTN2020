@@ -280,9 +280,13 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const detailUrlBody = (this
                 .requestBody as unknown) as DetailUrlDocumentModel;
-            await CatalogLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId,
-            });
+
+            if (detailUrlBody.catalogId) {
+                await CatalogLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId,
+                });
+            }
+
             const editedDetailUrl = await this.detailUrlLogic.update(
                 idBody,
                 detailUrlBody,

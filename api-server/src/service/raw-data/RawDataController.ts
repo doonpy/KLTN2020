@@ -580,9 +580,13 @@ export default class RawDataController extends CommonServiceControllerBase {
             const rawDataBody = (this
                 .requestBody as unknown) as RawDataDocumentModel;
             const currentRawData = await this.rawDataLogic.getById(idBody);
-            await DetailUrlLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
+
+            if (rawDataBody.detailUrlId) {
+                await DetailUrlLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId,
+                });
+            }
+
             let editedRawData: RawDataDocumentModel;
 
             if (currentRawData.detailUrlId !== rawDataBody.detailUrlId) {

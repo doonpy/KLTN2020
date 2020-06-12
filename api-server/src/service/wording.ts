@@ -7,8 +7,8 @@ const Wording = {
     },
     MESSAGE: {
         MSG_CM_SER_1: [
-            'không thể tìm thấy dữ liệu với %s là %s',
-            'can not find data with %s is %s',
+            'không thể tìm thấy dữ liệu với %s là %j',
+            'can not find data with %s is %j',
         ],
         MSG_CM_SER_2: [
             'dữ liệu có %s với giá trị %s đã tồn tại',

@@ -5,7 +5,7 @@ import {
     CommonOptions,
     GetAllReturnData,
 } from '@service/interface';
-import { CreateQuery, FilterQuery, Model } from 'mongoose';
+import { CreateQuery, FilterQuery, Model, UpdateQuery } from 'mongoose';
 import ResponseStatusCode from '@common/response-status-code';
 import Wording from '@service/wording';
 
@@ -130,7 +130,7 @@ export default abstract class CommonServiceLogicBase<
      */
     public async update(
         id: number,
-        input: T,
+        input: UpdateQuery<T>,
         validateExistedProperties?: Array<FilterQuery<T>>,
         validateNotExistedProperties?: Array<FilterQuery<T>>
     ): Promise<T | never> {
@@ -150,10 +150,12 @@ export default abstract class CommonServiceLogicBase<
             );
         }
 
-        return (await this.model.findByIdAndUpdate(id, input, {
-            new: true,
-            omitUndefined: true,
-        })) as T;
+        const document = await this.model.findById(id);
+        Object.keys(input).forEach((key) => {
+            document!.set(key, input[key]);
+        });
+
+        return document!.save();
     }
 
     /**

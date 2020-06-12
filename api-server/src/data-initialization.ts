@@ -250,7 +250,7 @@ async function* generateScript() {
     await importData();
     yield 'Step 1: Initialize data';
 
-    await initializeVisualData();
+    // await initializeVisualData();
     process.exit(0);
     return 'Done';
 }

@@ -353,12 +353,18 @@ export default class CatalogController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const catalogBody = (this
                 .requestBody as unknown) as CatalogDocumentModel;
-            await HostLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: catalogBody.hostId,
-            });
-            await PatternLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
-            });
+
+            if (catalogBody.hostId) {
+                await HostLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: catalogBody.hostId,
+                });
+            }
+
+            if (catalogBody.patternId) {
+                await PatternLogic.getInstance().checkExisted({
+                    [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
+                });
+            }
 
             const editedCatalog = await this.catalogLogic.update(
                 idBody,

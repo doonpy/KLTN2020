@@ -68,28 +68,25 @@ const handleVisualizationMapPoint = async (
         return;
     }
 
-    const point = visualMapPointDocument.points.filter(
+    const pointsIndex = visualMapPointDocument.points.findIndex(
         ({
             transactionType: pointTransactionType,
             propertyType: pointPropertyType,
         }) =>
             transactionType === pointTransactionType &&
             propertyType === pointPropertyType
-    )[0];
-    if (!point) {
+    );
+    if (pointsIndex === -1) {
         visualMapPointDocument.points.push({
             rawDataset: [newPoint],
             transactionType,
             propertyType,
         });
     } else {
-        point.rawDataset.push(newPoint);
+        visualMapPointDocument.points[pointsIndex].rawDataset.push(newPoint);
     }
 
-    await visualMapPointLogic.update(
-        visualMapPointDocument._id,
-        visualMapPointDocument
-    );
+    await visualMapPointDocument.save();
 };
 
 /**
@@ -111,14 +108,13 @@ export const mapPointPhase = async (script: AsyncGenerator): Promise<void> => {
                 const { districtId, wardId } = await getDistrictIdAndWardId(
                     rawData
                 );
+                await handleVisualizationMapPoint(districtId, wardId, rawData);
                 rawData.status.isMapPoint = true;
-                await Promise.all([
-                    handleVisualizationMapPoint(districtId, wardId, rawData),
-                    rawDataLogic.update(rawData._id, rawData),
-                ]);
+                await rawData.save();
+
                 new ConsoleLog(
                     ConsoleConstant.Type.INFO,
-                    `Preprocessing data - Summary - RID: ${rawData._id}`
+                    `Preprocessing data - Map point - RID: ${rawData._id}`
                 ).show();
             } catch (error) {
                 new ConsoleLog(

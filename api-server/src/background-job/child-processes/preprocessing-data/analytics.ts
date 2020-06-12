@@ -79,14 +79,7 @@ const handleVisualizationAnalytics = async ({
             ? newAverage
             : visualAnalyticsDocument.minAverage;
 
-    status.isAnalytics = true;
-    await Promise.all([
-        visualAnalyticsLogic.update(
-            visualAnalyticsDocument._id,
-            visualAnalyticsDocument
-        ),
-        rawDataLogic.update(_id, { status } as RawDataDocumentModel),
-    ]);
+    await visualAnalyticsDocument.save();
 };
 
 /**
@@ -106,6 +99,8 @@ export const analyticsPhase = async (script: AsyncGenerator): Promise<void> => {
         for (const rawData of documents) {
             try {
                 await handleVisualizationAnalytics(rawData);
+                rawData.status.isAnalytics = true;
+                await rawData.save();
                 new ConsoleLog(
                     ConsoleConstant.Type.INFO,
                     `Preprocessing data - Analytics - RID: ${rawData._id}`

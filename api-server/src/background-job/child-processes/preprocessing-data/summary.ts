@@ -28,19 +28,19 @@ const updateAmount = (
     transactionType: number,
     propertyType: number
 ): void => {
-    const summaryElement = summaryDocument.summary.find(
+    const summaryIndex = summaryDocument.summary.findIndex(
         (item: SummaryElement) =>
             item.transactionType === transactionType &&
             item.propertyType === propertyType
     );
-    if (!summaryElement) {
+    if (summaryIndex === -1) {
         summaryDocument.summary.push({
             transactionType,
             propertyType,
             amount: 1,
         });
     } else {
-        summaryElement.amount++;
+        summaryDocument.summary[summaryIndex].amount++;
     }
     summaryDocument.summaryAmount++;
 };
@@ -72,10 +72,7 @@ const handleVisualSummaryDistrictData = async (
     }
 
     updateAmount(visualSummaryDistrictDocument, transactionType, propertyType);
-    await visualSummaryDistrictLogic.update(
-        visualSummaryDistrictDocument._id,
-        visualSummaryDistrictDocument
-    );
+    await visualSummaryDistrictDocument.save();
 };
 
 /**
@@ -112,10 +109,7 @@ export const handleVisualSummaryDistrictWardData = async (
         transactionType,
         propertyType
     );
-    await visualSummaryDistrictWardLogic.update(
-        visualSummaryDistrictWardDocument._id,
-        visualSummaryDistrictWardDocument
-    );
+    await visualSummaryDistrictWardDocument.save();
 };
 
 /**
@@ -158,7 +152,6 @@ export const summaryPhase = async (script: AsyncGenerator): Promise<void> => {
                     await rawDataLogic.delete(rawData._id);
                     return;
                 }
-                rawData.status.isSummary = true;
                 await Promise.all([
                     handleVisualSummaryDistrictWardData(
                         districtId,
@@ -171,8 +164,9 @@ export const summaryPhase = async (script: AsyncGenerator): Promise<void> => {
                         rawData.transactionType,
                         rawData.propertyType
                     ),
-                    rawDataLogic.update(rawData._id, rawData),
                 ]);
+                rawData.status.isSummary = true;
+                await rawData.save();
                 new ConsoleLog(
                     ConsoleConstant.Type.INFO,
                     `Preprocessing data - Summary - RID: ${rawData._id}`
