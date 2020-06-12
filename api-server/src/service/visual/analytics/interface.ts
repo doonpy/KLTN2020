@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/interface';
+import { CommonApiModel, CommonDocumentModel } from '@service/interface';
 
 export interface VisualAnalyticsDocumentModel extends CommonDocumentModel {
     month: number;

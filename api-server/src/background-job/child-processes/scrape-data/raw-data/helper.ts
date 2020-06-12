@@ -262,7 +262,9 @@ export const priceHandler = (
  * @param acreageData
  */
 export const acreageHandler = (acreageData: string) => {
-    let value = Number(getValidDataFromPatterns(acreageData, [VALUE_PATTERN]));
+    let value = Number(
+        getValidDataFromPatterns(acreageData, [VALUE_PATTERN]) || NaN
+    );
     const unit = getValidDataFromPatterns(acreageData, [
         MEASURE_UNIT_PATTERN.KILOMETER,
         MEASURE_UNIT_PATTERN.METER,

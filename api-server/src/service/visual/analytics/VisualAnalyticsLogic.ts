@@ -2,7 +2,7 @@ import {
     VisualAnalyticsApiModel,
     VisualAnalyticsDocumentModel,
 } from '@service/visual/analytics/interface';
-import CommonServiceLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
 import Model from '@service/visual/analytics/model';
 
 export default class VisualAnalyticsLogic extends CommonServiceLogicBase<

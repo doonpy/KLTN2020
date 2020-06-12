@@ -21,7 +21,7 @@ module.exports = [
     {
         rules: { 'no-throw-literal': 'off' },
         files: [
-            'api-server/src/common/service/CommonServiceLogicBase.ts',
+            'api-server/src/service/CommonServiceLogicBase.ts',
             'api-server/src/util/checker/CheckerDate.ts',
             'api-server/src/util/checker/CheckerDecimalRange.ts',
             'api-server/src/util/checker/CheckerDomain.ts',
@@ -56,11 +56,11 @@ module.exports = [
     {
         rules: { 'require-atomic-updates': 'off' },
         files: [
-            'api-server/src/background-job/child-processes/preprocessing-data/main.ts',
+            'api-server/src/background-job/child-processes/preprocessing-data/add-coordinate.ts',
         ],
     },
     {
         rules: { 'new-cap': 'off' },
-        files: ['api-server/src/common/service/CommonServiceControllerBase.ts'],
+        files: ['api-server/src/service/CommonServiceControllerBase.ts'],
     },
 ];

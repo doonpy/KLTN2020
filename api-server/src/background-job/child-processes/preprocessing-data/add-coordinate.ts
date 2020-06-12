@@ -1,79 +1,16 @@
-import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/interface';
-import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/interface';
-import { removeSpecialCharacterAtHeadAndTail } from '@util/helper/string';
 import { CoordinateDocumentModel } from '@service/coordinate/interface';
 import { getGeocode } from '@util/external-api/map';
 import CoordinateLogic from '@service/coordinate/CoordinateLogic';
-import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/VisualAdministrativeDistrictLogic';
-import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/VisualAdministrativeWardLogic';
+import { RawDataDocumentModel } from '@service/raw-data/interface';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
+import RawDataLogic from '@service/raw-data/RawDataLogic';
+import {
+    DOCUMENT_LIMIT,
+    MAX_PROCESS,
+} from '@background-job/child-processes/preprocessing-data/constant';
 
-export type AddressProperties = {
-    district?: VisualAdministrativeDistrictDocumentModel;
-    ward?: VisualAdministrativeWardDocumentModel;
-};
-
-/**
- * Get address properties from origin address
- *
- * @param {string} address
- *
- * @return {AddressProperties}
- */
-export const getAddressProperties = async (
-    address: string
-): Promise<AddressProperties> => {
-    const visualAdministrativeDistrictLogic = VisualAdministrativeDistrictLogic.getInstance();
-    const visualAdministrativeWardLogic = VisualAdministrativeWardLogic.getInstance();
-    const districtPattern = (
-        await visualAdministrativeDistrictLogic.getAll({})
-    ).documents
-        .map(({ name }) => name)
-        .sort((a, b) => b.length - a.length)
-        .filter((name, index, array) => index === array.lastIndexOf(name))
-        .join('|');
-    const addressClone = removeSpecialCharacterAtHeadAndTail(
-        address.replace(/^.*(đường|phố)[^,]*,/gi, '')
-    );
-    const districtName =
-        addressClone
-            .replace(/^.*(phường|xã)[^,]*,/gi, '')
-            .match(RegExp(districtPattern, 'ig'))
-            ?.shift() || '';
-    const district = await visualAdministrativeDistrictLogic.getOne({
-        name: districtName,
-    });
-
-    if (!district) {
-        return {};
-    }
-
-    const wardList: VisualAdministrativeWardDocumentModel[] = (
-        await visualAdministrativeWardLogic.getAll({
-            conditions: { districtId: district._id },
-        })
-    ).documents;
-    const wardNames = wardList
-        .map(({ name }) => name)
-        .sort((a, b) => b.length - a.length);
-    const wardPattern = wardNames
-        .filter((name, index) => index === wardNames.lastIndexOf(name))
-        .join('|');
-    const wardName =
-        addressClone
-            .replace(districtName, '')
-            .match(RegExp(wardPattern))
-            ?.shift() || '';
-    const ward = await visualAdministrativeWardLogic.getOne({ name: wardName });
-
-    if (!ward) {
-        return { district };
-    }
-
-    return {
-        district,
-        ward,
-    };
-};
+const rawDataLogic = RawDataLogic.getInstance();
 
 /**
  * Get coordinate of certain address
@@ -82,7 +19,7 @@ export const getAddressProperties = async (
  *
  * @return {Promise<CoordinateDocumentModel | undefined>}
  */
-export const getCoordinate = async (
+const getCoordinate = async (
     address: string
 ): Promise<CoordinateDocumentModel | undefined> => {
     const coordinateLogic = CoordinateLogic.getInstance();
@@ -120,4 +57,85 @@ export const getCoordinate = async (
     }
 
     return coordinateDoc;
+};
+
+/**
+ * @param rawData
+ * @private
+ */
+const _addCoordinatePhase = async (
+    rawData: RawDataDocumentModel
+): Promise<void> => {
+    const coordinate = await getCoordinate(rawData.address);
+    if (!coordinate) {
+        new ConsoleLog(
+            ConsoleConstant.Type.ERROR,
+            `Preprocessing data - Add coordinate - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
+        ).show();
+        await rawDataLogic.delete(rawData._id);
+        return;
+    }
+
+    try {
+        await rawDataLogic.update(rawData._id, {
+            coordinateId: coordinate._id,
+        } as RawDataDocumentModel);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Preprocessing data - Add coordinate - RID: ${rawData._id}`
+        ).show();
+    } catch (error) {
+        new ConsoleLog(
+            ConsoleConstant.Type.ERROR,
+            `Preprocessing data - Add coordinate - RID: ${rawData._id} - Error: ${error.message}`
+        ).show();
+    }
+};
+
+/**
+ * Add coordinate phase
+ */
+export const addCoordinatePhase = async (
+    script: AsyncGenerator
+): Promise<void> => {
+    let processCounter = 0;
+    let documents: RawDataDocumentModel[] = (
+        await rawDataLogic.getAll({
+            limit: DOCUMENT_LIMIT,
+            conditions: {
+                coordinateId: null,
+            },
+        })
+    ).documents;
+
+    const loop = setInterval(async (): Promise<void> => {
+        if (documents.length === 0 && processCounter === 0) {
+            clearInterval(loop);
+            script.next();
+            return;
+        }
+
+        if (processCounter > MAX_PROCESS) {
+            return;
+        }
+
+        const targetRawData = documents.shift();
+        if (!targetRawData) {
+            return;
+        }
+        if (documents.length === 0) {
+            documents = (
+                await rawDataLogic.getAll({
+                    limit: DOCUMENT_LIMIT,
+                    conditions: {
+                        coordinateId: null,
+                    },
+                })
+            ).documents;
+        }
+
+        processCounter++;
+        await _addCoordinatePhase(targetRawData);
+        processCounter--;
+    }, 0);
 };

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@common/service/CommonServiceControllerBase';
+import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualSummaryDistrictLogic from './VisualSummaryDistrictLogic';
 import VisualCommonController from '../../VisualCommonController';

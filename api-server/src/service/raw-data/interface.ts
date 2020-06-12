@@ -2,7 +2,7 @@ import {
     CommonApiModel,
     CommonDocumentModel,
     CommonLogicBaseInterface,
-} from '@common/service/interface';
+} from '@service/interface';
 import {
     DetailUrlApiModel,
     DetailUrlDocumentModel,
@@ -67,6 +67,7 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
     coordinateId: CoordinateDocumentModel | number;
     status: {
         isSummary: boolean;
+        isMapPoint: boolean;
         isAnalytics: boolean;
         isGrouped: boolean;
     };

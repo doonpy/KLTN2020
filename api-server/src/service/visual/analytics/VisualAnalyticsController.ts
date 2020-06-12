@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@common/service/CommonServiceControllerBase';
+import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -23,7 +23,7 @@ export default class VisualAnalyticsController extends VisualCommonController {
 
     private readonly PARAM_FROM_MONTH = 'fromMonth';
 
-    private readonly PARAM_TO_MONTH = 'toYear';
+    private readonly PARAM_TO_MONTH = 'toMonth';
 
     private readonly PARAM_FROM_YEAR = 'fromYear';
 

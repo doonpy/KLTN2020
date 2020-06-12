@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '@common/service/interface';
+import { CommonApiModel, CommonDocumentModel } from '@service/interface';
 import { PatternApiModel, PatternDocumentModel } from '../pattern/interface';
 import { HostApiModel, HostDocumentModel } from '../host/interface';
 

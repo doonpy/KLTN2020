@@ -1,5 +1,5 @@
 import Model from '@service/visual/map-point/model';
-import CommonServiceLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
 import {
     VisualMapPointApiModel,
     VisualMapPointDocumentModel,

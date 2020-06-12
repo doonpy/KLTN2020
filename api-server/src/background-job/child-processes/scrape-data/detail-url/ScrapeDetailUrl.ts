@@ -121,11 +121,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
 
         newDetailUrlList = newDetailUrlList.map((url) => sanitizeUrl(url));
         for (const newDetailUrl of newDetailUrlList) {
-            const isExisted: boolean = await this.detailUrlLogic.isExisted({
+            const isExists: boolean = await this.detailUrlLogic.isExists({
                 url: newDetailUrl,
             });
 
-            if (!isExisted) {
+            if (!isExists) {
                 try {
                     const createdDoc = await this.detailUrlLogic.create(({
                         catalogId: this.catalog._id,

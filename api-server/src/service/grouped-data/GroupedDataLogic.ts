@@ -1,4 +1,4 @@
-import CommonServiceLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
 import Model from './model';
 import { GroupedDataApiModel, GroupedDataDocumentModel } from './interface';
 import RawDataLogic from '../raw-data/RawDataLogic';

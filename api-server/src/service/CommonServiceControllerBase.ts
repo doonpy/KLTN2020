@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { Query } from 'express-serve-static-core';
 import ResponseStatusCode from '@common/response-status-code';
-import { CommonServiceControllerBaseInterface } from '@common/service/interface';
+import { CommonServiceControllerBaseInterface } from '@service/interface';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import Validator from '@util/validator/Validator';
 import { replaceMetaDataString } from '@util/helper/string';
 import CommonLanguage from '@common/language';
 import Checker from '@util/checker';
-import Wording from '@common/service/wording';
+import Wording from '@service/wording';
 
 interface RequestParams {
     [key: string]: string;

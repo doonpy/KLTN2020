@@ -1,4 +1,4 @@
-import CommonLogicBase from '@common/service/CommonServiceLogicBase';
+import CommonLogicBase from '@service/CommonServiceLogicBase';
 import Model from './model';
 import {
     HostApiModel,
