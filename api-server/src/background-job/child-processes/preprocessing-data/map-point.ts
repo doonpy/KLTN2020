@@ -6,13 +6,9 @@ import {
 import CommonConstant from '@common/constant';
 import VisualMapPointLogic from '@service/visual/map-point/VisualMapPointLogic';
 import { CoordinateDocumentModel } from '@service/coordinate/interface';
-import RawDataLogic from '@service/raw-data/RawDataLogic';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
-import { DOCUMENT_LIMIT } from '@background-job/child-processes/preprocessing-data/constant';
 import { getDistrictIdAndWardId } from '@background-job/child-processes/preprocessing-data/helper';
-
-const rawDataLogic = RawDataLogic.getInstance();
 
 /**
  * Add visualization data for map point
@@ -92,45 +88,20 @@ const handleVisualizationMapPoint = async (
 /**
  * Map point phase
  */
-export const mapPointPhase = async (script: AsyncGenerator): Promise<void> => {
-    let documents = (
-        await rawDataLogic.getAll({
-            limit: DOCUMENT_LIMIT,
-            conditions: {
-                'status.isMapPoint': false,
-            },
-        })
-    ).documents;
-
-    while (documents.length > 0) {
-        for (const rawData of documents) {
-            try {
-                const { districtId, wardId } = await getDistrictIdAndWardId(
-                    rawData
-                );
-                await handleVisualizationMapPoint(districtId, wardId, rawData);
-                rawData.status.isMapPoint = true;
-                await rawData.save();
-
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Preprocessing data - Map point - RID: ${rawData._id}`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - Map point - RID: ${rawData._id} - Error: ${error.message}`
-                ).show();
-            }
-        }
-        documents = (
-            await rawDataLogic.getAll({
-                limit: DOCUMENT_LIMIT,
-                conditions: {
-                    'status.isMapPoint': false,
-                },
-            })
-        ).documents;
+export const mapPointPhase = async (
+    rawData: RawDataDocumentModel
+): Promise<void> => {
+    try {
+        const { districtId, wardId } = await getDistrictIdAndWardId(rawData);
+        await handleVisualizationMapPoint(districtId, wardId, rawData);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Preprocessing data - Map point - RID: ${rawData._id}`
+        ).show();
+    } catch (error) {
+        new ConsoleLog(
+            ConsoleConstant.Type.ERROR,
+            `Preprocessing data - Map point - RID: ${rawData._id} - Error: ${error.message}`
+        ).show();
     }
-    script.next();
 };

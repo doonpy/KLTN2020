@@ -7,9 +7,70 @@ import { analyticsPhase } from './analytics';
 import { addCoordinatePhase } from './add-coordinate';
 import { summaryPhase } from './summary';
 import { mapPointPhase } from './map-point';
+import { RawDataDocumentModel } from '@service/raw-data/interface';
+import { DOCUMENT_LIMIT } from '@background-job/child-processes/preprocessing-data/constant';
+import RawDataLogic from '@service/raw-data/RawDataLogic';
 
 const telegramChatBotInstance = ChatBotTelegram.getInstance();
 let script: AsyncGenerator;
+
+const visualizationDataHandler = async (): Promise<void> => {
+    const rawDataLogic = RawDataLogic.getInstance();
+    let documents: RawDataDocumentModel[] = (
+        await rawDataLogic.getAll({
+            limit: DOCUMENT_LIMIT,
+            conditions: {
+                $or: [
+                    { 'status.isMapPoint': false },
+                    { 'status.isSummary': false },
+                    { 'status.isAnalytics': false },
+                ],
+            },
+        })
+    ).documents;
+
+    while (documents.length > 0) {
+        for (const rawData of documents) {
+            try {
+                if (!rawData.status.isMapPoint) {
+                    await mapPointPhase(rawData);
+                    rawData.status.isMapPoint = true;
+                }
+
+                if (!rawData.status.isSummary) {
+                    await summaryPhase(rawData);
+                    rawData.status.isSummary = true;
+                }
+
+                if (!rawData.status.isAnalytics) {
+                    await analyticsPhase(rawData);
+                    rawData.status.isAnalytics = true;
+                }
+
+                await rawData.save();
+            } catch (error) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Preprocessing data - RID: ${rawData._id} - Error: ${error.message}`
+                ).show();
+            }
+        }
+        documents = (
+            await rawDataLogic.getAll({
+                limit: DOCUMENT_LIMIT,
+                conditions: {
+                    $or: [
+                        { 'status.isMapPoint': false },
+                        { 'status.isSummary': false },
+                        { 'status.isAnalytics': false },
+                    ],
+                },
+            })
+        ).documents;
+    }
+
+    script.next();
+};
 
 /**
  * Script of preprocessing data
@@ -27,14 +88,8 @@ async function* generateScript() {
     await addCoordinatePhase(script);
     yield 'Phase 1: Add coordinate';
 
-    await mapPointPhase(script);
-    yield 'Phase 2: Map point';
-
-    await summaryPhase(script);
-    yield 'Phase 3: Summary';
-
-    await analyticsPhase(script);
-    yield 'Phase 4: Analytics';
+    await visualizationDataHandler();
+    yield 'Phase 2: Visualization data handler';
 
     const executeTime = convertTotalSecondsToTime(process.hrtime(startTime)[0]);
     await telegramChatBotInstance.sendMessage(

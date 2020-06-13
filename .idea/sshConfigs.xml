@@ -2,7 +2,7 @@
 <project version="4">
   <component name="SshConfigs">
     <configs>
-      <sshConfig authType="PASSWORD" host="113.172.208.196" id="e449fd76-825f-4641-b292-92e0b2dfabbe" port="22" nameFormat="DESCRIPTIVE" username="pkroot" />
+      <sshConfig authType="PASSWORD" host="pk2020.tk" id="e449fd76-825f-4641-b292-92e0b2dfabbe" port="22" nameFormat="DESCRIPTIVE" username="pkroot" />
     </configs>
   </component>
 </project>

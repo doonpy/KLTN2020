@@ -4,11 +4,8 @@ import { VisualSummaryDistrictWardDocumentModel } from '@service/visual/summary/
 import { VisualSummaryDistrictDocumentModel } from '@service/visual/summary/district/interface';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
-import { DOCUMENT_LIMIT } from '@background-job/child-processes/preprocessing-data/constant';
-import RawDataLogic from '@service/raw-data/RawDataLogic';
 import { getAddressProperties } from '@background-job/child-processes/preprocessing-data/helper';
-
-const rawDataLogic = RawDataLogic.getInstance();
+import { RawDataDocumentModel } from '@service/raw-data/interface';
 
 type SummaryElement = {
     transactionType: number;
@@ -115,77 +112,51 @@ export const handleVisualSummaryDistrictWardData = async (
 /**
  * Summary phase
  */
-export const summaryPhase = async (script: AsyncGenerator): Promise<void> => {
-    let documents = (
-        await rawDataLogic.getAll({
-            limit: DOCUMENT_LIMIT,
-            conditions: {
-                'status.isSummary': false,
-            },
-        })
-    ).documents;
+export const summaryPhase = async (
+    rawData: RawDataDocumentModel
+): Promise<void> => {
+    try {
+        const addressProperties = await getAddressProperties(rawData.address);
 
-    while (documents.length > 0) {
-        for (const rawData of documents) {
-            try {
-                const addressProperties = await getAddressProperties(
-                    rawData.address
-                );
-
-                const districtId: number | undefined =
-                    addressProperties.district?._id;
-                if (!districtId) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
-                    ).show();
-                    await rawDataLogic.delete(rawData._id);
-                    return;
-                }
-
-                const wardId: number | undefined = addressProperties.ward?._id;
-                if (!wardId) {
-                    new ConsoleLog(
-                        ConsoleConstant.Type.ERROR,
-                        `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
-                    ).show();
-                    await rawDataLogic.delete(rawData._id);
-                    return;
-                }
-                await Promise.all([
-                    handleVisualSummaryDistrictWardData(
-                        districtId,
-                        wardId,
-                        rawData.transactionType,
-                        rawData.propertyType
-                    ),
-                    handleVisualSummaryDistrictData(
-                        districtId,
-                        rawData.transactionType,
-                        rawData.propertyType
-                    ),
-                ]);
-                rawData.status.isSummary = true;
-                await rawData.save();
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Preprocessing data - Summary - RID: ${rawData._id}`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - Summary - RID: ${rawData._id} - Error: ${error.message}`
-                ).show();
-            }
+        const districtId: number | undefined = addressProperties.district?._id;
+        if (!districtId) {
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
+            ).show();
+            return;
         }
-        documents = (
-            await rawDataLogic.getAll({
-                limit: DOCUMENT_LIMIT,
-                conditions: {
-                    'status.isSummary': false,
-                },
-            })
-        ).documents;
+
+        const wardId: number | undefined = addressProperties.ward?._id;
+        if (!wardId) {
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
+            ).show();
+            return;
+        }
+
+        await Promise.all([
+            handleVisualSummaryDistrictWardData(
+                districtId,
+                wardId,
+                rawData.transactionType,
+                rawData.propertyType
+            ),
+            handleVisualSummaryDistrictData(
+                districtId,
+                rawData.transactionType,
+                rawData.propertyType
+            ),
+        ]);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Preprocessing data - Summary - RID: ${rawData._id}`
+        ).show();
+    } catch (error) {
+        new ConsoleLog(
+            ConsoleConstant.Type.ERROR,
+            `Preprocessing data - Summary - RID: ${rawData._id} - Error: ${error.message}`
+        ).show();
     }
-    script.next();
 };
