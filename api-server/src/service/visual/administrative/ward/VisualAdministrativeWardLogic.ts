@@ -1,5 +1,5 @@
 import Model from '@service/visual/administrative/ward/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import { VisualAdministrativeDistrictApiModel } from '../district/interface';
 import {
     VisualAdministrativeWardApiModel,
@@ -7,7 +7,7 @@ import {
 } from './interface';
 import VisualAdministrativeDistrictLogic from '../district/VisualAdministrativeDistrictLogic';
 
-export default class VisualAdministrativeWardLogic extends CommonServiceLogicBase<
+export default class VisualAdministrativeWardLogic extends ServiceLogicBase<
     VisualAdministrativeWardDocumentModel,
     VisualAdministrativeWardApiModel
 > {

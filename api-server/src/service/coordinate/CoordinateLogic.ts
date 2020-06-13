@@ -1,4 +1,4 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import {
     CoordinateApiModel,
@@ -7,7 +7,7 @@ import {
 } from './interface';
 
 export default class CoordinateLogic
-    extends CommonServiceLogicBase<CoordinateDocumentModel, CoordinateApiModel>
+    extends ServiceLogicBase<CoordinateDocumentModel, CoordinateApiModel>
     implements CoordinateLogicInterface {
     private static instance: CoordinateLogic;
 

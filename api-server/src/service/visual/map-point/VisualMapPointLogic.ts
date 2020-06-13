@@ -1,5 +1,5 @@
 import Model from '@service/visual/map-point/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import {
     VisualMapPointApiModel,
     VisualMapPointDocumentModel,
@@ -9,7 +9,7 @@ import VisualAdministrativeDistrictLogic from '../administrative/district/Visual
 import { VisualAdministrativeWardApiModel } from '../administrative/ward/interface';
 import VisualAdministrativeWardLogic from '../administrative/ward/VisualAdministrativeWardLogic';
 
-export default class VisualMapPointLogic extends CommonServiceLogicBase<
+export default class VisualMapPointLogic extends ServiceLogicBase<
     VisualMapPointDocumentModel,
     VisualMapPointApiModel
 > {

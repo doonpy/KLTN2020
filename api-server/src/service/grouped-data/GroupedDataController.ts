@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
@@ -10,7 +10,7 @@ import RawDataLogic from '../raw-data/RawDataLogic';
 const commonPath = '/grouped-dataset';
 const specifyIdPath = '/grouped-data/:id';
 
-export default class GroupedDataController extends CommonServiceControllerBase {
+export default class GroupedDataController extends ServiceControllerBase {
     private static instance: GroupedDataController;
 
     private groupedDataLogic = new GroupedDataLogic();
@@ -85,7 +85,7 @@ export default class GroupedDataController extends CommonServiceControllerBase {
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -129,7 +129,7 @@ export default class GroupedDataController extends CommonServiceControllerBase {
                 ),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -172,7 +172,7 @@ export default class GroupedDataController extends CommonServiceControllerBase {
                 groupedDataBody
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.CREATED,
                 this.groupedDataLogic.convertToApiResponse(createdGroupedData)
@@ -228,7 +228,7 @@ export default class GroupedDataController extends CommonServiceControllerBase {
                 [{ [this.PARAM_DOCUMENT_ID]: idBody }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 this.groupedDataLogic.convertToApiResponse(editedGroupedData)
@@ -267,7 +267,7 @@ export default class GroupedDataController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.groupedDataLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.NO_CONTENT,
                 {}
@@ -292,11 +292,10 @@ export default class GroupedDataController extends CommonServiceControllerBase {
         try {
             const documentAmount = await this.groupedDataLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'grouped-data', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'grouped-data',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

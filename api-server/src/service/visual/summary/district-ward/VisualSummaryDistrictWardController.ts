@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualCommonController from '../../VisualCommonController';
 import VisualSummaryDistrictWardLogic from './VisualSummaryDistrictWardLogic';
@@ -82,7 +82,7 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
                     )
                 ),
             };
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -137,11 +137,10 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
         try {
             const documentAmount = await this.visualSummaryDistrictWardLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'visual-summary-district-ward', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'visual-summary-district-ward',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

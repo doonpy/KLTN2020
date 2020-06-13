@@ -1,8 +1,8 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import { PatternApiModel, PatternDocumentModel } from './interface';
 
-export default class PatternLogic extends CommonServiceLogicBase<
+export default class PatternLogic extends ServiceLogicBase<
     PatternDocumentModel,
     PatternApiModel
 > {

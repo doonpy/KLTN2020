@@ -1,4 +1,4 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from '@service/visual/administrative/province/model';
 import {
     VisualAdministrativeProvinceApiModel,
@@ -7,7 +7,7 @@ import {
 import { VisualAdministrativeCountryApiModel } from '../country/interface';
 import VisualAdministrativeCountryLogic from '../country/VisualAdministrativeCountryLogic';
 
-export default class VisualAdministrativeProvinceLogic extends CommonServiceLogicBase<
+export default class VisualAdministrativeProvinceLogic extends ServiceLogicBase<
     VisualAdministrativeProvinceDocumentModel,
     VisualAdministrativeProvinceApiModel
 > {

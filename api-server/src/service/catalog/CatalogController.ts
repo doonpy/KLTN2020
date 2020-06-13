@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import { CatalogDocumentModel } from './interface';
 import CatalogLogic from './CatalogLogic';
 import HostLogic from '../host/HostLogic';
@@ -11,7 +11,7 @@ import PatternLogic from '../pattern/PatternLogic';
 const commonPath = '/catalogs';
 const specifyIdPath = '/catalog/:id';
 
-export default class CatalogController extends CommonServiceControllerBase {
+export default class CatalogController extends ServiceControllerBase {
     private static instance: CatalogController;
 
     private catalogLogic = CatalogLogic.getInstance();
@@ -108,7 +108,7 @@ export default class CatalogController extends CommonServiceControllerBase {
                 ),
                 hasNext,
             };
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -150,7 +150,7 @@ export default class CatalogController extends CommonServiceControllerBase {
                 catalog: this.catalogLogic.convertToApiResponse(catalog),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -254,7 +254,7 @@ export default class CatalogController extends CommonServiceControllerBase {
                 [{ [this.PARAM_URL]: catalogBody.url }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.CREATED,
                 this.catalogLogic.convertToApiResponse(createdCatalog)
@@ -373,7 +373,7 @@ export default class CatalogController extends CommonServiceControllerBase {
                 [{ [this.PARAM_URL]: catalogBody.url }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 this.catalogLogic.convertToApiResponse(editedCatalog)
@@ -412,7 +412,7 @@ export default class CatalogController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.catalogLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.NO_CONTENT,
                 {}
@@ -437,11 +437,10 @@ export default class CatalogController extends CommonServiceControllerBase {
         try {
             const documentAmount = await this.catalogLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'catalog', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'catalog',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

@@ -1,8 +1,8 @@
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 
 const resourcePath = '/visualization';
 
-export default abstract class VisualCommonController extends CommonServiceControllerBase {
+export default abstract class VisualCommonController extends ServiceControllerBase {
     protected constructor() {
         super();
         this.commonPath += resourcePath;

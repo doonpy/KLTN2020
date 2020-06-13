@@ -1,10 +1,10 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import { CatalogApiModel, CatalogDocumentModel } from '../catalog/interface';
 import { DetailUrlApiModel, DetailUrlDocumentModel } from './interface';
 import CatalogLogic from '../catalog/CatalogLogic';
 
-export default class DetailUrlLogic extends CommonServiceLogicBase<
+export default class DetailUrlLogic extends ServiceLogicBase<
     DetailUrlDocumentModel,
     DetailUrlApiModel
 > {

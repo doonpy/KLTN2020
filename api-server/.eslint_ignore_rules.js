@@ -21,7 +21,7 @@ module.exports = [
     {
         rules: { 'no-throw-literal': 'off' },
         files: [
-            'api-server/src/service/CommonServiceLogicBase.ts',
+            'api-server/src/service/ServiceLogicBase.ts',
             'api-server/src/util/checker/CheckerDate.ts',
             'api-server/src/util/checker/CheckerDecimalRange.ts',
             'api-server/src/util/checker/CheckerDomain.ts',
@@ -61,6 +61,6 @@ module.exports = [
     },
     {
         rules: { 'new-cap': 'off' },
-        files: ['api-server/src/service/CommonServiceControllerBase.ts'],
+        files: ['api-server/src/service/ServiceControllerBase.ts'],
     },
 ];

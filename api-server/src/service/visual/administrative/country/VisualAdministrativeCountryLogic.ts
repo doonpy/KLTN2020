@@ -1,11 +1,11 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from '@service/visual/administrative/country/model';
 import {
     VisualAdministrativeCountryApiModel,
     VisualAdministrativeCountryDocumentModel,
 } from './interface';
 
-export default class VisualAdministrativeCountryLogic extends CommonServiceLogicBase<
+export default class VisualAdministrativeCountryLogic extends ServiceLogicBase<
     VisualAdministrativeCountryDocumentModel,
     VisualAdministrativeCountryApiModel
 > {

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualCommonController from '../../VisualCommonController';
 import VisualAdministrativeCountryLogic from './VisualAdministrativeCountryLogic';
@@ -87,7 +87,7 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
                 ),
                 hasNext,
             };
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -142,11 +142,10 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         try {
             const documentAmount = await this.visualAdministrativeCountryLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'visual-administrative-country', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'visual-administrative-country',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

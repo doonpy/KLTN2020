@@ -1,5 +1,5 @@
 import Model from '@service/visual/summary/district/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import {
     VisualSummaryDistrictApiModel,
     VisualSummaryDistrictDocumentModel,
@@ -7,7 +7,7 @@ import {
 import { VisualAdministrativeDistrictApiModel } from '../../administrative/district/interface';
 import VisualAdministrativeDistrictLogic from '../../administrative/district/VisualAdministrativeDistrictLogic';
 
-export default class VisualSummaryDistrictLogic extends CommonServiceLogicBase<
+export default class VisualSummaryDistrictLogic extends ServiceLogicBase<
     VisualSummaryDistrictDocumentModel,
     VisualSummaryDistrictApiModel
 > {

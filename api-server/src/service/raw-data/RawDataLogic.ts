@@ -1,4 +1,4 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import CommonConstant from '@common/constant';
 import Model from './model';
 import {
@@ -18,7 +18,7 @@ import {
 } from './interface';
 
 export default class RawDataLogic
-    extends CommonServiceLogicBase<RawDataDocumentModel, RawDataApiModel>
+    extends ServiceLogicBase<RawDataDocumentModel, RawDataApiModel>
     implements RawDataLogicInterface {
     private static instance: RawDataLogic;
 

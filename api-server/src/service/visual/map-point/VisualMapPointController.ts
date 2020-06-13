@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -270,7 +270,7 @@ export default class VisualMapPointController extends VisualCommonController {
                 ),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -325,11 +325,10 @@ export default class VisualMapPointController extends VisualCommonController {
         try {
             const documentAmount = await this.visualMapPointLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'visual-map-point', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'visual-map-point',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

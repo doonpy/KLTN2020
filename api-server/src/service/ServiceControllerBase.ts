@@ -17,7 +17,7 @@ interface RequestBody {
     [key: string]: any;
 }
 
-export default abstract class CommonServiceControllerBase
+export default abstract class ServiceControllerBase
     implements CommonServiceControllerBaseInterface {
     protected commonPath = '/:language';
 

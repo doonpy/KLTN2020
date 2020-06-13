@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualCommonController from '../../VisualCommonController';
 import VisualAdministrativeWardLogic from './VisualAdministrativeWardLogic';
@@ -83,7 +83,7 @@ export default class VisualAdministrativeWardController extends VisualCommonCont
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -138,11 +138,10 @@ export default class VisualAdministrativeWardController extends VisualCommonCont
         try {
             const documentAmount = await this.visualWardLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'visual-administrative-ward', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'visual-administrative-ward',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

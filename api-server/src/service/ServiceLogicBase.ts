@@ -14,7 +14,7 @@ enum ValidateType {
     NOT_EXISTED,
 }
 
-export default abstract class CommonServiceLogicBase<
+export default abstract class ServiceLogicBase<
     T extends CommonDocumentModel,
     A extends CommonApiModel
 > implements CommonLogicBaseInterface<T, A> {

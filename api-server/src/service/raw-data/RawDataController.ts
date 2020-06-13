@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
@@ -11,7 +11,7 @@ import DetailUrlLogic from '../detail-url/DetailUrlLogic';
 const commonPath = '/raw-dataset';
 const specifyIdPath = '/raw-data/:id';
 
-export default class RawDataController extends CommonServiceControllerBase {
+export default class RawDataController extends ServiceControllerBase {
     private static instance: RawDataController;
 
     private rawDataLogic = new RawDataLogic();
@@ -164,7 +164,7 @@ export default class RawDataController extends CommonServiceControllerBase {
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -206,7 +206,7 @@ export default class RawDataController extends CommonServiceControllerBase {
                 rawData: this.rawDataLogic.convertToApiResponse(rawData),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -392,7 +392,7 @@ export default class RawDataController extends CommonServiceControllerBase {
                 [{ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.CREATED,
                 this.rawDataLogic.convertToApiResponse(createdRawData)
@@ -603,7 +603,7 @@ export default class RawDataController extends CommonServiceControllerBase {
                 );
             }
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 this.rawDataLogic.convertToApiResponse(editedRawData)
@@ -642,7 +642,7 @@ export default class RawDataController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.rawDataLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.NO_CONTENT,
                 {}
@@ -697,11 +697,10 @@ export default class RawDataController extends CommonServiceControllerBase {
                 ])
             );
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'raw-data', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'raw-data',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }
