@@ -32,20 +32,20 @@ const MAX_REQUEST_RETRIES = Number(
 const MAX_REQUEST = Number(process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1');
 
 export default class ScrapeRawData extends ScrapeBase {
-    private readonly detailUrlLogic = DetailUrlLogic.getInstance();
+    private readonly detailUrlLogic: DetailUrlLogic;
 
-    private readonly rawDataLogic = RawDataLogic.getInstance();
+    private readonly rawDataLogic: RawDataLogic;
 
-    private readonly catalog: CatalogDocumentModel;
-
-    private detailUrls: DetailUrlDocumentModel[] = [];
+    private detailUrls: DetailUrlDocumentModel[];
 
     private pattern: PatternDocumentModel;
 
     constructor(catalog: CatalogDocumentModel) {
-        super();
-        this.catalog = catalog;
+        super(catalog);
+        this.detailUrlLogic = DetailUrlLogic.getInstance();
+        this.rawDataLogic = RawDataLogic.getInstance();
         this.pattern = catalog.patternId as PatternDocumentModel;
+        this.detailUrls = [];
     }
 
     /**
@@ -81,6 +81,7 @@ export default class ScrapeRawData extends ScrapeBase {
                 return;
             }
 
+            const domain = (this.catalog.hostId as HostDocumentModel).domain;
             let requestCounter = 0;
             const loop = setInterval(async (): Promise<void> => {
                 if (this.detailUrls.length === 0 && requestCounter === 0) {
@@ -98,9 +99,23 @@ export default class ScrapeRawData extends ScrapeBase {
                     return;
                 }
 
-                requestCounter++;
-                await this.scrapeAction(targetDetailUrl);
-                requestCounter--;
+                try {
+                    requestCounter++;
+                    await this.scrapeAction(
+                        domain,
+                        targetDetailUrl.url,
+                        [targetDetailUrl],
+                        [targetDetailUrl]
+                    );
+                    requestCounter--;
+                } catch (error) {
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Scrape raw data - Error: ${
+                            error.cause || error.message
+                        }`
+                    ).show();
+                }
             }, 0);
         } catch (error) {
             await this.telegramChatBotInstance.sendMessage(
@@ -115,29 +130,11 @@ export default class ScrapeRawData extends ScrapeBase {
         }
     }
 
-    /**
-     * Scrape action with loop
-     */
-    private async scrapeAction(
-        detailUrl: DetailUrlDocumentModel
-    ): Promise<void> {
-        const url: string = detailUrl.url;
-        const $ = await this.getStaticBody(
-            (this.catalog.hostId as HostDocumentModel).domain,
-            url
-        );
-
-        if (!$) {
-            await this.handleFailedRequest(detailUrl);
-        } else {
-            await this.handleSuccessRequest($, detailUrl);
-        }
-    }
-
-    protected async handleSuccessRequest(
+    protected async handleSuccess(
         $: CheerioStatic,
-        currentDetailUrlDocument: DetailUrlDocumentModel
+        args?: any[]
     ): Promise<void> {
+        const currentDetailUrlDocument = args!.shift() as DetailUrlDocumentModel;
         const {
             propertyType,
             postDate,
@@ -202,52 +199,35 @@ export default class ScrapeRawData extends ScrapeBase {
         currentDetailUrlDocument.requestRetries++;
 
         if (this.isHasEmptyProperty(rawData)) {
-            try {
-                await this.detailUrlLogic.update(
-                    currentDetailUrlDocument._id,
-                    currentDetailUrlDocument
-                );
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: Invalid value.`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Scrape raw data -> DID: ${
-                        currentDetailUrlDocument._id
-                    } - Error: ${error.cause || error.message}`
-                ).show();
-            }
+            await this.detailUrlLogic.update(
+                currentDetailUrlDocument._id,
+                currentDetailUrlDocument
+            );
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: Invalid value.`
+            ).show();
+
             return;
         }
 
-        try {
-            const result = await Promise.all([
-                this.detailUrlLogic.update(
-                    currentDetailUrlDocument._id,
-                    currentDetailUrlDocument
-                ),
-                this.rawDataLogic.create(rawData),
-            ]);
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Scrape raw data -> DID: ${result[0]._id} -> RID: ${
-                    result[1] ? result[1]._id : 'N/A'
-                }`
-            ).show();
-        } catch (error) {
-            new ConsoleLog(
-                ConsoleConstant.Type.ERROR,
-                `Scrape raw data -> DID: ${
-                    currentDetailUrlDocument._id
-                } - Error: ${error.cause || error.message}`
-            ).show();
-        }
+        const result = await Promise.all([
+            this.detailUrlLogic.update(
+                currentDetailUrlDocument._id,
+                currentDetailUrlDocument
+            ),
+            this.rawDataLogic.create(rawData),
+        ]);
+        new ConsoleLog(
+            ConsoleConstant.Type.INFO,
+            `Scrape raw data -> DID: ${result[0]._id} -> RID: ${
+                result[1] ? result[1]._id : 'N/A'
+            }`
+        ).show();
     }
 
     private isHasEmptyProperty(input: { [key: string]: any }): boolean {
-        const propertyList: string[] = [
+        const requireProperties: string[] = [
             'transactionType',
             'propertyType',
             'detailUrlId',
@@ -259,7 +239,7 @@ export default class ScrapeRawData extends ScrapeBase {
             'address',
             'others',
         ];
-        for (const property of propertyList) {
+        for (const property of requireProperties) {
             const value = input[property];
             switch (typeof value) {
                 case 'string':
@@ -291,28 +271,20 @@ export default class ScrapeRawData extends ScrapeBase {
         return false;
     }
 
-    protected async handleFailedRequest(
-        currentDetailUrlDocument: DetailUrlDocumentModel
-    ): Promise<void> {
+    protected async handleFailed(args?: any[]): Promise<void> {
+        const currentDetailUrlDocument = args!.shift() as DetailUrlDocumentModel;
         currentDetailUrlDocument.requestRetries++;
         if (currentDetailUrlDocument.requestRetries < MAX_REQUEST_RETRIES) {
             this.detailUrls.push(currentDetailUrlDocument);
         } else {
-            try {
-                await this.detailUrlLogic.update(
-                    currentDetailUrlDocument._id,
-                    currentDetailUrlDocument
-                );
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
-                ).show();
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: ${error.message}`
-                ).show();
-            }
+            await this.detailUrlLogic.update(
+                currentDetailUrlDocument._id,
+                currentDetailUrlDocument
+            );
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
+            ).show();
         }
     }
 
