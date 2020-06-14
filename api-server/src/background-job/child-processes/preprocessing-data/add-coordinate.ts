@@ -5,10 +5,7 @@ import { RawDataDocumentModel } from '@service/raw-data/interface';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
 import RawDataLogic from '@service/raw-data/RawDataLogic';
-import {
-    DOCUMENT_LIMIT,
-    MAX_PROCESS,
-} from '@background-job/child-processes/preprocessing-data/constant';
+import { DOCUMENT_LIMIT } from '@background-job/child-processes/preprocessing-data/constant';
 
 const rawDataLogic = RawDataLogic.getInstance();
 
@@ -68,29 +65,22 @@ const getCoordinate = async (
 const _addCoordinatePhase = async (
     rawData: RawDataDocumentModel
 ): Promise<void> => {
-    try {
-        const coordinate = await getCoordinate(rawData.address);
-        if (!coordinate) {
-            new ConsoleLog(
-                ConsoleConstant.Type.ERROR,
-                `Preprocessing data - Add coordinate - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
-            ).show();
-            await rawDataLogic.delete(rawData._id);
-            return;
-        }
-
-        rawData.coordinateId = coordinate._id;
-        await rawData.save();
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Preprocessing data - Add coordinate - RID: ${rawData._id}`
-        ).show();
-    } catch (error) {
+    const coordinate = await getCoordinate(rawData.address);
+    if (!coordinate) {
         new ConsoleLog(
             ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Add coordinate - RID: ${rawData._id} - Error: ${error.message}`
+            `Preprocessing data - Add coordinate - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
         ).show();
+        await rawDataLogic.delete(rawData._id);
+        return;
     }
+
+    rawData.coordinateId = coordinate._id;
+    await rawData.save();
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Add coordinate - RID: ${rawData._id}`
+    ).show();
 };
 
 /**
@@ -99,7 +89,6 @@ const _addCoordinatePhase = async (
 export const addCoordinatePhase = async (
     script: AsyncGenerator
 ): Promise<void> => {
-    let processCounter = 0;
     let documents: RawDataDocumentModel[] = (
         await rawDataLogic.getAll({
             limit: DOCUMENT_LIMIT,
@@ -109,34 +98,27 @@ export const addCoordinatePhase = async (
         })
     ).documents;
 
-    const loop = setInterval(async (): Promise<void> => {
-        if (documents.length === 0 && processCounter === 0) {
-            clearInterval(loop);
-            script.next();
-            return;
+    while (documents.length > 0) {
+        for (const rawData of documents) {
+            try {
+                await _addCoordinatePhase(rawData);
+            } catch (error) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Preprocessing data - Add coordinate - RID: ${rawData._id} - Error: ${error.message}`
+                ).show();
+            }
         }
 
-        if (processCounter > MAX_PROCESS) {
-            return;
-        }
+        documents = (
+            await rawDataLogic.getAll({
+                limit: DOCUMENT_LIMIT,
+                conditions: {
+                    coordinateId: null,
+                },
+            })
+        ).documents;
+    }
 
-        const targetRawData = documents.shift();
-        if (!targetRawData) {
-            return;
-        }
-        if (documents.length === 0) {
-            documents = (
-                await rawDataLogic.getAll({
-                    limit: DOCUMENT_LIMIT,
-                    conditions: {
-                        coordinateId: null,
-                    },
-                })
-            ).documents;
-        }
-
-        processCounter++;
-        await _addCoordinatePhase(targetRawData);
-        processCounter--;
-    }, 0);
+    script.next();
 };

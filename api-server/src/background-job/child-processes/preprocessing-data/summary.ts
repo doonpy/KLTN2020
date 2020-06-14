@@ -100,7 +100,7 @@ export const handleVisualSummaryDistrictWardData = async (
  */
 export const summaryPhase = async (
     rawData: RawDataDocumentModel
-): Promise<void> => {
+): Promise<boolean> => {
     try {
         const addressProperties = await getAddressProperties(rawData.address);
 
@@ -110,7 +110,7 @@ export const summaryPhase = async (
                 ConsoleConstant.Type.ERROR,
                 `Preprocessing data - RID: ${rawData._id} - District ID is invalid - ${rawData.address}`
             ).show();
-            return;
+            return false;
         }
 
         const wardId: number | undefined = addressProperties.ward?._id;
@@ -119,7 +119,7 @@ export const summaryPhase = async (
                 ConsoleConstant.Type.ERROR,
                 `Preprocessing data - RID: ${rawData._id} - Ward ID is invalid - ${rawData.address}`
             ).show();
-            return;
+            return false;
         }
 
         await Promise.all([
@@ -139,10 +139,12 @@ export const summaryPhase = async (
             ConsoleConstant.Type.INFO,
             `Preprocessing data - Summary - RID: ${rawData._id}`
         ).show();
+        return true;
     } catch (error) {
         new ConsoleLog(
             ConsoleConstant.Type.ERROR,
             `Preprocessing data - Summary - RID: ${rawData._id} - Error: ${error.message}`
         ).show();
+        return false;
     }
 };

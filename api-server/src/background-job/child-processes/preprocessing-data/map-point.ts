@@ -86,7 +86,7 @@ const handleVisualizationMapPoint = async (
  */
 export const mapPointPhase = async (
     rawData: RawDataDocumentModel
-): Promise<void> => {
+): Promise<boolean> => {
     try {
         const { districtId, wardId } = await getDistrictIdAndWardId(rawData);
         await handleVisualizationMapPoint(districtId, wardId, rawData);
@@ -94,10 +94,12 @@ export const mapPointPhase = async (
             ConsoleConstant.Type.INFO,
             `Preprocessing data - Map point - RID: ${rawData._id}`
         ).show();
+        return true;
     } catch (error) {
         new ConsoleLog(
             ConsoleConstant.Type.ERROR,
             `Preprocessing data - Map point - RID: ${rawData._id} - Error: ${error.message}`
         ).show();
+        return false;
     }
 };

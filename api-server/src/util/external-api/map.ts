@@ -69,9 +69,8 @@ export const getGeocodeByBingMap = async (
     );
     while (result.statusCode !== ResponseStatusCode.OK) {
         apiKey = BING_API_KEYS.shift();
-        if (!apiKey) {
-            return undefined;
-        }
+        if (!apiKey) return undefined;
+
         requestOptions.qs.key = apiKey;
         result = await sendRequest<BingMapGeocodeResponse>(
             endPoint,
