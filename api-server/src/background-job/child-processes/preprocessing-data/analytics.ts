@@ -14,7 +14,6 @@ const handleVisualizationAnalytics = async ({
     propertyType,
     price,
     acreage,
-    status,
 }: RawDataDocumentModel): Promise<void> => {
     const visualAnalyticsLogic = VisualAnalyticsLogic.getInstance();
     const month = new Date(postDate).getMonth() + 1;
@@ -81,17 +80,19 @@ const handleVisualizationAnalytics = async ({
  */
 export const analyticsPhase = async (
     rawData: RawDataDocumentModel
-): Promise<void> => {
+): Promise<boolean> => {
     try {
         await handleVisualizationAnalytics(rawData);
         new ConsoleLog(
             ConsoleConstant.Type.INFO,
             `Preprocessing data - Analytics - RID: ${rawData._id}`
         ).show();
+        return true;
     } catch (error) {
         new ConsoleLog(
             ConsoleConstant.Type.ERROR,
             `Preprocessing data - Analytics - RID: ${rawData._id} - Error: ${error.message}`
         ).show();
+        return false;
     }
 };
