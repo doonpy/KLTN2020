@@ -1,7 +1,7 @@
 import './prepend';
 import * as bodyParser from 'body-parser';
-import cors from 'cors';
-import requestLogger from '@middleware/request-logger/request-logger';
+import checkCors from '@middleware/check-cors';
+import requestLogger from '@middleware/request-logger';
 import HostController from '@service/host/HostController';
 import CatalogController from '@service/catalog/CatalogController';
 import PatternController from '@service/pattern/PatternController';
@@ -24,10 +24,10 @@ import App from './app';
 (async (): Promise<void> => {
     await App.getInstance().start(
         [
-            cors(),
             bodyParser.json(),
             bodyParser.urlencoded({ extended: true }),
             requestLogger,
+            checkCors,
         ],
         [
             HostController.getInstance(),

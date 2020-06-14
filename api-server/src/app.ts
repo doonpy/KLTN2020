@@ -2,10 +2,7 @@ import express, { Application } from 'express';
 import path from 'path';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
-import {
-    errorHandler,
-    notFoundRoute,
-} from '@middleware/error-handler/error-handler';
+import { errorHandler, notFoundRoute } from '@middleware/error-handler';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 
 export default class App {
