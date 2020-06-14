@@ -34,32 +34,31 @@ const convertToString = (
 
         if (typeof item !== 'object') {
             inputString.push(`'${index}' => '${item}'`);
-        } else {
-            for (const key of keys) {
-                const value = item[key];
-
-                if (!value) {
-                    inputString.push(`'${key}' => '${value}'`);
-                    continue;
-                }
-
-                if (typeof value === 'object') {
-                    if (Array.isArray(value)) {
-                        inputString.push(
-                            `'${key}' => {${convertToString(value)}}`
-                        );
-                    } else {
-                        inputString.push(
-                            `'${key}' => {${convertToString([value])}}`
-                        );
-                    }
-                    continue;
-                }
-
-                inputString.push(`'${key}' => '${value}'`);
-            }
+            index++;
+            continue;
         }
-        index++;
+
+        for (const key of keys) {
+            const value = item[key];
+
+            if (!value) {
+                inputString.push(`'${key}' => '${value}'`);
+                continue;
+            }
+
+            if (typeof value === 'object') {
+                if (Array.isArray(value)) {
+                    inputString.push(`'${key}' => {${convertToString(value)}}`);
+                } else {
+                    inputString.push(
+                        `'${key}' => {${convertToString([value])}}`
+                    );
+                }
+                continue;
+            }
+
+            inputString.push(`'${key}' => '${value}'`);
+        }
     }
 
     return inputString.join(', ');
