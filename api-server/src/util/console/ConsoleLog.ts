@@ -14,8 +14,6 @@ export default class ConsoleLog {
 
     /**
      * Show message in console
-     *
-     * @return
      */
     public show(): void {
         let prefix = chalk.bold(

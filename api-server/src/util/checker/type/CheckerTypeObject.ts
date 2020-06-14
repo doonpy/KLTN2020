@@ -3,11 +3,6 @@ import CheckerTypeBase from './CheckerTypeBase';
 import CheckerWording from '../wording';
 
 export default class CheckerTypeObject extends CheckerTypeBase {
-    /**
-     * @param paramName
-     * @param value
-     */
-
     public checkType(paramName: string, value: any): void {
         if (typeof value !== 'object') {
             throw {

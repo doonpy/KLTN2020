@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualCommonController from '../../VisualCommonController';
 import VisualAdministrativeCountryLogic from './VisualAdministrativeCountryLogic';
@@ -29,13 +29,6 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         return this.instance;
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async createRoute(
         req: Request,
         res: Response,
@@ -44,13 +37,6 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async deleteRoute(
         req: Request,
         res: Response,
@@ -59,13 +45,6 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getAllRoute(
         req: Request,
         res: Response,
@@ -87,7 +66,7 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
                 ),
                 hasNext,
             };
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -97,13 +76,6 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getByIdRoute(
         req: Request,
         res: Response,
@@ -112,13 +84,6 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async updateRoute(
         req: Request,
         res: Response,
@@ -127,13 +92,6 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getDocumentAmount(
         req: Request,
         res: Response,
@@ -142,11 +100,10 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
         try {
             const documentAmount = await this.visualAdministrativeCountryLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'visual-administrative-country', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'visual-administrative-country',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

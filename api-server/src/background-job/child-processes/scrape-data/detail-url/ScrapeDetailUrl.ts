@@ -109,9 +109,6 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         await this.handleSuccessRequest($);
     }
 
-    /**
-     * @param $
-     */
     private async handleSuccessRequest($: CheerioStatic): Promise<void> {
         let newDetailUrlList = ScrapeBase.extractData(
             $,

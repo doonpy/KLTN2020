@@ -10,11 +10,6 @@ export default class ValidatorParam {
         this.checker = checker;
     }
 
-    /**
-     * @param input
-     *
-     * @return boolean
-     */
     public validate(input: object): void {
         this.checker.check(this.paramName, input);
     }

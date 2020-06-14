@@ -23,12 +23,6 @@ export default class ScrapeBase {
         time: true,
     };
 
-    /**
-     * @param domain
-     * @param path
-     *
-     * @return Promise<CheerioStatic | undefined>
-     */
     protected async getStaticBody(
         domain: string,
         path: string
@@ -60,13 +54,6 @@ export default class ScrapeBase {
         }
     }
 
-    /**
-     * @param $
-     * @param locator
-     * @param attribute
-     *
-     * @return dataArray
-     */
     protected static extractData(
         $: CheerioStatic,
         locator: string,
@@ -88,12 +75,6 @@ export default class ScrapeBase {
         return data;
     }
 
-    /**
-     * @param element
-     * @param attribute
-     *
-     * @return string data
-     */
     private static getDataOfElement(element: Cheerio, attribute = ''): string {
         let data = '';
         if (attribute) {

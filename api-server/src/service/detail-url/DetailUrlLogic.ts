@@ -1,10 +1,10 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import { CatalogApiModel, CatalogDocumentModel } from '../catalog/interface';
 import { DetailUrlApiModel, DetailUrlDocumentModel } from './interface';
 import CatalogLogic from '../catalog/CatalogLogic';
 
-export default class DetailUrlLogic extends CommonServiceLogicBase<
+export default class DetailUrlLogic extends ServiceLogicBase<
     DetailUrlDocumentModel,
     DetailUrlApiModel
 > {
@@ -14,9 +14,6 @@ export default class DetailUrlLogic extends CommonServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {DetailUrlLogic}
-     */
     public static getInstance(): DetailUrlLogic {
         if (!this.instance) {
             this.instance = new DetailUrlLogic();
@@ -25,11 +22,6 @@ export default class DetailUrlLogic extends CommonServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {DetailUrlDocumentModel}
-     *
-     * @return {DetailUrlApiModel}
-     */
     public convertToApiResponse({
         _id,
         catalogId,

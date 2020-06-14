@@ -2,10 +2,10 @@ import {
     VisualAnalyticsApiModel,
     VisualAnalyticsDocumentModel,
 } from '@service/visual/analytics/interface';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from '@service/visual/analytics/model';
 
-export default class VisualAnalyticsLogic extends CommonServiceLogicBase<
+export default class VisualAnalyticsLogic extends ServiceLogicBase<
     VisualAnalyticsDocumentModel,
     VisualAnalyticsApiModel
 > {
@@ -15,9 +15,6 @@ export default class VisualAnalyticsLogic extends CommonServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualAnalyticsLogic}
-     */
     public static getInstance(): VisualAnalyticsLogic {
         if (!this.instance) {
             this.instance = new VisualAnalyticsLogic();
@@ -25,11 +22,6 @@ export default class VisualAnalyticsLogic extends CommonServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualAnalyticsDocumentModel} input
-     *
-     * @return {VisualAnalyticsApiModel}
-     */
     public convertToApiResponse({
         _id,
         month,

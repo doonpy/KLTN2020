@@ -1,6 +1,6 @@
 import {
-    CommonApiModel,
-    CommonDocumentModel,
+    ApiModelBase,
+    DocumentModelBase,
     CommonLogicBaseInterface,
 } from '@service/interface';
 import {
@@ -12,7 +12,7 @@ import {
     CoordinateDocumentModel,
 } from '../coordinate/interface';
 
-export interface RawDataApiModel extends CommonApiModel {
+export interface RawDataApiModel extends ApiModelBase {
     detailUrl: DetailUrlApiModel | number | null;
     transactionType: { id: number; wording: string[] } | null;
     propertyType: { id: number; wording: string[] } | null;
@@ -41,7 +41,7 @@ export interface RawDataApiModel extends CommonApiModel {
     coordinate: CoordinateApiModel | number | null;
 }
 
-export interface RawDataDocumentModel extends CommonDocumentModel {
+export interface RawDataDocumentModel extends DocumentModelBase {
     detailUrlId: DetailUrlDocumentModel | number;
     transactionType: number;
     propertyType: number;
@@ -75,17 +75,7 @@ export interface RawDataDocumentModel extends CommonDocumentModel {
 
 export interface RawDataLogicInterface
     extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
-    /**
-     * @param {string} propertyTypeData
-     *
-     * @return {number} index
-     */
     getPropertyTypeIndex(propertyTypeData: string): number;
 
-    /**
-     * @param {object | undefined} conditions
-     *
-     * @return {number}
-     */
     countDocumentsWithConditions(conditions?: object): Promise<number>;
 }

@@ -6,7 +6,7 @@ import {
     errorHandler,
     notFoundRoute,
 } from '@middleware/error-handler/error-handler';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 
 export default class App {
     private static instance: App | undefined;
@@ -39,13 +39,10 @@ export default class App {
 
     /**
      * Start server
-     *
-     * @param middlewareArray
-     * @param controllerArray
      */
     public start(
         middlewareArray: any[],
-        controllerArray: CommonServiceControllerBase[]
+        controllerArray: ServiceControllerBase[]
     ): void {
         this.setAssets();
         this.bindMiddleware(middlewareArray);
@@ -55,8 +52,6 @@ export default class App {
 
     /**
      * Bind middleware
-     *
-     * @param middlewareArray
      */
     private bindMiddleware(middlewareArray: any[]): void {
         middlewareArray.forEach((middleware: any): void => {
@@ -66,11 +61,9 @@ export default class App {
 
     /**
      * Bind routes
-     *
-     * @param routes
      */
-    private bindRoutes(routes: CommonServiceControllerBase[]): void {
-        routes.forEach((controller: CommonServiceControllerBase): void => {
+    private bindRoutes(routes: ServiceControllerBase[]): void {
+        routes.forEach((controller: ServiceControllerBase): void => {
             this.app.use('/api/v1', controller.router);
         });
 

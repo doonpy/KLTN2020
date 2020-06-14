@@ -1,8 +1,8 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 import { PatternApiModel, PatternDocumentModel } from '../pattern/interface';
 import { HostApiModel, HostDocumentModel } from '../host/interface';
 
-export interface CatalogApiModel extends CommonApiModel {
+export interface CatalogApiModel extends ApiModelBase {
     title: string | null;
     url: string | null;
     locator: {
@@ -13,7 +13,7 @@ export interface CatalogApiModel extends CommonApiModel {
     pattern: PatternApiModel | number | null;
 }
 
-export interface CatalogDocumentModel extends CommonDocumentModel {
+export interface CatalogDocumentModel extends DocumentModelBase {
     title: string;
     url: string;
     locator: {

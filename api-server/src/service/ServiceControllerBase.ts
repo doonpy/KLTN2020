@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { Query } from 'express-serve-static-core';
 import ResponseStatusCode from '@common/response-status-code';
-import { CommonServiceControllerBaseInterface } from '@service/interface';
+import { ServiceControllerBaseInterface } from '@service/interface';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import Validator from '@util/validator/Validator';
 import { replaceMetaDataString } from '@util/helper/string';
@@ -17,8 +17,8 @@ interface RequestBody {
     [key: string]: any;
 }
 
-export default abstract class CommonServiceControllerBase
-    implements CommonServiceControllerBaseInterface {
+export default abstract class ServiceControllerBase
+    implements ServiceControllerBaseInterface {
     protected commonPath = '/:language';
 
     protected specifyIdPath = '/:language';
@@ -51,52 +51,24 @@ export default abstract class CommonServiceControllerBase
 
     protected readonly PARAM_LANGUAGE: string = 'language';
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected abstract async getAllRoute(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void>;
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected abstract async getByIdRoute(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void>;
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected abstract async createRoute(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void>;
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected abstract async updateRoute(
         req: Request,
         res: Response,
@@ -135,39 +107,18 @@ export default abstract class CommonServiceControllerBase
             );
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected abstract async deleteRoute(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void>;
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected abstract async getDocumentAmount(
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<void>;
 
-    /**
-     * @param req
-     * @param res
-     * @param next
-     *
-     * @return void
-     */
     protected validateCommonInputs(
         req: Request,
         res: Response,
@@ -207,13 +158,6 @@ export default abstract class CommonServiceControllerBase
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected initCommonInputs(
         req: Request,
         res: Response,
@@ -249,11 +193,6 @@ export default abstract class CommonServiceControllerBase
         }
     }
 
-    /**
-     * @param {number} statusCode
-     * @param {object} body
-     * @param {Response} res
-     */
     static sendResponse(
         res: Response,
         statusCode: number = ResponseStatusCode.INTERNAL_SERVER_ERROR,
@@ -266,12 +205,6 @@ export default abstract class CommonServiceControllerBase
         }
     }
 
-    /**
-     * @param {object} error
-     * @param {number} languageIndex
-     *
-     * @return {ExceptionCustomize}
-     */
     protected createError(
         {
             statusCode,
@@ -336,11 +269,6 @@ export default abstract class CommonServiceControllerBase
         );
     }
 
-    /**
-     * @param {string[]} queryParams
-     *
-     * @return {object}
-     */
     protected buildQueryConditions(
         queryParams: Array<{ paramName: string; isString: boolean }>
     ): object {

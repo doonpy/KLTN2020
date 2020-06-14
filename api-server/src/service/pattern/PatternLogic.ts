@@ -1,8 +1,8 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import { PatternApiModel, PatternDocumentModel } from './interface';
 
-export default class PatternLogic extends CommonServiceLogicBase<
+export default class PatternLogic extends ServiceLogicBase<
     PatternDocumentModel,
     PatternApiModel
 > {
@@ -12,9 +12,6 @@ export default class PatternLogic extends CommonServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {PatternLogic}
-     */
     public static getInstance(): PatternLogic {
         if (!this.instance) {
             this.instance = new PatternLogic();
@@ -23,11 +20,6 @@ export default class PatternLogic extends CommonServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {PatternDocumentModel}
-     *
-     * @return {PatternApiModel}
-     */
     public convertToApiResponse({
         _id,
         sourceUrl,

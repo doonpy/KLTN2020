@@ -1,5 +1,5 @@
 import Model from '@service/visual/summary/district-ward/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import {
     VisualSummaryDistrictWardApiModel,
     VisualSummaryDistrictWardDocumentModel,
@@ -9,7 +9,7 @@ import VisualAdministrativeDistrictLogic from '../../administrative/district/Vis
 import { VisualAdministrativeWardApiModel } from '../../administrative/ward/interface';
 import VisualAdministrativeWardLogic from '../../administrative/ward/VisualAdministrativeWardLogic';
 
-export default class VisualSummaryDistrictWardLogic extends CommonServiceLogicBase<
+export default class VisualSummaryDistrictWardLogic extends ServiceLogicBase<
     VisualSummaryDistrictWardDocumentModel,
     VisualSummaryDistrictWardApiModel
 > {
@@ -19,9 +19,6 @@ export default class VisualSummaryDistrictWardLogic extends CommonServiceLogicBa
         super(Model);
     }
 
-    /**
-     * @return {VisualSummaryDistrictWardLogic}
-     */
     public static getInstance(): VisualSummaryDistrictWardLogic {
         if (!this.instance) {
             this.instance = new VisualSummaryDistrictWardLogic();
@@ -29,11 +26,6 @@ export default class VisualSummaryDistrictWardLogic extends CommonServiceLogicBa
         return this.instance;
     }
 
-    /**
-     * @param {VisualSummaryDistrictWardDocumentModel}
-     *
-     * @return {VisualSummaryDistrictWardApiModel}
-     */
     public convertToApiResponse({
         _id,
         districtId,

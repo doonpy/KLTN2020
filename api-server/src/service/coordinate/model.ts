@@ -6,7 +6,7 @@ autoIncrement.initialize(mongoose.connection);
 
 const CoordinateCacheSchema: Schema = new Schema(
     {
-        location: Schema.Types.String,
+        locations: [Schema.Types.String],
         lat: Schema.Types.Number,
         lng: Schema.Types.Number,
     },

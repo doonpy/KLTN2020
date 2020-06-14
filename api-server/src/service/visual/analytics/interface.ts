@@ -1,6 +1,6 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 
-export interface VisualAnalyticsDocumentModel extends CommonDocumentModel {
+export interface VisualAnalyticsDocumentModel extends DocumentModelBase {
     month: number;
     year: number;
     transactionType: number;
@@ -14,7 +14,7 @@ export interface VisualAnalyticsDocumentModel extends CommonDocumentModel {
     minAverage: number;
 }
 
-export interface VisualAnalyticsApiModel extends CommonApiModel {
+export interface VisualAnalyticsApiModel extends ApiModelBase {
     month: number | null;
     year: number | null;
     transactionType: number | null;

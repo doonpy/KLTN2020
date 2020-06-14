@@ -7,10 +7,6 @@ export default class CheckerDomain extends CheckerBase {
         /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+$/
     );
 
-    /**
-     * @param paramName
-     * @param input
-     */
     public check(paramName: string, input: object): void {
         const value = this.getValue(paramName, input);
 

@@ -1,4 +1,4 @@
-import CommonLogicBase from '@service/CommonServiceLogicBase';
+import CommonLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import {
     HostApiModel,
@@ -15,9 +15,6 @@ export default class HostLogic
         super(Model);
     }
 
-    /**
-     * @return {HostLogic}
-     */
     public static getInstance(): HostLogic {
         if (!this.instance) {
             this.instance = new HostLogic();
@@ -26,11 +23,6 @@ export default class HostLogic
         return this.instance;
     }
 
-    /**
-     * @param {string} domain
-     *
-     * @return Promise<HostDocumentModel | null>
-     */
     public async getByDomain(domain: string): Promise<HostDocumentModel> {
         await this.checkExisted({ domain });
 
@@ -39,11 +31,6 @@ export default class HostLogic
         }).exec()) as HostDocumentModel;
     }
 
-    /**
-     * @param {HostDocumentModel}
-     *
-     * @return {HostApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

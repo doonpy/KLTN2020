@@ -1,6 +1,6 @@
 import {
-    CommonApiModel,
-    CommonDocumentModel,
+    ApiModelBase,
+    DocumentModelBase,
     CommonLogicBaseInterface,
     CommonOptions,
     GetAllReturnData,
@@ -14,21 +14,21 @@ enum ValidateType {
     NOT_EXISTED,
 }
 
-export default abstract class CommonServiceLogicBase<
-    T extends CommonDocumentModel,
-    A extends CommonApiModel
-> implements CommonLogicBaseInterface<T, A> {
-    protected constructor(protected model: Model<T>) {}
+interface ValidateInput {
+    [key: string]: any;
+}
 
-    /**
-     * @param properties
-     * @param {ValidateType} type
-     */
+export default abstract class ServiceLogicBase<
+    DocumentModel extends DocumentModelBase,
+    ApiModel extends ApiModelBase
+> implements CommonLogicBaseInterface<DocumentModel, ApiModel> {
+    protected constructor(protected model: Model<DocumentModel>) {}
+
     private async validate(
-        properties: Array<FilterQuery<T>>,
+        properties: ValidateInput[],
         type: ValidateType
     ): Promise<void> {
-        const promise: Array<Promise<void>> = [];
+        const promise: Promise<void>[] = [];
         properties.forEach((prop) => {
             if (type === ValidateType.EXISTED) {
                 promise.push(this.checkExisted(prop));
@@ -40,16 +40,11 @@ export default abstract class CommonServiceLogicBase<
         await Promise.all(promise);
     }
 
-    /**
-     * @param {CommonOptions} input
-     *
-     * @return {Promise<GetAllReturnData<T>>}
-     */
     public async getAll({
         limit,
         offset,
         conditions,
-    }: CommonOptions): Promise<GetAllReturnData<T>> {
+    }: CommonOptions): Promise<GetAllReturnData<DocumentModel>> {
         const documentQuery = this.model.find(conditions ?? {});
         const remainQuery = this.model.countDocuments(conditions ?? {});
 
@@ -62,7 +57,7 @@ export default abstract class CommonServiceLogicBase<
             documentQuery.limit(limit);
         }
 
-        const promises: [Promise<T[]>, Promise<number> | number] = [
+        const promises: [Promise<DocumentModel[]>, Promise<number> | number] = [
             documentQuery.exec(),
             limit ? remainQuery.exec() : -1,
         ];
@@ -71,38 +66,21 @@ export default abstract class CommonServiceLogicBase<
         return { documents, hasNext: documents.length < remainAmount };
     }
 
-    /**
-     * @param {number} id
-     *
-     * @return {Promise<T | never>}
-     */
-    public async getById(id: number): Promise<T | never> {
-        await this.checkExisted({ _id: id } as FilterQuery<T>);
+    public async getById(id: number): Promise<DocumentModel | never> {
+        await this.checkExisted({ _id: id });
 
-        return (await this.model.findById(id)) as T;
+        return (await this.model.findById(id)) as DocumentModel;
     }
 
-    /**
-     * @param {object} conditions
-     *
-     * @return {Promise<T | null>}
-     */
-    public async getOne(conditions: FilterQuery<T>): Promise<T | null> {
+    public async getOne(conditions: object): Promise<DocumentModel | null> {
         return this.model.findOne(conditions);
     }
 
-    /**
-     * @param {T} input
-     * @param validateExistedProperties
-     * @param validateNotExistedProperties
-     *
-     * @return {Promise<T>}
-     */
     public async create(
-        input: T,
-        validateExistedProperties?: Array<FilterQuery<T>>,
-        validateNotExistedProperties?: Array<FilterQuery<T>>
-    ): Promise<T> {
+        input: DocumentModel,
+        validateExistedProperties?: ValidateInput[],
+        validateNotExistedProperties?: ValidateInput[]
+    ): Promise<DocumentModel> {
         if (validateExistedProperties) {
             await this.validate(
                 validateExistedProperties,
@@ -117,24 +95,16 @@ export default abstract class CommonServiceLogicBase<
             );
         }
 
-        return this.model.create(input as CreateQuery<T>);
+        return this.model.create(input as CreateQuery<DocumentModel>);
     }
 
-    /**
-     * @param {number} id
-     * @param {T} input
-     * @param validateExistedProperties
-     * @param validateNotExistedProperties
-     *
-     * @return {Promise<T | never>}
-     */
     public async update(
         id: number,
-        input: UpdateQuery<T>,
-        validateExistedProperties?: Array<FilterQuery<T>>,
-        validateNotExistedProperties?: Array<FilterQuery<T>>
-    ): Promise<T | never> {
-        await this.checkExisted({ _id: id } as FilterQuery<T>);
+        input: UpdateQuery<DocumentModel>,
+        validateExistedProperties?: ValidateInput[],
+        validateNotExistedProperties?: ValidateInput[]
+    ): Promise<DocumentModel | never> {
+        await this.checkExisted({ _id: id });
 
         if (validateExistedProperties) {
             await this.validate(
@@ -158,31 +128,16 @@ export default abstract class CommonServiceLogicBase<
         return document!.save();
     }
 
-    /**
-     * @param {number} id
-     *
-     * @return {Promise<void>}
-     */
     public async delete(id: number): Promise<void> {
-        await this.checkExisted({ _id: id } as FilterQuery<T>);
+        await this.checkExisted({ _id: id });
         await this.model.findByIdAndDelete(id);
     }
 
-    /**
-     * @param {object} conditions
-     *
-     * @return {boolean}
-     */
-    public async isExists(conditions: FilterQuery<T>): Promise<boolean> {
+    public async isExists(conditions: object): Promise<boolean> {
         return (await this.model.findOne(conditions)) !== null;
     }
 
-    /**
-     * @param {object} conditions
-     *
-     * @return {Promise<void>}
-     */
-    public async checkExisted(conditions: FilterQuery<T>): Promise<void> {
+    public async checkExisted(conditions: object): Promise<void> {
         if (!(await this.isExists(conditions))) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
@@ -198,12 +153,7 @@ export default abstract class CommonServiceLogicBase<
         }
     }
 
-    /**
-     * @param {object} conditions
-     *
-     * @return {Promise<void>}
-     */
-    public async checkNotExisted(conditions: FilterQuery<T>): Promise<void> {
+    public async checkNotExisted(conditions: object): Promise<void> {
         if (await this.isExists(conditions)) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
@@ -222,24 +172,12 @@ export default abstract class CommonServiceLogicBase<
     /**
      * Get current amount document
      */
-    public async getDocumentAmount(
-        conditions?: FilterQuery<T>
-    ): Promise<number> {
+    public async getDocumentAmount(conditions?: object): Promise<number> {
         return this.model.countDocuments(conditions ?? {});
     }
 
-    /**
-     * @param {CommonDocumentModel} input
-     *
-     * @return {CommonApiModel}
-     */
-    public abstract convertToApiResponse(input: T): A;
+    public abstract convertToApiResponse(input: DocumentModel): ApiModel;
 
-    /**
-     * @param {object[]} aggregations
-     *
-     * @return {Promise<any[]>}
-     */
     public async getWithAggregation<AT>(aggregations: object[]): Promise<AT[]> {
         return this.model.aggregate<AT>(aggregations).allowDiskUse(true).exec();
     }

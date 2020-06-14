@@ -7,10 +7,6 @@ export default class CheckerUrl extends CheckerBase {
         /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/
     );
 
-    /**
-     * @param paramName
-     * @param input
-     */
     public check(paramName: string, input: object): void {
         const value = this.getValue(paramName, input);
 

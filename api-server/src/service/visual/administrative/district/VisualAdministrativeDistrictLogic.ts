@@ -1,5 +1,5 @@
 import Model from '@service/visual/administrative/district/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import { VisualAdministrativeProvinceApiModel } from '../province/interface';
 import {
     VisualAdministrativeDistrictApiModel,
@@ -7,7 +7,7 @@ import {
 } from './interface';
 import VisualAdministrativeProvinceLogic from '../province/VisualAdministrativeProvinceLogic';
 
-export default class VisualAdministrativeDistrictLogic extends CommonServiceLogicBase<
+export default class VisualAdministrativeDistrictLogic extends ServiceLogicBase<
     VisualAdministrativeDistrictDocumentModel,
     VisualAdministrativeDistrictApiModel
 > {
@@ -17,9 +17,6 @@ export default class VisualAdministrativeDistrictLogic extends CommonServiceLogi
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeDistrictLogic}
-     */
     public static getInstance(): VisualAdministrativeDistrictLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeDistrictLogic();
@@ -27,11 +24,6 @@ export default class VisualAdministrativeDistrictLogic extends CommonServiceLogi
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeDistrictDocumentModel} input
-     *
-     * @return {VisualAdministrativeDistrictApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

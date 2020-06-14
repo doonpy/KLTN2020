@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
@@ -9,7 +9,7 @@ import PatternLogic from './PatternLogic';
 const commonPath = '/patterns';
 const specifyIdPath = '/pattern/:id';
 
-export default class PatternController extends CommonServiceControllerBase {
+export default class PatternController extends ServiceControllerBase {
     private static instance: PatternController;
 
     private patternLogic = PatternLogic.getInstance();
@@ -45,9 +45,6 @@ export default class PatternController extends CommonServiceControllerBase {
         this.initRoutes();
     }
 
-    /**
-     * @return {PatternController}
-     */
     public static getInstance(): PatternController {
         if (!this.instance) {
             this.instance = new PatternController();
@@ -56,13 +53,6 @@ export default class PatternController extends CommonServiceControllerBase {
         return this.instance;
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getAllRoute(
         req: Request,
         res: Response,
@@ -89,26 +79,15 @@ export default class PatternController extends CommonServiceControllerBase {
                 this.patternLogic.convertToApiResponse(pattern)
             );
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                {
-                    patterns,
-                    hasNext,
-                }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                patterns,
+                hasNext,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getByIdRoute(
         req: Request,
         res: Response,
@@ -134,7 +113,7 @@ export default class PatternController extends CommonServiceControllerBase {
                 pattern: this.patternLogic.convertToApiResponse(pattern),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -144,13 +123,6 @@ export default class PatternController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async createRoute(
         req: Request,
         res: Response,
@@ -261,7 +233,7 @@ export default class PatternController extends CommonServiceControllerBase {
                 [{ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.CREATED,
                 this.patternLogic.convertToApiResponse(createdPattern)
@@ -271,13 +243,6 @@ export default class PatternController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async updateRoute(
         req: Request,
         res: Response,
@@ -410,7 +375,7 @@ export default class PatternController extends CommonServiceControllerBase {
                 );
             }
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 this.patternLogic.convertToApiResponse(editedPattern)
@@ -420,13 +385,6 @@ export default class PatternController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async deleteRoute(
         req: Request,
         res: Response,
@@ -449,7 +407,7 @@ export default class PatternController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.patternLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.NO_CONTENT,
                 {}
@@ -459,13 +417,6 @@ export default class PatternController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getDocumentAmount(
         req: Request,
         res: Response,
@@ -474,11 +425,10 @@ export default class PatternController extends CommonServiceControllerBase {
         try {
             const documentAmount = await this.patternLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'pattern', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'pattern',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

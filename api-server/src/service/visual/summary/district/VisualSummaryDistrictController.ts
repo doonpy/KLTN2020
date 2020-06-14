@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualSummaryDistrictLogic from './VisualSummaryDistrictLogic';
 import VisualCommonController from '../../VisualCommonController';
@@ -29,13 +29,6 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         return this.instance;
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async createRoute(
         req: Request,
         res: Response,
@@ -44,13 +37,6 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async deleteRoute(
         req: Request,
         res: Response,
@@ -59,13 +45,6 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getAllRoute(
         req: Request,
         res: Response,
@@ -84,7 +63,7 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
                 ),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -94,13 +73,6 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getByIdRoute(
         req: Request,
         res: Response,
@@ -109,13 +81,6 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async updateRoute(
         req: Request,
         res: Response,
@@ -124,13 +89,6 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         next();
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getDocumentAmount(
         req: Request,
         res: Response,
@@ -139,11 +97,10 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         try {
             const documentAmount = await this.visualSummaryDistrictLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'visual-summary-district', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'visual-summary-district',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

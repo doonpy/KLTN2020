@@ -1,7 +1,4 @@
-/**
- * @param str
- * @param value
- */
+/***/
 export const replaceMetaDataString = (str: string, value: any[]): string => {
     const METADATA_KEY_STRING = 's';
     const METADATA_KEY_INTEGER = 'i';
@@ -42,11 +39,7 @@ export const replaceMetaDataString = (str: string, value: any[]): string => {
     return completedCause;
 };
 
-/**
- * @param {string} firstString
- * @param {string} secondString
- * @return {number}
- */
+/***/
 export const calculateSimilarRate = (
     firstString: string,
     secondString: string
@@ -118,9 +111,6 @@ export const calculateSimilarRate = (
 
 /**
  * Get similar rate - min: 0 and max: 1
- * @param {string} firstString
- * @param {string} secondString
- * @return number
  */
 export const getSimilarRate = (
     firstString: string,
@@ -142,7 +132,6 @@ export const getSimilarRate = (
 
 /**
  * Upper case first character of string (not include trim string)
- * @param str
  */
 export const upperCaseFirstCharacter = (str: string): string => {
     return str.replace(
@@ -151,11 +140,6 @@ export const upperCaseFirstCharacter = (str: string): string => {
     );
 };
 
-/**
- * @param {string} str
- *
- * @return {string}
- */
 export const removeBreakLineAndTrim = (str: string): string => {
     return str
         .replace(/\r|\n|\r\n/gm, ' ')
@@ -165,9 +149,6 @@ export const removeBreakLineAndTrim = (str: string): string => {
 
 /**
  * Remove special character at head and tail of string.
- * @param {string} str
- *
- * @return {string}
  */
 export const removeSpecialCharacterAtHeadAndTail = (str: string): string => {
     const STANDARD_ADDRESS_PATTERN = RegExp(
@@ -179,9 +160,6 @@ export const removeSpecialCharacterAtHeadAndTail = (str: string): string => {
 
 /**
  * Remove special character exits at any position
- * @param {string} str
- *
- * @return {string}
  */
 export const removeSpecialCharacter = (str: string): string => {
     return str.replace(

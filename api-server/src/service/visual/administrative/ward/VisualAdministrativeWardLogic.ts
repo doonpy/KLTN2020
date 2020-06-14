@@ -1,5 +1,5 @@
 import Model from '@service/visual/administrative/ward/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import { VisualAdministrativeDistrictApiModel } from '../district/interface';
 import {
     VisualAdministrativeWardApiModel,
@@ -7,7 +7,7 @@ import {
 } from './interface';
 import VisualAdministrativeDistrictLogic from '../district/VisualAdministrativeDistrictLogic';
 
-export default class VisualAdministrativeWardLogic extends CommonServiceLogicBase<
+export default class VisualAdministrativeWardLogic extends ServiceLogicBase<
     VisualAdministrativeWardDocumentModel,
     VisualAdministrativeWardApiModel
 > {
@@ -17,9 +17,6 @@ export default class VisualAdministrativeWardLogic extends CommonServiceLogicBas
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeWardLogic}
-     */
     public static getInstance(): VisualAdministrativeWardLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeWardLogic();
@@ -27,11 +24,6 @@ export default class VisualAdministrativeWardLogic extends CommonServiceLogicBas
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeWardDocumentModel} document
-     *
-     * @return {VisualAdministrativeWardDocumentModel}
-     */
     public async populateDocument(
         document: VisualAdministrativeWardDocumentModel
     ): Promise<VisualAdministrativeWardDocumentModel> {
@@ -40,11 +32,6 @@ export default class VisualAdministrativeWardLogic extends CommonServiceLogicBas
             .execPopulate();
     }
 
-    /**
-     * @param {VisualAdministrativeWardDocumentModel} input
-     *
-     * @return {VisualAdministrativeWardApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

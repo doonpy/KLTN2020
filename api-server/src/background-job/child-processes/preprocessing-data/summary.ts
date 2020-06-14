@@ -13,11 +13,6 @@ type SummaryElement = {
     amount: number;
 };
 
-/**
- * @param {number} summaryDocument
- * @param {number} transactionType
- * @param {number} propertyType
- */
 const updateAmount = (
     summaryDocument:
         | VisualSummaryDistrictWardDocumentModel
@@ -44,10 +39,6 @@ const updateAmount = (
 
 /**
  * Add summary data for visualization summary by district
- *
- * @param {number} districtId
- * @param {number} transactionType
- * @param {number} propertyType
  */
 const handleVisualSummaryDistrictData = async (
     districtId: number,
@@ -74,11 +65,6 @@ const handleVisualSummaryDistrictData = async (
 
 /**
  *  Add summary data for visualization summary by district and ward
- *
- * @param {number} districtId
- * @param {number} wardId
- * @param {number} transactionType
- * @param {number} propertyType
  */
 export const handleVisualSummaryDistrictWardData = async (
     districtId: number,

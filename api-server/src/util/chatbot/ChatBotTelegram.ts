@@ -25,9 +25,6 @@ export default class ChatBotTelegram {
         return this.instance;
     }
 
-    /**
-     * @param message
-     */
     public async sendMessage(message: string): Promise<void> {
         for (const receiver of receiverList) {
             if (!this.telegramBot) {

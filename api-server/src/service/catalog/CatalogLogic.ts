@@ -1,4 +1,4 @@
-import CommonLogicBase from '@service/CommonServiceLogicBase';
+import CommonLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import { CatalogApiModel, CatalogDocumentModel } from './interface';
 import { HostApiModel, HostDocumentModel } from '../host/interface';
@@ -16,9 +16,6 @@ export default class CatalogLogic extends CommonLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {CatalogLogic}
-     */
     public static getInstance(): CatalogLogic {
         if (!this.instance) {
             this.instance = new CatalogLogic();
@@ -26,11 +23,6 @@ export default class CatalogLogic extends CommonLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {CatalogDocumentModel}
-     *
-     * @return {CatalogApiModel}
-     */
     public convertToApiResponse({
         _id,
         title,

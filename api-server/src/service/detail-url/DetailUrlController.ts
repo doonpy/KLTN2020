@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
@@ -10,7 +10,7 @@ import CatalogLogic from '../catalog/CatalogLogic';
 const commonPath = '/detail-urls';
 const specifyIdPath = '/detail-url/:id';
 
-export default class DetailUrlController extends CommonServiceControllerBase {
+export default class DetailUrlController extends ServiceControllerBase {
     private static instance: DetailUrlController;
 
     private detailUrlLogic = new DetailUrlLogic();
@@ -30,9 +30,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         this.initRoutes();
     }
 
-    /**
-     * @return {DetailUrlController}
-     */
     public static getInstance(): DetailUrlController {
         if (!this.instance) {
             this.instance = new DetailUrlController();
@@ -41,13 +38,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         return this.instance;
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getAllRoute(
         req: Request,
         res: Response,
@@ -109,7 +99,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                 hasNext,
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -119,13 +109,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getByIdRoute(
         req: Request,
         res: Response,
@@ -151,7 +134,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                 detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -161,13 +144,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async createRoute(
         req: Request,
         res: Response,
@@ -208,7 +184,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                 [{ [this.PARAM_URL]: detailUrlBody.url }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.CREATED,
                 this.detailUrlLogic.convertToApiResponse(createdDetailUrl)
@@ -218,13 +194,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async updateRoute(
         req: Request,
         res: Response,
@@ -294,7 +263,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
                 [{ [this.PARAM_URL]: detailUrlBody.url }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 this.detailUrlLogic.convertToApiResponse(editedDetailUrl)
@@ -304,13 +273,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async deleteRoute(
         req: Request,
         res: Response,
@@ -333,7 +295,7 @@ export default class DetailUrlController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.detailUrlLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.NO_CONTENT,
                 {}
@@ -343,13 +305,6 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getDocumentAmount(
         req: Request,
         res: Response,
@@ -358,11 +313,10 @@ export default class DetailUrlController extends CommonServiceControllerBase {
         try {
             const documentAmount = await this.detailUrlLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'detail-url', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'detail-url',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

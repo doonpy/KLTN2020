@@ -1,11 +1,11 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from '@service/visual/administrative/country/model';
 import {
     VisualAdministrativeCountryApiModel,
     VisualAdministrativeCountryDocumentModel,
 } from './interface';
 
-export default class VisualAdministrativeCountryLogic extends CommonServiceLogicBase<
+export default class VisualAdministrativeCountryLogic extends ServiceLogicBase<
     VisualAdministrativeCountryDocumentModel,
     VisualAdministrativeCountryApiModel
 > {
@@ -15,9 +15,6 @@ export default class VisualAdministrativeCountryLogic extends CommonServiceLogic
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeCountryLogic}
-     */
     public static getInstance(): VisualAdministrativeCountryLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeCountryLogic();
@@ -25,11 +22,6 @@ export default class VisualAdministrativeCountryLogic extends CommonServiceLogic
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeCountryDocumentModel} input
-     *
-     * @return {VisualAdministrativeCountryApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

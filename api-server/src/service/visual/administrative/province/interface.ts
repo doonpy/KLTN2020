@@ -1,18 +1,18 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 import {
     VisualAdministrativeCountryApiModel,
     VisualAdministrativeCountryDocumentModel,
 } from '../country/interface';
 
 export interface VisualAdministrativeProvinceDocumentModel
-    extends CommonDocumentModel {
+    extends DocumentModelBase {
     name: string;
     code: string;
     countryId: number | VisualAdministrativeCountryDocumentModel;
     acreage: number;
 }
 
-export interface VisualAdministrativeProvinceApiModel extends CommonApiModel {
+export interface VisualAdministrativeProvinceApiModel extends ApiModelBase {
     name: string | null;
     code: string | null;
     country: number | VisualAdministrativeCountryApiModel | null;

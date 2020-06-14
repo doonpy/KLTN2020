@@ -1,5 +1,5 @@
 import { CoordinateDocumentModel } from '@service/coordinate/interface';
-import { getGeocode } from '@util/external-api/map';
+import { getGeocodeByBingMap } from '@util/external-api/map';
 import CoordinateLogic from '@service/coordinate/CoordinateLogic';
 import { RawDataDocumentModel } from '@service/raw-data/interface';
 import ConsoleLog from '@util/console/ConsoleLog';
@@ -14,18 +14,14 @@ const rawDataLogic = RawDataLogic.getInstance();
 
 /**
  * Get coordinate of certain address
- *
- * @param {string} address
- *
- * @return {Promise<CoordinateDocumentModel | undefined>}
  */
 const getCoordinate = async (
     address: string
 ): Promise<CoordinateDocumentModel | undefined> => {
     const coordinateLogic = CoordinateLogic.getInstance();
-    let coordinateDoc = await coordinateLogic.getByLocation(address);
+    let coordinateDoc = await coordinateLogic.getOne({ locations: address });
     if (!coordinateDoc) {
-        const apiResponse = await getGeocode(address);
+        const apiResponse = await getGeocodeByBingMap(address);
         if (!apiResponse) {
             return undefined;
         }
@@ -49,11 +45,17 @@ const getCoordinate = async (
             lng,
         ] = apiResponse.resourceSets[0].resources[0].point.coordinates;
 
-        coordinateDoc = await coordinateLogic.create({
-            location: address,
-            lat,
-            lng,
-        } as CoordinateDocumentModel);
+        const similarCoordinateDoc = await coordinateLogic.getOne({ lat, lng });
+        if (similarCoordinateDoc) {
+            similarCoordinateDoc.locations.push(address);
+            coordinateDoc = await similarCoordinateDoc.save();
+        } else {
+            coordinateDoc = await coordinateLogic.create({
+                locations: [address],
+                lat,
+                lng,
+            } as CoordinateDocumentModel);
+        }
     }
 
     return coordinateDoc;

@@ -1,10 +1,10 @@
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
 import { GroupedDataApiModel, GroupedDataDocumentModel } from './interface';
 import RawDataLogic from '../raw-data/RawDataLogic';
 import { RawDataApiModel, RawDataDocumentModel } from '../raw-data/interface';
 
-export default class GroupedDataLogic extends CommonServiceLogicBase<
+export default class GroupedDataLogic extends ServiceLogicBase<
     GroupedDataDocumentModel,
     GroupedDataApiModel
 > {
@@ -14,9 +14,6 @@ export default class GroupedDataLogic extends CommonServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {GroupedDataLogic}
-     */
     public static getInstance(): GroupedDataLogic {
         if (!this.instance) {
             this.instance = new GroupedDataLogic();
@@ -25,11 +22,6 @@ export default class GroupedDataLogic extends CommonServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {GroupedDataDocumentModel}
-     *
-     * @return {GroupedDataApiModel}
-     */
     public convertToApiResponse({
         _id,
         items,

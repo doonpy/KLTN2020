@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import CommonServiceControllerBase from '@service/CommonServiceControllerBase';
+import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
@@ -9,7 +9,7 @@ import { HostDocumentModel } from './interface';
 const commonPath = '/hosts';
 const specifyIdPath = '/host/:id';
 
-export default class HostController extends CommonServiceControllerBase {
+export default class HostController extends ServiceControllerBase {
     private static instance: HostController;
 
     private hostLogic = HostLogic.getInstance();
@@ -25,9 +25,6 @@ export default class HostController extends CommonServiceControllerBase {
         this.initRoutes();
     }
 
-    /**
-     * @return {HostController}
-     */
     public static getInstance(): HostController {
         if (!this.instance) {
             this.instance = new HostController();
@@ -36,13 +33,6 @@ export default class HostController extends CommonServiceControllerBase {
         return this.instance;
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getAllRoute(
         req: Request,
         res: Response,
@@ -75,26 +65,15 @@ export default class HostController extends CommonServiceControllerBase {
                 this.hostLogic.convertToApiResponse(host)
             );
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                {
-                    hosts,
-                    hasNext,
-                }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                hosts,
+                hasNext,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getByIdRoute(
         req: Request,
         res: Response,
@@ -120,7 +99,7 @@ export default class HostController extends CommonServiceControllerBase {
                 host: this.hostLogic.convertToApiResponse(host),
             };
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 responseBody
@@ -130,13 +109,6 @@ export default class HostController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async createRoute(
         req: Request,
         res: Response,
@@ -176,7 +148,7 @@ export default class HostController extends CommonServiceControllerBase {
                 [{ [this.PARAM_DOMAIN]: hostBody.domain }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.CREATED,
                 this.hostLogic.convertToApiResponse(createdHost)
@@ -186,13 +158,6 @@ export default class HostController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async updateRoute(
         req: Request,
         res: Response,
@@ -244,7 +209,7 @@ export default class HostController extends CommonServiceControllerBase {
                 [{ [this.PARAM_DOMAIN]: hostBody.domain }]
             );
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.OK,
                 this.hostLogic.convertToApiResponse(editedHost)
@@ -254,13 +219,6 @@ export default class HostController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async deleteRoute(
         req: Request,
         res: Response,
@@ -283,7 +241,7 @@ export default class HostController extends CommonServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             await this.hostLogic.delete(idBody);
 
-            CommonServiceControllerBase.sendResponse(
+            ServiceControllerBase.sendResponse(
                 res,
                 ResponseStatusCode.NO_CONTENT,
                 {}
@@ -293,13 +251,6 @@ export default class HostController extends CommonServiceControllerBase {
         }
     }
 
-    /**
-     * @param {Request} req
-     * @param {Response} res
-     * @param {NextFunction} next
-     *
-     * @return {Promise<void>}
-     */
     protected async getDocumentAmount(
         req: Request,
         res: Response,
@@ -308,11 +259,10 @@ export default class HostController extends CommonServiceControllerBase {
         try {
             const documentAmount = await this.hostLogic.getDocumentAmount();
 
-            CommonServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                { schema: 'host', documentAmount }
-            );
+            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
+                schema: 'host',
+                documentAmount,
+            });
         } catch (error) {
             next(this.createError(error, this.language));
         }

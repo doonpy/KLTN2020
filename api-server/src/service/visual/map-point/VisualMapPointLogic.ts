@@ -1,5 +1,5 @@
 import Model from '@service/visual/map-point/model';
-import CommonServiceLogicBase from '@service/CommonServiceLogicBase';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 import {
     VisualMapPointApiModel,
     VisualMapPointDocumentModel,
@@ -9,7 +9,7 @@ import VisualAdministrativeDistrictLogic from '../administrative/district/Visual
 import { VisualAdministrativeWardApiModel } from '../administrative/ward/interface';
 import VisualAdministrativeWardLogic from '../administrative/ward/VisualAdministrativeWardLogic';
 
-export default class VisualMapPointLogic extends CommonServiceLogicBase<
+export default class VisualMapPointLogic extends ServiceLogicBase<
     VisualMapPointDocumentModel,
     VisualMapPointApiModel
 > {
@@ -19,9 +19,6 @@ export default class VisualMapPointLogic extends CommonServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualMapPointLogic}
-     */
     public static getInstance(): VisualMapPointLogic {
         if (!this.instance) {
             this.instance = new VisualMapPointLogic();
@@ -29,11 +26,6 @@ export default class VisualMapPointLogic extends CommonServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualMapPointDocumentModel} input
-     *
-     * @return {VisualMapPointApiModel}
-     */
     public convertToApiResponse({
         _id,
         districtId,
