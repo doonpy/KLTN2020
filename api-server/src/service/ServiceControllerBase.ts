@@ -5,7 +5,7 @@ import { ServiceControllerBaseInterface } from '@service/interface';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import Validator from '@util/validator/Validator';
 import { replaceMetaDataString } from '@util/helper/string';
-import CommonLanguage from '@common/language';
+import { CommonLanguageIndex } from '@common/language';
 import Checker from '@util/checker';
 import Wording from '@service/wording';
 
@@ -167,7 +167,7 @@ export default abstract class ServiceControllerBase
             this.limit = Number(req.query[this.PARAM_LIMIT]) || this.limit;
             this.offset = Number(req.query[this.PARAM_OFFSET]) || this.offset;
             this.language =
-                CommonLanguage[req.params[this.PARAM_LANGUAGE]] ??
+                CommonLanguageIndex[req.params[this.PARAM_LANGUAGE]] ??
                 this.language;
 
             this.requestParams = req.params ?? {};

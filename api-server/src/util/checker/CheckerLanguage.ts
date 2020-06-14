@@ -1,4 +1,4 @@
-import CommonLanguage from '@common/language';
+import { CommonLanguageIndex } from '@common/language';
 import ResponseStatusCode from '@common/response-status-code';
 import CheckerBase from './CheckerBase';
 import CheckerWording from './wording';
@@ -11,7 +11,7 @@ export default class CheckerLanguage extends CheckerBase {
             return;
         }
 
-        const languageList = Object.keys(CommonLanguage);
+        const languageList = Object.keys(CommonLanguageIndex);
         const index = languageList.indexOf(value);
 
         if (index < 0) {

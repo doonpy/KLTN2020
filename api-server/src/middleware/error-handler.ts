@@ -5,8 +5,15 @@ import {
     replaceMetaDataString,
     upperCaseFirstCharacter,
 } from '@util/helper/string';
-import CommonLanguage from '@common/language';
-import Wording from './wording';
+import { getLanguageIndexOfRequest } from '@common/language';
+
+const MESSAGE = {
+    MSG_ERR_1: ['đường dẫn không tồn tại', 'specify path does not exist'],
+};
+const CAUSE = {
+    CAU_ERR_1: ['%s không tồn tại', '%s does not exits'],
+    CAU_ERR_2: ['lỗi không xác định', 'unknown error'],
+};
 
 const convertToString = (
     input: Array<{ [key: string]: string | number }>
@@ -66,16 +73,12 @@ export const notFoundRoute = (
     res: Response,
     next: NextFunction
 ): void => {
+    const language = getLanguageIndexOfRequest(req);
     next(
         new ExceptionCustomize(
             ResponseStatusCode.NOT_FOUND,
-            replaceMetaDataString(
-                Wording.CAUSE.CAU_ERR_1[
-                    CommonLanguage[req.params.language] || 0
-                ],
-                [req.path]
-            ),
-            Wording.MESSAGE.MSG_ERR_1[CommonLanguage[req.params.language] || 0]
+            replaceMetaDataString(CAUSE.CAU_ERR_1[language], [req.path]),
+            MESSAGE.MSG_ERR_1[language]
         )
     );
 };
@@ -90,15 +93,12 @@ export const errorHandler = (
     next: NextFunction
 ): void => {
     let body = {};
-
+    const language = getLanguageIndexOfRequest(req);
     if (process.env.NODE_ENV === 'production') {
         body = {
             error: {
                 cause: upperCaseFirstCharacter(
-                    cause ||
-                        Wording.CAUSE.CAU_ERR_2[
-                            CommonLanguage[req.params.language] || 0
-                        ]
+                    cause || CAUSE.CAU_ERR_2[language]
                 ),
                 message: upperCaseFirstCharacter(message),
                 input: convertToString(
@@ -110,10 +110,7 @@ export const errorHandler = (
         body = {
             error: {
                 cause: upperCaseFirstCharacter(
-                    cause ||
-                        Wording.CAUSE.CAU_ERR_2[
-                            CommonLanguage[req.params.language] || 0
-                        ]
+                    cause || CAUSE.CAU_ERR_2[language]
                 ),
                 message: upperCaseFirstCharacter(message),
                 input: convertToString(
