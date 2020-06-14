@@ -104,8 +104,12 @@ export default class ScrapeRawData extends ScrapeBase {
                     await this.scrapeAction(
                         domain,
                         targetDetailUrl.url,
-                        [targetDetailUrl],
-                        [targetDetailUrl]
+                        async ($: CheerioStatic): Promise<void> => {
+                            await this.handleSuccess($, targetDetailUrl);
+                        },
+                        async (): Promise<void> => {
+                            await this.handleFailed(targetDetailUrl);
+                        }
                     );
                     requestCounter--;
                 } catch (error) {
@@ -132,9 +136,8 @@ export default class ScrapeRawData extends ScrapeBase {
 
     protected async handleSuccess(
         $: CheerioStatic,
-        args?: any[]
+        currentDetailUrlDocument: DetailUrlDocumentModel
     ): Promise<void> {
-        const currentDetailUrlDocument = args!.shift() as DetailUrlDocumentModel;
         const {
             propertyType,
             postDate,
@@ -271,8 +274,9 @@ export default class ScrapeRawData extends ScrapeBase {
         return false;
     }
 
-    protected async handleFailed(args?: any[]): Promise<void> {
-        const currentDetailUrlDocument = args!.shift() as DetailUrlDocumentModel;
+    protected async handleFailed(
+        currentDetailUrlDocument: DetailUrlDocumentModel
+    ): Promise<void> {
         currentDetailUrlDocument.requestRetries++;
         if (currentDetailUrlDocument.requestRetries < MAX_REQUEST_RETRIES) {
             this.detailUrls.push(currentDetailUrlDocument);
