@@ -30,13 +30,6 @@ export default abstract class ScrapeBase {
         this.catalog = catalog;
     }
 
-    protected abstract async handleSuccess(
-        $: CheerioStatic,
-        args?: any[]
-    ): Promise<void>;
-
-    protected abstract async handleFailed(args?: any[]): Promise<void>;
-
     protected async getStaticBody(
         domain: string,
         path: string
@@ -103,15 +96,17 @@ export default abstract class ScrapeBase {
     protected async scrapeAction(
         domain: string,
         url: string,
-        successHandlerParams?: any[],
-        failedHandlerParams?: any[]
+        successHandler: Function,
+        failedHandler?: Function
     ): Promise<void> {
         const $ = await this.getStaticBody(domain, url);
 
         if (!$) {
-            await this.handleFailed(failedHandlerParams);
+            if (failedHandler) {
+                await failedHandler();
+            }
         } else {
-            await this.handleSuccess($, successHandlerParams);
+            await successHandler($);
         }
     }
 }

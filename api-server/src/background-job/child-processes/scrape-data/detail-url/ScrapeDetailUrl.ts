@@ -71,7 +71,13 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 try {
                     requestCounter++;
                     this.scrapedPageNumber.push(targetUrl);
-                    await this.scrapeAction(domain, targetUrl);
+                    await this.scrapeAction(
+                        domain,
+                        targetUrl,
+                        async ($: CheerioStatic): Promise<void> => {
+                            await this.handleSuccess($);
+                        }
+                    );
                     requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
@@ -96,10 +102,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         }
     }
 
-    protected async handleSuccess(
-        $: CheerioStatic,
-        args?: any[]
-    ): Promise<void> {
+    protected async handleSuccess($: CheerioStatic): Promise<void> {
         let newDetailUrlList = ScrapeBase.extractData(
             $,
             this.catalog.locator.detailUrl,
@@ -168,9 +171,5 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             `Scrape detail URL -> CID: ${this.catalog._id} - Execute time: ${executeTime} - Complete`
         ).show();
         await new ScrapeRawData(this.catalog).start();
-    }
-
-    protected async handleFailed(args?: any[]): Promise<void> {
-        return Promise.resolve(undefined);
     }
 }
