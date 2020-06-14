@@ -4,9 +4,12 @@ import { sendRequest } from '@util/request';
 import ResponseStatusCode from '@common/response-status-code';
 import { RequestPromiseOptions } from 'request-promise';
 import { RequestResponse } from 'request';
+import { CatalogDocumentModel } from '@service/catalog/interface';
 
-export default class ScrapeBase {
+export default abstract class ScrapeBase {
     protected startTime: [number, number] | undefined;
+
+    protected readonly catalog: CatalogDocumentModel;
 
     protected isRunning = false;
 
@@ -22,6 +25,17 @@ export default class ScrapeBase {
         resolveWithFullResponse: true,
         time: true,
     };
+
+    protected constructor(catalog: CatalogDocumentModel) {
+        this.catalog = catalog;
+    }
+
+    protected abstract async handleSuccess(
+        $: CheerioStatic,
+        args?: any[]
+    ): Promise<void>;
+
+    protected abstract async handleFailed(args?: any[]): Promise<void>;
 
     protected async getStaticBody(
         domain: string,
@@ -84,5 +98,20 @@ export default class ScrapeBase {
         }
 
         return data;
+    }
+
+    protected async scrapeAction(
+        domain: string,
+        url: string,
+        successHandlerParams?: any[],
+        failedHandlerParams?: any[]
+    ): Promise<void> {
+        const $ = await this.getStaticBody(domain, url);
+
+        if (!$) {
+            await this.handleFailed(failedHandlerParams);
+        } else {
+            await this.handleSuccess($, successHandlerParams);
+        }
     }
 }

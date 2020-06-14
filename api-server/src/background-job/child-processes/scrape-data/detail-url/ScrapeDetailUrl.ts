@@ -14,18 +14,20 @@ import ScrapeRawData from '@background-job/child-processes/scrape-data/raw-data/
 const MAX_REQUEST = Number(
     process.env.BGR_SCRAPE_DETAIL_URL_MAX_REQUEST || '1'
 );
-
 const ATTRIBUTE_TO_GET_DATA = 'href';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
-    private detailUrlLogic = DetailUrlLogic.getInstance();
+    private readonly detailUrlLogic: DetailUrlLogic;
 
-    private pageNumberQueue: string[] = [];
+    private pageNumberQueue: string[];
 
-    private scrapedPageNumber: string[] = [];
+    private scrapedPageNumber: string[];
 
-    constructor(private readonly catalog: CatalogDocumentModel) {
-        super();
+    constructor(catalog: CatalogDocumentModel) {
+        super(catalog);
+        this.detailUrlLogic = DetailUrlLogic.getInstance();
+        this.pageNumberQueue = [];
+        this.scrapedPageNumber = [];
     }
 
     /**
@@ -47,6 +49,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 )
             );
 
+            const domain = (this.catalog.hostId as HostDocumentModel).domain;
             let requestCounter = 0;
             this.pageNumberQueue = [this.catalog.url];
             const loop = setInterval(async (): Promise<void> => {
@@ -68,7 +71,7 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 try {
                     requestCounter++;
                     this.scrapedPageNumber.push(targetUrl);
-                    await this.scrapeAction(targetUrl);
+                    await this.scrapeAction(domain, targetUrl);
                     requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
@@ -93,23 +96,10 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         }
     }
 
-    /**
-     * Scrape action.
-     */
-    private async scrapeAction(url: string): Promise<void> {
-        const $ = await this.getStaticBody(
-            (this.catalog.hostId as HostDocumentModel).domain,
-            url
-        );
-
-        if (!$) {
-            return;
-        }
-
-        await this.handleSuccessRequest($);
-    }
-
-    private async handleSuccessRequest($: CheerioStatic): Promise<void> {
+    protected async handleSuccess(
+        $: CheerioStatic,
+        args?: any[]
+    ): Promise<void> {
         let newDetailUrlList = ScrapeBase.extractData(
             $,
             this.catalog.locator.detailUrl,
@@ -178,5 +168,9 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             `Scrape detail URL -> CID: ${this.catalog._id} - Execute time: ${executeTime} - Complete`
         ).show();
         await new ScrapeRawData(this.catalog).start();
+    }
+
+    protected async handleFailed(args?: any[]): Promise<void> {
+        return Promise.resolve(undefined);
     }
 }
