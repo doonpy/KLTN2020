@@ -17,11 +17,17 @@ const CAUSE = {
 
 const corsOptionsDelegate = (req: Request, callback: Function): void => {
     const whiteList = process.env.CORS_WHITE_LIST!.split(';');
+    const isEnable = Number(process.env.CORS_ENABLE) === 1;
     const corsOptions: CorsOptions = {
         origin: (
             origin: string | undefined,
             originCallback: Function
         ): void => {
+            if (!isEnable) {
+                originCallback(null, true);
+                return;
+            }
+
             if (whiteList.indexOf(origin!) !== -1) {
                 originCallback(null, true);
             } else {
