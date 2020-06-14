@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 import {
     VisualAdministrativeWardApiModel,
     VisualAdministrativeWardDocumentModel,
@@ -9,7 +9,7 @@ import {
 } from '../../administrative/district/interface';
 
 export interface VisualSummaryDistrictWardDocumentModel
-    extends CommonDocumentModel {
+    extends DocumentModelBase {
     districtId: number | VisualAdministrativeDistrictDocumentModel;
     wardId: number | VisualAdministrativeWardDocumentModel;
     summaryAmount: number;
@@ -20,7 +20,7 @@ export interface VisualSummaryDistrictWardDocumentModel
     }>;
 }
 
-export interface VisualSummaryDistrictWardApiModel extends CommonApiModel {
+export interface VisualSummaryDistrictWardApiModel extends ApiModelBase {
     district: VisualAdministrativeDistrictApiModel | number | null;
     ward: VisualAdministrativeWardApiModel | number | null;
     summaryAmount: number | null;

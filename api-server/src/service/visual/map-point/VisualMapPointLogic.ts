@@ -19,9 +19,6 @@ export default class VisualMapPointLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualMapPointLogic}
-     */
     public static getInstance(): VisualMapPointLogic {
         if (!this.instance) {
             this.instance = new VisualMapPointLogic();
@@ -29,11 +26,6 @@ export default class VisualMapPointLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualMapPointDocumentModel} input
-     *
-     * @return {VisualMapPointApiModel}
-     */
     public convertToApiResponse({
         _id,
         districtId,

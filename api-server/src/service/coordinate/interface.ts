@@ -1,30 +1,17 @@
 import {
-    CommonApiModel,
-    CommonDocumentModel,
+    ApiModelBase,
+    DocumentModelBase,
     CommonLogicBaseInterface,
 } from '@service/interface';
 
-export interface CoordinateApiModel extends CommonApiModel {
-    location: string | null;
+export interface CoordinateApiModel extends ApiModelBase {
+    locations: string[] | null;
     lat: number | null;
     lng: number | null;
 }
 
-export interface CoordinateDocumentModel extends CommonDocumentModel {
-    location: string;
+export interface CoordinateDocumentModel extends DocumentModelBase {
+    locations: string[];
     lat: number;
     lng: number;
-}
-
-export interface CoordinateLogicInterface
-    extends CommonLogicBaseInterface<
-        CoordinateDocumentModel,
-        CoordinateApiModel
-    > {
-    /**
-     * @param {string} location
-     *
-     * @return {Promise<CoordinateDocumentModel>}
-     */
-    getByLocation(location: string): Promise<CoordinateDocumentModel>;
 }

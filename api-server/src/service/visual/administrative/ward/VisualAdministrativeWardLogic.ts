@@ -17,9 +17,6 @@ export default class VisualAdministrativeWardLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeWardLogic}
-     */
     public static getInstance(): VisualAdministrativeWardLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeWardLogic();
@@ -27,11 +24,6 @@ export default class VisualAdministrativeWardLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeWardDocumentModel} document
-     *
-     * @return {VisualAdministrativeWardDocumentModel}
-     */
     public async populateDocument(
         document: VisualAdministrativeWardDocumentModel
     ): Promise<VisualAdministrativeWardDocumentModel> {
@@ -40,11 +32,6 @@ export default class VisualAdministrativeWardLogic extends ServiceLogicBase<
             .execPopulate();
     }
 
-    /**
-     * @param {VisualAdministrativeWardDocumentModel} input
-     *
-     * @return {VisualAdministrativeWardApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

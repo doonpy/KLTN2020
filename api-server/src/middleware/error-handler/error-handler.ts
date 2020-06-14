@@ -8,11 +8,6 @@ import {
 import CommonLanguage from '@common/language';
 import Wording from './wording';
 
-/**
- * @param input
- *
- * @return {string} inputString
- */
 const convertToString = (
     input: Array<{ [key: string]: string | number }>
 ): string => {
@@ -65,12 +60,6 @@ const convertToString = (
 
 /**
  * Catch 404 and forward to error handler
- *
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
- *
- * @return {void}
  */
 export const notFoundRoute = (
     req: Request,
@@ -93,13 +82,6 @@ export const notFoundRoute = (
 
 /**
  * Error handler
- *
- * @param error
- * @param {Request} req
- * @param {Response} res
- * @param {NextFunction} next
- *
- * @return {void}
  */
 export const errorHandler = (
     { statusCode, message, cause, stack, input }: ExceptionCustomize,

@@ -8,10 +8,6 @@ export default class CheckerDate extends CheckerBase {
         super();
     }
 
-    /**
-     * @param paramName
-     * @param input
-     */
     public check(paramName: string, input: object): void {
         const value = this.getValue(paramName, input);
 

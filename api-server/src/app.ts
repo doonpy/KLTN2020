@@ -39,9 +39,6 @@ export default class App {
 
     /**
      * Start server
-     *
-     * @param middlewareArray
-     * @param controllerArray
      */
     public start(
         middlewareArray: any[],
@@ -55,8 +52,6 @@ export default class App {
 
     /**
      * Bind middleware
-     *
-     * @param middlewareArray
      */
     private bindMiddleware(middlewareArray: any[]): void {
         middlewareArray.forEach((middleware: any): void => {
@@ -66,8 +61,6 @@ export default class App {
 
     /**
      * Bind routes
-     *
-     * @param routes
      */
     private bindRoutes(routes: ServiceControllerBase[]): void {
         routes.forEach((controller: ServiceControllerBase): void => {

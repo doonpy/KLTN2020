@@ -1,6 +1,6 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 
-export interface PatternApiModel extends CommonApiModel {
+export interface PatternApiModel extends ApiModelBase {
     sourceUrl: string | null;
     mainLocator: {
         propertyType: string | null;
@@ -26,7 +26,7 @@ export interface PatternApiModel extends CommonApiModel {
         | null;
 }
 
-export interface PatternDocumentModel extends CommonDocumentModel {
+export interface PatternDocumentModel extends DocumentModelBase {
     sourceUrl: string;
     mainLocator: {
         propertyType: string;

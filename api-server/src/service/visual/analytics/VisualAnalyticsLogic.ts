@@ -15,9 +15,6 @@ export default class VisualAnalyticsLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualAnalyticsLogic}
-     */
     public static getInstance(): VisualAnalyticsLogic {
         if (!this.instance) {
             this.instance = new VisualAnalyticsLogic();
@@ -25,11 +22,6 @@ export default class VisualAnalyticsLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualAnalyticsDocumentModel} input
-     *
-     * @return {VisualAnalyticsApiModel}
-     */
     public convertToApiResponse({
         _id,
         month,

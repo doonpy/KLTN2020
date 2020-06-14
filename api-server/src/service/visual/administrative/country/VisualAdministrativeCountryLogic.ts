@@ -15,9 +15,6 @@ export default class VisualAdministrativeCountryLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeCountryLogic}
-     */
     public static getInstance(): VisualAdministrativeCountryLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeCountryLogic();
@@ -25,11 +22,6 @@ export default class VisualAdministrativeCountryLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeCountryDocumentModel} input
-     *
-     * @return {VisualAdministrativeCountryApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

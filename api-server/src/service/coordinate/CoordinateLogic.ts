@@ -1,23 +1,17 @@
 import ServiceLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
-import {
-    CoordinateApiModel,
-    CoordinateDocumentModel,
-    CoordinateLogicInterface,
-} from './interface';
+import { CoordinateApiModel, CoordinateDocumentModel } from './interface';
 
-export default class CoordinateLogic
-    extends ServiceLogicBase<CoordinateDocumentModel, CoordinateApiModel>
-    implements CoordinateLogicInterface {
+export default class CoordinateLogic extends ServiceLogicBase<
+    CoordinateDocumentModel,
+    CoordinateApiModel
+> {
     private static instance: CoordinateLogic;
 
     constructor() {
         super(Model);
     }
 
-    /**
-     * @return {CoordinateLogic}
-     */
     public static getInstance(): CoordinateLogic {
         if (!this.instance) {
             this.instance = new CoordinateLogic();
@@ -26,27 +20,9 @@ export default class CoordinateLogic
         return this.instance;
     }
 
-    /**
-     * @param {string} location
-     *
-     * @return Promise<CoordinateDocumentModel>
-     */
-    public async getByLocation(
-        location: string
-    ): Promise<CoordinateDocumentModel> {
-        return (await Model.findOne({
-            location: location.trim(),
-        }).exec()) as CoordinateDocumentModel;
-    }
-
-    /**
-     * @param {CoordinateDocumentModel}
-     *
-     * @return {CoordinateApiModel}
-     */
     public convertToApiResponse({
         _id,
-        location,
+        locations,
         lat,
         lng,
         cTime,
@@ -54,7 +30,7 @@ export default class CoordinateLogic
     }: CoordinateDocumentModel): CoordinateApiModel {
         return {
             id: _id ?? null,
-            location: location ?? null,
+            locations: locations ?? null,
             lat: lat ?? null,
             lng: lng ?? null,
             createAt: cTime ?? null,

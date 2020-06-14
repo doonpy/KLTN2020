@@ -25,9 +25,6 @@ const PRICE_UNIT_PATTERN = {
 
 /**
  * Convert acreage value to meter
- * @param {number} value
- * @param {string} fromUnit
- * @return {number} value
  */
 export const convertAcreageValueToMeter = (
     value: number,
@@ -54,9 +51,6 @@ export const convertAcreageValueToMeter = (
 
 /**
  * Convert acreage value to kilometer
- * @param {number} value
- * @param {string} fromUnit
- * @return {number} value
  */
 export const convertAcreageValueToKilometer = (
     value: number,
@@ -83,9 +77,6 @@ export const convertAcreageValueToKilometer = (
 
 /**
  * Convert price value by unit
- * @param {number} value
- * @param {string} fromUnit
- * @return {number} returnValue
  */
 export const convertPriceValueToK = (
     value: number,
@@ -111,9 +102,6 @@ export const convertPriceValueToK = (
 
 /**
  * Get valid data from patterns
- *
- * @param data
- * @param patterns
  */
 const getValidDataFromPatterns = (data: string, patterns: RegExp[]): string => {
     let result = '';
@@ -128,10 +116,6 @@ const getValidDataFromPatterns = (data: string, patterns: RegExp[]): string => {
     return result;
 };
 
-/**
- * @param data
- * @param type
- */
 const convertToEnum = (data: string, type: 'price' | 'acreage'): number => {
     switch (type) {
         case 'acreage':
@@ -164,10 +148,6 @@ const convertToEnum = (data: string, type: 'price' | 'acreage'): number => {
 
 /**
  * Handle price data to price object in raw data schema
- *
- * @param priceData
- * @param transactionType
- * @param acreageValue
  */
 export const priceHandler = (
     priceData: string,
@@ -257,10 +237,7 @@ export const priceHandler = (
 };
 
 /**
- * Handle price data to price object in raw data schema
- *
- * @param acreageData
- */
+ * Handle price data to price object in raw data schema*/
 export const acreageHandler = (acreageData: string) => {
     let value = Number(
         getValidDataFromPatterns(acreageData, [VALUE_PATTERN]) || NaN

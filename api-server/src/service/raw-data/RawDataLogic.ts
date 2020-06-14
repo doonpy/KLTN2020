@@ -26,9 +26,6 @@ export default class RawDataLogic
         super(Model);
     }
 
-    /**
-     * @return {RawDataLogic}
-     */
     public static getInstance(): RawDataLogic {
         if (!this.instance) {
             this.instance = new RawDataLogic();
@@ -37,11 +34,6 @@ export default class RawDataLogic
         return this.instance;
     }
 
-    /**
-     * @param {string} propertyTypeData
-     *
-     * @return {number} index
-     */
     public getPropertyTypeIndex(propertyTypeData: string): number {
         const propertyType:
             | number
@@ -58,22 +50,12 @@ export default class RawDataLogic
         return propertyType;
     }
 
-    /**
-     * @param {object | undefined} conditions
-     *
-     * @return {number}
-     */
     public async countDocumentsWithConditions(
         conditions?: object
     ): Promise<number> {
         return Model.countDocuments(conditions || {}).exec();
     }
 
-    /**
-     * @param {RawDataDocumentModel}
-     *
-     * @return {RawDataApiModel}
-     */
     public convertToApiResponse({
         _id,
         transactionType,

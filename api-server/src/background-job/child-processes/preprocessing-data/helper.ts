@@ -18,10 +18,6 @@ export type AddressProperties = {
 
 /**
  * Get address properties from origin address
- *
- * @param {string} address
- *
- * @return {AddressProperties}
  */
 export const getAddressProperties = async (
     address: string
@@ -79,12 +75,6 @@ export const getAddressProperties = async (
     };
 };
 
-/**
- * @param _id
- * @param address
- *
- * @return { districtId: number, wardId: number }
- */
 export const getDistrictIdAndWardId = async ({
     _id,
     address,

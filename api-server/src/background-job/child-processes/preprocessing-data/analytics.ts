@@ -6,8 +6,6 @@ import ConsoleConstant from '@util/console/constant';
 
 /**
  * Handle visualization analytics data
- *
- * @param {RawDataDocumentModel} input
  */
 const handleVisualizationAnalytics = async ({
     _id,

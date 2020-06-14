@@ -4,12 +4,6 @@ import CheckerBase from './CheckerBase';
 import CheckerWording from './wording';
 
 export default class CheckerLanguage extends CheckerBase {
-    /**
-     * @param {string} paramName
-     * @param {object | string | null} input
-     *
-     * @return void
-     */
     public check(paramName: string, input: object): void {
         const value = this.getValue(paramName, input);
 

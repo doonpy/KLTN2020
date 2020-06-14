@@ -23,11 +23,6 @@ const detailUrlLogic = DetailUrlLogic.getInstance();
 const rawDataLogic = RawDataLogic.getInstance();
 let script: AsyncGenerator;
 
-/**
- * @param _id
- * @param isExtracted
- * @private
- */
 const _deleteDuplicateData = async ({
     _id,
     isExtracted,
@@ -88,8 +83,6 @@ const deleteDuplicateData = async (): Promise<void> => {
 
 /**
  * Delete raw data have invalid address
- *
- * @param {RawDataDocumentModel} rawData
  */
 const _deleteInvalidAddressData = async (
     rawData: RawDataDocumentModel

@@ -17,9 +17,6 @@ export default class VisualAdministrativeProvinceLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeProvinceLogic}
-     */
     public static getInstance(): VisualAdministrativeProvinceLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeProvinceLogic();
@@ -27,11 +24,6 @@ export default class VisualAdministrativeProvinceLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeProvinceDocumentModel} input
-     *
-     * @return {VisualAdministrativeProvinceApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

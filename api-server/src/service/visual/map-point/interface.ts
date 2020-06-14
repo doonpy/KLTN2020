@@ -1,4 +1,4 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 import {
     VisualAdministrativeDistrictApiModel,
     VisualAdministrativeDistrictDocumentModel,
@@ -16,7 +16,7 @@ export interface MapPoint {
     timeUnit?: string[];
 }
 
-export interface VisualMapPointDocumentModel extends CommonDocumentModel {
+export interface VisualMapPointDocumentModel extends DocumentModelBase {
     districtId: number | VisualAdministrativeDistrictDocumentModel;
     wardId: number | VisualAdministrativeWardDocumentModel;
     lat: number;
@@ -28,7 +28,7 @@ export interface VisualMapPointDocumentModel extends CommonDocumentModel {
     }>;
 }
 
-export interface VisualMapPointApiModel extends CommonApiModel {
+export interface VisualMapPointApiModel extends ApiModelBase {
     district: number | VisualAdministrativeDistrictApiModel | null;
     ward: number | VisualAdministrativeWardApiModel | null;
     lat: number | null;

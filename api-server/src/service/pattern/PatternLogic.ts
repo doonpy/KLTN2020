@@ -12,9 +12,6 @@ export default class PatternLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {PatternLogic}
-     */
     public static getInstance(): PatternLogic {
         if (!this.instance) {
             this.instance = new PatternLogic();
@@ -23,11 +20,6 @@ export default class PatternLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {PatternDocumentModel}
-     *
-     * @return {PatternApiModel}
-     */
     public convertToApiResponse({
         _id,
         sourceUrl,

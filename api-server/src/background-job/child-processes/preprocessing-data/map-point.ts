@@ -12,10 +12,6 @@ import { getDistrictIdAndWardId } from '@background-job/child-processes/preproce
 
 /**
  * Add visualization data for map point
- *
- * @param {number} districtId
- * @param {number} wardId
- * @param {RawDataDocumentModel} rawData
  */
 const handleVisualizationMapPoint = async (
     districtId: number,

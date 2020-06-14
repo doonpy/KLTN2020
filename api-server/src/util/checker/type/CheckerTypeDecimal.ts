@@ -3,11 +3,6 @@ import CheckerTypeBase from './CheckerTypeBase';
 import CheckerWording from '../wording';
 
 export default class CheckerTypeDecimal extends CheckerTypeBase {
-    /**
-     * @param paramName
-     * @param value
-     */
-
     public checkType(paramName: string, value: any): void {
         if (!Number(value)) {
             throw {

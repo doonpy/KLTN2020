@@ -5,10 +5,6 @@ import CheckerWording from '../wording';
 const NUMERIC_CHARACTER_PATTERN = RegExp(/^-?\d+$/);
 
 export default class CheckerTypeInteger extends CheckerTypeBase {
-    /**
-     * @param paramName
-     * @param value
-     */
     public checkType(paramName: string, value: any): void {
         if (
             !NUMERIC_CHARACTER_PATTERN.test(value) ||

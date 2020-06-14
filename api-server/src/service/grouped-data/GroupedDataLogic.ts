@@ -14,9 +14,6 @@ export default class GroupedDataLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {GroupedDataLogic}
-     */
     public static getInstance(): GroupedDataLogic {
         if (!this.instance) {
             this.instance = new GroupedDataLogic();
@@ -25,11 +22,6 @@ export default class GroupedDataLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {GroupedDataDocumentModel}
-     *
-     * @return {GroupedDataApiModel}
-     */
     public convertToApiResponse({
         _id,
         items,

@@ -1,11 +1,10 @@
-import { CommonApiModel, CommonDocumentModel } from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 import {
     VisualAdministrativeDistrictApiModel,
     VisualAdministrativeDistrictDocumentModel,
 } from '../../administrative/district/interface';
 
-export interface VisualSummaryDistrictDocumentModel
-    extends CommonDocumentModel {
+export interface VisualSummaryDistrictDocumentModel extends DocumentModelBase {
     districtId: number | VisualAdministrativeDistrictDocumentModel;
     summaryAmount: number;
     summary: Array<{
@@ -15,7 +14,7 @@ export interface VisualSummaryDistrictDocumentModel
     }>;
 }
 
-export interface VisualSummaryDistrictApiModel extends CommonApiModel {
+export interface VisualSummaryDistrictApiModel extends ApiModelBase {
     district: VisualAdministrativeDistrictApiModel | number | null;
     summaryAmount: number | null;
     summary: Array<{

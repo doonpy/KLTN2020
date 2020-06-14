@@ -1,15 +1,5 @@
 /**
  * Return aggregation query for get all
-
- * @param minLat
- * @param maxLat
- * @param minLng
- * @param maxLng
- * @param minAcreage
- * @param maxAcreage
- * @param minPrice
- * @param maxPrice
- * @param transactionTypeAndPropertyTypeAggregations
  */
 export const getAggregationForGetAll = (
     minLat: number,

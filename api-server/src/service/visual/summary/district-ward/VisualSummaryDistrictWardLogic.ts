@@ -19,9 +19,6 @@ export default class VisualSummaryDistrictWardLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualSummaryDistrictWardLogic}
-     */
     public static getInstance(): VisualSummaryDistrictWardLogic {
         if (!this.instance) {
             this.instance = new VisualSummaryDistrictWardLogic();
@@ -29,11 +26,6 @@ export default class VisualSummaryDistrictWardLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualSummaryDistrictWardDocumentModel}
-     *
-     * @return {VisualSummaryDistrictWardApiModel}
-     */
     public convertToApiResponse({
         _id,
         districtId,

@@ -179,20 +179,12 @@ export default class GroupData {
         this.isSuspense = false;
     }
 
-    /**
-     * @return {boolean}
-     */
     public isProcessSuspense(): boolean {
         return this.isSuspense;
     }
 
     /**
      * Get similar score between two raw data document.
-     *
-     * @param {RawDataDocumentModel} firstRawData
-     * @param {RawDataDocumentModel} secondRawData
-     *
-     * @return {number} totalPoint
      */
     private getSimilarScore(
         firstRawData: RawDataDocumentModel,
@@ -233,11 +225,6 @@ export default class GroupData {
 
     /**
      * Calculate price distance score
-     *
-     * @param {RawDataDocumentModel} firstTarget
-     * @param {RawDataDocumentModel} secondTarget
-     *
-     * @return {number} points
      */
     private calculatePriceScore(
         firstTarget: RawDataDocumentModel,
@@ -266,12 +253,6 @@ export default class GroupData {
 
     /**
      * Calculate string attribute score
-     *
-     * @param {RawDataDocumentModel} firstTarget
-     * @param {RawDataDocumentModel} secondTarget
-     * @param {'title' | 'address' | 'describe'} type
-     *
-     * @return {number} points
      */
     private calculateStringAttributeScore(
         firstTarget: RawDataDocumentModel,
@@ -294,12 +275,6 @@ export default class GroupData {
         }
     }
 
-    /**
-     * @param startTime
-     * @param transactionType
-     * @param propertyType
-     * @param type
-     */
     private async finishAction(
         startTime: [number, number],
         transactionType: number,

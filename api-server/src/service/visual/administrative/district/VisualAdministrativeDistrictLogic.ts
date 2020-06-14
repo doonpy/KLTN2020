@@ -17,9 +17,6 @@ export default class VisualAdministrativeDistrictLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {VisualAdministrativeDistrictLogic}
-     */
     public static getInstance(): VisualAdministrativeDistrictLogic {
         if (!this.instance) {
             this.instance = new VisualAdministrativeDistrictLogic();
@@ -27,11 +24,6 @@ export default class VisualAdministrativeDistrictLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {VisualAdministrativeDistrictDocumentModel} input
-     *
-     * @return {VisualAdministrativeDistrictApiModel}
-     */
     public convertToApiResponse({
         _id,
         name,

@@ -1,19 +1,11 @@
 import { RequestPromiseOptions } from 'request-promise';
-import { Response } from 'request';
 import ResponseStatusCode from '@common/response-status-code';
 import { sendRequest } from '../request';
-import { BingMapGeocodeResponse } from './interface';
+import { BingMapGeocodeResponse, MapBoxGeocodeResponse } from './interface';
 
-/**
- * @param {string} queryAddress
- * @param {object} requestOptions
- *
- * @return {Promise<Response>}
- */
-export const getGeocode = async (
-    queryAddress: string,
+const initRequestOptions = (
     requestOptions?: RequestPromiseOptions
-): Promise<BingMapGeocodeResponse | undefined> => {
+): RequestPromiseOptions => {
     let requestOptionsDefault: RequestPromiseOptions = {
         method: 'GET',
         headers: {
@@ -28,8 +20,19 @@ export const getGeocode = async (
         requestOptionsDefault = requestOptions;
     }
 
+    return requestOptionsDefault;
+};
+
+/**
+ * Get geocode from Bing service
+ */
+export const getGeocodeByBingMap = async (
+    queryAddress: string,
+    customizeRequestOptions?: RequestPromiseOptions
+): Promise<BingMapGeocodeResponse | undefined> => {
+    const requestOptions = initRequestOptions(customizeRequestOptions);
+
     const BING_API_KEYS = [
-        'ApMeVn2de85sCgrhbvSG99dRStsusJyOmUePGowvPzJdEWjsIkEWP0Y1Jz__FZ_h',
         'Ahk4IGiU-0Qm-DTdqSh7ZbpEjK8su_dwM3OjNOZH4LTyxeQCeoIUwIaHkHhOKy4I',
         'AoaVtDLGAZ68iSaMergzDJxEdg1YlOyWrpcuCvgAqPPp2DmP9jtKEYaBwam_VOgB',
         'AoyJIwQPfyz9521x4S2aKFk8JjG6sQhQpKULdJKDpHhVPW9o09u9elaxRxatKZtl',
@@ -53,7 +56,7 @@ export const getGeocode = async (
     ];
     let result: BingMapGeocodeResponse;
     let apiKey = BING_API_KEYS.shift();
-    requestOptionsDefault.qs = {
+    requestOptions.qs = {
         key: apiKey,
         query: queryAddress,
         suppressStatus: true,
@@ -62,18 +65,43 @@ export const getGeocode = async (
     const endPoint = `https://dev.virtualearth.net/REST/v1/Locations`;
     result = await sendRequest<BingMapGeocodeResponse>(
         endPoint,
-        requestOptionsDefault
+        requestOptions
     );
     while (result.statusCode !== ResponseStatusCode.OK) {
         apiKey = BING_API_KEYS.shift();
         if (!apiKey) {
             return undefined;
         }
-        requestOptionsDefault.qs.key = apiKey;
+        requestOptions.qs.key = apiKey;
         result = await sendRequest<BingMapGeocodeResponse>(
             endPoint,
-            requestOptionsDefault
+            requestOptions
         );
     }
     return result;
+};
+
+/**
+ * Get geocode from Mapbox service
+ */
+export const getGeocodeByMapBox = async (
+    queryAddress: string,
+    customizeRequestOptions?: RequestPromiseOptions
+): Promise<MapBoxGeocodeResponse | undefined> => {
+    const requestOptions = initRequestOptions(customizeRequestOptions);
+    const apiKey =
+        'pk.eyJ1IjoiZG9vbnB5IiwiYSI6ImNrYW9xd3hjcTB3a3Eycm1vNHhzY250c2sifQ.Ti9ktyjr224DM5eDsXftfQ';
+    requestOptions.qs = {
+        access_token: apiKey,
+        limit: 1,
+    };
+    const endPoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURI(
+        queryAddress
+    )}.json`;
+
+    try {
+        return sendRequest<MapBoxGeocodeResponse>(endPoint, requestOptions);
+    } catch (error) {
+        return undefined;
+    }
 };

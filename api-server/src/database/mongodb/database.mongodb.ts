@@ -45,11 +45,6 @@ export default class DatabaseMongodb {
         return this.instance;
     }
 
-    /**
-     * @param connString
-     * @param options
-     * @private
-     */
     private async _connect(
         connString: string,
         options: ConnectionOptions

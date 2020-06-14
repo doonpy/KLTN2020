@@ -32,7 +32,7 @@ const visualizationDataHandler = async (): Promise<void> => {
     while (documents.length > 0) {
         for (const rawData of documents) {
             try {
-                if (!rawData.status.isMapPoint) {
+                if (!rawData.status.isMapPoint && rawData.coordinateId) {
                     await mapPointPhase(rawData);
                     rawData.status.isMapPoint = true;
                 }

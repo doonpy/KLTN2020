@@ -38,3 +38,18 @@ export interface BingMapGeocodeResponse {
     statusDescription: string;
     traceId: string;
 }
+
+export interface MapBoxGeocodeResponse {
+    features:
+        | [
+              {
+                  geometry: {
+                      type: 'Point';
+                      coordinates: [106.76889, 10.88222];
+                  };
+                  [extraProperties: string]: any;
+              }
+          ]
+        | [];
+    [extraProperties: string]: any;
+}

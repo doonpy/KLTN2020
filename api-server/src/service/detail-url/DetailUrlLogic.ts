@@ -14,9 +14,6 @@ export default class DetailUrlLogic extends ServiceLogicBase<
         super(Model);
     }
 
-    /**
-     * @return {DetailUrlLogic}
-     */
     public static getInstance(): DetailUrlLogic {
         if (!this.instance) {
             this.instance = new DetailUrlLogic();
@@ -25,11 +22,6 @@ export default class DetailUrlLogic extends ServiceLogicBase<
         return this.instance;
     }
 
-    /**
-     * @param {DetailUrlDocumentModel}
-     *
-     * @return {DetailUrlApiModel}
-     */
     public convertToApiResponse({
         _id,
         catalogId,

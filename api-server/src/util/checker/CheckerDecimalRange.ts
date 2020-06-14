@@ -13,10 +13,6 @@ export default class CheckerDecimalRange extends CheckerBase {
         this.maxRange = maxRange || Number.MAX_SAFE_INTEGER;
     }
 
-    /**
-     * @param paramName
-     * @param input
-     */
     public check(paramName: string, input: object): void {
         const value = this.getValue(paramName, input);
 
@@ -47,20 +43,10 @@ export default class CheckerDecimalRange extends CheckerBase {
         }
     }
 
-    /**
-     * @param value
-     *
-     * @return boolean
-     */
     private checkMinRange(value: number): boolean {
         return value >= this.minRange;
     }
 
-    /**
-     * @param value
-     *
-     * @return boolean
-     */
     private checkMaxRange(value: number): boolean {
         if (!this.maxRange) {
             return true;

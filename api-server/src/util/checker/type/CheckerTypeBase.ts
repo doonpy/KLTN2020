@@ -1,10 +1,6 @@
 import CheckerBase from '../CheckerBase';
 
 export default abstract class CheckerTypeBase extends CheckerBase {
-    /**
-     * @param paramName
-     * @param input
-     */
     public check(paramName: string, input: object): void {
         const value = this.getValue(paramName, input);
 
@@ -14,11 +10,6 @@ export default abstract class CheckerTypeBase extends CheckerBase {
 
         this.checkType(paramName, value);
     }
-
-    /**
-     * @param paramName
-     * @param value
-     */
 
     public abstract checkType(paramName: string, value: any): void;
 }

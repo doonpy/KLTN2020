@@ -50,8 +50,6 @@ export default class ScrapeRawData extends ScrapeBase {
 
     /**
      * Start raw data scraper
-     *
-     * @return {Promise<void>}
      */
     public async start(): Promise<void> {
         try {
@@ -119,8 +117,6 @@ export default class ScrapeRawData extends ScrapeBase {
 
     /**
      * Scrape action with loop
-     *
-     * @return {void}
      */
     private async scrapeAction(
         detailUrl: DetailUrlDocumentModel
@@ -138,12 +134,6 @@ export default class ScrapeRawData extends ScrapeBase {
         }
     }
 
-    /**
-     * @param {CheerioStatic} $
-     * @param {DetailUrlDocumentModel} currentDetailUrlDocument
-     *
-     * @return {Promise<void>}
-     */
     protected async handleSuccessRequest(
         $: CheerioStatic,
         currentDetailUrlDocument: DetailUrlDocumentModel
@@ -256,11 +246,6 @@ export default class ScrapeRawData extends ScrapeBase {
         }
     }
 
-    /**
-     * @param { [key: string]: any } input
-     *
-     * @return {boolean}
-     */
     private isHasEmptyProperty(input: { [key: string]: any }): boolean {
         const propertyList: string[] = [
             'transactionType',
@@ -306,9 +291,6 @@ export default class ScrapeRawData extends ScrapeBase {
         return false;
     }
 
-    /**
-     * @param currentDetailUrlDocument
-     */
     protected async handleFailedRequest(
         currentDetailUrlDocument: DetailUrlDocumentModel
     ): Promise<void> {
@@ -334,19 +316,6 @@ export default class ScrapeRawData extends ScrapeBase {
         }
     }
 
-    /**
-     *
-     * @return RawDataDocumentModel
-     * @param detailUrlId
-     * @param propertyTypeData
-     * @param postDateData
-     * @param titleData
-     * @param describeData
-     * @param priceData
-     * @param acreageData
-     * @param addressData
-     * @param othersData
-     */
     private handleScrapedData(
         detailUrlId: number,
         propertyTypeData: string,

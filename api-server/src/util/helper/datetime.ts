@@ -1,8 +1,3 @@
-/**
- * @param value
- * @param format
- * @param delimiter
- */
 export const convertStringToDate = (
     value: string,
     format: string,
@@ -35,12 +30,6 @@ export const convertStringToDate = (
     );
 };
 
-/**
- * @param expectTime
- * @param isUtcTime
- *
- * @return boolean
- */
 export const isExactTime = (expectTime: Date, isUtcTime = false): boolean => {
     const currentTime = new Date();
 
@@ -68,10 +57,6 @@ export const isExactTime = (expectTime: Date, isUtcTime = false): boolean => {
 
 /**
  * Convert seconds to time
- *
- * @param totalSeconds
- *
- * @return string
  */
 export const convertTotalSecondsToTime = (totalSeconds: number): string => {
     let totalSecondsClone = totalSeconds;
