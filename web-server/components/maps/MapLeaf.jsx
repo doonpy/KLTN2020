@@ -1,21 +1,18 @@
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
-import {
-    Map,
-    TileLayer,
-    CircleMarker,
-    Popup,
-    Tooltip,
-    ZoomControl,
-} from 'react-leaflet';
+import { Map, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import Control from 'react-leaflet-control';
 import debounce from 'lodash.debounce';
+import { useSelector, useDispatch } from 'react-redux';
 import useDarkMode from 'use-dark-mode';
 import { FaRegListAlt } from 'react-icons/fa';
+import PropTypes from 'prop-types';
 import LegendMap from './LegendMap';
 import LoadingIcon from '../LoadingIcon';
+import MapLeafLeftSide from './MapLeafLeftSide';
 import { ZOOM_LEVEL, MAP_MODE } from '../../util/constants';
 import useMapPoint from '../../hooks/use-map-point';
+import * as action from '../../store/color-point/actions';
 import {
     numberWithCommas,
     setRadiusByArea,
@@ -34,6 +31,7 @@ const TitleTypeMap = ({ type }) => {
         </h1>
     );
 };
+
 const LoadingMap = ({ isLoading }) => {
     return isLoading ? (
         <div
@@ -44,14 +42,18 @@ const LoadingMap = ({ isLoading }) => {
         </div>
     ) : null;
 };
-export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
+export default function MapLeaf({ propertyStage, transactionStage }) {
+    const map = useRef();
+
     const { value: hasActiveDarkMode } = useDarkMode();
 
-    const map = useRef();
+    const { modeMap } = useSelector((state) => state.modeMap);
+    const dispatch = useDispatch();
     const centerPosition = {
         lat: 10.753715262326807,
         lng: 106.7129197816087,
     };
+
     const [latlngBounds, setBounds] = useState({
         minLat: 10.213570791008156,
         maxLat: 11.292894361058085,
@@ -59,13 +61,13 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         maxLng: 107.42156982421876,
     });
     const [zoomLevel, setZoomLevel] = useState(10);
-    const [onLegend, setOnLegend] = useState(false);
+    const [onLegend, setOnLegend] = useState(true);
 
     const area = ZOOM_LEVEL.find((w) => w.zoom === zoomLevel);
     const { data, isValidating } = useMapPoint({
         variables: {
-            minAcreage: tabMap === MAP_MODE.AREA_MODE ? area.minArea : 1,
-            minPrice: tabMap === MAP_MODE.PRICE_MODE ? area.minPrice : 1,
+            minAcreage: modeMap === MAP_MODE.AREA_MODE ? area.minArea : 1,
+            minPrice: modeMap === MAP_MODE.PRICE_MODE ? area.minPrice : 1,
             minLat: latlngBounds.minLat,
             maxLat: latlngBounds.maxLat,
             minLng: latlngBounds.minLng,
@@ -86,9 +88,12 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         setZoomLevel(event.target.getZoom());
     }, 500);
 
+    const resetState = () => {
+        setZoomLevel(10);
+    };
     return (
         <div className="relative" style={{ height: 'calc(100vh - 135px)' }}>
-            <TitleTypeMap type={tabMap} />
+            <TitleTypeMap type={modeMap} />
             <LoadingMap isLoading={!data && isValidating} />
             <Map
                 ref={map}
@@ -98,7 +103,7 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                 doubleClickZoom={false}
                 attributionControl={false}
                 minZoom={10}
-                scrollWheelZoom={false}
+                scrollWheelZoom
                 style={{
                     color: 'white',
                     height: '100%',
@@ -108,11 +113,12 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                     {onLegend ? (
                         <LegendMap
                             zoomLevel={zoomLevel}
-                            typeLegend={tabMap}
+                            typeLegend={modeMap}
                             setOnLegend={setOnLegend}
                         />
                     ) : null}
                 </Control>
+                <MapLeafLeftSide resetState={resetState} />
                 <Control position="bottomright">
                     <FaRegListAlt
                         size={24}
@@ -129,72 +135,99 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
                     />
                 ) : (
                     <TileLayer
-                        attribution='&amp;&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                        attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+                        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
                     />
                 )}
 
                 {data?.mapPoints &&
-                    data.mapPoints.map((c) => {
+                    data.mapPoints?.map((c) => {
                         return c.points.map((point) => {
                             return (
                                 <CircleMarker
+                                    onMouseOver={(e) => {
+                                        const { color } = e.target.options;
+                                        dispatch(action.getColorPoint(color));
+                                    }}
+                                    onFocus={(e) => {
+                                        const { color } = e.target.options;
+                                        dispatch(action.getColorPoint(color));
+                                    }}
+                                    onMouseOut={() => {
+                                        dispatch(action.getColorPoint(''));
+                                    }}
+                                    onBlur={() => {
+                                        dispatch(action.getColorPoint(''));
+                                    }}
                                     color={
-                                        tabMap === MAP_MODE.AREA_MODE
+                                        modeMap === MAP_MODE.AREA_MODE
                                             ? setColorByArea(
                                                   point.rawDataset[0].acreage
                                               )
                                             : setColorByPrice(
-                                                  point.rawDataset[0].price
+                                                  point.rawDataset[0].price /
+                                                      1000000000
                                               )
                                     }
                                     key={point.rawDataset[0].rawDataId}
-                                    fillOpacity={0.7}
+                                    fillOpacity={1}
                                     stroke={false}
                                     center={[c.lat, c.lng]}
                                     radius={
-                                        tabMap === MAP_MODE.AREA_MODE
+                                        modeMap === MAP_MODE.AREA_MODE
                                             ? setRadiusByArea(
                                                   point.rawDataset[0].acreage
-                                              ) *
-                                              ((zoomLevel * 10) / 200)
+                                              )
                                             : setRadiusByPrice(
-                                                  point.rawDataset[0].price
+                                                  point.rawDataset[0].price /
+                                                      1000000000
                                               )
                                     }
                                 >
-                                    <Tooltip>Ấn để xem chi tiết</Tooltip>
+                                    <Tooltip>{`Ấn để xem ${modeMap}`}</Tooltip>
                                     <Popup closeButton>
                                         <div className="flex flex-col cursor-pointer">
-                                            {point.rawDataset.map((rawdata) => {
-                                                return (
-                                                    <div
-                                                        key={rawdata.rawDataId}
-                                                    >
-                                                        <Link
-                                                            href="/detail/[id]"
-                                                            as={`/detail/${rawdata.rawDataId}`}
-                                                        >
-                                                            <ul className="list-inside list-disc">
-                                                                {tabMap ===
-                                                                MAP_MODE.AREA_MODE ? (
-                                                                    <li className="text-blue-400 py-2 hover:text-blue-600">
-                                                                        {`Diện tích: ${numberWithCommas(
-                                                                            rawdata.acreage
-                                                                        )} m2 `}
-                                                                    </li>
-                                                                ) : (
-                                                                    <li className="text-blue-400 py-2">
-                                                                        {`Giá: ${numberWithCommas(
-                                                                            rawdata.price
-                                                                        )} vnđ `}
-                                                                    </li>
-                                                                )}
-                                                            </ul>
-                                                        </Link>
-                                                    </div>
-                                                );
-                                            })}
+                                            {/* <div></div> */}
+                                            <div
+                                                className="overflow-auto h-full w-full"
+                                                style={{ maxHeight: '100px' }}
+                                            >
+                                                {point.rawDataset.map(
+                                                    (rawdata) => {
+                                                        return (
+                                                            <div
+                                                                key={
+                                                                    rawdata.rawDataId
+                                                                }
+                                                            >
+                                                                <Link
+                                                                    href="/detail/[id]"
+                                                                    as={`/detail/${rawdata.rawDataId}`}
+                                                                >
+                                                                    <ul className="list-inside list-disc">
+                                                                        {modeMap ===
+                                                                        MAP_MODE.AREA_MODE ? (
+                                                                            <li className="text-blue-400 py-2 hover:text-blue-600">
+                                                                                {`Diện tích: ${numberWithCommas(
+                                                                                    rawdata.acreage
+                                                                                )} m2 `}
+                                                                            </li>
+                                                                        ) : (
+                                                                            <li className="text-blue-400 py-2">
+                                                                                {`Giá: ${numberWithCommas(
+                                                                                    rawdata.price
+                                                                                )} ${
+                                                                                    rawdata.currency
+                                                                                } `}
+                                                                            </li>
+                                                                        )}
+                                                                    </ul>
+                                                                </Link>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )}
+                                            </div>
                                         </div>
                                     </Popup>
                                 </CircleMarker>
@@ -205,3 +238,13 @@ export default function MapLeaf({ propertyStage, transactionStage, tabMap }) {
         </div>
     );
 }
+TitleTypeMap.propTypes = {
+    type: PropTypes.string.isRequired,
+};
+LoadingMap.propTypes = {
+    isLoading: PropTypes.bool.isRequired,
+};
+MapLeaf.propTypes = {
+    transactionStage: PropTypes.number,
+    propertyStage: PropTypes.number,
+};

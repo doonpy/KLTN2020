@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import fs from 'fs';
 import path from 'path';
 import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import Loading from '../components/Loading';
 import PageLayout from '../components/page-layout';
 import PageMap from '../components/page-map';
@@ -77,7 +78,7 @@ const Home = ({ mapStaticJSON }) => {
             summaryData.cache[_synmetricKey] = dataSummaryWard;
             return dataSummaryWard;
         }
-        const dataSummaryDistrict = dataDistrict?.summaryDistrict.map((w) => {
+        const dataSummaryDistrict = dataDistrict?.summaryDistrict?.map((w) => {
             const summary =
                 tabKey !== 0
                     ? w.summary.filter((sum) => sum.transactionType === tabKey)
@@ -110,6 +111,7 @@ const Home = ({ mapStaticJSON }) => {
                                 <div className="w-9/12 h-full">
                                     <div className="h-full flex flex-col">
                                         <PageMap
+                                            setTabmap={setTabmap}
                                             tabMap={tabMap}
                                             mapStaticJSON={mapStaticJSON}
                                             transactionStage={transactionStage}
@@ -143,4 +145,7 @@ const Home = ({ mapStaticJSON }) => {
     );
 };
 
+Home.propTypes = {
+    mapStaticJSON: PropTypes.arrayOf(PropTypes.any).isRequired,
+};
 export default Home;

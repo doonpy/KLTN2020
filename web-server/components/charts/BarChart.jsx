@@ -4,6 +4,7 @@ import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import { BINDING_OPTIONS } from '../../util/bindingOptions';
+// import { DARK_UNICA } from '../../themes/dark-unica';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -13,15 +14,16 @@ if (typeof Highcharts === 'object') {
 const BarChart = ({ data }) => {
     const [barChartOption, setBarChartOption] = useState({
         ...BINDING_OPTIONS,
+
         chart: {
             type: 'bar',
             backgroundColor: 'rgba(0,0,0,0)',
             height: '75%',
         },
         title: {
-            text: 'Tổng bất động sản',
+            text: 'Biểu đồ thể hiện số lượng bất động sản theo từng khu vực',
             style: {
-                fontSize: '12px',
+                fontSize: '10px',
                 color: '#ffffff',
             },
         },
@@ -45,7 +47,7 @@ const BarChart = ({ data }) => {
             },
             labels: {
                 style: {
-                    fontSize: '6px',
+                    // fontSize: '6px',
                     color: '#ffffff',
                 },
             },

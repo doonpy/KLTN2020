@@ -55,16 +55,9 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
                 verticalAlign: 'bottom',
             },
         },
-        // plotOptions: {
-        //     map: {
-        //         states: {
-        //             hover: {
-        //                 borderColor: '#EEDD66',
-        //                 borderWidth: 3,
-        //             },
-        //         },
-        //     },
-        // },
+        plotOptions: {
+            map: {},
+        },
         legend: {
             layout: 'vertical',
             align: 'right',

@@ -2,8 +2,8 @@ import React from 'react';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import { wrapper } from '../store/store';
-import '../styles/global.css';
 import 'nprogress/nprogress.css';
+import '../styles/global.css';
 
 NProgress.configure({
     minimum: 0.3,

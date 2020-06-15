@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TypeTransactionBox from './TypeTransactionBox';
 import TotalByDistrictBarChart from './ChartWrapper/TotalByDistrictBarChart';
 import { TRANSATION_TYPE } from '../util/constants';
@@ -22,7 +23,7 @@ const TabButton = ({ title, onClick, isActive }) => {
     );
 };
 const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
-    const dataChart = dataSummary.map((data) => {
+    const dataChart = dataSummary?.map((data) => {
         const dataFilter = [data.name, data.summaryAmount];
         return dataFilter;
     });
@@ -59,5 +60,8 @@ const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
         </div>
     );
 };
-
+PageRight.propTypes = {
+    transactionStage: PropTypes.number,
+    dataSummary: PropTypes.arrayOf(PropTypes.any),
+};
 export default PageRight;

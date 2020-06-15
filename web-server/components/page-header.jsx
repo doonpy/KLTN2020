@@ -28,20 +28,20 @@ const PageHeader = () => {
                     <div className="flex flex-col">
                         <div className="dark:text-gray-100 text-gray-900 text-base xl:text-xl no-underline hover:no-underline font-bold flex items-center pt-4">
                             <FaChartArea className="mr-2" size={32} />
-                            Analysis of Real Estate data HoChiMinh City
+                            Phân tích dữ liệu bất động sản Thành Phố Hồ Chí Minh
                         </div>
 
                         <ul className="list-reset lg:flex flex-1 items-center px-4 md:px-0">
                             <MenuItemHeader href="/">
                                 <FaHome />
                                 <span className="pb-1 md:pb-0 text-sm ml-2">
-                                    Home
+                                    Trang chủ
                                 </span>
                             </MenuItemHeader>
                             <MenuItemHeader href="/analytics">
                                 <FaChartBar />
                                 <span className="pb-1 md:pb-0 text-sm ml-2">
-                                    Analytics
+                                    Phân tích
                                 </span>
                             </MenuItemHeader>
                         </ul>

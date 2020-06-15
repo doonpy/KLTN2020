@@ -2,7 +2,6 @@
 @tailwind base;
 @tailwind components;
 /* purgecss end ignore */
-
 @import 'spinner.css';
 @import 'legend.css';
 

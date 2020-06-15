@@ -1,3 +1,7 @@
+export const UNIT_OF_MEASURE = {
+    SQUARE_METER: 'm2',
+    VND: 'VND',
+};
 export const PROPERTY_TYPE_NUMBER = [
     {
         id: 0,

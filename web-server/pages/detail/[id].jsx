@@ -28,14 +28,14 @@ const DetailRealEstate = ({ id, initialData }) => {
     const { data } = useRawDataDetail(id, initialData);
     return (
         <PageLayout>
-            <div className="m-0 m-auto max-w-screen-xl pt-12">
+            <div
+                className="m-0 m-auto max-w-screen-xl pt-12"
+                style={{ height: 'calc(100vh - 100px)' }}
+            >
                 <h1 className="uppercase font-semibold text-xl text-blue-400 text-3xl">
                     {data.rawData.title}
                 </h1>
-                <div
-                    className="text-white w-full flex"
-                    style={{ height: 'calc(100vh - 100px)' }}
-                >
+                <div className="text-white w-full flex">
                     <div className="w-1/2 mr-6">
                         <div>
                             <div className="flex">

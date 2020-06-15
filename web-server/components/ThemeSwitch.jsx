@@ -40,7 +40,6 @@ const ThemeSwitch = () => {
             offColor="#f7fafc"
             onHandleColor="#f7fafc"
             offHandleColor="#000a1f"
-            // className="text-white dark:text-gray-100 border border-gray-400 dark:border-dark-primary border-solid dark:border-0"
         />
     );
 };

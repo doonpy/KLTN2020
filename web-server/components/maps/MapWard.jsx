@@ -13,8 +13,6 @@ if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
-
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const MapWard = ({ dataWard, setStage }) => {
     const [wardMap, setWardMap] = useState(null);
     const { mapKey } = useSelector((state) => state.mapKey);
@@ -28,7 +26,7 @@ const MapWard = ({ dataWard, setStage }) => {
             }
         }
         fetchData();
-    }, []);
+    }, [mapKey]);
 
     const backToMapDistrict = async () => {
         await dispatch(action.fetchMapKey('full'));
@@ -63,9 +61,14 @@ const MapWard = ({ dataWard, setStage }) => {
         },
         plotOptions: {
             map: {
-                states: {
-                    hover: {
-                        color: '#EEDD66',
+                // states: {
+                //     hover: {
+                //         color: '#EEDD66',
+                //     },
+                // },
+                events: {
+                    click: (e) => {
+                        // console.log(e);
                     },
                 },
             },
