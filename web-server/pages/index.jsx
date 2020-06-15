@@ -10,7 +10,7 @@ import PageLeft from '../components/page-left';
 import PageRight from '../components/page-right';
 import useDistrict from '../hooks/use-district';
 import useWard from '../hooks/use-ward';
-import { TRANSATION_TYPE, MAP_MODE } from '../util/constants';
+import { TRANSATION_TYPE, MAP_MODE, MAP_KEY_HCM } from '../util/constants';
 
 export async function getStaticProps() {
     const postsDirectory = path.join(
@@ -50,7 +50,7 @@ const Home = ({ mapStaticJSON }) => {
         if (summaryData.cache[_synmetricKey])
             return summaryData.cache[_synmetricKey];
 
-        if (key !== 'full') {
+        if (key !== MAP_KEY_HCM) {
             const dataWardFilter = dataWard?.summaryDistrictWard.filter(
                 (w) => w.district.code === key
             );

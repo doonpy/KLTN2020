@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import LoadingIcon from '../LoadingIcon';
 import { fetchMapData } from '../../util/api/fetchMapJson';
 import * as action from '../../store/map-key/actions';
+import { MAP_KEY_HCM } from '../../util/constants';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -20,7 +21,7 @@ const MapWard = ({ dataWard, setStage }) => {
 
     useEffect(() => {
         async function fetchData() {
-            if (mapKey !== 'full') {
+            if (mapKey !== MAP_KEY_HCM) {
                 const response = await fetchMapData(mapKey);
                 setWardMap(response);
             }
@@ -29,7 +30,7 @@ const MapWard = ({ dataWard, setStage }) => {
     }, [mapKey]);
 
     const backToMapDistrict = async () => {
-        await dispatch(action.fetchMapKey('full'));
+        await dispatch(action.fetchMapKey(MAP_KEY_HCM));
         setStage(0);
     };
 
@@ -61,14 +62,9 @@ const MapWard = ({ dataWard, setStage }) => {
         },
         plotOptions: {
             map: {
-                // states: {
-                //     hover: {
-                //         color: '#EEDD66',
-                //     },
-                // },
                 events: {
                     click: (e) => {
-                        // console.log(e);
+                        // TODO
                     },
                 },
             },

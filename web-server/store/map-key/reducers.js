@@ -1,7 +1,8 @@
 import { GET_MAP_KEY } from './actions';
+import { MAP_KEY_HCM } from '../../util/constants';
 
 const initialState = {
-    mapKey: 'full',
+    mapKey: MAP_KEY_HCM,
 };
 
 export const mapKeyReducer = (state = initialState, action) => {

@@ -127,3 +127,5 @@ export const MAP_MODE = {
     DENSITY_MODE: 'mật độ',
     POSITION_MODE: 'vị trí',
 };
+
+export const MAP_KEY_HCM = 'full';

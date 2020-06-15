@@ -8,6 +8,7 @@ import useDarkMode from 'use-dark-mode';
 import { FaRegListAlt } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import LegendMap from './LegendMap';
+import styled from 'styled-components';
 import LoadingIcon from '../LoadingIcon';
 import MapLeafLeftSide from './MapLeafLeftSide';
 import { ZOOM_LEVEL, MAP_MODE } from '../../util/constants';
@@ -15,12 +16,23 @@ import useMapPoint from '../../hooks/use-map-point';
 import * as action from '../../store/color-point/actions';
 import {
     numberWithCommas,
-    setRadiusByArea,
-    setRadiusByPrice,
     setColorByArea,
     setColorByPrice,
 } from '../../util/services/helper';
 
+const StyledPop = styled(Popup)`
+    border-radius: 0;
+    z-index: 9999;
+    position: 'relative';
+    .leaflet-popup-content-wrapper {
+        border-radius: 0;
+        background-color: rgb(25, 25, 25);
+        border-width: 1px;
+    }
+    .leaflet-popup-tip-container {
+        visibility: hidden;
+    }
+`;
 const TitleTypeMap = ({ type }) => {
     return (
         <h1
@@ -43,8 +55,8 @@ const LoadingMap = ({ isLoading }) => {
     ) : null;
 };
 export default function MapLeaf({ propertyStage, transactionStage }) {
+    const MIN_ACREAGE = 1;
     const map = useRef();
-
     const { value: hasActiveDarkMode } = useDarkMode();
 
     const { modeMap } = useSelector((state) => state.modeMap);
@@ -66,8 +78,10 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
     const area = ZOOM_LEVEL.find((w) => w.zoom === zoomLevel);
     const { data, isValidating } = useMapPoint({
         variables: {
-            minAcreage: modeMap === MAP_MODE.AREA_MODE ? area.minArea : 1,
-            minPrice: modeMap === MAP_MODE.PRICE_MODE ? area.minPrice : 1,
+            minAcreage:
+                modeMap === MAP_MODE.AREA_MODE ? area.minArea : MIN_ACREAGE,
+            minPrice:
+                modeMap === MAP_MODE.PRICE_MODE ? area.minPrice : MIN_ACREAGE,
             minLat: latlngBounds.minLat,
             maxLat: latlngBounds.maxLat,
             minLng: latlngBounds.minLng,
@@ -135,8 +149,8 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                     />
                 ) : (
                     <TileLayer
-                        attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-                        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+                        attribution='&amp;&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                     />
                 )}
 
@@ -173,21 +187,11 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                     fillOpacity={1}
                                     stroke={false}
                                     center={[c.lat, c.lng]}
-                                    radius={
-                                        modeMap === MAP_MODE.AREA_MODE
-                                            ? setRadiusByArea(
-                                                  point.rawDataset[0].acreage
-                                              )
-                                            : setRadiusByPrice(
-                                                  point.rawDataset[0].price /
-                                                      1000000000
-                                              )
-                                    }
+                                    radius={7}
                                 >
                                     <Tooltip>{`Ấn để xem ${modeMap}`}</Tooltip>
-                                    <Popup closeButton>
+                                    <StyledPop>
                                         <div className="flex flex-col cursor-pointer">
-                                            {/* <div></div> */}
                                             <div
                                                 className="overflow-auto h-full w-full"
                                                 style={{ maxHeight: '100px' }}
@@ -200,36 +204,48 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                                                     rawdata.rawDataId
                                                                 }
                                                             >
-                                                                <Link
-                                                                    href="/detail/[id]"
-                                                                    as={`/detail/${rawdata.rawDataId}`}
-                                                                >
-                                                                    <ul className="list-inside list-disc">
-                                                                        {modeMap ===
-                                                                        MAP_MODE.AREA_MODE ? (
-                                                                            <li className="text-blue-400 py-2 hover:text-blue-600">
-                                                                                {`Diện tích: ${numberWithCommas(
-                                                                                    rawdata.acreage
-                                                                                )} m2 `}
-                                                                            </li>
-                                                                        ) : (
-                                                                            <li className="text-blue-400 py-2">
-                                                                                {`Giá: ${numberWithCommas(
-                                                                                    rawdata.price
-                                                                                )} ${
-                                                                                    rawdata.currency
-                                                                                } `}
-                                                                            </li>
-                                                                        )}
-                                                                    </ul>
-                                                                </Link>
+                                                                <div>
+                                                                    <Link
+                                                                        href="/detail/[id]"
+                                                                        as={`/detail/${rawdata.rawDataId}`}
+                                                                    >
+                                                                        <ul className="list-inside list-disc">
+                                                                            {modeMap ===
+                                                                            MAP_MODE.AREA_MODE ? (
+                                                                                <li className="text-white py-2 hover:text-blue-600">
+                                                                                    {`Diện tích: ${numberWithCommas(
+                                                                                        rawdata.acreage
+                                                                                    )} m2 `}
+                                                                                </li>
+                                                                            ) : (
+                                                                                <li className="text-white py-2 hover:text-blue-600">
+                                                                                    {`Giá: ${numberWithCommas(
+                                                                                        rawdata.price
+                                                                                    )} ${
+                                                                                        rawdata.currency
+                                                                                    }${
+                                                                                        Array.isArray(
+                                                                                            rawdata.timeUnit
+                                                                                        ) &&
+                                                                                        rawdata
+                                                                                            .timeUnit
+                                                                                            .length !==
+                                                                                            0
+                                                                                            ? `/${rawdata.timeUnit[0]}`
+                                                                                            : ''
+                                                                                    }`}
+                                                                                </li>
+                                                                            )}
+                                                                        </ul>
+                                                                    </Link>
+                                                                </div>
                                                             </div>
                                                         );
                                                     }
                                                 )}
                                             </div>
                                         </div>
-                                    </Popup>
+                                    </StyledPop>
                                 </CircleMarker>
                             );
                         });
