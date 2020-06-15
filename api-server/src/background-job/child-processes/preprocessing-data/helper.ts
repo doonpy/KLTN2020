@@ -1,5 +1,3 @@
-import { RawDataDocumentModel } from '@service/raw-data/interface';
-import RawDataLogic from '@service/raw-data/RawDataLogic';
 import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/interface';
 import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/interface';
 import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/VisualAdministrativeDistrictLogic';
@@ -40,7 +38,7 @@ export const getAddressProperties = async (
             .match(RegExp(districtPattern, 'ig'))
             ?.shift() || '';
     const district = await visualAdministrativeDistrictLogic.getOne({
-        name: districtName,
+        name: { $regex: RegExp(`^${districtName}$`, 'ig') },
     });
 
     if (!district) {
@@ -61,9 +59,12 @@ export const getAddressProperties = async (
     const wardName =
         addressClone
             .replace(districtName, '')
-            .match(RegExp(wardPattern))
+            .match(RegExp(wardPattern, 'ig'))
             ?.shift() || '';
-    const ward = await visualAdministrativeWardLogic.getOne({ name: wardName });
+    const ward = await visualAdministrativeWardLogic.getOne({
+        name: { $regex: RegExp(`^${wardName}$`, 'ig') },
+        districtId: district._id,
+    });
 
     if (!ward) {
         return { district };
@@ -73,29 +74,4 @@ export const getAddressProperties = async (
         district,
         ward,
     };
-};
-
-export const getDistrictIdAndWardId = async ({
-    _id,
-    address,
-}: RawDataDocumentModel): Promise<IdAddressProperties> => {
-    const rawDataLogic = RawDataLogic.getInstance();
-    const addressProperties = await getAddressProperties(address);
-    const districtId: number | undefined = addressProperties.district?._id;
-    if (!districtId) {
-        await rawDataLogic.delete(_id);
-        throw new Error(
-            `Preprocessing data - RID: ${_id} - District ID is invalid - ${address}`
-        );
-    }
-
-    const wardId: number | undefined = addressProperties.ward?._id;
-    if (!wardId) {
-        await rawDataLogic.delete(_id);
-        throw new Error(
-            `Preprocessing data - RID: ${_id} - Ward ID is invalid - ${address}`
-        );
-    }
-
-    return { districtId, wardId };
 };

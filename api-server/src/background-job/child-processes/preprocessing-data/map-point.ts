@@ -8,7 +8,28 @@ import VisualMapPointLogic from '@service/visual/map-point/VisualMapPointLogic';
 import { CoordinateDocumentModel } from '@service/coordinate/interface';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
-import { getDistrictIdAndWardId } from '@background-job/child-processes/preprocessing-data/helper';
+import {
+    getAddressProperties,
+    IdAddressProperties,
+} from '@background-job/child-processes/preprocessing-data/helper';
+
+const getDistrictIdAndWardId = async ({
+    _id,
+    address,
+}: RawDataDocumentModel): Promise<IdAddressProperties> => {
+    const addressProperties = await getAddressProperties(address);
+    const districtId: number | undefined = addressProperties.district?._id;
+    if (!districtId) {
+        throw new Error(`District ID is invalid - ${address}`);
+    }
+
+    const wardId: number | undefined = addressProperties.ward?._id;
+    if (!wardId) {
+        throw new Error(`Ward ID is invalid - ${address}`);
+    }
+
+    return { districtId, wardId };
+};
 
 /**
  * Add visualization data for map point
