@@ -1,7 +1,8 @@
-import { connect, Mongoose, set } from 'mongoose';
-import ConsoleLog from '@util/console/console.log';
-import ConsoleConstant from '@util/console/console.constant';
+import { connect, Mongoose, set, ConnectionOptions } from 'mongoose';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
 import DatabaseWording from '@database/database.wording';
+import { upperCaseFirstCharacter } from '@util/helper/string';
 
 export default class DatabaseMongodb {
     private static instance: DatabaseMongodb | undefined;
@@ -44,33 +45,38 @@ export default class DatabaseMongodb {
         return this.instance;
     }
 
+    private async _connect(
+        connString: string,
+        options: ConnectionOptions
+    ): Promise<void> {
+        this.connection = await connect(connString, options);
+    }
+
     /**
      * Open connection to database
      */
     public async connect(): Promise<void> {
+        const connString = `mongodb://${this.dbHost}:${this.dbPort}/${this.dbName}`;
+        const options: ConnectionOptions = {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false,
+            useCreateIndex: true,
+            connectTimeoutMS: 10000,
+        };
+
+        if (process.env.NODE_ENV === 'production') {
+            options.user = this.username;
+            options.pass = this.password;
+            options.authSource = this.authDb;
+        }
+
         try {
-            const connString = `mongodb://${this.dbHost}:${this.dbPort}/${this.dbName}`;
-            const options: { [key: string]: any } = {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-                useFindAndModify: false,
-                useCreateIndex: true,
-            };
-
-            if (process.env.NODE_ENV === 'production') {
-                options.auth = { user: this.username, password: this.password };
-                options.authSource = this.authDb;
-            }
-
-            this.connection = await connect(connString, options);
-            new ConsoleLog(
-                ConsoleConstant.Type.INFO,
-                `Successful connection to (DB: ${this.dbName}).`
-            ).show();
+            await this._connect(connString, options);
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
-                DatabaseWording.CAUSE.DBC_1[0]
+                upperCaseFirstCharacter(DatabaseWording.CAUSE.DBC_1[1])
             ).show();
         }
     }

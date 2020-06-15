@@ -8,6 +8,8 @@ module.exports = {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         'react/display-name': 'off',
         '@typescript-eslint/ban-types': 'off',
+        '@typescript-eslint/array-type': 'off',
+        'node/no-missing-import': 'off',
     },
     overrides: [
         // DO NOT ADD MORE FILES TO THE IGNORE LIST

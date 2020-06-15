@@ -20,7 +20,7 @@ jobs:
 
       - name: Build the Docker image
         run: |
-          docker build -f ${{ matrix.node-version }}.dockerfile -t app .
+          docker build -f tools/docker/${{ matrix.node-version }}.dockerfile -t app .
 
       - name: Push to Docker Hub
         env:

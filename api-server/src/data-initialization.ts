@@ -1,22 +1,22 @@
 import './prepend';
-import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/visual.administrative.district.interface';
+import { VisualAdministrativeDistrictDocumentModel } from '@service/visual/administrative/district/interface';
 import countryData from '@util/data-initialization/countries.json';
 import provinceData from '@util/data-initialization/provinces.json';
 import districtData from '@util/data-initialization/districts.json';
 import wardData from '@util/data-initialization/wards.json';
-import ConsoleLog from '@util/console/console.log';
-import ConsoleConstant from '@util/console/console.constant';
-import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/visual.administrative.ward.interface';
-import { VisualAdministrativeCountryDocumentModel } from '@service/visual/administrative/country/visual.administrative.country.interface';
-import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/visual.administrative.district.logic';
-import VisualAdministrativeCountryLogic from '@service/visual/administrative/country/visual.administrative.country.logic';
-import VisualAdministrativeProvinceLogic from '@service/visual/administrative/province/visual.administrative.province.logic';
-import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/visual.administrative.ward.logic';
-import { VisualAdministrativeProvinceDocumentModel } from '@service/visual/administrative/province/visual.administrative.province.interface';
-import VisualSummaryDistrictLogic from '@service/visual/summary/district/visual.summary.district.logic';
-import VisualSummaryDistrictWardLogic from '@service/visual/summary/district-ward/visual.summary.district-ward.logic';
-import { VisualSummaryDistrictDocumentModel } from '@service/visual/summary/district/visual.summary.district.interface';
-import { VisualSummaryDistrictWardDocumentModel } from '@service/visual/summary/district-ward/visual.summary.district-ward.interface';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
+import { VisualAdministrativeWardDocumentModel } from '@service/visual/administrative/ward/interface';
+import { VisualAdministrativeCountryDocumentModel } from '@service/visual/administrative/country/interface';
+import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/VisualAdministrativeDistrictLogic';
+import VisualAdministrativeCountryLogic from '@service/visual/administrative/country/VisualAdministrativeCountryLogic';
+import VisualAdministrativeProvinceLogic from '@service/visual/administrative/province/VisualAdministrativeProvinceLogic';
+import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/VisualAdministrativeWardLogic';
+import { VisualAdministrativeProvinceDocumentModel } from '@service/visual/administrative/province/interface';
+import VisualSummaryDistrictLogic from '@service/visual/summary/district/VisualSummaryDistrictLogic';
+import VisualSummaryDistrictWardLogic from '@service/visual/summary/district-ward/VisualSummaryDistrictWardLogic';
+import { VisualSummaryDistrictDocumentModel } from '@service/visual/summary/district/interface';
+import { VisualSummaryDistrictWardDocumentModel } from '@service/visual/summary/district-ward/interface';
 
 let script: AsyncGenerator;
 const visualAdministrativeCountryLogic = VisualAdministrativeCountryLogic.getInstance();
@@ -39,7 +39,7 @@ const importData = async (): Promise<void> => {
     ).show();
     for (const item of countryData) {
         if (
-            !(await visualAdministrativeCountryLogic.isExisted({
+            !(await visualAdministrativeCountryLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -73,7 +73,7 @@ const importData = async (): Promise<void> => {
         )?._id;
 
         if (
-            !(await visualAdministrativeProvinceLogic.isExisted({
+            !(await visualAdministrativeProvinceLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -109,7 +109,7 @@ const importData = async (): Promise<void> => {
         )?._id;
 
         if (
-            !(await visualAdministrativeDistrictLogic.isExisted({
+            !(await visualAdministrativeDistrictLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -143,7 +143,7 @@ const importData = async (): Promise<void> => {
         )?._id;
 
         if (
-            !(await visualAdministrativeWardLogic.isExisted({
+            !(await visualAdministrativeWardLogic.isExists({
                 code: item.code,
             }))
         ) {
@@ -194,7 +194,7 @@ const initializeVisualData = async (): Promise<void> => {
         .documents;
     for (const district of districtList) {
         if (
-            !(await visualSummaryDistrictLogic.isExisted({
+            !(await visualSummaryDistrictLogic.isExists({
                 districtId: district._id,
             }))
         ) {
@@ -218,7 +218,7 @@ const initializeVisualData = async (): Promise<void> => {
         ).documents;
         for (const ward of wardList) {
             if (
-                !(await visualSummaryDistrictWardLogic.isExisted({
+                !(await visualSummaryDistrictWardLogic.isExists({
                     districtId: district._id,
                     wardId: ward._id,
                 }))
@@ -250,7 +250,7 @@ async function* generateScript() {
     await importData();
     yield 'Step 1: Initialize data';
 
-    await initializeVisualData();
+    // await initializeVisualData();
     process.exit(0);
     return 'Done';
 }

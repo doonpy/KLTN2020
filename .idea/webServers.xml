@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="4b44a334-c517-4728-837e-d89bdf8ea67c" name="pk2020" url="http://pk2020.tk">
+        <fileTransfer rootFolder="/home/pkroot" accessType="SFTP" host="pk2020.tk" port="22" sshConfigId="e449fd76-825f-4641-b292-92e0b2dfabbe" sshConfig="pkroot@pk2020.tk:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

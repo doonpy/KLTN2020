@@ -89,7 +89,7 @@
     "@types/mongoose": "^5.7.22",
     "@types/mongoose-auto-increment": "^5.0.33",
     "@types/mongoose-autopopulate": "^0.10.1",
-    "@types/node": "^13.13.10",
+    "@types/node": "^13.13.12",
     "@types/node-telegram-bot-api": "^0.40.3",
     "@types/react": "^16.9.35",
     "@types/request-promise": "^4.1.46",
