@@ -61,7 +61,9 @@ const handleVisualizationMapPoint = async (
     };
     if (transactionType === CommonConstant.TRANSACTION_TYPE[1].id) {
         newPoint.timeUnit =
-            CommonConstant.PRICE_TIME_UNIT[price.timeUnit].wording;
+            CommonConstant.PRICE_TIME_UNIT.find(
+                ({ id }) => price.timeUnit === id
+            )?.wording || [];
     }
 
     if (!visualMapPointDocument) {
