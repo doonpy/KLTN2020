@@ -53,7 +53,10 @@ export default class GroupData {
                 propertyType,
             },
         });
-
+        const representOfGroupedDataset = await this.getRepresent(
+            transactionType,
+            propertyType
+        );
         rawDataLoop: for (const rawData of rawDataset.documents) {
             if (this.isSuspense) {
                 await this.finishAction(
@@ -65,34 +68,6 @@ export default class GroupData {
                 return;
             }
             rawData.status.isGrouped = true;
-            const aggregations = [
-                {
-                    $lookup: {
-                        from: 'raw_datas',
-                        localField: 'items',
-                        foreignField: '_id',
-                        as: 'items',
-                    },
-                },
-                {
-                    $project: {
-                        represent: { $arrayElemAt: ['$items', 0] },
-                    },
-                },
-                {
-                    $match: {
-                        $and: [
-                            {
-                                'represent.transactionType': transactionType,
-                            },
-                            { 'represent.propertyType': propertyType },
-                        ],
-                    },
-                },
-            ];
-            const representOfGroupedDataset = await this.groupedDataLogic.getWithAggregation<
-                AggregationGroupDataResult
-            >(aggregations);
 
             for (const item of representOfGroupedDataset) {
                 const similarScore = this.getSimilarScore(
@@ -105,7 +80,7 @@ export default class GroupData {
                         ConsoleConstant.Type.ERROR,
                         `Group data -> RID: ${rawData._id} -> GID: ${item._id} - Error: Over fitting.`
                     ).show();
-                    await this.rawDataLogic.update(rawData._id, rawData);
+                    await rawData.save();
                     continue rawDataLoop;
                 }
 
@@ -116,10 +91,7 @@ export default class GroupData {
 
                     groupData.items.push(rawData._id);
                     try {
-                        await Promise.all([
-                            this.groupedDataLogic.update(item._id, groupData),
-                            this.rawDataLogic.update(rawData._id, rawData),
-                        ]);
+                        await Promise.all([groupData.save(), rawData.save()]);
                         new ConsoleLog(
                             ConsoleConstant.Type.INFO,
                             `Group data -> RID: ${rawData._id} -> GID: ${item._id}`
@@ -147,9 +119,14 @@ export default class GroupData {
                     this.groupedDataLogic.create(({
                         items: [rawData._id],
                     } as unknown) as GroupedDataDocumentModel),
-                    this.rawDataLogic.update(rawData._id, rawData),
+                    rawData.save(),
                 ])
             )[0];
+            const newRepresent: AggregationGroupDataResult = {
+                _id: groupedDataCreated._id,
+                represent: rawData,
+            };
+            representOfGroupedDataset.push(newRepresent);
 
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
@@ -163,6 +140,43 @@ export default class GroupData {
             propertyType,
             FinishActionType.COMPLETE
         );
+    }
+
+    /**
+     * Get represent of each item in grouped data
+     */
+    private async getRepresent(
+        transactionType: number,
+        propertyType: number
+    ): Promise<AggregationGroupDataResult[]> {
+        const aggregations = [
+            {
+                $lookup: {
+                    from: 'raw_datas',
+                    localField: 'items',
+                    foreignField: '_id',
+                    as: 'items',
+                },
+            },
+            {
+                $project: {
+                    represent: { $arrayElemAt: ['$items', 0] },
+                },
+            },
+            {
+                $match: {
+                    $and: [
+                        {
+                            'represent.transactionType': transactionType,
+                        },
+                        { 'represent.propertyType': propertyType },
+                    ],
+                },
+            },
+        ];
+        return this.groupedDataLogic.getWithAggregation<
+            AggregationGroupDataResult
+        >(aggregations);
     }
 
     /**
