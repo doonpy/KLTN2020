@@ -209,34 +209,36 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                                                         href="/detail/[id]"
                                                                         as={`/detail/${rawdata.rawDataId}`}
                                                                     >
-                                                                        <ul className="list-inside list-disc">
-                                                                            {modeMap ===
-                                                                            MAP_MODE.AREA_MODE ? (
-                                                                                <li className="text-white py-2 hover:text-blue-600">
-                                                                                    {`Diện tích: ${numberWithCommas(
-                                                                                        rawdata.acreage
-                                                                                    )} m2 `}
-                                                                                </li>
-                                                                            ) : (
-                                                                                <li className="text-white py-2 hover:text-blue-600">
-                                                                                    {`Giá: ${numberWithCommas(
-                                                                                        rawdata.price
-                                                                                    )} ${
-                                                                                        rawdata.currency
-                                                                                    }${
-                                                                                        Array.isArray(
-                                                                                            rawdata.timeUnit
-                                                                                        ) &&
-                                                                                        rawdata
-                                                                                            .timeUnit
-                                                                                            .length !==
-                                                                                            0
-                                                                                            ? `/${rawdata.timeUnit[0]}`
-                                                                                            : ''
-                                                                                    }`}
-                                                                                </li>
-                                                                            )}
-                                                                        </ul>
+                                                                        <a target="_blank">
+                                                                            <ul className="list-inside list-disc">
+                                                                                {modeMap ===
+                                                                                MAP_MODE.AREA_MODE ? (
+                                                                                    <li className="text-white py-2 hover:text-blue-600">
+                                                                                        {`Diện tích: ${numberWithCommas(
+                                                                                            rawdata.acreage
+                                                                                        )} m2 `}
+                                                                                    </li>
+                                                                                ) : (
+                                                                                    <li className="text-white py-2 hover:text-blue-600">
+                                                                                        {`Giá: ${numberWithCommas(
+                                                                                            rawdata.price
+                                                                                        )} ${
+                                                                                            rawdata.currency
+                                                                                        }${
+                                                                                            Array.isArray(
+                                                                                                rawdata.timeUnit
+                                                                                            ) &&
+                                                                                            rawdata
+                                                                                                .timeUnit
+                                                                                                .length !==
+                                                                                                0
+                                                                                                ? `/${rawdata.timeUnit[0]}`
+                                                                                                : ''
+                                                                                        }`}
+                                                                                    </li>
+                                                                                )}
+                                                                            </ul>
+                                                                        </a>
                                                                     </Link>
                                                                 </div>
                                                             </div>
