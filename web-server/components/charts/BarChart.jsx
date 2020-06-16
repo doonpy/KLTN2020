@@ -4,24 +4,26 @@ import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import { BINDING_OPTIONS } from '../../util/bindingOptions';
+// import { DARK_UNICA } from '../../themes/dark-unica';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
 
-const BarChart = ({ data, mapKey }) => {
+const BarChart = ({ data }) => {
     const [barChartOption, setBarChartOption] = useState({
         ...BINDING_OPTIONS,
+
         chart: {
-            type: 'column',
+            type: 'bar',
             backgroundColor: 'rgba(0,0,0,0)',
-            height: '70%',
+            height: '75%',
         },
         title: {
-            text: 'Tổng bất động sản',
+            text: 'Biểu đồ thể hiện số lượng bất động sản theo từng khu vực',
             style: {
-                fontSize: '12px',
+                fontSize: '10px',
                 color: '#ffffff',
             },
         },
@@ -39,13 +41,13 @@ const BarChart = ({ data, mapKey }) => {
             title: {
                 text: 'Số lượng (bất động sản)',
                 style: {
-                    fontSize: '6px',
+                    fontSize: '9px',
                     color: '#ffffff',
                 },
             },
             labels: {
                 style: {
-                    fontSize: '6px',
+                    // fontSize: '6px',
                     color: '#ffffff',
                 },
             },
@@ -85,7 +87,15 @@ const BarChart = ({ data, mapKey }) => {
     }, [data]);
     return (
         <div>
-            <HighchartsReact highcharts={Highcharts} options={barChartOption} />
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={barChartOption}
+                containerProps={{
+                    style: {
+                        maxHeight: '100%',
+                    },
+                }}
+            />
         </div>
     );
 };

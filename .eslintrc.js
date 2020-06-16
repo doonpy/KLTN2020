@@ -5,6 +5,8 @@ module.exports = {
     ],
     rules: {
         'prefer-const': 'warn',
+        '@typescript-eslint/explicit-module-boundary-types': 'off', //Turn off typescript for Javascript React
+        '@typescript-eslint/ban-types': 'off',
         '@typescript-eslint/array-type': 'off',
         'node/no-missing-import': 'off',
     },

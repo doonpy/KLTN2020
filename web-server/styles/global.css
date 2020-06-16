@@ -2,11 +2,11 @@
 @tailwind base;
 @tailwind components;
 /* purgecss end ignore */
-
 @import 'spinner.css';
 @import 'legend.css';
 
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;
 }
+
 @tailwind utilities;

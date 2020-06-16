@@ -1,5 +1,5 @@
 module.exports = {
-    important: true,
+    // important: true,
     purge: {
         enabled: true,
         content: [
@@ -9,6 +9,7 @@ module.exports = {
     },
     theme: {
         darkSelector: '.dark-mode',
+
         backgroundColor: (theme) => ({
             ...theme('colors'),
             dark: '#191919',

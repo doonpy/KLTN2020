@@ -1,3 +1,7 @@
+export const UNIT_OF_MEASURE = {
+    SQUARE_METER: 'm2',
+    VND: 'VND',
+};
 export const PROPERTY_TYPE_NUMBER = [
     {
         id: 0,
@@ -64,62 +68,64 @@ export const TRANSATION_TYPE = {
     SALE: 1,
     RENT: 2,
 };
-export const ACREAGE_BY_ZOOM_LEVEL = [
+export const ZOOM_LEVEL = [
     {
         zoom: 10,
         minArea: 50000,
-        minPrice: 392000000000,
+        minPrice: 5000000000000,
     },
     {
         zoom: 11,
         minArea: 10000,
-        minPrice: 39200000000,
+        minPrice: 1000000000000,
     },
     {
         zoom: 12,
         minArea: 5000,
-        minPrice: 3920000000,
+        minPrice: 500000000000,
     },
     {
         zoom: 13,
         minArea: 1000,
-        minPrice: 3920000000,
+        minPrice: 100000000000,
     },
     {
         zoom: 14,
         minArea: 800,
-        minPrice: 3920000000,
+        minPrice: 50000000000,
     },
     {
         zoom: 14,
         minArea: 500,
-        minPrice: 3920000000,
+        minPrice: 30000000000,
     },
     {
         zoom: 15,
         minArea: 100,
-        minPrice: 3920000000,
+        minPrice: 10000000000,
     },
     {
         zoom: 16,
         minArea: 1,
-        minPrice: 3920000000,
+        minPrice: 5000000000,
     },
     {
         zoom: 17,
         minArea: 1,
-        minPrice: 3920000000,
+        minPrice: 1000000000,
     },
     {
         zoom: 18,
         minArea: 1,
-        minPrice: 3920000000,
+        minPrice: 1,
     },
 ];
 
 export const MAP_MODE = {
-    AREA_MODE: 'Xem Diện tích',
-    PRICE_MODE: 'Xem Giá',
-    DENSITY_MODE: 'Xem mật độ',
-    POSITION_MODE: 'Xem vị trí',
+    AREA_MODE: 'diện tích',
+    PRICE_MODE: 'giá',
+    DENSITY_MODE: 'mật độ',
+    POSITION_MODE: 'vị trí',
 };
+
+export const MAP_KEY_HCM = 'full';

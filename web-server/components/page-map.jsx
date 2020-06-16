@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
+import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
 import RenderCompleted from '../hooks/use-mounted';
 import LoadingIcon from './LoadingIcon';
 import { PROPERTY_TYPE_NUMBER, MAP_MODE } from '../util/constants';
@@ -14,7 +16,8 @@ const MapWard = dynamic(() => import('./maps/MapWard'), {
     loading: () => <LoadingIcon />,
 });
 
-const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
+const PageMap = ({ mapStaticJSON, dataSummary, transactionStage }) => {
+    const { modeMap } = useSelector((state) => state.modeMap);
     const [stage, setStage] = useState(0);
     const [propertyStage, setProperty] = useState(PROPERTY_TYPE_NUMBER[0].id);
     const mapData = mapStaticJSON[0].content;
@@ -37,7 +40,7 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
         <div className="flex-1 flex relative">
             <div
                 className={
-                    tabMap !== MAP_MODE.DENSITY_MODE
+                    modeMap !== MAP_MODE.DENSITY_MODE
                         ? `bottom-0 left-0 w-full  border border-solid border-light-primary dark:border-primary absolute dark:bg-gray-900 bg-white`
                         : 'hidden'
                 }
@@ -61,12 +64,12 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
                     ))}
                 </div>
             </div>
-            {tabMap !== MAP_MODE.DENSITY_MODE ? (
+            {modeMap !== MAP_MODE.DENSITY_MODE ? (
                 <div className="w-full border-r border-light-primary dark:border-primary">
                     <div className="overflow-auto w-full">
                         {isMounted && (
                             <MapLeaf
-                                tabMap={tabMap}
+                                tabMap={modeMap}
                                 propertyStage={propertyStage}
                                 transactionStage={transactionStage}
                             />
@@ -74,7 +77,13 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
                     </div>
                 </div>
             ) : (
-                <div className="w-full h-full">
+                <div className="w-full h-full relative">
+                    {/* <div
+                        className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400, text-xs"
+                        style={{ zIndex: 9999, left: '35px', padding: '10px' }}
+                    >
+                        {` Bản đồ thể hiện ${tabMap} bất động sản`}
+                    </div> */}
                     {dataSummary &&
                         (stage === 0 ? (
                             <MapOverview
@@ -93,5 +102,10 @@ const PageMap = ({ mapStaticJSON, dataSummary, tabMap, transactionStage }) => {
         </div>
     );
 };
-
+// PageMap.propTypes = {
+//     mapStaticJSON: PropTypes.isRequired,
+//     dataSummary: PropTypes.isRequired,
+//     tabMap: PropTypes.isRequired,
+//     transactionStage: PropTypes.isRequired,
+// };
 export default PageMap;

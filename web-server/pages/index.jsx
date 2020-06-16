@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import fs from 'fs';
 import path from 'path';
 import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import Loading from '../components/Loading';
 import PageLayout from '../components/page-layout';
 import PageMap from '../components/page-map';
@@ -9,7 +10,7 @@ import PageLeft from '../components/page-left';
 import PageRight from '../components/page-right';
 import useDistrict from '../hooks/use-district';
 import useWard from '../hooks/use-ward';
-import { TRANSATION_TYPE, MAP_MODE } from '../util/constants';
+import { TRANSATION_TYPE, MAP_MODE, MAP_KEY_HCM } from '../util/constants';
 
 export async function getStaticProps() {
     const postsDirectory = path.join(
@@ -49,7 +50,7 @@ const Home = ({ mapStaticJSON }) => {
         if (summaryData.cache[_synmetricKey])
             return summaryData.cache[_synmetricKey];
 
-        if (key !== 'full') {
+        if (key !== MAP_KEY_HCM) {
             const dataWardFilter = dataWard?.summaryDistrictWard.filter(
                 (w) => w.district.code === key
             );
@@ -77,7 +78,7 @@ const Home = ({ mapStaticJSON }) => {
             summaryData.cache[_synmetricKey] = dataSummaryWard;
             return dataSummaryWard;
         }
-        const dataSummaryDistrict = dataDistrict?.summaryDistrict.map((w) => {
+        const dataSummaryDistrict = dataDistrict?.summaryDistrict?.map((w) => {
             const summary =
                 tabKey !== 0
                     ? w.summary.filter((sum) => sum.transactionType === tabKey)
@@ -110,6 +111,7 @@ const Home = ({ mapStaticJSON }) => {
                                 <div className="w-9/12 h-full">
                                     <div className="h-full flex flex-col">
                                         <PageMap
+                                            setTabmap={setTabmap}
                                             tabMap={tabMap}
                                             mapStaticJSON={mapStaticJSON}
                                             transactionStage={transactionStage}
@@ -143,4 +145,7 @@ const Home = ({ mapStaticJSON }) => {
     );
 };
 
+Home.propTypes = {
+    mapStaticJSON: PropTypes.arrayOf(PropTypes.any).isRequired,
+};
 export default Home;

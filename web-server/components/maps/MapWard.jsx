@@ -4,29 +4,33 @@ import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch, useSelector } from 'react-redux';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
+import PropTypes from 'prop-types';
 import LoadingIcon from '../LoadingIcon';
 import { fetchMapData } from '../../util/api/fetchMapJson';
 import * as action from '../../store/map-key/actions';
+import { MAP_KEY_HCM } from '../../util/constants';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
-
 const MapWard = ({ dataWard, setStage }) => {
     const [wardMap, setWardMap] = useState(null);
     const { mapKey } = useSelector((state) => state.mapKey);
     const dispatch = useDispatch();
 
-    const fetchData = async () => {
-        const res = await fetchMapData(mapKey);
-        setWardMap(res);
-    };
     useEffect(() => {
+        async function fetchData() {
+            if (mapKey !== MAP_KEY_HCM) {
+                const response = await fetchMapData(mapKey);
+                setWardMap(response);
+            }
+        }
         fetchData();
-    }, [fetchData]);
+    }, [mapKey]);
+
     const backToMapDistrict = async () => {
-        await dispatch(action.fetchMapKey('full'));
+        await dispatch(action.fetchMapKey(MAP_KEY_HCM));
         setStage(0);
     };
 
@@ -58,9 +62,9 @@ const MapWard = ({ dataWard, setStage }) => {
         },
         plotOptions: {
             map: {
-                states: {
-                    hover: {
-                        color: '#EEDD66',
+                events: {
+                    click: (e) => {
+                        // TODO
                     },
                 },
             },
@@ -135,5 +139,8 @@ const MapWard = ({ dataWard, setStage }) => {
         </>
     );
 };
-
+MapWard.propTypes = {
+    dataWard: PropTypes.array.isRequired,
+    setStage: PropTypes.func.isRequired,
+};
 export default MapWard;

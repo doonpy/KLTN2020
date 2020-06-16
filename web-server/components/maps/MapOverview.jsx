@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import Highcharts from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';
@@ -55,16 +55,9 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
                 verticalAlign: 'bottom',
             },
         },
-        // plotOptions: {
-        //     map: {
-        //         states: {
-        //             hover: {
-        //                 borderColor: '#EEDD66',
-        //                 borderWidth: 3,
-        //             },
-        //         },
-        //     },
-        // },
+        plotOptions: {
+            map: {},
+        },
         legend: {
             layout: 'vertical',
             align: 'right',
