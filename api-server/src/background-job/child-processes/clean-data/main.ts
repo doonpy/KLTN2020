@@ -11,7 +11,7 @@ import VisualAdministrativeProvinceLogic from '@service/visual/administrative/pr
 import VisualAdministrativeDistrictLogic from '@service/visual/administrative/district/VisualAdministrativeDistrictLogic';
 import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/VisualAdministrativeWardLogic';
 import { convertTotalSecondsToTime } from '@util/helper/datetime';
-import { CleanDataConstant } from '../constant';
+import { CleanDataConstant } from './constant';
 
 type AggregationGroupDataResult = {
     _id: string;
