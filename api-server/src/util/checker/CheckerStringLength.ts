@@ -13,7 +13,7 @@ export default class CheckerStringLength extends CheckerBase {
         this.maxRange = maxRange || Number.MAX_SAFE_INTEGER;
     }
 
-    public check(paramName: string, input: object): void {
+    public check(paramName: string, input: Record<string, any>): void {
         const value = this.getValue(paramName, input);
 
         if (!value) {

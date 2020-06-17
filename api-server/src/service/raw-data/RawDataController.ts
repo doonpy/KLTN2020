@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -184,9 +184,12 @@ export default class RawDataController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.rawDataLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const rawData = await this.rawDataLogic.getById(idBody);
             const responseBody = {
-                rawData: this.rawDataLogic.convertToApiResponse(rawData),
+                rawData: this.rawDataLogic.convertToApiResponse(rawData!),
             };
 
             ServiceControllerBase.sendResponse(
@@ -348,13 +351,16 @@ export default class RawDataController extends ServiceControllerBase {
 
             this.bodyValidator.validate(this.requestBody);
             this.priceValidator.validate(
-                (this.requestBody[this.PARAM_PRICE] as object) ?? {}
+                (this.requestBody[this.PARAM_PRICE] as Record<string, any>) ??
+                    {}
             );
             this.acreageValidator.validate(
-                (this.requestBody[this.PARAM_ACREAGE] as object) ?? {}
+                (this.requestBody[this.PARAM_ACREAGE] as Record<string, any>) ??
+                    {}
             );
             this.othersValidator.validate(
-                (this.requestBody[this.PARAM_OTHERS] as object) ?? {}
+                (this.requestBody[this.PARAM_OTHERS] as Record<string, any>) ??
+                    {}
             );
 
             const rawDataBody = (this
@@ -362,11 +368,11 @@ export default class RawDataController extends ServiceControllerBase {
             await DetailUrlLogic.getInstance().checkExisted({
                 [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId,
             });
-            const createdRawData = await this.rawDataLogic.create(
-                rawDataBody,
-                undefined,
-                [{ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId }]
-            );
+            const createdRawData = await this.rawDataLogic.create(rawDataBody, {
+                notExist: {
+                    [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId,
+                },
+            });
 
             ServiceControllerBase.sendResponse(
                 res,
@@ -536,16 +542,22 @@ export default class RawDataController extends ServiceControllerBase {
 
             this.bodyValidator.validate(this.requestBody);
             this.priceValidator.validate(
-                (this.requestBody[this.PARAM_PRICE] as object) ?? {}
+                (this.requestBody[this.PARAM_PRICE] as Record<string, any>) ??
+                    {}
             );
             this.acreageValidator.validate(
-                (this.requestBody[this.PARAM_ACREAGE] as object) ?? {}
+                (this.requestBody[this.PARAM_ACREAGE] as Record<string, any>) ??
+                    {}
             );
             this.othersValidator.validate(
-                (this.requestBody[this.PARAM_OTHERS] as object) ?? {}
+                (this.requestBody[this.PARAM_OTHERS] as Record<string, any>) ??
+                    {}
             );
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.rawDataLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const rawDataBody = (this
                 .requestBody as unknown) as RawDataDocumentModel;
             const currentRawData = await this.rawDataLogic.getById(idBody);
@@ -558,12 +570,15 @@ export default class RawDataController extends ServiceControllerBase {
 
             let editedRawData: RawDataDocumentModel;
 
-            if (currentRawData.detailUrlId !== rawDataBody.detailUrlId) {
+            if (currentRawData!.detailUrlId !== rawDataBody.detailUrlId) {
                 editedRawData = await this.rawDataLogic.update(
                     idBody,
                     rawDataBody,
-                    undefined,
-                    [{ [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId }]
+                    {
+                        notExist: {
+                            [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId,
+                        },
+                    }
                 );
             } else {
                 editedRawData = await this.rawDataLogic.update(

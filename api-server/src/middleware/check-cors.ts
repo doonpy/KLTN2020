@@ -1,4 +1,4 @@
-import cors, { CorsOptions } from 'cors';
+import cors, { CorsOptions, CorsOptionsDelegate } from 'cors';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import ResponseStatusCode from '@common/response-status-code';
 import { replaceMetaDataString } from '@util/helper/string';
@@ -15,13 +15,16 @@ const CAUSE = {
     ],
 };
 
-const corsOptionsDelegate = (req: Request, callback: Function): void => {
+const corsOptionsDelegate: CorsOptionsDelegate = (
+    req: Request,
+    callback: (err: Error | null, options?: CorsOptions) => void
+): void => {
     const whiteList = process.env.CORS_WHITE_LIST!.split(';');
     const isEnable = Number(process.env.CORS_ENABLE) === 1;
     const corsOptions: CorsOptions = {
         origin: (
             origin: string | undefined,
-            originCallback: Function
+            originCallback: (err: Error | null, allow?: boolean) => void
         ): void => {
             if (!isEnable) {
                 originCallback(null, true);

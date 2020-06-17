@@ -62,9 +62,10 @@ const handleExpectedScore = async (
     item: AggregationGroupDataResult,
     rawData: RawDataDocumentModel
 ): Promise<void> => {
+    await groupedDataLogic.checkExisted({ _id: item._id });
     const groupData = await groupedDataLogic.getById(item._id);
-    groupData.items.push(rawData._id);
-    await Promise.all([groupData.save(), rawData.save()]);
+    groupData!.items.push(rawData._id);
+    await Promise.all([groupData!.save(), rawData.save()]);
 };
 
 /**

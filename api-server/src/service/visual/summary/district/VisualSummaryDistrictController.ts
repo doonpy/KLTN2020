@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualSummaryDistrictLogic from './VisualSummaryDistrictLogic';

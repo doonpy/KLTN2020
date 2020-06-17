@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -94,9 +94,12 @@ export default class HostController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.hostLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const host = await this.hostLogic.getById(idBody);
             const responseBody = {
-                host: this.hostLogic.convertToApiResponse(host),
+                host: this.hostLogic.convertToApiResponse(host!),
             };
 
             ServiceControllerBase.sendResponse(
@@ -144,8 +147,8 @@ export default class HostController extends ServiceControllerBase {
             const hostBody = (this.requestBody as unknown) as HostDocumentModel;
             const createdHost = await this.hostLogic.create(
                 hostBody,
-                undefined,
-                [{ [this.PARAM_DOMAIN]: hostBody.domain }]
+
+                { notExist: { [this.PARAM_DOMAIN]: hostBody.domain } }
             );
 
             ServiceControllerBase.sendResponse(
@@ -201,13 +204,13 @@ export default class HostController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.hostLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const hostBody = (this.requestBody as unknown) as HostDocumentModel;
-            const editedHost = await this.hostLogic.update(
-                idBody,
-                hostBody,
-                undefined,
-                [{ [this.PARAM_DOMAIN]: hostBody.domain }]
-            );
+            const editedHost = await this.hostLogic.update(idBody, hostBody, {
+                notExist: { [this.PARAM_DOMAIN]: hostBody.domain },
+            });
 
             ServiceControllerBase.sendResponse(
                 res,

@@ -1,8 +1,4 @@
-import {
-    ApiModelBase,
-    DocumentModelBase,
-    CommonLogicBaseInterface,
-} from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 
 export interface HostApiModel extends ApiModelBase {
     name: string | null;
@@ -12,9 +8,4 @@ export interface HostApiModel extends ApiModelBase {
 export interface HostDocumentModel extends DocumentModelBase {
     name: string;
     domain: string;
-}
-
-export interface HostLogicInterface
-    extends CommonLogicBaseInterface<HostDocumentModel, HostApiModel> {
-    getByDomain(domain: string): Promise<HostDocumentModel>;
 }

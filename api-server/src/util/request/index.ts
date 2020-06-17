@@ -1,14 +1,10 @@
-import requestPromise, {
-    RequestPromise,
-    RequestPromiseOptions,
-} from 'request-promise';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 /**
  * Send request
  */
-export const sendRequest = <T>(
-    url: string,
-    options: RequestPromiseOptions
-): RequestPromise<T> => {
-    return requestPromise(url, options);
+export const sendRequest = async <ResponseDataType>(
+    configs: AxiosRequestConfig
+): Promise<AxiosResponse<ResponseDataType>> => {
+    return axios.request<ResponseDataType>(configs);
 };

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -105,10 +105,13 @@ export default class GroupedDataController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.groupedDataLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const groupedData = await this.groupedDataLogic.getById(idBody);
             const responseBody = {
                 groupedData: this.groupedDataLogic.convertToApiResponse(
-                    groupedData
+                    groupedData!
                 ),
             };
 
@@ -184,6 +187,9 @@ export default class GroupedDataController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.groupedDataLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const groupedDataBody = (this
                 .requestBody as unknown) as GroupedDataDocumentModel;
             for (const item of groupedDataBody.items) {
@@ -193,8 +199,7 @@ export default class GroupedDataController extends ServiceControllerBase {
             }
             const editedGroupedData = await this.groupedDataLogic.update(
                 idBody,
-                groupedDataBody,
-                [{ [this.PARAM_DOCUMENT_ID]: idBody }]
+                groupedDataBody
             );
 
             ServiceControllerBase.sendResponse(

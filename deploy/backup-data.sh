@@ -21,7 +21,7 @@ mv dump ${BACKUP_NAME}
 echo "=> Zip backup data to tar..."
 tar -zcvf ${BACKUPS_DIR}/${BACKUP_NAME}.tgz ${BACKUP_NAME}
 
-#echo "=> Remove dump folder..."
-#rm -rf ${BACKUP_NAME}
+echo "=> Remove dump folder..."
+rm -rf ${BACKUP_NAME}
 
 echo "=> Done"

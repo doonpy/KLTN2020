@@ -11,15 +11,13 @@ import {
 } from '../coordinate/interface';
 import CoordinateLogic from '../coordinate/CoordinateLogic';
 import DetailUrlLogic from '../detail-url/DetailUrlLogic';
-import {
-    RawDataApiModel,
-    RawDataDocumentModel,
-    RawDataLogicInterface,
-} from './interface';
+import { RawDataApiModel, RawDataDocumentModel } from './interface';
+import { MongooseFilterQuery } from 'mongoose';
 
-export default class RawDataLogic
-    extends ServiceLogicBase<RawDataDocumentModel, RawDataApiModel>
-    implements RawDataLogicInterface {
+export default class RawDataLogic extends ServiceLogicBase<
+    RawDataDocumentModel,
+    RawDataApiModel
+> {
     private static instance: RawDataLogic;
 
     constructor() {
@@ -51,7 +49,7 @@ export default class RawDataLogic
     }
 
     public async countDocumentsWithConditions(
-        conditions?: object
+        conditions?: MongooseFilterQuery<RawDataDocumentModel>
     ): Promise<number> {
         return Model.countDocuments(conditions || {}).exec();
     }

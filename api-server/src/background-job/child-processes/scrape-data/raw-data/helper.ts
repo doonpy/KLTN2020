@@ -23,6 +23,17 @@ const PRICE_UNIT_PATTERN = {
     BILLION: RegExp(/billion|tỉ|tỷ/, 'i'),
 };
 
+interface Price {
+    value: number;
+    currency: string;
+    timeUnit: number;
+}
+
+interface Acreage {
+    value: number;
+    measureUnit: string;
+}
+
 /**
  * Convert acreage value to meter
  */
@@ -153,7 +164,7 @@ export const priceHandler = (
     priceData: string,
     transactionType: number,
     acreageValue: number
-) => {
+): Price => {
     const PER_METER_PATTERN = RegExp(/\/(m²|m2)/, 'gi');
     const PER_KILOMETER_PATTERN = RegExp(/\/(km²|km2)/, 'gi');
     const PER_YEAR_PATTERN = RegExp(/\/(year|năm)/, 'gi');
@@ -238,7 +249,7 @@ export const priceHandler = (
 
 /**
  * Handle price data to price object in raw data schema*/
-export const acreageHandler = (acreageData: string) => {
+export const acreageHandler = (acreageData: string): Acreage => {
     let value = Number(
         getValidDataFromPatterns(acreageData, [VALUE_PATTERN]) || NaN
     );

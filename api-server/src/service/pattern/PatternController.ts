@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -108,9 +108,12 @@ export default class PatternController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.patternLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const pattern = await this.patternLogic.getById(idBody);
             const responseBody = {
-                pattern: this.patternLogic.convertToApiResponse(pattern),
+                pattern: this.patternLogic.convertToApiResponse(pattern!),
             };
 
             ServiceControllerBase.sendResponse(
@@ -227,11 +230,9 @@ export default class PatternController extends ServiceControllerBase {
 
             const patternBody = (this
                 .requestBody as unknown) as PatternDocumentModel;
-            const createdPattern = await this.patternLogic.create(
-                patternBody,
-                [],
-                [{ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl }]
-            );
+            const createdPattern = await this.patternLogic.create(patternBody, {
+                notExist: { [this.PARAM_SOURCE_URL]: patternBody.sourceUrl },
+            });
 
             ServiceControllerBase.sendResponse(
                 res,
@@ -356,22 +357,27 @@ export default class PatternController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
+            await this.patternLogic.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: idBody,
+            });
             const patternBody = (this
                 .requestBody as unknown) as PatternDocumentModel;
             const currentPattern = await this.patternLogic.getById(idBody);
             let editedPattern: PatternDocumentModel;
-            if (patternBody.sourceUrl !== currentPattern.sourceUrl) {
+            if (patternBody.sourceUrl !== currentPattern!.sourceUrl) {
                 editedPattern = await this.patternLogic.update(
                     idBody,
                     patternBody,
-                    undefined,
-                    [{ [this.PARAM_SOURCE_URL]: patternBody.sourceUrl }]
+                    {
+                        notExist: {
+                            [this.PARAM_SOURCE_URL]: patternBody.sourceUrl,
+                        },
+                    }
                 );
             } else {
                 editedPattern = await this.patternLogic.update(
                     idBody,
-                    patternBody,
-                    [{ [this.PARAM_DOCUMENT_ID]: idBody }]
+                    patternBody
                 );
             }
 

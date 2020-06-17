@@ -10,7 +10,7 @@ export default class CheckerMeasureUnit extends CheckerBase {
         this.measureUnit = encodeURI(measureUnit);
     }
 
-    public check(paramName: string, input: object): void {
+    public check(paramName: string, input: Record<string, any>): void {
         const value = this.getValue(paramName, input);
 
         if (!value) {

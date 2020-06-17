@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, MongooseFilterQuery } from 'mongoose';
 import { Router } from 'express';
 
 export interface DocumentModelBase extends Document {
@@ -17,55 +17,15 @@ export interface GetAllReturnData<DocumentModel extends DocumentModelBase> {
     hasNext: boolean;
 }
 
-export interface CommonOptions {
+export interface CommonOptions<DocumentModel extends DocumentModelBase> {
     limit?: number;
     offset?: number;
-    conditions?: object;
+    conditions?: MongooseFilterQuery<DocumentModel>;
 }
 
-export interface CommonLogicBaseInterface<
-    DocumentModel extends DocumentModelBase,
-    ApiModel extends ApiModelBase
-> {
-    getAll(options: CommonOptions): Promise<GetAllReturnData<DocumentModel>>;
-
-    getById(id: number): Promise<DocumentModel | null>;
-
-    getOne(
-        conditions: object,
-        validateExistedProperties?: Array<{ [key: string]: any }>,
-        validateNotExistedProperties?: Array<{ [key: string]: any }>
-    ): Promise<DocumentModel | null>;
-
-    create(
-        input: DocumentModel,
-        validateExistedProperties?: Array<{ [key: string]: any }>,
-        validateNotExistedProperties?: Array<{ [key: string]: any }>
-    ): Promise<DocumentModel>;
-
-    update(
-        id: number,
-        input: DocumentModel,
-        validateExistedProperties?: Array<{ [key: string]: any }>,
-        validateNotExistedProperties?: Array<{ [key: string]: any }>
-    ): Promise<DocumentModel>;
-
-    delete(id: number): Promise<void>;
-
-    isExists(conditions: object): Promise<boolean>;
-
-    checkExisted(conditions: object): Promise<void>;
-
-    checkNotExisted(conditions: object): Promise<void>;
-
-    convertToApiResponse(input: DocumentModel): ApiModel;
-
-    /**
-     * Get current amount document
-     */
-    getDocumentAmount(conditions?: object): Promise<number>;
-
-    getWithAggregation<AT>(aggregations: object[]): Promise<AT[]>;
+export interface ValidateProperties<DocumentModel extends DocumentModelBase> {
+    exist?: MongooseFilterQuery<DocumentModel>;
+    notExist?: MongooseFilterQuery<DocumentModel>;
 }
 
 export interface ServiceControllerBaseInterface {

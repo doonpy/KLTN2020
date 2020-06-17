@@ -89,13 +89,14 @@ const _addCoordinatePhase = async (
 export const addCoordinatePhase = async (
     script: AsyncGenerator
 ): Promise<void> => {
+    const queryConditions = {
+        limit: DOCUMENT_LIMIT,
+        conditions: {
+            coordinateId: undefined,
+        },
+    };
     let documents: RawDataDocumentModel[] = (
-        await rawDataLogic.getAll({
-            limit: DOCUMENT_LIMIT,
-            conditions: {
-                coordinateId: null,
-            },
-        })
+        await rawDataLogic.getAll(queryConditions)
     ).documents;
 
     while (documents.length > 0) {
@@ -110,14 +111,7 @@ export const addCoordinatePhase = async (
             }
         }
 
-        documents = (
-            await rawDataLogic.getAll({
-                limit: DOCUMENT_LIMIT,
-                conditions: {
-                    coordinateId: null,
-                },
-            })
-        ).documents;
+        documents = (await rawDataLogic.getAll(queryConditions)).documents;
     }
 
     script.next();

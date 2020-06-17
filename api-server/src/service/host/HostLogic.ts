@@ -1,14 +1,11 @@
 import CommonLogicBase from '@service/ServiceLogicBase';
 import Model from './model';
-import {
-    HostApiModel,
-    HostDocumentModel,
-    HostLogicInterface,
-} from './interface';
+import { HostApiModel, HostDocumentModel } from './interface';
 
-export default class HostLogic
-    extends CommonLogicBase<HostDocumentModel, HostApiModel>
-    implements HostLogicInterface {
+export default class HostLogic extends CommonLogicBase<
+    HostDocumentModel,
+    HostApiModel
+> {
     public static instance: HostLogic;
 
     constructor() {
