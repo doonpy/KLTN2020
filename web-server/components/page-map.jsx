@@ -80,9 +80,9 @@ const PageMap = ({ mapStaticJSON, dataSummary, transactionStage }) => {
                 <div className="w-full h-full relative">
                     {/* <div
                         className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400, text-xs"
-                        style={{ zIndex: 9999, left: '35px', padding: '10px' }}
+                        style={{ zIndex: 10, left: '35px', padding: '10px' }}
                     >
-                        {` Bản đồ thể hiện ${tabMap} bất động sản`}
+                        {` Bản đồ thể hiện ${modeMap} bất động sản`}
                     </div> */}
                     {dataSummary &&
                         (stage === 0 ? (

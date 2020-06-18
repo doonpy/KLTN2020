@@ -9,6 +9,11 @@ import LoadingIcon from '../LoadingIcon';
 import { fetchMapData } from '../../util/api/fetchMapJson';
 import * as action from '../../store/map-key/actions';
 import { MAP_KEY_HCM } from '../../util/constants';
+import {
+    CUSTOM_STYLE_HIGHMAPS,
+    CUSTOM_SERIES_HIGHMAPS,
+    getCustomHighmaps,
+} from '../../themes/custom-map';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -35,54 +40,23 @@ const MapWard = ({ dataWard, setStage }) => {
     };
 
     const mapOptions = {
-        chart: {
-            type: 'map',
-            backgroundColor: 'rgba(0,0,0,0)',
-        },
-        credits: {
-            enabled: false,
-        },
-
-        colorAxis: {
-            min: 1,
-            type: 'logarithmic',
-            minColor: '#EEEEFF',
-            maxColor: '#000022',
-            stops: [
-                [0, '#EFEFFF'],
-                [0.67, '#4444FF'],
-                [1, '#000022'],
-            ],
-        },
-        mapNavigation: {
-            enabled: true,
-            buttonOptions: {
-                verticalAlign: 'bottom',
+        ...CUSTOM_STYLE_HIGHMAPS,
+        title: {
+            text: 'Bản đồ thể hiện mật độ bất động sản ',
+            style: {
+                color: 'white',
+                fontSize: '12px',
             },
         },
-        plotOptions: {
-            map: {
-                events: {
-                    click: (e) => {
-                        // TODO
-                    },
-                },
-            },
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'right',
-            backgroundColor: 'rgba(0,0,0,0)',
-            y: 35,
-        },
+        chart: getCustomHighmaps({}),
         exporting: {
             buttons: [
                 {
-                    text: 'Back to HCM',
+                    text: 'Quay lại bản đồ TPHCM',
                     onclick: async () => {
                         await backToMapDistrict();
                     },
+
                     theme: {
                         'stroke-width': 1,
                         stroke: 'silver',
@@ -101,19 +75,9 @@ const MapWard = ({ dataWard, setStage }) => {
             {
                 mapData: wardMap,
                 data: dataWard,
-                name: 'HCM',
+                name: '',
                 joinBy: ['hc-key', 'hc-key'],
-                dataLabels: {
-                    enabled: true,
-                    color: '#FFFFFF',
-                    format: '{point.name}',
-                },
-                allowPointSelect: true,
-                cursor: 'pointer',
-                showInLegend: false,
-                tooltip: {
-                    pointFormat: '{point.name}: {point.value:.1f} bds/km2',
-                },
+                ...CUSTOM_SERIES_HIGHMAPS,
             },
         ],
     };
