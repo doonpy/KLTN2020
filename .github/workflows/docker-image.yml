@@ -8,8 +8,8 @@ on:
 
 jobs:
   create-image:
-
     runs-on: ubuntu-latest
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
 
     strategy:
       matrix:
