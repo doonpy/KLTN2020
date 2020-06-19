@@ -131,9 +131,6 @@ export default class CatalogController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.catalogLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const catalog = await this.catalogLogic.getById(idBody);
             const responseBody = {
                 catalog: this.catalogLogic.convertToApiResponse(catalog!),
@@ -330,9 +327,6 @@ export default class CatalogController extends ServiceControllerBase {
             );
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.catalogLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const catalogBody = (this
                 .requestBody as unknown) as CatalogDocumentModel;
 

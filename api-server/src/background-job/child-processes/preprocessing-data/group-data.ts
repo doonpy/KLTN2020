@@ -4,6 +4,10 @@ import ConsoleConstant from '@util/console/constant';
 import GroupedDataLogic from '@service/grouped-data/GroupedDataLogic';
 import { RawDataDocumentModel } from '@service/raw-data/interface';
 import { GroupedDataDocumentModel } from '@service/grouped-data/interface';
+import {
+    setStateCache,
+    StateCacheProperties,
+} from '@background-job/child-processes/preprocessing-data/preprocessing-data';
 
 export interface AggregationGroupDataResult {
     _id: number;
@@ -31,26 +35,28 @@ const groupedDataLogic = GroupedDataLogic.getInstance();
 /**
  * Check settings
  */
-const checkSettings = (): void => {
+export const checkGroupDataSettings = (): void => {
     if (isNaN(EXPECTED_SCORE)) {
-        throw new Error(`Invalid settings (EXPECTED_SCORE: ${EXPECTED_SCORE})`);
+        throw new Error(
+            `Group data - Invalid settings (EXPECTED_SCORE: ${EXPECTED_SCORE})`
+        );
     }
 
     if (isNaN(ATTR_TITLE_SCORE)) {
         throw new Error(
-            `Invalid settings (ATTR_TITLE_SCORE: ${ATTR_TITLE_SCORE})`
+            `Group data - Invalid settings (ATTR_TITLE_SCORE: ${ATTR_TITLE_SCORE})`
         );
     }
 
     if (isNaN(ATTR_PRICE_SCORE)) {
         throw new Error(
-            `Invalid settings (ATTR_PRICE_SCORE: ${ATTR_PRICE_SCORE})`
+            `Group data - Invalid settings (ATTR_PRICE_SCORE: ${ATTR_PRICE_SCORE})`
         );
     }
 
     if (isNaN(ATTR_ADDRESS_SCORE)) {
         throw new Error(
-            `Invalid settings (ATTR_ADDRESS_SCORE: ${ATTR_ADDRESS_SCORE})`
+            `Group data - Invalid settings (ATTR_ADDRESS_SCORE: ${ATTR_ADDRESS_SCORE})`
         );
     }
 };
@@ -59,13 +65,14 @@ const checkSettings = (): void => {
  * Handle when score larger than expected score
  */
 const handleExpectedScore = async (
-    item: AggregationGroupDataResult,
-    rawData: RawDataDocumentModel
-): Promise<void> => {
-    await groupedDataLogic.checkExisted({ _id: item._id });
-    const groupData = await groupedDataLogic.getById(item._id);
-    groupData!.items.push(rawData._id);
-    await Promise.all([groupData!.save(), rawData.save()]);
+    itemId: number,
+    rawDataId: number
+): Promise<GroupedDataDocumentModel> => {
+    await groupedDataLogic.checkExisted({ _id: itemId });
+    const groupData = await groupedDataLogic.getById(itemId);
+    setStateCache(StateCacheProperties.GROUPED, groupData!);
+    groupData!.items.push(rawDataId);
+    return groupData!.save();
 };
 
 /**
@@ -165,58 +172,41 @@ const calculateStringAttributeScore = (
 export const groupDataPhase = async (
     rawData: RawDataDocumentModel,
     groupedDataCache: GroupDataCache
-): Promise<boolean> => {
-    try {
-        checkSettings();
+): Promise<void> => {
+    for (const item of groupedDataCache.items) {
+        const similarScore = getSimilarScore(rawData, item.represent);
 
-        for (const item of groupedDataCache.items) {
-            const similarScore = getSimilarScore(rawData, item.represent);
-
-            if (similarScore >= OVER_FITTING_SCORE) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - Group data -> RID: ${rawData._id} -> GID: ${item._id} - Error: Over fitting.`
-                ).show();
-                return false;
-            }
-
-            if (similarScore >= EXPECTED_SCORE) {
-                await handleExpectedScore(item, rawData);
-                new ConsoleLog(
-                    ConsoleConstant.Type.INFO,
-                    `Preprocessing data - Group data -> RID: ${rawData._id} -> GID: ${item._id}`
-                ).show();
-                return true;
-            }
+        if (similarScore >= OVER_FITTING_SCORE) {
+            throw new Error(
+                `Group data - GID: ${item._id} - Error: Over fitting.`
+            );
         }
 
-        const groupedDataCreated = (
-            await Promise.all([
-                groupedDataLogic.create(({
-                    items: [rawData._id],
-                } as unknown) as GroupedDataDocumentModel),
-                rawData.save(),
-            ])
-        )[0];
-        const newGroupDataCache: AggregationGroupDataResult = {
-            _id: groupedDataCreated._id,
-            represent: rawData,
-        };
-        groupedDataCache.items.push(newGroupDataCache);
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Preprocessing data - Group data -> RID: ${rawData._id} -> GID: ${groupedDataCreated?._id}`
-        ).show();
-        return true;
-    } catch (error) {
-        new ConsoleLog(
-            ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Group data -> RID: ${rawData._id} - Error: ${
-                error.cause || error.message
-            }`
-        ).show();
-        return false;
+        if (similarScore >= EXPECTED_SCORE) {
+            await handleExpectedScore(item._id, rawData._id);
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Preprocessing data - Group data -> RID: ${rawData._id} -> GID: ${item._id}`
+            ).show();
+            return;
+        }
     }
+
+    const newDocument = await groupedDataLogic.create(({
+        items: [rawData._id],
+    } as unknown) as GroupedDataDocumentModel);
+    const newGroupDataCache: AggregationGroupDataResult = {
+        _id: newDocument._id,
+        represent: rawData,
+    };
+
+    groupedDataCache.items.push(newGroupDataCache);
+    newDocument.isNew = true;
+    setStateCache(StateCacheProperties.GROUPED, newDocument);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Group data -> RID: ${rawData._id} -> GID: ${newDocument?._id}`
+    ).show();
 };
 
 /**

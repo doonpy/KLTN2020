@@ -94,9 +94,6 @@ export default class HostController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.hostLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const host = await this.hostLogic.getById(idBody);
             const responseBody = {
                 host: this.hostLogic.convertToApiResponse(host!),
@@ -204,9 +201,6 @@ export default class HostController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.hostLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const hostBody = (this.requestBody as unknown) as HostDocumentModel;
             const editedHost = await this.hostLogic.update(idBody, hostBody, {
                 notExist: { [this.PARAM_DOMAIN]: hostBody.domain },

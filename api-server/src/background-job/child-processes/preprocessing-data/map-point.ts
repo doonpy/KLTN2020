@@ -12,6 +12,10 @@ import {
     getAddressProperties,
     IdAddressProperties,
 } from '@background-job/child-processes/preprocessing-data/helper';
+import {
+    setStateCache,
+    StateCacheProperties,
+} from '@background-job/child-processes/preprocessing-data/preprocessing-data';
 
 const getDistrictIdAndWardId = async ({
     _id,
@@ -20,12 +24,12 @@ const getDistrictIdAndWardId = async ({
     const addressProperties = await getAddressProperties(address);
     const districtId: number | undefined = addressProperties.district?._id;
     if (!districtId) {
-        throw new Error(`District ID is invalid - ${address}`);
+        throw new Error(`Map point - District ID is invalid - ${address}`);
     }
 
     const wardId: number | undefined = addressProperties.ward?._id;
     if (!wardId) {
-        throw new Error(`Ward ID is invalid - ${address}`);
+        throw new Error(`Map point - Ward ID is invalid - ${address}`);
     }
 
     return { districtId, wardId };
@@ -67,7 +71,7 @@ const handleVisualizationMapPoint = async (
     }
 
     if (!visualMapPointDocument) {
-        await visualMapPointLogic.create({
+        const newDocument = await visualMapPointLogic.create({
             districtId,
             wardId,
             lat,
@@ -80,9 +84,12 @@ const handleVisualizationMapPoint = async (
                 },
             ],
         } as VisualMapPointDocumentModel);
+        newDocument.isNew = true;
+        setStateCache(StateCacheProperties.MAP_POINT, newDocument);
         return;
     }
 
+    setStateCache(StateCacheProperties.MAP_POINT, visualMapPointDocument);
     const pointsIndex = visualMapPointDocument.points.findIndex(
         ({
             transactionType: pointTransactionType,
@@ -109,20 +116,11 @@ const handleVisualizationMapPoint = async (
  */
 export const mapPointPhase = async (
     rawData: RawDataDocumentModel
-): Promise<boolean> => {
-    try {
-        const { districtId, wardId } = await getDistrictIdAndWardId(rawData);
-        await handleVisualizationMapPoint(districtId, wardId, rawData);
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Preprocessing data - Map point - RID: ${rawData._id}`
-        ).show();
-        return true;
-    } catch (error) {
-        new ConsoleLog(
-            ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Map point - RID: ${rawData._id} - Error: ${error.message}`
-        ).show();
-        return false;
-    }
+): Promise<void> => {
+    const { districtId, wardId } = await getDistrictIdAndWardId(rawData);
+    await handleVisualizationMapPoint(districtId, wardId, rawData);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Map point - RID: ${rawData._id}`
+    ).show();
 };

@@ -100,12 +100,10 @@ export default abstract class ServiceLogicBase<
             await this.validate(notExist, ValidateType.NOT_EXISTED);
         }
 
-        const document = await this.model.findById(id);
-        Object.keys(input).forEach((key) => {
-            document!.set(key, input[key]);
-        });
-
-        return document!.save();
+        await this.checkExisted({ _id: id } as MongooseFilterQuery<
+            DocumentModel
+        >);
+        return (await this.model.findByIdAndUpdate(id, input))!;
     }
 
     public async delete(id: number): Promise<void> {

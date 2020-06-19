@@ -184,9 +184,6 @@ export default class RawDataController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.rawDataLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const rawData = await this.rawDataLogic.getById(idBody);
             const responseBody = {
                 rawData: this.rawDataLogic.convertToApiResponse(rawData!),
@@ -555,9 +552,6 @@ export default class RawDataController extends ServiceControllerBase {
             );
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.rawDataLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const rawDataBody = (this
                 .requestBody as unknown) as RawDataDocumentModel;
             const currentRawData = await this.rawDataLogic.getById(idBody);

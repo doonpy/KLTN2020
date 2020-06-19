@@ -105,9 +105,6 @@ export default class GroupedDataController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.groupedDataLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const groupedData = await this.groupedDataLogic.getById(idBody);
             const responseBody = {
                 groupedData: this.groupedDataLogic.convertToApiResponse(
@@ -187,9 +184,6 @@ export default class GroupedDataController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.groupedDataLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const groupedDataBody = (this
                 .requestBody as unknown) as GroupedDataDocumentModel;
             for (const item of groupedDataBody.items) {

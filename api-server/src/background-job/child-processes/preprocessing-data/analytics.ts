@@ -3,6 +3,10 @@ import { VisualAnalyticsDocumentModel } from '@service/visual/analytics/interfac
 import VisualAnalyticsLogic from '@service/visual/analytics/VisualAnalyticsLogic';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
+import {
+    setStateCache,
+    StateCacheProperties,
+} from '@background-job/child-processes/preprocessing-data/preprocessing-data';
 
 /**
  * Handle visualization analytics data
@@ -21,15 +25,15 @@ const handleVisualizationAnalytics = async ({
     const priceValue = price.value;
     const acreageValue = acreage.value;
     const newAverage = Math.round((priceValue / acreageValue) * 100) / 100;
-    const visualAnalyticsDocument = await visualAnalyticsLogic.getOne({
+    const targetDocument = await visualAnalyticsLogic.getOne({
         month,
         year,
         transactionType,
         propertyType,
     });
 
-    if (!visualAnalyticsDocument) {
-        await visualAnalyticsLogic.create({
+    if (!targetDocument) {
+        const newDocument = await visualAnalyticsLogic.create({
             month,
             year,
             transactionType,
@@ -42,37 +46,32 @@ const handleVisualizationAnalytics = async ({
             maxAverage: newAverage,
             minAverage: newAverage,
         } as VisualAnalyticsDocumentModel);
-
+        newDocument.isNew = true;
+        setStateCache(StateCacheProperties.ANALYTICS, newDocument);
         return;
     }
-    visualAnalyticsDocument.amount++;
-    visualAnalyticsDocument.sumAverage =
-        Math.round((visualAnalyticsDocument.sumAverage + newAverage) * 100) /
-        100;
-    visualAnalyticsDocument.average =
-        Math.round(
-            (visualAnalyticsDocument.sumAverage /
-                visualAnalyticsDocument.amount) *
-                100
-        ) / 100;
-    visualAnalyticsDocument.max =
-        priceValue > visualAnalyticsDocument.max
-            ? priceValue
-            : visualAnalyticsDocument.max;
-    visualAnalyticsDocument.min =
-        priceValue < visualAnalyticsDocument.min
-            ? priceValue
-            : visualAnalyticsDocument.min;
-    visualAnalyticsDocument.maxAverage =
-        newAverage > visualAnalyticsDocument.maxAverage
-            ? newAverage
-            : visualAnalyticsDocument.maxAverage;
-    visualAnalyticsDocument.minAverage =
-        newAverage < visualAnalyticsDocument.minAverage
-            ? newAverage
-            : visualAnalyticsDocument.minAverage;
 
-    await visualAnalyticsDocument.save();
+    setStateCache(StateCacheProperties.ANALYTICS, targetDocument);
+    targetDocument.amount++;
+    targetDocument.sumAverage =
+        Math.round((targetDocument.sumAverage + newAverage) * 100) / 100;
+    targetDocument.average =
+        Math.round((targetDocument.sumAverage / targetDocument.amount) * 100) /
+        100;
+    targetDocument.max =
+        priceValue > targetDocument.max ? priceValue : targetDocument.max;
+    targetDocument.min =
+        priceValue < targetDocument.min ? priceValue : targetDocument.min;
+    targetDocument.maxAverage =
+        newAverage > targetDocument.maxAverage
+            ? newAverage
+            : targetDocument.maxAverage;
+    targetDocument.minAverage =
+        newAverage < targetDocument.minAverage
+            ? newAverage
+            : targetDocument.minAverage;
+
+    await targetDocument.save();
 };
 
 /**
@@ -80,19 +79,10 @@ const handleVisualizationAnalytics = async ({
  */
 export const analyticsPhase = async (
     rawData: RawDataDocumentModel
-): Promise<boolean> => {
-    try {
-        await handleVisualizationAnalytics(rawData);
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Preprocessing data - Analytics - RID: ${rawData._id}`
-        ).show();
-        return true;
-    } catch (error) {
-        new ConsoleLog(
-            ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Analytics - RID: ${rawData._id} - Error: ${error.message}`
-        ).show();
-        return false;
-    }
+): Promise<void> => {
+    await handleVisualizationAnalytics(rawData);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Analytics - RID: ${rawData._id}`
+    ).show();
 };

@@ -67,12 +67,9 @@ const _addCoordinatePhase = async (
 ): Promise<void> => {
     const coordinate = await getCoordinate(rawData.address);
     if (!coordinate) {
-        new ConsoleLog(
-            ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Add coordinate - RID: ${rawData._id} - Can't get coordinate of this address - ${rawData.address}`
-        ).show();
-        await rawDataLogic.delete(rawData._id);
-        return;
+        throw new Error(
+            `Can't get coordinate of this address - ${rawData.address}`
+        );
     }
 
     rawData.coordinateId = coordinate._id;
@@ -89,30 +86,37 @@ const _addCoordinatePhase = async (
 export const addCoordinatePhase = async (
     script: AsyncGenerator
 ): Promise<void> => {
-    const queryConditions = {
-        limit: DOCUMENT_LIMIT,
-        conditions: {
-            coordinateId: undefined,
-        },
-    };
-    let documents: RawDataDocumentModel[] = (
-        await rawDataLogic.getAll(queryConditions)
-    ).documents;
+    try {
+        const queryConditions = {
+            limit: DOCUMENT_LIMIT,
+            conditions: {
+                coordinateId: undefined,
+            },
+        };
+        let documents: RawDataDocumentModel[] = (
+            await rawDataLogic.getAll(queryConditions)
+        ).documents;
 
-    while (documents.length > 0) {
-        for (const rawData of documents) {
-            try {
-                await _addCoordinatePhase(rawData);
-            } catch (error) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Preprocessing data - Add coordinate - RID: ${rawData._id} - Error: ${error.message}`
-                ).show();
+        while (documents.length > 0) {
+            for (const rawData of documents) {
+                try {
+                    await _addCoordinatePhase(rawData);
+                } catch (error) {
+                    await rawDataLogic.delete(rawData._id);
+                    new ConsoleLog(
+                        ConsoleConstant.Type.ERROR,
+                        `Preprocessing data - Add coordinate - RID: ${rawData._id} - Error: ${error.message}`
+                    ).show();
+                }
             }
+
+            documents = (await rawDataLogic.getAll(queryConditions)).documents;
         }
 
-        documents = (await rawDataLogic.getAll(queryConditions)).documents;
+        script.next();
+    } catch (error) {
+        throw new Error(
+            `Preprocessing data - Add coordinate phase - Error: ${error.message}`
+        );
     }
-
-    script.next();
 };

@@ -108,9 +108,6 @@ export default class PatternController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.patternLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const pattern = await this.patternLogic.getById(idBody);
             const responseBody = {
                 pattern: this.patternLogic.convertToApiResponse(pattern!),
@@ -357,9 +354,6 @@ export default class PatternController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.patternLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const patternBody = (this
                 .requestBody as unknown) as PatternDocumentModel;
             const currentPattern = await this.patternLogic.getById(idBody);

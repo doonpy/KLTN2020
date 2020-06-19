@@ -129,9 +129,6 @@ export default class DetailUrlController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.detailUrlLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const detailUrl = await this.detailUrlLogic.getById(idBody);
             const responseBody = {
                 detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl!),
@@ -249,9 +246,6 @@ export default class DetailUrlController extends ServiceControllerBase {
             this.validator.validate(this.requestBody);
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.detailUrlLogic.checkExisted({
-                [this.PARAM_DOCUMENT_ID]: idBody,
-            });
             const detailUrlBody = (this
                 .requestBody as unknown) as DetailUrlDocumentModel;
 
