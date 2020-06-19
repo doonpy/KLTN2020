@@ -42,10 +42,10 @@ export default abstract class ScrapeBase {
             : originDomain + (/^\//.test(path) ? path : `/${path}`);
 
         try {
-            DEFAULT_REQUEST_OPTIONS.url = url;
-            const { data, status, request } = await sendRequest<string>(
-                DEFAULT_REQUEST_OPTIONS
-            );
+            const { data, status, request } = await sendRequest<string>({
+                ...DEFAULT_REQUEST_OPTIONS,
+                url,
+            });
 
             if (
                 status !== ResponseStatusCode.OK ||
