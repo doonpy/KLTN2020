@@ -2,7 +2,7 @@
     "GUID": "ab0d4500-b1d7-11ea-81c1-7feb2d2ee98e",
     "modelName": "New Model",
     "code": "",
-    "lastModifTS": "2020-06-19T08:27:15.725Z",
+    "lastModifTS": "2020-06-20T14:21:12.015Z",
     "persistenceSchemaVersion": "4",
     "description": "",
     "comments": "",
@@ -4143,7 +4143,7 @@
                     "code": "",
                     "type": "numeric",
                     "primaryKey": false,
-                    "name": "sumAverage",
+                    "name": "perMeterSum",
                     "GUID": "c7ba9326-b1e2-11ea-81c1-7feb2d2ee98e",
                     "relationshipType": "",
                     "parentRelationship": "",
@@ -4165,13 +4165,16 @@
                     "description": "",
                     "comments": "",
                     "dependencies": [],
-                    "id": ""
+                    "id": "",
+                    "error": {
+                        "name": false
+                    }
                 },
                 {
                     "code": "",
                     "type": "numeric",
                     "primaryKey": false,
-                    "name": "average",
+                    "name": "perMeterAverage",
                     "GUID": "c7ba931d-b1e2-11ea-81c1-7feb2d2ee98e",
                     "relationshipType": "",
                     "parentRelationship": "",
@@ -4193,13 +4196,16 @@
                     "description": "",
                     "comments": "",
                     "dependencies": [],
-                    "id": ""
+                    "id": "",
+                    "error": {
+                        "name": false
+                    }
                 },
                 {
                     "code": "",
                     "type": "numeric",
                     "primaryKey": false,
-                    "name": "max",
+                    "name": "priceMax",
                     "GUID": "c7ba931f-b1e2-11ea-81c1-7feb2d2ee98e",
                     "relationshipType": "",
                     "parentRelationship": "",
@@ -4221,13 +4227,16 @@
                     "description": "",
                     "comments": "",
                     "dependencies": [],
-                    "id": ""
+                    "id": "",
+                    "error": {
+                        "name": false
+                    }
                 },
                 {
                     "code": "",
                     "type": "numeric",
                     "primaryKey": false,
-                    "name": "min",
+                    "name": "priceMin",
                     "GUID": "c7ba9321-b1e2-11ea-81c1-7feb2d2ee98e",
                     "relationshipType": "",
                     "parentRelationship": "",
@@ -4249,13 +4258,16 @@
                     "description": "",
                     "comments": "",
                     "dependencies": [],
-                    "id": ""
+                    "id": "",
+                    "error": {
+                        "name": false
+                    }
                 },
                 {
                     "code": "",
                     "type": "numeric",
                     "primaryKey": false,
-                    "name": "maxAverage",
+                    "name": "perMeterMax",
                     "GUID": "c7ba9320-b1e2-11ea-81c1-7feb2d2ee98e",
                     "relationshipType": "",
                     "parentRelationship": "",
@@ -4277,13 +4289,16 @@
                     "description": "",
                     "comments": "",
                     "dependencies": [],
-                    "id": ""
+                    "id": "",
+                    "error": {
+                        "name": false
+                    }
                 },
                 {
                     "code": "",
                     "type": "numeric",
                     "primaryKey": false,
-                    "name": "minAverage",
+                    "name": "perMeterMin",
                     "GUID": "c7ba9322-b1e2-11ea-81c1-7feb2d2ee98e",
                     "relationshipType": "",
                     "parentRelationship": "",
@@ -4305,7 +4320,10 @@
                     "description": "",
                     "comments": "",
                     "dependencies": [],
-                    "id": ""
+                    "id": "",
+                    "error": {
+                        "name": false
+                    }
                 },
                 {
                     "code": "",
@@ -6289,12 +6307,12 @@
         "c7ba9327-b1e2-11ea-81c1-7feb2d2ee98e": "transactionType",
         "c7ba9325-b1e2-11ea-81c1-7feb2d2ee98e": "propertyType",
         "c7ba931c-b1e2-11ea-81c1-7feb2d2ee98e": "amount",
-        "c7ba9326-b1e2-11ea-81c1-7feb2d2ee98e": "sumAverage",
-        "c7ba931d-b1e2-11ea-81c1-7feb2d2ee98e": "average",
-        "c7ba931f-b1e2-11ea-81c1-7feb2d2ee98e": "max",
-        "c7ba9321-b1e2-11ea-81c1-7feb2d2ee98e": "min",
-        "c7ba9320-b1e2-11ea-81c1-7feb2d2ee98e": "maxAverage",
-        "c7ba9322-b1e2-11ea-81c1-7feb2d2ee98e": "minAverage",
+        "c7ba9326-b1e2-11ea-81c1-7feb2d2ee98e": "perMeterSum",
+        "c7ba931d-b1e2-11ea-81c1-7feb2d2ee98e": "perMeterAverage",
+        "c7ba931f-b1e2-11ea-81c1-7feb2d2ee98e": "priceMax",
+        "c7ba9321-b1e2-11ea-81c1-7feb2d2ee98e": "priceMin",
+        "c7ba9320-b1e2-11ea-81c1-7feb2d2ee98e": "perMeterMax",
+        "c7ba9322-b1e2-11ea-81c1-7feb2d2ee98e": "perMeterMin",
         "c7ba931e-b1e2-11ea-81c1-7feb2d2ee98e": "cTime",
         "c7ba9324-b1e2-11ea-81c1-7feb2d2ee98e": "mTime",
         "c7ba931b-b1e2-11ea-81c1-7feb2d2ee98e": "__v",
@@ -6533,12 +6551,8 @@
                     "aa50f280-b1da-11ea-81c1-7feb2d2ee98e"
                 ],
                 "activeRelationship": "",
-                "activeRelationshipFields": {
-                    "childField": [],
-                    "parentField": []
-                },
                 "selectedCollections": [],
-                "displayColorPicker": false,
+                "decorativeSymbols": [],
                 "graphView": {
                     "erd": [],
                     "buckets": [],
@@ -6549,7 +6563,11 @@
                     "forceLayout": true,
                     "defaultLinkLength": 300
                 },
-                "decorativeSymbols": [],
+                "activeRelationshipFields": {
+                    "childField": [],
+                    "parentField": []
+                },
+                "displayColorPicker": false,
                 "nestedCollectionsLayout": "horizontal"
             },
             "collectionLevel": {},
