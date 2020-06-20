@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo "=> Step 1: Stop docker-compose..."
 docker-compose down

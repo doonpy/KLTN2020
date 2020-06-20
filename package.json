@@ -14,7 +14,7 @@
     "dev:web": "next dev web-server -p 3001",
     "start:init-data": "node dist/api-bgr-job/data-initialization.js",
     "start:api": "node dist/api-bgr-job/server.js",
-    "start:bgr-job": "node dist/api-bgr-job/background-job/main.js",
+    "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/background-job/main.js",
     "start:web": "next start dist/web -p 3001",
     "build": "npm run clean && npm run build:api && npm run build:web",
     "build:api": "tsc --build --extendedDiagnostics api-server",

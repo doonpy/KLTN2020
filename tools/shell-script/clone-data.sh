@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 MONGO_DATABASE="kltn2020"
 MONGO_HOST="pk2020.tk:27017"
