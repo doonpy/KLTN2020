@@ -28,3 +28,5 @@ export const CleanDataConstant = {
         },
     ],
 };
+
+export const DOCUMENT_LIMIT = 1000;
