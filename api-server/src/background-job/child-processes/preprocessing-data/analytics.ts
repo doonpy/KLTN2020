@@ -24,7 +24,7 @@ const handleVisualizationAnalytics = async ({
     const year = new Date(postDate).getFullYear();
     const priceValue = price.value;
     const acreageValue = acreage.value;
-    const newAverage = Math.round((priceValue / acreageValue) * 100) / 100;
+    const newPerMeter = Math.round((priceValue / acreageValue) * 100) / 100;
     const targetDocument = await visualAnalyticsLogic.getOne({
         month,
         year,
@@ -39,12 +39,12 @@ const handleVisualizationAnalytics = async ({
             transactionType,
             propertyType,
             amount: 1,
-            sumAverage: newAverage,
-            average: newAverage,
-            max: priceValue,
-            min: priceValue,
-            maxAverage: newAverage,
-            minAverage: newAverage,
+            perMeterSum: newPerMeter,
+            perMeterAverage: newPerMeter,
+            priceMax: priceValue,
+            priceMin: priceValue,
+            perMeterMax: newPerMeter,
+            perMeterMin: newPerMeter,
         } as VisualAnalyticsDocumentModel);
         newDocument.isNew = true;
         setStateCache(StateCacheProperties.ANALYTICS, newDocument);
@@ -53,23 +53,27 @@ const handleVisualizationAnalytics = async ({
 
     setStateCache(StateCacheProperties.ANALYTICS, targetDocument);
     targetDocument.amount++;
-    targetDocument.sumAverage =
-        Math.round((targetDocument.sumAverage + newAverage) * 100) / 100;
-    targetDocument.average =
-        Math.round((targetDocument.sumAverage / targetDocument.amount) * 100) /
+    targetDocument.perMeterSum =
+        Math.round((targetDocument.perMeterSum + newPerMeter) * 100) / 100;
+    targetDocument.perMeterAverage =
+        Math.round((targetDocument.perMeterSum / targetDocument.amount) * 100) /
         100;
-    targetDocument.max =
-        priceValue > targetDocument.max ? priceValue : targetDocument.max;
-    targetDocument.min =
-        priceValue < targetDocument.min ? priceValue : targetDocument.min;
-    targetDocument.maxAverage =
-        newAverage > targetDocument.maxAverage
-            ? newAverage
-            : targetDocument.maxAverage;
-    targetDocument.minAverage =
-        newAverage < targetDocument.minAverage
-            ? newAverage
-            : targetDocument.minAverage;
+    targetDocument.priceMax =
+        priceValue > targetDocument.priceMax
+            ? priceValue
+            : targetDocument.priceMax;
+    targetDocument.priceMin =
+        priceValue < targetDocument.priceMin
+            ? priceValue
+            : targetDocument.priceMin;
+    targetDocument.perMeterMax =
+        newPerMeter > targetDocument.perMeterMax
+            ? newPerMeter
+            : targetDocument.perMeterMax;
+    targetDocument.perMeterMin =
+        newPerMeter < targetDocument.perMeterMin
+            ? newPerMeter
+            : targetDocument.perMeterMin;
 
     await targetDocument.save();
 };

@@ -5,7 +5,13 @@ import {
     GetAllReturnData,
     ValidateProperties,
 } from '@service/interface';
-import { CreateQuery, Model, MongooseFilterQuery, UpdateQuery } from 'mongoose';
+import {
+    CreateQuery,
+    FilterQuery,
+    Model,
+    MongooseFilterQuery,
+    UpdateQuery,
+} from 'mongoose';
 import ResponseStatusCode from '@common/response-status-code';
 import Wording from '@service/wording';
 
@@ -106,8 +112,16 @@ export default abstract class ServiceLogicBase<
         return (await this.model.findByIdAndUpdate(id, input))!;
     }
 
-    public async delete(id: number): Promise<void> {
-        await this.model.findByIdAndDelete(id);
+    public async delete(id: number): Promise<DocumentModel | null> {
+        return this.model.findByIdAndDelete(id);
+    }
+
+    public async deleteByConditions(
+        conditions: FilterQuery<DocumentModel>
+    ): Promise<number> {
+        const { deletedCount } = await this.model.deleteMany(conditions);
+
+        return deletedCount ?? 0;
     }
 
     public async isExists(

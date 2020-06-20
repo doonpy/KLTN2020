@@ -18,12 +18,12 @@ const VisualAnalyticsSchema: Schema = new Schema(
             enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
         },
         amount: { type: Schema.Types.Number },
-        max: { type: Schema.Types.Number },
-        min: { type: Schema.Types.Number },
-        sumAverage: { type: Schema.Types.Number },
-        average: { type: Schema.Types.Number },
-        maxAverage: { type: Schema.Types.Number },
-        minAverage: { type: Schema.Types.Number },
+        priceMax: { type: Schema.Types.Number },
+        priceMin: { type: Schema.Types.Number },
+        perMeterSum: { type: Schema.Types.Number },
+        perMeterAverage: { type: Schema.Types.Number },
+        perMeterMax: { type: Schema.Types.Number },
+        perMeterMin: { type: Schema.Types.Number },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );
