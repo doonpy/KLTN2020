@@ -55,7 +55,6 @@ services:
     env_file: config/database.config.env
     volumes:
       - kltn2020_db-volume:/data/db
-      - ./:/workdir
     ports:
       - '27017-27019:27017-27019'
     tty: true
