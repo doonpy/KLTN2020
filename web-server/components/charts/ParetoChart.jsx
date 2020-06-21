@@ -13,7 +13,6 @@ if (typeof Highcharts === 'object') {
 }
 
 const ParetoChart = ({ categoriesData, ammountData, priceData }) => {
-    //
     const [paretoChartOption, setParetoChartOption] = useState({
         ...CUSTOM_CHART,
         navigation: {
@@ -76,17 +75,7 @@ const ParetoChart = ({ categoriesData, ammountData, priceData }) => {
         tooltip: {
             shared: true,
         },
-        legend: {
-            // layout: 'vertical',
-            // align: 'left',
-            // x: 120,
-            // verticalAlign: 'top',
-            // y: 100,
-            // floating: true,
-            // style: {
-            //     color: '#fff',
-            // },
-        },
+
         series: [
             {
                 name: 'Số lượng',
@@ -107,6 +96,36 @@ const ParetoChart = ({ categoriesData, ammountData, priceData }) => {
             },
         ],
     });
+    useEffect(() => {
+        setParetoChartOption({
+            ...paretoChartOption,
+            xAxis: [
+                {
+                    categories: categoriesData,
+                    crosshair: true,
+                },
+            ],
+            series: [
+                {
+                    name: 'Số lượng',
+                    type: 'column',
+                    yAxis: 1,
+                    data: ammountData,
+                    tooltip: {
+                        valueSuffix: ' BĐS',
+                    },
+                },
+                {
+                    name: 'Giá',
+                    type: 'spline',
+                    data: priceData,
+                    tooltip: {
+                        valueSuffix: ' tr/m²',
+                    },
+                },
+            ],
+        });
+    }, [categoriesData, ammountData, priceData]);
     return (
         <div>
             <HighchartsReact

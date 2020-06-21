@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ParetoChart from '../charts/ParetoChart';
+import LoadingIcon from '../LoadingIcon';
 
-const PeratoWrapper = ({ dataGroupBy }) => {
+const PeratoWrapper = ({ dataGroupBy, loading }) => {
     const analyticsData = () => {
         const dataResult = [];
         let obj = {};
@@ -39,14 +40,20 @@ const PeratoWrapper = ({ dataGroupBy }) => {
     });
 
     return (
-        <div className="w-9/12 pr-4 mt-8 ">
-            <div className="dark:bg-gray-900 bg-white border border-solid border-light-primary dark:border-primary">
+        <div className="w-9/12 pr-4 mt-8" style={{ minHeight: '450px' }}>
+            <div className="dark:bg-gray-900 bg-white border border-solid border-light-primary dark:border-primary h-full">
                 <div className="mt-8">
-                    <ParetoChart
-                        categoriesData={categoriesData}
-                        ammountData={ammountData}
-                        priceData={priceData}
-                    />
+                    {!loading ? (
+                        <ParetoChart
+                            categoriesData={categoriesData}
+                            ammountData={ammountData}
+                            priceData={priceData}
+                        />
+                    ) : (
+                        <div className="flex justify-center items-center h-full">
+                            <LoadingIcon />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -55,5 +62,6 @@ const PeratoWrapper = ({ dataGroupBy }) => {
 
 PeratoWrapper.propTypes = {
     dataGroupBy: PropTypes.objectOf(PropTypes.any),
+    loading: PropTypes.bool,
 };
 export default PeratoWrapper;

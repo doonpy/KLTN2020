@@ -148,7 +148,7 @@ export const MAP_KEY_HCM = 'full';
 export const TRANSATION_SELECT = [
     {
         id: 0,
-        type: '--',
+        type: 'Tổng hợp',
     },
     {
         id: 1,
@@ -161,15 +161,15 @@ export const TRANSATION_SELECT = [
 ];
 export const TIME_SELECT = [
     {
-        id: 0,
+        value: 6,
         time: '6 tháng',
     },
     {
-        id: 1,
+        value: 12,
         time: '1 năm',
     },
     {
-        id: 2,
+        value: 24,
         time: '2 năm',
     },
 ];

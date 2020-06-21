@@ -1,9 +1,8 @@
 import React from 'react';
-import sortBy from 'lodash.sortby';
+import { useSelector } from 'react-redux';
 import Router from 'next/router';
-import NProgress from 'nprogress';
-import LoadingIcon from '../components/LoadingIcon';
 import groupBy from 'lodash.groupby';
+import NProgress from 'nprogress';
 import PageLayout from '../components/page-layout';
 import AnalystLeft from '../components/analytics/analyst-left';
 import AnalysticsSelect from '../components/analytics/AnalysticsSelect';
@@ -24,17 +23,16 @@ Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
 const Analytics = () => {
+    const analytics = useSelector((state) => state.analytics);
     const { data: dataAnalytics, isValidating } = useAnalytics({
         variables: {
-            fromMonth: getTimeAgo(12).month,
-            fromYear: getTimeAgo(12).year,
-            propertyType: 1,
-            transactionType: 1,
+            fromMonth: JSON.stringify(getTimeAgo(analytics.time).month),
+            fromYear: JSON.stringify(getTimeAgo(analytics.time).year),
+            propertyType: analytics.propertyType,
+            transactionType: analytics.transactionType,
         },
     });
-
-    console.log(('dataAnalytics', dataAnalytics));
-    const dataSortByMonthYear = dataAnalytics?.analytics.sort((a, b) => {
+    const dataSortByMonthYear = dataAnalytics?.analytics?.sort((a, b) => {
         return a.year - b.year || a.month - b.month;
     });
 
@@ -51,18 +49,15 @@ const Analytics = () => {
                         height: 'calc(100vh - 100px)',
                     }}
                 >
-                    {!dataAnalytics && isValidating ? (
-                        <div className="w-full items-center">
-                            <LoadingIcon />
+                    <div className="w-full h-full">
+                        <div className="flex">
+                            <AnalysticsSelect />
+                            <PeratoWrapper
+                                dataGroupBy={dataGroupBy}
+                                loading={!dataAnalytics && isValidating}
+                            />
                         </div>
-                    ) : (
-                        <div className="w-full h-full">
-                            <div className="flex">
-                                <AnalysticsSelect />
-                                <PeratoWrapper dataGroupBy={dataGroupBy} />
-                            </div>
-                        </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </PageLayout>
