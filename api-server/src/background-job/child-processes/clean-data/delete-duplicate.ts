@@ -55,6 +55,7 @@ export const deleteDuplicate = async (
     >(CleanDataConstant.DUPLICATE_DETAIL_URL_AGGREGATIONS);
     try {
         for (const item of aggregationResult) {
+            item.docList.shift();
             const promises = item.docList.map((doc) => _deleteDuplicate(doc));
             await Promise.all(promises);
         }
