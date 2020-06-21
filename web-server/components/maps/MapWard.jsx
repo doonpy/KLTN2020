@@ -13,7 +13,7 @@ import {
     CUSTOM_STYLE_HIGHMAPS,
     CUSTOM_SERIES_HIGHMAPS,
     getCustomHighmaps,
-} from '../../themes/custom-map';
+} from '../../custom/custom-map';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);

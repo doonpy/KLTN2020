@@ -63,5 +63,11 @@ const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
 PageRight.propTypes = {
     transactionStage: PropTypes.number,
     dataSummary: PropTypes.arrayOf(PropTypes.any),
+    setTransaction: PropTypes.func,
+};
+TabButton.propTypes = {
+    title: PropTypes.string,
+    onClick: PropTypes.func,
+    isActive: PropTypes.bool,
 };
 export default PageRight;

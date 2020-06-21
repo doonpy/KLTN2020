@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
+import PropTypes from 'prop-types';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { BINDING_OPTIONS } from '../../util/bindingOptions';
-import { DARK_UNICA } from '../../themes/dark-unica';
+import { CUSTOM_CHART } from '../../custom/custom-charts';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -13,20 +13,12 @@ if (typeof Highcharts === 'object') {
 
 const PieChart = ({ data }) => {
     const [chartOptions, setChartOptions] = useState({
-        ...BINDING_OPTIONS,
-        colors: [
-            '#2b908f',
-            '#90ee7e',
-            '#f45b5b',
-            '#7798BF',
-            '#aaeeee',
-            '#ff0066',
-            '#eeaaee',
-            '#55BF3B',
-            '#DF5353',
-            '#7798BF',
-            '#aaeeee',
-        ],
+        ...CUSTOM_CHART,
+        navigation: {
+            buttonOptions: {
+                enabled: false,
+            },
+        },
         chart: {
             type: 'pie',
             backgroundColor: 'rgba(0,0,0,0)',
@@ -62,8 +54,6 @@ const PieChart = ({ data }) => {
                 dataLabels: {
                     enabled: false,
                 },
-                // showInLegend: true,
-                // size: '70%',
             },
             series: {
                 dataLabels: {
@@ -86,7 +76,6 @@ const PieChart = ({ data }) => {
                 color: 'white',
             },
         },
-
         series: [
             {
                 name: 'Tỷ lệ',
@@ -114,4 +103,7 @@ const PieChart = ({ data }) => {
     );
 };
 
+PieChart.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.array),
+};
 export default React.memo(PieChart);

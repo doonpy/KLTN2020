@@ -1,5 +1,20 @@
+export const AREA_LEGEND = [0, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
+export const PRICE_LEGEND = [0, 0.5, 1, 5, 10, 50, 100, 500, 1000, 5000];
+
+export const COLOR_CODE = [
+    '#85929E',
+    '#CCD1D1',
+    '#CA6F1E',
+    '#F1C40F',
+    '#40C8F6',
+    '#8597FE',
+    '#48C9B0',
+    '#2980B9',
+    '#9B59B6',
+    '#E74C3C',
+];
 export const UNIT_OF_MEASURE = {
-    SQUARE_METER: 'm2',
+    SQUARE_METER: 'm²',
     VND: 'VND',
 };
 export const PROPERTY_TYPE_NUMBER = [
@@ -129,3 +144,32 @@ export const MAP_MODE = {
 };
 
 export const MAP_KEY_HCM = 'full';
+
+export const TRANSATION_SELECT = [
+    {
+        id: 0,
+        type: '--',
+    },
+    {
+        id: 1,
+        type: 'Bán',
+    },
+    {
+        id: 2,
+        type: 'Thuê',
+    },
+];
+export const TIME_SELECT = [
+    {
+        id: 0,
+        time: '6 tháng',
+    },
+    {
+        id: 1,
+        time: '1 năm',
+    },
+    {
+        id: 2,
+        time: '2 năm',
+    },
+];

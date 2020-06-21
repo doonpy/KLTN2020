@@ -11,14 +11,15 @@ import LegendMap from './LegendMap';
 import styled from 'styled-components';
 import LoadingIcon from '../LoadingIcon';
 import MapLeafLeftSide from './MapLeafLeftSide';
-import { ZOOM_LEVEL, MAP_MODE } from '../../util/constants';
+import {
+    ZOOM_LEVEL,
+    MAP_MODE,
+    AREA_LEGEND,
+    PRICE_LEGEND,
+} from '../../util/constants';
 import useMapPoint from '../../hooks/use-map-point';
 import * as action from '../../store/color-point/actions';
-import {
-    numberWithCommas,
-    setColorByArea,
-    setColorByPrice,
-} from '../../util/services/helper';
+import { numberWithCommas, setColor } from '../../util/services/helper';
 
 const StyledPop = styled(Popup)`
     border-radius: 0;
@@ -108,6 +109,17 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
     return (
         <div className="relative" style={{ height: 'calc(100vh - 135px)' }}>
             <TitleTypeMap type={modeMap} />
+            <span
+                className="text-center absolute font-bold bottom-0 left-0 m-0 m-auto text-gray-400"
+                style={{
+                    zIndex: 9999,
+                    padding: '10px',
+                    fontSize: '10px',
+                    opacity: '0.7',
+                }}
+            >
+                *Phóng to để xem được nhiều dữ liệu hơn
+            </span>
             <LoadingMap isLoading={!data && isValidating} />
             <Map
                 ref={map}
@@ -129,6 +141,7 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                             zoomLevel={zoomLevel}
                             typeLegend={modeMap}
                             setOnLegend={setOnLegend}
+                            transactionStage={transactionStage}
                         />
                     ) : null}
                 </Control>
@@ -175,12 +188,14 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                     }}
                                     color={
                                         modeMap === MAP_MODE.AREA_MODE
-                                            ? setColorByArea(
-                                                  point.rawDataset[0].acreage
+                                            ? setColor(
+                                                  point.rawDataset[0].acreage,
+                                                  AREA_LEGEND
                                               )
-                                            : setColorByPrice(
+                                            : setColor(
                                                   point.rawDataset[0].price /
-                                                      1000000000
+                                                      1000000000,
+                                                  PRICE_LEGEND
                                               )
                                     }
                                     key={point.rawDataset[0].rawDataId}
@@ -194,7 +209,10 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                         <div className="flex flex-col cursor-pointer">
                                             <div
                                                 className="overflow-auto h-full w-full"
-                                                style={{ maxHeight: '100px' }}
+                                                style={{
+                                                    maxHeight: '100px',
+                                                    maxWidth: '300px',
+                                                }}
                                             >
                                                 {point.rawDataset.map(
                                                     (rawdata) => {

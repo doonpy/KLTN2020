@@ -2,14 +2,15 @@ import React, { useRef } from 'react';
 import Highcharts from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
-import { BINDING_OPTIONS } from '../../util/bindingOptions';
+
 import {
     CUSTOM_STYLE_HIGHMAPS,
     CUSTOM_SERIES_HIGHMAPS,
     getCustomHighmaps,
-} from '../../themes/custom-map';
+} from '../../custom/custom-map';
 import * as action from '../../store/map-key/actions';
 
 if (typeof Highcharts === 'object') {
@@ -65,5 +66,9 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
         />
     ) : null;
 };
-
+MapOverview.propTypes = {
+    mapData: PropTypes.any,
+    dataMap: PropTypes.any,
+    setStage: PropTypes.func,
+};
 export default MapOverview;

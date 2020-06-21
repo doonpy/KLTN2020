@@ -8,5 +8,13 @@
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;
 }
+#style-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+#style-scroll::-webkit-scrollbar-thumb {
+    background-color: #a7a7a7;
+    outline: 1px solid #a7a7a7;
+    border-radius: 10px;
+}
 
 @tailwind utilities;
