@@ -1,6 +1,8 @@
 node_modules/
 archive/
 public/
-.gitignore
-docker-compose.yml
+deploy/
+doc/
+dist/
 README.md
+.gitignore
