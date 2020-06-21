@@ -160,7 +160,7 @@ export default class RawDataController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -195,7 +195,7 @@ export default class RawDataController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -377,7 +377,7 @@ export default class RawDataController extends ServiceControllerBase {
                 this.rawDataLogic.convertToApiResponse(createdRawData)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -587,7 +587,7 @@ export default class RawDataController extends ServiceControllerBase {
                 this.rawDataLogic.convertToApiResponse(editedRawData)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -619,7 +619,7 @@ export default class RawDataController extends ServiceControllerBase {
                 {}
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -666,7 +666,7 @@ export default class RawDataController extends ServiceControllerBase {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

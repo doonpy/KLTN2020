@@ -38,6 +38,7 @@
   },
   "homepage": "https://github.com/doonpy/KLTN2020#readme",
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
     "chalk": "^3.0.0",
@@ -120,6 +121,7 @@
     "webpack": "^4.43.0"
   },
   "_moduleAliases": {
+    "hapi__joi": "node_modules/@hapi/joi",
     "@root": "dist/api-bgr-job",
     "@background-job": "dist/api-bgr-job/background-job",
     "@common": "dist/api-bgr-job/common",
