@@ -84,7 +84,7 @@ export default class PatternController extends ServiceControllerBase {
                 hasNext,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -119,7 +119,7 @@ export default class PatternController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -237,7 +237,7 @@ export default class PatternController extends ServiceControllerBase {
                 this.patternLogic.convertToApiResponse(createdPattern)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -381,7 +381,7 @@ export default class PatternController extends ServiceControllerBase {
                 this.patternLogic.convertToApiResponse(editedPattern)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -413,7 +413,7 @@ export default class PatternController extends ServiceControllerBase {
                 {}
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -430,7 +430,7 @@ export default class PatternController extends ServiceControllerBase {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

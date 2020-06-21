@@ -6,6 +6,8 @@ import Checker from '@util/checker';
 import CommonConstant from '@common/constant';
 import VisualCommonController from '@service/visual/VisualCommonController';
 import VisualAnalyticsLogic from '@service/visual/analytics/VisualAnalyticsLogic';
+import Joi from 'hapi__joi';
+import { InputParamsSchema } from '@service/visual/analytics/interface';
 
 const commonPath = '/analytics';
 const specifyIdPath = '/analytics/:id';
@@ -38,6 +40,27 @@ export default class VisualAnalyticsController extends VisualCommonController {
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
+    }
+
+    protected initValidateSchema(): void {
+        this.validateSchema = Joi.object<InputParamsSchema>({
+            fromMonth: Joi.number()
+                .required()
+                .integer()
+                .min(MIN_MONTH)
+                .max(MAX_MONTH),
+            fromYear: Joi.number().required().integer().max(MAX_YEAR),
+            toMonth: Joi.number().integer().min(MIN_MONTH).max(MAX_MONTH),
+            toYear: Joi.number().integer().max(MAX_MONTH),
+            transactionType: Joi.number()
+                .integer()
+                .min(DEFAULT_TRANSACTION_TYPE)
+                .max(CommonConstant.TRANSACTION_TYPE.length),
+            propertyType: Joi.number()
+                .integer()
+                .min(DEFAULT_PROPERTY_TYPE)
+                .max(CommonConstant.PROPERTY_TYPE.length),
+        });
     }
 
     /**
@@ -76,6 +99,10 @@ export default class VisualAnalyticsController extends VisualCommonController {
 
             this.validator.addParamValidator(
                 this.PARAM_FROM_MONTH,
+                new Checker.StringLength(1, null)
+            );
+            this.validator.addParamValidator(
+                this.PARAM_FROM_MONTH,
                 new Checker.Type.Integer()
             );
             this.validator.addParamValidator(
@@ -99,6 +126,10 @@ export default class VisualAnalyticsController extends VisualCommonController {
             this.validator.addParamValidator(
                 this.PARAM_FROM_YEAR,
                 new Checker.IntegerRange(MIN_YEAR, MAX_YEAR)
+            );
+            this.validator.addParamValidator(
+                this.PARAM_FROM_YEAR,
+                new Checker.StringLength(1, null)
             );
 
             this.validator.addParamValidator(
@@ -131,8 +162,8 @@ export default class VisualAnalyticsController extends VisualCommonController {
                 new Checker.DecimalRange(1, CommonConstant.PROPERTY_TYPE.length)
             );
 
-            this.validator.validate(this.requestQuery);
-
+            // this.validator.validate(this.requestQuery);
+            this.validateInputParams(this.requestQuery);
             const fromMonth =
                 Number(this.requestQuery[this.PARAM_FROM_MONTH]) || MIN_MONTH;
             const toMonth =
@@ -149,10 +180,12 @@ export default class VisualAnalyticsController extends VisualCommonController {
                 undefined;
             const conditions = {
                 $and: [
-                    { month: { $gte: fromMonth } },
-                    { month: { $lte: toMonth } },
-                    { year: { $gte: fromYear } },
-                    { year: { $lte: toYear } },
+                    {
+                        $or: [
+                            { year: fromYear, month: { $gte: fromMonth } },
+                            { year: toYear, month: { $lte: toMonth } },
+                        ],
+                    },
                     {
                         transactionType: transactionType || {
                             $gte: DEFAULT_TRANSACTION_TYPE,
@@ -184,7 +217,7 @@ export default class VisualAnalyticsController extends VisualCommonController {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -217,7 +250,7 @@ export default class VisualAnalyticsController extends VisualCommonController {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

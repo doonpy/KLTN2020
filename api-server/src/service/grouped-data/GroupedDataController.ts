@@ -81,7 +81,7 @@ export default class GroupedDataController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -118,7 +118,7 @@ export default class GroupedDataController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -154,7 +154,7 @@ export default class GroupedDataController extends ServiceControllerBase {
                 this.groupedDataLogic.convertToApiResponse(createdGroupedData)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -202,7 +202,7 @@ export default class GroupedDataController extends ServiceControllerBase {
                 this.groupedDataLogic.convertToApiResponse(editedGroupedData)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -234,7 +234,7 @@ export default class GroupedDataController extends ServiceControllerBase {
                 {}
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -251,7 +251,7 @@ export default class GroupedDataController extends ServiceControllerBase {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

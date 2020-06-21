@@ -72,7 +72,7 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -105,7 +105,7 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

@@ -27,3 +27,12 @@ export interface VisualAnalyticsApiModel extends ApiModelBase {
     perMeterMax: number | null;
     perMeterMin: number | null;
 }
+
+export interface InputParamsSchema {
+    fromMonth?: string;
+    fromYear?: string;
+    toMonth?: string;
+    toYear?: string;
+    transactionType?: string;
+    propertyType?: string;
+}

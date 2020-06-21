@@ -70,7 +70,7 @@ export default class HostController extends ServiceControllerBase {
                 hasNext,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -105,7 +105,7 @@ export default class HostController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -154,7 +154,7 @@ export default class HostController extends ServiceControllerBase {
                 this.hostLogic.convertToApiResponse(createdHost)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -212,7 +212,7 @@ export default class HostController extends ServiceControllerBase {
                 this.hostLogic.convertToApiResponse(editedHost)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -244,7 +244,7 @@ export default class HostController extends ServiceControllerBase {
                 {}
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -261,7 +261,7 @@ export default class HostController extends ServiceControllerBase {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }
