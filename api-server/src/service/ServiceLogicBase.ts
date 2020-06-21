@@ -46,6 +46,7 @@ export default abstract class ServiceLogicBase<
         limit,
         offset,
         conditions,
+        sort,
     }: CommonOptions<DocumentModel>): Promise<GetAllReturnData<DocumentModel>> {
         const documentQuery = this.model.find(conditions ?? {});
         const remainQuery = this.model.countDocuments(conditions ?? {});
@@ -57,6 +58,10 @@ export default abstract class ServiceLogicBase<
 
         if (limit) {
             documentQuery.limit(limit);
+        }
+
+        if (sort) {
+            documentQuery.sort(sort);
         }
 
         const promises: [Promise<DocumentModel[]>, Promise<number> | number] = [

@@ -165,8 +165,12 @@ export default class VisualAnalyticsController extends VisualCommonController {
                     },
                 ],
             };
+            const sort = {
+                year: 1,
+                month: 1,
+            };
             const documents = (
-                await this.visualAnalysisLogic.getAll({ conditions })
+                await this.visualAnalysisLogic.getAll({ conditions, sort })
             ).documents;
             const responseBody = {
                 analytics: documents.map((document) =>

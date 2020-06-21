@@ -21,6 +21,7 @@ export interface CommonOptions<DocumentModel extends DocumentModelBase> {
     limit?: number;
     offset?: number;
     conditions?: MongooseFilterQuery<DocumentModel>;
+    sort?: Record<string, any>;
 }
 
 export interface ValidateProperties<DocumentModel extends DocumentModelBase> {
