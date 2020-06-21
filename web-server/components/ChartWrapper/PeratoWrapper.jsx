@@ -14,11 +14,10 @@ const PeratoWrapper = ({ dataGroupBy, loading }) => {
                 }, 0);
                 const averagePrice = dataGroupBy[key].reduce(
                     (total, current) => {
-                        return total + current.average;
+                        return total + current.perMeterAverage;
                     },
                     0
                 );
-
                 obj = {
                     key,
                     sumAmount: sumAmount,
@@ -29,6 +28,8 @@ const PeratoWrapper = ({ dataGroupBy, loading }) => {
         }
         return dataResult;
     };
+    // console.log('[analyticsData ư', analyticsData());
+    console.log('data GroupBy ', dataGroupBy);
     const categoriesData = analyticsData()?.map((c) => {
         return c.key;
     });

@@ -6,6 +6,7 @@ import NProgress from 'nprogress';
 import PageLayout from '../components/page-layout';
 import AnalystLeft from '../components/analytics/analyst-left';
 import AnalysticsSelect from '../components/analytics/AnalysticsSelect';
+import PriceStatistics from '../components/analytics/PriceStatistics';
 import PeratoWrapper from '../components/ChartWrapper/PeratoWrapper';
 import { getTimeAgo } from '../util/services/helper';
 import useAnalytics from '../hooks/use-analytics';
@@ -44,11 +45,12 @@ const Analytics = () => {
         <PageLayout>
             <div className="max-w-screen-xl m-0 m-auto text-white">
                 <div
-                    className="flex"
+                    className="flex flex-col"
                     style={{
                         height: 'calc(100vh - 100px)',
                     }}
                 >
+                    <PriceStatistics />
                     <div className="w-full h-full">
                         <div className="flex">
                             <AnalysticsSelect />

@@ -26,7 +26,7 @@ const ParetoChart = ({ categoriesData, ammountData, priceData }) => {
         },
         title: {
             text:
-                'Biểu đồ thể hiện giá trung bình và số lượng bất động sản trung bình của TPHCM theo từng (tháng) năm',
+                'Biểu đồ thể hiện giá trung bình và số lượng bất động sản của TPHCM theo từng (tháng) năm',
             style: {
                 color: '#ffffff',
                 fontSize: '12px',
