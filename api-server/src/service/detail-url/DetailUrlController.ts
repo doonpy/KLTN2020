@@ -105,7 +105,7 @@ export default class DetailUrlController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -140,7 +140,7 @@ export default class DetailUrlController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -189,7 +189,7 @@ export default class DetailUrlController extends ServiceControllerBase {
                 this.detailUrlLogic.convertToApiResponse(createdDetailUrl)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -267,7 +267,7 @@ export default class DetailUrlController extends ServiceControllerBase {
                 this.detailUrlLogic.convertToApiResponse(editedDetailUrl)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -299,7 +299,7 @@ export default class DetailUrlController extends ServiceControllerBase {
                 {}
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -316,7 +316,7 @@ export default class DetailUrlController extends ServiceControllerBase {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

@@ -68,7 +68,7 @@ export default class VisualAdministrativeWardController extends VisualCommonCont
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -101,7 +101,7 @@ export default class VisualAdministrativeWardController extends VisualCommonCont
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

@@ -2,7 +2,7 @@
     "GUID": "ab0d4500-b1d7-11ea-81c1-7feb2d2ee98e",
     "modelName": "New Model",
     "code": "",
-    "lastModifTS": "2020-06-20T14:21:12.015Z",
+    "lastModifTS": "2020-06-21T08:28:39.263Z",
     "persistenceSchemaVersion": "4",
     "description": "",
     "comments": "",
@@ -6509,8 +6509,8 @@
                         "GUID": "c7bf7504-b1e2-11ea-81c1-7feb2d2ee98e",
                         "x": 1189.516552284989,
                         "y": 1039.2492234055865,
-                        "width": 246,
-                        "height": 239,
+                        "width": 277,
+                        "height": 240,
                         "color": {}
                     },
                     {

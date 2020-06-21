@@ -14,6 +14,7 @@ import { replaceMetaDataString } from '@util/helper/string';
 import { CommonLanguageIndex } from '@common/language';
 import Checker from '@util/checker';
 import Wording from '@service/wording';
+import Joi from 'hapi__joi';
 
 interface RequestParams {
     [key: string]: string;
@@ -25,37 +26,27 @@ interface RequestBody {
 
 export default abstract class ServiceControllerBase
     implements ServiceControllerBaseInterface {
+    protected validateSchema!: Joi.Schema;
     protected commonPath = '/:language';
-
     protected specifyIdPath = '/:language';
-
     private documentAmountPath = '/document-amount';
-
     protected limit = 100;
-
     protected offset = 0;
-
     protected language = 0;
-
     protected requestBody: RequestBody = {};
-
     protected requestParams: RequestParams = {};
-
     protected requestQuery: Query = {};
-
     protected validator: Validator = new Validator();
-
     public router: RouterType = Router();
-
     protected readonly PARAM_DOCUMENT_ID = '_id';
-
     protected readonly PARAM_ID: string = 'id';
-
     protected readonly PARAM_LIMIT: string = 'limit';
-
     protected readonly PARAM_OFFSET: string = 'offset';
-
     protected readonly PARAM_LANGUAGE: string = 'language';
+
+    protected constructor() {
+        this.initValidateSchema();
+    }
 
     protected abstract async getAllRoute(
         req: Request,
@@ -160,7 +151,7 @@ export default abstract class ServiceControllerBase
             this.validator.validate(this.requestParams);
             next();
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -195,7 +186,7 @@ export default abstract class ServiceControllerBase
 
             next();
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -211,7 +202,7 @@ export default abstract class ServiceControllerBase
         }
     }
 
-    protected createError(
+    protected createServiceError(
         {
             statusCode,
             cause,
@@ -304,5 +295,24 @@ export default abstract class ServiceControllerBase
         });
 
         return conditions;
+    }
+
+    protected initValidateSchema(): void {
+        return undefined;
+    }
+
+    protected validateInputParams(value: Record<string, any>): void {
+        const { error } = this.validateSchema.validate(value);
+
+        if (error) {
+            const errorMessage = error.details
+                .map(({ message }) => message)
+                .join('. ');
+            throw new ExceptionCustomize(
+                ResponseStatusCode.BAD_REQUEST,
+                Wording.CAUSE.CAU_CM_SER_4[this.language],
+                errorMessage
+            );
+        }
     }
 }

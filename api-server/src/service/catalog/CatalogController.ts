@@ -107,7 +107,7 @@ export default class CatalogController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     };
 
@@ -142,7 +142,7 @@ export default class CatalogController extends ServiceControllerBase {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -240,7 +240,7 @@ export default class CatalogController extends ServiceControllerBase {
                 this.catalogLogic.convertToApiResponse(createdCatalog)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -354,7 +354,7 @@ export default class CatalogController extends ServiceControllerBase {
                 this.catalogLogic.convertToApiResponse(editedCatalog)
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -386,7 +386,7 @@ export default class CatalogController extends ServiceControllerBase {
                 {}
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -403,7 +403,7 @@ export default class CatalogController extends ServiceControllerBase {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }
