@@ -8,15 +8,21 @@ import VisualAdministrativeWardLogic from '@service/visual/administrative/ward/V
 import RawDataLogic from '@service/raw-data/RawDataLogic';
 import { DOCUMENT_LIMIT } from '@background-job/child-processes/clean-data/constant';
 
+interface AddressRawDataset {
+    _id: number;
+    address: string;
+}
+
 const rawDataLogic = RawDataLogic.getInstance();
 
-const _deleteInvalidAddress = async (
-    rawData: RawDataDocumentModel
-): Promise<void> => {
-    await rawDataLogic.delete(rawData._id);
+const _deleteInvalidAddress = async ({
+    _id,
+    address,
+}: AddressRawDataset): Promise<void> => {
+    await rawDataLogic.delete(_id);
     new ConsoleLog(
         ConsoleConstant.Type.INFO,
-        `Clean data - Invalid address -> RID: ${rawData._id} - ${rawData.address}`
+        `Clean data - Invalid address -> RID: ${_id} - ${address}`
     ).show();
 };
 
@@ -61,7 +67,15 @@ export const deleteInvalidAddress = async (
             coordinateId: undefined,
         },
     };
-    let rawDataset = (await rawDataLogic.getAll(queryConditions)).documents;
+    let rawDataset: AddressRawDataset[] = (
+        await rawDataLogic.getAll(queryConditions)
+    ).documents.map(
+        ({ _id, address }): AddressRawDataset =>
+            Object({
+                _id,
+                address,
+            })
+    );
 
     while (rawDataset.length > 0) {
         for (const rawData of rawDataset) {
