@@ -255,7 +255,7 @@ export default class VisualMapPointController extends VisualCommonController {
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -288,7 +288,7 @@ export default class VisualMapPointController extends VisualCommonController {
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }

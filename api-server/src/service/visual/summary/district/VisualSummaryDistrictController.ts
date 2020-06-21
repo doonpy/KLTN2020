@@ -69,7 +69,7 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
                 responseBody
             );
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 
@@ -102,7 +102,7 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
                 documentAmount,
             });
         } catch (error) {
-            next(this.createError(error, this.language));
+            next(this.createServiceError(error, this.language));
         }
     }
 }
