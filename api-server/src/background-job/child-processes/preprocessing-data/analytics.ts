@@ -3,6 +3,10 @@ import { VisualAnalyticsDocumentModel } from '@service/visual/analytics/interfac
 import VisualAnalyticsLogic from '@service/visual/analytics/VisualAnalyticsLogic';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
+import {
+    setStateCache,
+    StateCacheProperties,
+} from '@background-job/child-processes/preprocessing-data/preprocessing-data';
 
 /**
  * Handle visualization analytics data
@@ -20,59 +24,58 @@ const handleVisualizationAnalytics = async ({
     const year = new Date(postDate).getFullYear();
     const priceValue = price.value;
     const acreageValue = acreage.value;
-    const newAverage = Math.round((priceValue / acreageValue) * 100) / 100;
-    const visualAnalyticsDocument = await visualAnalyticsLogic.getOne({
+    const newPerMeter = Math.round((priceValue / acreageValue) * 100) / 100;
+    const targetDocument = await visualAnalyticsLogic.getOne({
         month,
         year,
         transactionType,
         propertyType,
     });
 
-    if (!visualAnalyticsDocument) {
-        await visualAnalyticsLogic.create({
+    if (!targetDocument) {
+        const newDocument = await visualAnalyticsLogic.create({
             month,
             year,
             transactionType,
             propertyType,
             amount: 1,
-            sumAverage: newAverage,
-            average: newAverage,
-            max: priceValue,
-            min: priceValue,
-            maxAverage: newAverage,
-            minAverage: newAverage,
+            perMeterSum: newPerMeter,
+            perMeterAverage: newPerMeter,
+            priceMax: priceValue,
+            priceMin: priceValue,
+            perMeterMax: newPerMeter,
+            perMeterMin: newPerMeter,
         } as VisualAnalyticsDocumentModel);
-
+        newDocument.isNew = true;
+        setStateCache(StateCacheProperties.ANALYTICS, newDocument);
         return;
     }
-    visualAnalyticsDocument.amount++;
-    visualAnalyticsDocument.sumAverage =
-        Math.round((visualAnalyticsDocument.sumAverage + newAverage) * 100) /
-        100;
-    visualAnalyticsDocument.average =
-        Math.round(
-            (visualAnalyticsDocument.sumAverage /
-                visualAnalyticsDocument.amount) *
-                100
-        ) / 100;
-    visualAnalyticsDocument.max =
-        priceValue > visualAnalyticsDocument.max
-            ? priceValue
-            : visualAnalyticsDocument.max;
-    visualAnalyticsDocument.min =
-        priceValue < visualAnalyticsDocument.min
-            ? priceValue
-            : visualAnalyticsDocument.min;
-    visualAnalyticsDocument.maxAverage =
-        newAverage > visualAnalyticsDocument.maxAverage
-            ? newAverage
-            : visualAnalyticsDocument.maxAverage;
-    visualAnalyticsDocument.minAverage =
-        newAverage < visualAnalyticsDocument.minAverage
-            ? newAverage
-            : visualAnalyticsDocument.minAverage;
 
-    await visualAnalyticsDocument.save();
+    setStateCache(StateCacheProperties.ANALYTICS, targetDocument);
+    targetDocument.amount++;
+    targetDocument.perMeterSum =
+        Math.round((targetDocument.perMeterSum + newPerMeter) * 100) / 100;
+    targetDocument.perMeterAverage =
+        Math.round((targetDocument.perMeterSum / targetDocument.amount) * 100) /
+        100;
+    targetDocument.priceMax =
+        priceValue > targetDocument.priceMax
+            ? priceValue
+            : targetDocument.priceMax;
+    targetDocument.priceMin =
+        priceValue < targetDocument.priceMin
+            ? priceValue
+            : targetDocument.priceMin;
+    targetDocument.perMeterMax =
+        newPerMeter > targetDocument.perMeterMax
+            ? newPerMeter
+            : targetDocument.perMeterMax;
+    targetDocument.perMeterMin =
+        newPerMeter < targetDocument.perMeterMin
+            ? newPerMeter
+            : targetDocument.perMeterMin;
+
+    await targetDocument.save();
 };
 
 /**
@@ -80,19 +83,10 @@ const handleVisualizationAnalytics = async ({
  */
 export const analyticsPhase = async (
     rawData: RawDataDocumentModel
-): Promise<boolean> => {
-    try {
-        await handleVisualizationAnalytics(rawData);
-        new ConsoleLog(
-            ConsoleConstant.Type.INFO,
-            `Preprocessing data - Analytics - RID: ${rawData._id}`
-        ).show();
-        return true;
-    } catch (error) {
-        new ConsoleLog(
-            ConsoleConstant.Type.ERROR,
-            `Preprocessing data - Analytics - RID: ${rawData._id} - Error: ${error.message}`
-        ).show();
-        return false;
-    }
+): Promise<void> => {
+    await handleVisualizationAnalytics(rawData);
+    new ConsoleLog(
+        ConsoleConstant.Type.INFO,
+        `Preprocessing data - Analytics - RID: ${rawData._id}`
+    ).show();
 };

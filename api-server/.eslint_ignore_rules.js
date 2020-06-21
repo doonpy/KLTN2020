@@ -1,5 +1,9 @@
 module.exports = [
     {
+        rules: { '@typescript-eslint/explicit-module-boundary-types': 'off' },
+        files: ['web-server/**/*.js'],
+    },
+    {
         rules: { 'node/no-missing-import': 'off' },
         files: [
             'api-server/src/app.ts',
@@ -56,11 +60,24 @@ module.exports = [
     {
         rules: { 'require-atomic-updates': 'off' },
         files: [
+            'api-server/src/background-job/child-processes/preprocessing-data/preprocessing-data.ts',
             'api-server/src/background-job/child-processes/preprocessing-data/add-coordinate.ts',
         ],
     },
     {
         rules: { 'new-cap': 'off' },
         files: ['api-server/src/service/ServiceControllerBase.ts'],
+    },
+    {
+        rules: { '@typescript-eslint/explicit-module-boundary-types': 'off' },
+        files: [
+            'api-server/src/util/checker/type/CheckerTypeArray.ts',
+            'api-server/src/util/checker/type/CheckerTypeBase.ts',
+            'api-server/src/util/checker/type/CheckerTypeBoolean.ts',
+            'api-server/src/util/checker/type/CheckerTypeDecimal.ts',
+            'api-server/src/util/checker/type/CheckerTypeInteger.ts',
+            'api-server/src/util/checker/type/CheckerTypeObject.ts',
+            'api-server/src/util/checker/type/CheckerTypeString.ts',
+        ],
     },
 ];

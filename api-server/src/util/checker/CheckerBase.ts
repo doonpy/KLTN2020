@@ -1,10 +1,10 @@
 export default abstract class CheckerBase {
-    public abstract check(paramName: string, input: object): void;
+    public abstract check(paramName: string, input: Record<string, any>): void;
 
     /**
      * Get value
      */
-    public getValue(key: string, input: object): string | null {
+    public getValue(key: string, input: Record<string, any>): string | null {
         if (!input && !(input as { [key: string]: string })[key]) {
             return null;
         }

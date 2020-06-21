@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ResponseStatusCode from '@common/response-status-code';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import {

@@ -1,5 +1,11 @@
-import { NextFunction, Request, Response, Router } from 'express';
-import { Query } from 'express-serve-static-core';
+import { Router } from 'express';
+import {
+    Request,
+    Response,
+    Query,
+    Router as RouterType,
+    NextFunction,
+} from 'express-serve-static-core';
 import ResponseStatusCode from '@common/response-status-code';
 import { ServiceControllerBaseInterface } from '@service/interface';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
@@ -39,7 +45,7 @@ export default abstract class ServiceControllerBase
 
     protected validator: Validator = new Validator();
 
-    public router: Router = Router();
+    public router: RouterType = Router();
 
     protected readonly PARAM_DOCUMENT_ID = '_id';
 
@@ -196,7 +202,7 @@ export default abstract class ServiceControllerBase
     static sendResponse(
         res: Response,
         statusCode: number = ResponseStatusCode.INTERNAL_SERVER_ERROR,
-        body: object = {}
+        body: Record<string, any> = {}
     ): void {
         if (statusCode === ResponseStatusCode.NO_CONTENT) {
             res.status(statusCode).json();
@@ -271,7 +277,7 @@ export default abstract class ServiceControllerBase
 
     protected buildQueryConditions(
         queryParams: Array<{ paramName: string; isString: boolean }>
-    ): object {
+    ): Record<string, any> {
         const conditions: { [key: string]: any } = {};
 
         Object.entries(

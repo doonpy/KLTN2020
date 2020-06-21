@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
 import ResponseStatusCode from '@common/response-status-code';
@@ -133,7 +133,7 @@ export default class CatalogController extends ServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const catalog = await this.catalogLogic.getById(idBody);
             const responseBody = {
-                catalog: this.catalogLogic.convertToApiResponse(catalog),
+                catalog: this.catalogLogic.convertToApiResponse(catalog!),
             };
 
             ServiceControllerBase.sendResponse(
@@ -215,7 +215,10 @@ export default class CatalogController extends ServiceControllerBase {
 
             this.validator.validate(this.requestBody);
             this.validator.validate(
-                (this.requestBody[this.PARAM_LOCATOR] as object) ?? {}
+                (this.requestBody[this.PARAM_LOCATOR] as Record<
+                    string,
+                    string
+                >) ?? {}
             );
 
             const catalogBody = (this
@@ -227,11 +230,9 @@ export default class CatalogController extends ServiceControllerBase {
                 [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
             });
 
-            const createdCatalog = await this.catalogLogic.create(
-                catalogBody,
-                [],
-                [{ [this.PARAM_URL]: catalogBody.url }]
-            );
+            const createdCatalog = await this.catalogLogic.create(catalogBody, {
+                notExist: { [this.PARAM_URL]: catalogBody.url },
+            });
 
             ServiceControllerBase.sendResponse(
                 res,
@@ -319,7 +320,10 @@ export default class CatalogController extends ServiceControllerBase {
             this.validator.validate(this.requestParams);
             this.validator.validate(this.requestBody);
             this.validator.validate(
-                (this.requestBody[this.PARAM_LOCATOR] as object) ?? {}
+                (this.requestBody[this.PARAM_LOCATOR] as Record<
+                    string,
+                    string
+                >) ?? {}
             );
 
             const idBody = Number(this.requestParams[this.PARAM_ID]);
@@ -341,8 +345,7 @@ export default class CatalogController extends ServiceControllerBase {
             const editedCatalog = await this.catalogLogic.update(
                 idBody,
                 catalogBody,
-                undefined,
-                [{ [this.PARAM_URL]: catalogBody.url }]
+                { notExist: { [this.PARAM_URL]: catalogBody.url } }
             );
 
             ServiceControllerBase.sendResponse(

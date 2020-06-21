@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -131,7 +131,7 @@ export default class DetailUrlController extends ServiceControllerBase {
             const idBody = Number(this.requestParams[this.PARAM_ID]);
             const detailUrl = await this.detailUrlLogic.getById(idBody);
             const responseBody = {
-                detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl),
+                detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl!),
             };
 
             ServiceControllerBase.sendResponse(
@@ -180,8 +180,7 @@ export default class DetailUrlController extends ServiceControllerBase {
             });
             const createdDetailUrl = await this.detailUrlLogic.create(
                 detailUrlBody,
-                [],
-                [{ [this.PARAM_URL]: detailUrlBody.url }]
+                { notExist: { [this.PARAM_URL]: detailUrlBody.url } }
             );
 
             ServiceControllerBase.sendResponse(
@@ -259,8 +258,7 @@ export default class DetailUrlController extends ServiceControllerBase {
             const editedDetailUrl = await this.detailUrlLogic.update(
                 idBody,
                 detailUrlBody,
-                undefined,
-                [{ [this.PARAM_URL]: detailUrlBody.url }]
+                { notExist: { [this.PARAM_URL]: detailUrlBody.url } }
             );
 
             ServiceControllerBase.sendResponse(

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import Validator from '@util/validator/Validator';
 import Checker from '@util/checker';
@@ -108,7 +108,7 @@ export default class GroupedDataController extends ServiceControllerBase {
             const groupedData = await this.groupedDataLogic.getById(idBody);
             const responseBody = {
                 groupedData: this.groupedDataLogic.convertToApiResponse(
-                    groupedData
+                    groupedData!
                 ),
             };
 
@@ -193,8 +193,7 @@ export default class GroupedDataController extends ServiceControllerBase {
             }
             const editedGroupedData = await this.groupedDataLogic.update(
                 idBody,
-                groupedDataBody,
-                [{ [this.PARAM_DOCUMENT_ID]: idBody }]
+                groupedDataBody
             );
 
             ServiceControllerBase.sendResponse(

@@ -2,9 +2,19 @@ import cherrio from 'cheerio';
 import ChatBotTelegram from '@util/chatbot/ChatBotTelegram';
 import { sendRequest } from '@util/request';
 import ResponseStatusCode from '@common/response-status-code';
-import { RequestPromiseOptions } from 'request-promise';
-import { RequestResponse } from 'request';
 import { CatalogDocumentModel } from '@service/catalog/interface';
+import { AxiosRequestConfig } from 'axios';
+import ConsoleLog from '@util/console/ConsoleLog';
+import ConsoleConstant from '@util/console/constant';
+
+const DEFAULT_REQUEST_OPTIONS: AxiosRequestConfig = {
+    headers: {
+        'User-Agent':
+            'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        Accept: 'text/plain,text/html,*/*',
+    },
+    timeout: Number(process.env.REQUEST_TIMEOUT || '10000'),
+};
 
 export default abstract class ScrapeBase {
     protected startTime: [number, number] | undefined;
@@ -15,25 +25,14 @@ export default abstract class ScrapeBase {
 
     protected telegramChatBotInstance = ChatBotTelegram.getInstance();
 
-    private readonly requestOptions: RequestPromiseOptions = {
-        headers: {
-            'User-Agent':
-                'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            Accept: 'text/plain,text/html,*/*',
-        },
-        timeout: Number(process.env.REQUEST_TIMEOUT || '10000'),
-        resolveWithFullResponse: true,
-        time: true,
-    };
-
     protected constructor(catalog: CatalogDocumentModel) {
         this.catalog = catalog;
     }
 
-    protected async getStaticBody(
+    private async getStaticBody(
         domain: string,
         path: string
-    ): Promise<CheerioStatic | undefined> {
+    ): Promise<CheerioStatic | null> {
         const DOMAIN_PATTERN = RegExp(
             /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
         );
@@ -43,21 +42,25 @@ export default abstract class ScrapeBase {
             : originDomain + (/^\//.test(path) ? path : `/${path}`);
 
         try {
-            const response = await sendRequest<RequestResponse>(
+            const { data, status, request } = await sendRequest<string>({
+                ...DEFAULT_REQUEST_OPTIONS,
                 url,
-                this.requestOptions
-            );
+            });
 
             if (
-                response.statusCode !== ResponseStatusCode.OK ||
-                response.request.uri.href !== url
+                status !== ResponseStatusCode.OK ||
+                !url.includes(request.path)
             ) {
-                return undefined;
+                return null;
             }
 
-            return cherrio.load(response.body);
+            return cherrio.load(data);
         } catch (error) {
-            return undefined;
+            new ConsoleLog(
+                ConsoleConstant.Type.ERROR,
+                `Scrape - Error: ${error.message}`
+            ).show();
+            return null;
         }
     }
 
@@ -96,8 +99,8 @@ export default abstract class ScrapeBase {
     protected async scrapeAction(
         domain: string,
         url: string,
-        successHandler: Function,
-        failedHandler?: Function
+        successHandler: ($: CheerioStatic) => Promise<void>,
+        failedHandler?: () => Promise<void>
     ): Promise<void> {
         const $ = await this.getStaticBody(domain, url);
 

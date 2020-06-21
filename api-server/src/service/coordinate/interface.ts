@@ -1,8 +1,4 @@
-import {
-    ApiModelBase,
-    DocumentModelBase,
-    CommonLogicBaseInterface,
-} from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 
 export interface CoordinateApiModel extends ApiModelBase {
     locations: string[] | null;

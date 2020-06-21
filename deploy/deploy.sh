@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 echo "### Pull latest images..."
 docker-compose pull

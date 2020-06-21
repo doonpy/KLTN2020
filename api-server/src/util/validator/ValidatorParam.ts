@@ -10,7 +10,7 @@ export default class ValidatorParam {
         this.checker = checker;
     }
 
-    public validate(input: object): void {
+    public validate(input: Record<string, any>): void {
         this.checker.check(this.paramName, input);
     }
 }

@@ -8,7 +8,7 @@ export default class Validator {
         this.paramValidators.push(new ValidatorParam(name, checker));
     }
 
-    public validate(input: object): void {
+    public validate(input: Record<string, any>): void {
         this.paramValidators.forEach((validatorItem) => {
             validatorItem.validate(input);
         });

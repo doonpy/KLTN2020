@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import Validator from '@util/validator/Validator';
@@ -165,8 +165,12 @@ export default class VisualAnalyticsController extends VisualCommonController {
                     },
                 ],
             };
+            const sort = {
+                year: 1,
+                month: 1,
+            };
             const documents = (
-                await this.visualAnalysisLogic.getAll({ conditions })
+                await this.visualAnalysisLogic.getAll({ conditions, sort })
             ).documents;
             const responseBody = {
                 analytics: documents.map((document) =>

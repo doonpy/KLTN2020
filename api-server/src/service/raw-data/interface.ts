@@ -1,8 +1,4 @@
-import {
-    ApiModelBase,
-    DocumentModelBase,
-    CommonLogicBaseInterface,
-} from '@service/interface';
+import { ApiModelBase, DocumentModelBase } from '@service/interface';
 import {
     DetailUrlApiModel,
     DetailUrlDocumentModel,
@@ -71,11 +67,4 @@ export interface RawDataDocumentModel extends DocumentModelBase {
         isAnalytics: boolean;
         isGrouped: boolean;
     };
-}
-
-export interface RawDataLogicInterface
-    extends CommonLogicBaseInterface<RawDataDocumentModel, RawDataApiModel> {
-    getPropertyTypeIndex(propertyTypeData: string): number;
-
-    countDocumentsWithConditions(conditions?: object): Promise<number>;
 }

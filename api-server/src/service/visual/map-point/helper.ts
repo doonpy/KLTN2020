@@ -10,8 +10,8 @@ export const getAggregationForGetAll = (
     maxAcreage: number,
     minPrice: number,
     maxPrice: number,
-    transactionTypeAndPropertyTypeAggregations: object
-) => {
+    transactionTypeAndPropertyTypeAggregations: Record<string, any>
+): Array<Record<string, any>> => {
     return [
         // Filter by lat long
         {

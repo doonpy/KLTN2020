@@ -6,12 +6,12 @@ export interface VisualAnalyticsDocumentModel extends DocumentModelBase {
     transactionType: number;
     propertyType: number;
     amount: number;
-    max: number;
-    min: number;
-    sumAverage: number;
-    average: number;
-    maxAverage: number;
-    minAverage: number;
+    priceMax: number;
+    priceMin: number;
+    perMeterSum: number;
+    perMeterAverage: number;
+    perMeterMax: number;
+    perMeterMin: number;
 }
 
 export interface VisualAnalyticsApiModel extends ApiModelBase {
@@ -20,10 +20,10 @@ export interface VisualAnalyticsApiModel extends ApiModelBase {
     transactionType: number | null;
     propertyType: number | null;
     amount: number | null;
-    max: number | null;
-    min: number | null;
-    sumAverage: number | null;
-    average: number | null;
-    maxAverage: number | null;
-    minAverage: number | null;
+    priceMax: number | null;
+    priceMin: number | null;
+    perMeterSum: number | null;
+    perMeterAverage: number | null;
+    perMeterMax: number | null;
+    perMeterMin: number | null;
 }

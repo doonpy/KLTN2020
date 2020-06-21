@@ -1,27 +1,18 @@
 #!/bin/bash
+set -e
 
 MONGO_DATABASE="kltn2020"
-APP_NAME="kltn2020"
 MONGO_HOST="127.0.0.1:27017"
 MONGO_USERNAME="alice"
 MONGO_PASSWORD="pkroot"
 MONGO_AUTHDB="admin"
+BACKUP_FOLDER="/home/pkroot/mongo-backup"
 
 TIMESTAMP=`date +%F-%H%M`
-MONGODUMP_PATH="mongodump"
-BACKUPS_DIR=db-backup/$APP_NAME
-BACKUP_NAME=$APP_NAME-$TIMESTAMP
+DB_CONTAINER_NAME="kltn2020_db"
 
-echo "=> Start backup data..."
-$MONGODUMP_PATH -h ${MONGO_HOST} -d ${MONGO_DATABASE} -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase ${MONGO_AUTHDB}
+DUMP_CMD="mongodump -h ${MONGO_HOST} -d ${MONGO_DATABASE} -u ${MONGO_USERNAME} -p ${MONGO_PASSWORD} --authenticationDatabase ${MONGO_AUTHDB} --archive"
 
-mkdir -p ${BACKUPS_DIR}
-mv dump ${BACKUP_NAME}
+mkdir -p ${BACKUP_FOLDER}
 
-echo "=> Zip backup data to tar..."
-tar -zcvf ${BACKUPS_DIR}/${BACKUP_NAME}.tgz ${BACKUP_NAME}
-
-#echo "=> Remove dump folder..."
-#rm -rf ${BACKUP_NAME}
-
-echo "=> Done"
+docker exec ${DB_CONTAINER_NAME} sh -c "exec ${DUMP_CMD}" > ${BACKUP_FOLDER}/${TIMESTAMP}.archive

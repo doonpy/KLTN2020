@@ -4,7 +4,7 @@ import CheckerBase from './CheckerBase';
 import CheckerWording from './wording';
 
 export default class CheckerLanguage extends CheckerBase {
-    public check(paramName: string, input: object): void {
+    public check(paramName: string, input: Record<string, any>): void {
         const value = this.getValue(paramName, input);
 
         if (!value) {

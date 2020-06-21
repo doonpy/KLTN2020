@@ -1,11 +1,17 @@
 import {
     ApiModelBase,
     DocumentModelBase,
-    CommonLogicBaseInterface,
     CommonOptions,
     GetAllReturnData,
+    ValidateProperties,
 } from '@service/interface';
-import { CreateQuery, FilterQuery, Model, UpdateQuery } from 'mongoose';
+import {
+    CreateQuery,
+    FilterQuery,
+    Model,
+    MongooseFilterQuery,
+    UpdateQuery,
+} from 'mongoose';
 import ResponseStatusCode from '@common/response-status-code';
 import Wording from '@service/wording';
 
@@ -14,26 +20,22 @@ enum ValidateType {
     NOT_EXISTED,
 }
 
-interface ValidateInput {
-    [key: string]: any;
-}
-
 export default abstract class ServiceLogicBase<
     DocumentModel extends DocumentModelBase,
     ApiModel extends ApiModelBase
-> implements CommonLogicBaseInterface<DocumentModel, ApiModel> {
+> {
     protected constructor(protected model: Model<DocumentModel>) {}
 
     private async validate(
-        properties: ValidateInput[],
+        properties: MongooseFilterQuery<DocumentModel>,
         type: ValidateType
     ): Promise<void> {
-        const promise: Promise<void>[] = [];
-        properties.forEach((prop) => {
+        const promise: Array<Promise<void>> = [];
+        Object.keys(properties).forEach((key) => {
             if (type === ValidateType.EXISTED) {
-                promise.push(this.checkExisted(prop));
+                promise.push(this.checkExisted(properties[key]));
             } else {
-                promise.push(this.checkNotExisted(prop));
+                promise.push(this.checkNotExisted(properties[key]));
             }
         });
 
@@ -44,7 +46,8 @@ export default abstract class ServiceLogicBase<
         limit,
         offset,
         conditions,
-    }: CommonOptions): Promise<GetAllReturnData<DocumentModel>> {
+        sort,
+    }: CommonOptions<DocumentModel>): Promise<GetAllReturnData<DocumentModel>> {
         const documentQuery = this.model.find(conditions ?? {});
         const remainQuery = this.model.countDocuments(conditions ?? {});
 
@@ -57,6 +60,10 @@ export default abstract class ServiceLogicBase<
             documentQuery.limit(limit);
         }
 
+        if (sort) {
+            documentQuery.sort(sort);
+        }
+
         const promises: [Promise<DocumentModel[]>, Promise<number> | number] = [
             documentQuery.exec(),
             limit ? remainQuery.exec() : -1,
@@ -66,33 +73,26 @@ export default abstract class ServiceLogicBase<
         return { documents, hasNext: documents.length < remainAmount };
     }
 
-    public async getById(id: number): Promise<DocumentModel | never> {
-        await this.checkExisted({ _id: id });
-
-        return (await this.model.findById(id)) as DocumentModel;
+    public async getById(id: number): Promise<DocumentModel | null> {
+        return this.model.findById(id);
     }
 
-    public async getOne(conditions: object): Promise<DocumentModel | null> {
+    public async getOne(
+        conditions: MongooseFilterQuery<DocumentModel>
+    ): Promise<DocumentModel | null> {
         return this.model.findOne(conditions);
     }
 
     public async create(
         input: DocumentModel,
-        validateExistedProperties?: ValidateInput[],
-        validateNotExistedProperties?: ValidateInput[]
+        { exist, notExist }: ValidateProperties<DocumentModel> = {}
     ): Promise<DocumentModel> {
-        if (validateExistedProperties) {
-            await this.validate(
-                validateExistedProperties,
-                ValidateType.EXISTED
-            );
+        if (exist) {
+            await this.validate(exist, ValidateType.EXISTED);
         }
 
-        if (validateNotExistedProperties) {
-            await this.validate(
-                validateNotExistedProperties,
-                ValidateType.NOT_EXISTED
-            );
+        if (notExist) {
+            await this.validate(notExist, ValidateType.NOT_EXISTED);
         }
 
         return this.model.create(input as CreateQuery<DocumentModel>);
@@ -101,43 +101,43 @@ export default abstract class ServiceLogicBase<
     public async update(
         id: number,
         input: UpdateQuery<DocumentModel>,
-        validateExistedProperties?: ValidateInput[],
-        validateNotExistedProperties?: ValidateInput[]
+        { exist, notExist }: ValidateProperties<DocumentModel> = {}
     ): Promise<DocumentModel | never> {
-        await this.checkExisted({ _id: id });
-
-        if (validateExistedProperties) {
-            await this.validate(
-                validateExistedProperties,
-                ValidateType.EXISTED
-            );
+        if (exist) {
+            await this.validate(exist, ValidateType.EXISTED);
         }
 
-        if (validateNotExistedProperties) {
-            await this.validate(
-                validateNotExistedProperties,
-                ValidateType.NOT_EXISTED
-            );
+        if (notExist) {
+            await this.validate(notExist, ValidateType.NOT_EXISTED);
         }
 
-        const document = await this.model.findById(id);
-        Object.keys(input).forEach((key) => {
-            document!.set(key, input[key]);
-        });
-
-        return document!.save();
+        await this.checkExisted({ _id: id } as MongooseFilterQuery<
+            DocumentModel
+        >);
+        return (await this.model.findByIdAndUpdate(id, input))!;
     }
 
-    public async delete(id: number): Promise<void> {
-        await this.checkExisted({ _id: id });
-        await this.model.findByIdAndDelete(id);
+    public async delete(id: number): Promise<DocumentModel | null> {
+        return this.model.findByIdAndDelete(id);
     }
 
-    public async isExists(conditions: object): Promise<boolean> {
+    public async deleteByConditions(
+        conditions: FilterQuery<DocumentModel>
+    ): Promise<number> {
+        const { deletedCount } = await this.model.deleteMany(conditions);
+
+        return deletedCount ?? 0;
+    }
+
+    public async isExists(
+        conditions: MongooseFilterQuery<DocumentModel>
+    ): Promise<boolean> {
         return (await this.model.findOne(conditions)) !== null;
     }
 
-    public async checkExisted(conditions: object): Promise<void> {
+    public async checkExisted(
+        conditions: MongooseFilterQuery<DocumentModel>
+    ): Promise<void> {
         if (!(await this.isExists(conditions))) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
@@ -153,7 +153,9 @@ export default abstract class ServiceLogicBase<
         }
     }
 
-    public async checkNotExisted(conditions: object): Promise<void> {
+    public async checkNotExisted(
+        conditions: MongooseFilterQuery<DocumentModel>
+    ): Promise<void> {
         if (await this.isExists(conditions)) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
@@ -172,13 +174,17 @@ export default abstract class ServiceLogicBase<
     /**
      * Get current amount document
      */
-    public async getDocumentAmount(conditions?: object): Promise<number> {
+    public async getDocumentAmount(
+        conditions?: MongooseFilterQuery<DocumentModel>
+    ): Promise<number> {
         return this.model.countDocuments(conditions ?? {});
     }
 
     public abstract convertToApiResponse(input: DocumentModel): ApiModel;
 
-    public async getWithAggregation<AT>(aggregations: object[]): Promise<AT[]> {
+    public async getWithAggregation<AT>(
+        aggregations: Array<Record<string, any>>
+    ): Promise<AT[]> {
         return this.model.aggregate<AT>(aggregations).allowDiskUse(true).exec();
     }
 }
