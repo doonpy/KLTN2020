@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TypePropertyPieChart from './ChartWrapper/TypePropertyPieChart';
 import { PROPERTY_TYPE_NUMBER } from '../util/constants';
 
@@ -45,10 +46,16 @@ const TypeTransactionBox = ({ data }) => {
     return (
         <div className="m-0 m-auto h-full mt-4" style={{ maxWidth: '90%' }}>
             <div className="dark:bg-gray-900 bg-white border border-light-primary dark:border-primary border-solid">
-                <TypePropertyPieChart data={resultPropertyData()} />
+                <TypePropertyPieChart
+                    data={resultPropertyData()}
+                    title="Biểu đồ thể hiện các loại bất động sản TPHCM (đơn vị %)"
+                />
             </div>
         </div>
     );
 };
 
+TypeTransactionBox.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.any),
+};
 export default React.memo(TypeTransactionBox);

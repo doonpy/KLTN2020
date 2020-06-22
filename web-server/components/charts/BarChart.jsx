@@ -4,27 +4,34 @@ import Highcharts from 'highcharts';
 import PropTypes from 'prop-types';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { CUSTOM_CHART } from '../../custom/custom-charts';
+import {
+    CUSTOM_CHART,
+    BUTTON_VIEW_FULLSCREEN,
+} from '../../custom/custom-charts';
+import { DARK_UNICA_COLOR } from '../../themes/color';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
 
-const BarChart = ({ data }) => {
+const BarChart = ({ data, title }) => {
+    const TEXT_COLOR = {
+        color: '#ffffff',
+    };
     const [barChartOption, setBarChartOption] = useState({
-        // ...BINDING_OPTIONS,
         ...CUSTOM_CHART,
-
+        ...BUTTON_VIEW_FULLSCREEN,
         chart: {
             type: 'bar',
             backgroundColor: 'rgba(0,0,0,0)',
         },
+        colors: DARK_UNICA_COLOR,
         title: {
-            text: 'Biểu đồ thể hiện số lượng bất động sản theo từng khu vực',
+            text: title,
             style: {
                 fontSize: '10px',
-                color: '#ffffff',
+                ...TEXT_COLOR,
             },
         },
         xAxis: {
@@ -43,13 +50,11 @@ const BarChart = ({ data }) => {
                 text: 'Số lượng (bất động sản)',
                 style: {
                     fontSize: '9px',
-                    color: '#ffffff',
+                    ...TEXT_COLOR,
                 },
             },
             labels: {
-                style: {
-                    color: '#ffffff',
-                },
+                style: TEXT_COLOR,
             },
         },
 
@@ -57,19 +62,6 @@ const BarChart = ({ data }) => {
             enabled: false,
         },
 
-        exporting: {
-            buttons: {
-                contextButton: {
-                    menuItems: ['viewFullscreen'],
-                    symbolX: 8,
-                    symbolY: 8,
-                    symbol: 'square',
-                    symbolSize: 11,
-                    height: 16,
-                    width: 16,
-                },
-            },
-        },
         tooltip: {
             pointFormat: '<b>{point.y} bds</b>',
         },
@@ -79,6 +71,7 @@ const BarChart = ({ data }) => {
             },
         ],
     });
+
     useEffect(() => {
         setBarChartOption({
             ...barChartOption,
@@ -108,5 +101,6 @@ const BarChart = ({ data }) => {
 
 BarChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.array),
+    title: PropTypes.string,
 };
 export default React.memo(BarChart);

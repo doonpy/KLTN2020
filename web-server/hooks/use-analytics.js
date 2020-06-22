@@ -9,13 +9,12 @@ export default function useAnalytics({
         fromYear = '2019',
         toYear = JSON.stringify(currentDate.getFullYear()),
         transactionType = 1,
-        propertyType = 1,
+        propertyType = 0,
     },
 }) {
-    return useSWR(
-        `/api/v1/vi/visualization/analytics?toMonth=${toMonth}&toYear=${toYear}${
-            propertyType !== 0 ? `&propertyType=${propertyType}` : ''
-        }${transactionType !== 0 ? `&transactionType=${transactionType}` : ''}`,
-        fetcher
-    );
+    const URL = `/api/v1/vi/visualization/analytics?fromMonth=${fromMonth}&fromYear=${fromYear}&toMonth=${toMonth}&toYear=${toYear}${
+        propertyType !== 0 ? `&propertyType=${propertyType}` : ''
+    }${transactionType !== 0 ? `&transactionType=${transactionType}` : ''}`;
+
+    return useSWR(URL, fetcher);
 }

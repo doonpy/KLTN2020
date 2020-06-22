@@ -1,21 +1,31 @@
 export const CUSTOM_CHART = {
-    colors: [
-        '#2b908f',
-        '#90ee7e',
-        '#f45b5b',
-        '#7798BF',
-        '#aaeeee',
-        '#ff0066',
-        '#eeaaee',
-        '#55BF3B',
-        '#DF5353',
-        '#7798BF',
-        '#aaeeee',
-    ],
     credits: {
         enabled: false,
     },
     title: {
         text: undefined,
+    },
+};
+
+export const TURN_OFF_CONTEXT_MENU = {
+    navigation: {
+        buttonOptions: {
+            enabled: false,
+        },
+    },
+};
+export const BUTTON_VIEW_FULLSCREEN = {
+    exporting: {
+        buttons: {
+            contextButton: {
+                menuItems: ['viewFullscreen'],
+                symbolX: 8,
+                symbolY: 8,
+                symbol: 'square',
+                symbolSize: 11,
+                height: 16,
+                width: 16,
+            },
+        },
     },
 };

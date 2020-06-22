@@ -36,6 +36,7 @@ const AnalysticsSelect = () => {
                                 style={{ color: '#000' }}
                             >
                                 <select
+                                    value={time}
                                     id="time"
                                     style={{ outline: 'none' }}
                                     name="time"

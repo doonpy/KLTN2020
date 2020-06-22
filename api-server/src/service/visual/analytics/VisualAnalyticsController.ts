@@ -51,7 +51,7 @@ export default class VisualAnalyticsController extends VisualCommonController {
                 .max(MAX_MONTH),
             fromYear: Joi.number().required().integer().max(MAX_YEAR),
             toMonth: Joi.number().integer().min(MIN_MONTH).max(MAX_MONTH),
-            toYear: Joi.number().integer().max(MAX_MONTH),
+            toYear: Joi.number().integer().max(MAX_YEAR),
             transactionType: Joi.number()
                 .integer()
                 .min(DEFAULT_TRANSACTION_TYPE)

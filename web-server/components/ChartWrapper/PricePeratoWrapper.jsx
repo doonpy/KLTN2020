@@ -28,8 +28,7 @@ const PeratoWrapper = ({ dataGroupBy, loading }) => {
         }
         return dataResult;
     };
-    // console.log('[analyticsData ư', analyticsData());
-    console.log('data GroupBy ', dataGroupBy);
+
     const categoriesData = analyticsData()?.map((c) => {
         return c.key;
     });
@@ -49,6 +48,7 @@ const PeratoWrapper = ({ dataGroupBy, loading }) => {
                             categoriesData={categoriesData}
                             ammountData={ammountData}
                             priceData={priceData}
+                            title="Biểu đồ thể hiện giá trung bình và số lượng bất động sản của TPHCM theo từng (tháng) năm"
                         />
                     ) : (
                         <div className="flex justify-center items-center h-full">

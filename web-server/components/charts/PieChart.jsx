@@ -4,33 +4,34 @@ import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import PropTypes from 'prop-types';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { CUSTOM_CHART } from '../../custom/custom-charts';
+import { DARK_UNICA_COLOR } from '../../themes/color';
+import {
+    CUSTOM_CHART,
+    TURN_OFF_CONTEXT_MENU,
+} from '../../custom/custom-charts';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
 
-const PieChart = ({ data }) => {
+const PieChart = ({ data, title }) => {
+    const TEXT_STYLE = {
+        fontSize: '10px',
+        color: '#ffffff',
+    };
     const [chartOptions, setChartOptions] = useState({
         ...CUSTOM_CHART,
-        navigation: {
-            buttonOptions: {
-                enabled: false,
-            },
-        },
+        ...TURN_OFF_CONTEXT_MENU,
         chart: {
             type: 'pie',
             backgroundColor: 'rgba(0,0,0,0)',
             height: '100%',
         },
-
+        colors: DARK_UNICA_COLOR,
         title: {
-            text: 'Biểu đồ thể hiện các loại bất động sản TPHCM (đơn vị %)',
-            style: {
-                fontSize: '10px',
-                color: '#ffffff',
-            },
+            text: title,
+            style: TEXT_STYLE,
         },
         legend: {
             enabled: true,
@@ -105,5 +106,6 @@ const PieChart = ({ data }) => {
 
 PieChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.array),
+    title: PropTypes.string,
 };
 export default React.memo(PieChart);

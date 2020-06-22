@@ -4,38 +4,42 @@ import Highcharts from 'highcharts';
 import PropTypes from 'prop-types';
 import { numberWithCommas } from '../../util/services/helper';
 import HighchartsExporting from 'highcharts/modules/exporting';
+import { SAND_COLOR } from '../../themes/color';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { CUSTOM_CHART } from '../../custom/custom-charts';
+import {
+    CUSTOM_CHART,
+    TURN_OFF_CONTEXT_MENU,
+} from '../../custom/custom-charts';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
 
-const ParetoChart = ({ categoriesData, ammountData, priceData }) => {
+const ParetoChart = ({ categoriesData, ammountData, priceData, title }) => {
+    const TYPE_TEXT = {
+        color: '#ffffff',
+        fontSize: '10px',
+    };
     const [paretoChartOption, setParetoChartOption] = useState({
         ...CUSTOM_CHART,
-        navigation: {
-            buttonOptions: {
-                enabled: false,
-            },
-        },
+        ...TURN_OFF_CONTEXT_MENU,
+        colors: SAND_COLOR,
         chart: {
             zoomType: 'xy',
             backgroundColor: 'rgba(0,0,0,0)',
         },
         title: {
-            text:
-                'Biểu đồ thể hiện giá trung bình và số lượng bất động sản của TPHCM theo từng (tháng) năm',
-            style: {
-                color: '#ffffff',
-                fontSize: '12px',
-            },
+            text: title,
+            style: TYPE_TEXT,
         },
 
         xAxis: [
             {
                 categories: categoriesData,
+                labels: {
+                    style: TYPE_TEXT,
+                },
                 crosshair: true,
             },
         ],
@@ -45,29 +49,21 @@ const ParetoChart = ({ categoriesData, ammountData, priceData }) => {
                     formatter: function (e) {
                         return `${numberWithCommas(e.value)} tr/m²`;
                     },
-                    style: {
-                        color: '#ffffff',
-                    },
+                    style: TYPE_TEXT,
                 },
                 title: {
                     text: 'Giá BĐS',
-                    style: {
-                        color: '#ffffff',
-                    },
+                    style: TYPE_TEXT,
                 },
             },
             {
                 title: {
                     text: 'Số lượng',
-                    style: {
-                        color: '#ffffff',
-                    },
+                    style: TYPE_TEXT,
                 },
                 labels: {
                     format: '{value}',
-                    style: {
-                        color: '#ffffff',
-                    },
+                    style: TYPE_TEXT,
                 },
                 opposite: true,
             },
@@ -144,5 +140,6 @@ ParetoChart.propTypes = {
     categoriesData: PropTypes.arrayOf(PropTypes.any),
     ammountData: PropTypes.arrayOf(PropTypes.any),
     priceData: PropTypes.arrayOf(PropTypes.any),
+    title: PropTypes.string,
 };
-export default ParetoChart;
+export default React.memo(ParetoChart);
