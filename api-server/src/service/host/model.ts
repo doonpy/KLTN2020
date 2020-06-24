@@ -6,8 +6,8 @@ autoIncrement.initialize(mongoose.connection);
 
 const hostSchema = new Schema<HostDocumentModel>(
     {
-        name: Schema.Types.String,
-        domain: Schema.Types.String,
+        name: { type: Schema.Types.String, required: true },
+        domain: { type: Schema.Types.String, required: true },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );

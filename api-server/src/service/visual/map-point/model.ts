@@ -12,14 +12,16 @@ const VisualMapPointSchema: Schema = new Schema(
             type: Schema.Types.Number,
             ref: 'visual_administrative_district',
             autopopulate: true,
+            required: true,
         },
         wardId: {
             type: Schema.Types.Number,
             ref: 'visual_administrative_ward',
             autopopulate: true,
+            required: true,
         },
-        lat: { type: Schema.Types.Number },
-        lng: { type: Schema.Types.Number },
+        lat: { type: Schema.Types.Number, required: true },
+        lng: { type: Schema.Types.Number, required: true },
         points: [
             {
                 _id: false,
@@ -29,11 +31,14 @@ const VisualMapPointSchema: Schema = new Schema(
                         rawDataId: {
                             type: Schema.Types.Number,
                             ref: 'raw_data',
+                            required: true,
                         },
-                        acreage: { type: Schema.Types.Number },
-                        price: { type: Schema.Types.Number },
-                        currency: { type: Schema.Types.String },
-                        timeUnit: [{ type: Schema.Types.String }],
+                        acreage: { type: Schema.Types.Number, required: true },
+                        price: { type: Schema.Types.Number, required: true },
+                        currency: { type: Schema.Types.String, required: true },
+                        timeUnit: [
+                            { type: Schema.Types.String, required: true },
+                        ],
                     },
                 ],
                 transactionType: {
@@ -41,10 +46,12 @@ const VisualMapPointSchema: Schema = new Schema(
                     enum: CommonConstant.TRANSACTION_TYPE.map(
                         (item) => item.id
                     ),
+                    required: true,
                 },
                 propertyType: {
                     type: Schema.Types.Number,
                     enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+                    required: true,
                 },
             },
         ],

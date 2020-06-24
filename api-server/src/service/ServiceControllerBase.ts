@@ -1,200 +1,155 @@
 import { Router } from 'express';
 import {
-    Request,
     Response,
-    Query,
     Router as RouterType,
     NextFunction,
 } from 'express-serve-static-core';
 import ResponseStatusCode from '@common/response-status-code';
-import { ServiceControllerBaseInterface } from '@service/interface';
+import {
+    ApiModelBase,
+    CommonRequest,
+    CommonRequestBodySchema,
+    CommonRequestParamSchema,
+    CommonRequestQuerySchema,
+    DocumentModelBase,
+} from '@service/interface';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
 import Validator from '@util/validator/Validator';
-import { replaceMetaDataString } from '@util/helper/string';
-import { CommonLanguageIndex } from '@common/language';
-import Checker from '@util/checker';
 import Wording from '@service/wording';
-import Joi from 'hapi__joi';
+import Joi from '@hapi/joi';
+import ServiceLogicBase from '@service/ServiceLogicBase';
 
-interface RequestParams {
-    [key: string]: string;
+enum ValidationType {
+    PARAM,
+    QUERY,
+    BODY,
 }
 
-interface RequestBody {
-    [key: string]: any;
-}
+const documentAmountPath = '/document-amount';
+const MIN_LIMIT = 1;
+const MIN_ID = 1;
+const MAX_LIMIT = 100;
+const MIN_OFFSET = 0;
 
-export default abstract class ServiceControllerBase
-    implements ServiceControllerBaseInterface {
-    protected validateSchema!: Joi.Schema;
-    protected commonPath = '/:language';
-    protected specifyIdPath = '/:language';
-    private documentAmountPath = '/document-amount';
-    protected limit = 100;
-    protected offset = 0;
-    protected language = 0;
-    protected requestBody: RequestBody = {};
-    protected requestParams: RequestParams = {};
-    protected requestQuery: Query = {};
+export default abstract class ServiceControllerBase<
+    ReqParamSchema extends CommonRequestParamSchema = any,
+    ReqQuerySchema extends CommonRequestQuerySchema = any,
+    ReqBodySchema extends CommonRequestBodySchema = any
+> {
+    protected logicInstance!: ServiceLogicBase<DocumentModelBase, ApiModelBase>;
+    protected commonPath = '';
+    protected commonName = '';
+    protected specifyIdPath = '';
+    protected specifyName = '';
+    protected limit!: number;
+    protected offset!: number;
+    protected reqParamSchema!: Joi.ObjectSchema<ReqParamSchema>;
+    protected reqQuerySchema!: Joi.ObjectSchema<ReqQuerySchema>;
+    protected reqBodySchema!: Joi.ObjectSchema<ReqBodySchema>;
+    protected reqBody!: ReqBodySchema;
+    protected reqParam!: ReqParamSchema;
+    protected reqQuery!: ReqQuerySchema;
     protected validator: Validator = new Validator();
     public router: RouterType = Router();
     protected readonly PARAM_DOCUMENT_ID = '_id';
     protected readonly PARAM_ID: string = 'id';
-    protected readonly PARAM_LIMIT: string = 'limit';
-    protected readonly PARAM_OFFSET: string = 'offset';
-    protected readonly PARAM_LANGUAGE: string = 'language';
 
-    protected constructor() {
+    protected constructor(
+        commonName: string,
+        specifyName: string,
+        logicInstance: ServiceLogicBase<DocumentModelBase, ApiModelBase>
+    ) {
+        this.logicInstance = logicInstance;
+        this.commonName = commonName;
+        this.specifyName = specifyName;
+        this.initDefaultParamValidateSchema();
+        this.initDefaultQueryValidateSchema();
         this.initValidateSchema();
     }
-
-    protected abstract async getAllRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void>;
-
-    protected abstract async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void>;
-
-    protected abstract async createRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void>;
-
-    protected abstract async updateRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void>;
 
     /**
      * Initialize REST API routes
      */
     protected initRoutes(): void {
         this.router
-            .all(this.commonPath, [
-                this.initCommonInputs.bind(this),
-                this.validateCommonInputs.bind(this),
-            ])
-            .get(this.commonPath, this.getAllRoute.bind(this))
-            .post(this.commonPath, this.createRoute.bind(this));
-
-        this.router
-            .all(this.specifyIdPath, [
-                this.initCommonInputs.bind(this),
-                this.validateCommonInputs.bind(this),
-            ])
-            .get(this.specifyIdPath, this.getByIdRoute.bind(this))
-            .put(this.specifyIdPath, this.updateRoute.bind(this))
-            .delete(this.specifyIdPath, this.deleteRoute.bind(this));
-
-        this.router
-            .all(
-                this.commonPath + this.documentAmountPath,
-                this.initCommonInputs.bind(this)
+            .all<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.commonPath,
+                this.initRequestLocalVariables.bind(this),
+                this.getInputFromRequest.bind(this),
+                this.validateInput.bind(this)
             )
-            .get(
-                this.commonPath + this.documentAmountPath,
-                this.getDocumentAmount.bind(this)
+            .get<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.commonPath,
+                this.getAllPrepend.bind(this),
+                this.getAllHandler.bind(this),
+                this.sendResponse.bind(this)
+            )
+            .post<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.commonPath,
+                this.createPrepend.bind(this),
+                this.createHandler.bind(this),
+                this.sendResponse.bind(this)
+            );
+
+        this.router
+            .all<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.specifyIdPath,
+                this.initRequestLocalVariables.bind(this),
+                this.getInputFromRequest.bind(this),
+                this.validateInput.bind(this)
+            )
+            .get<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.specifyIdPath,
+                this.getByIdPrepend.bind(this),
+                this.getByIdHandler.bind(this),
+                this.sendResponse.bind(this)
+            )
+            .patch<
+                ReqParamSchema,
+                ReqBodySchema,
+                ReqBodySchema,
+                ReqQuerySchema
+            >(
+                this.specifyIdPath,
+                this.updatePrepend.bind(this),
+                this.updateHandler.bind(this),
+                this.sendResponse.bind(this)
+            )
+            .delete<
+                ReqParamSchema,
+                ReqBodySchema,
+                ReqBodySchema,
+                ReqQuerySchema
+            >(
+                this.specifyIdPath,
+                this.deletePrepend.bind(this),
+                this.deleteHandler.bind(this),
+                this.sendResponse.bind(this)
+            );
+
+        this.router
+            .all<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.commonPath + documentAmountPath,
+                this.initRequestLocalVariables.bind(this),
+                this.getInputFromRequest.bind(this),
+                this.validateInput.bind(this)
+            )
+            .get<ReqParamSchema, ReqBodySchema, ReqBodySchema, ReqQuerySchema>(
+                this.commonPath + documentAmountPath,
+                this.getDocumentAmountPrepend.bind(this),
+                this.getDocumentAmountHandler.bind(this),
+                this.sendResponse.bind(this)
             );
     }
 
-    protected abstract async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void>;
-
-    protected abstract async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void>;
-
-    protected validateCommonInputs(
-        req: Request,
+    protected sendResponse(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
         res: Response,
         next: NextFunction
     ): void {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_LIMIT,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_LIMIT,
-                new Checker.IntegerRange(1, 1000)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_OFFSET,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_OFFSET,
-                new Checker.IntegerRange(0, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_LANGUAGE,
-                new Checker.Language()
-            );
-
-            this.validator.validate(this.requestQuery);
-            this.validator.validate(this.requestParams);
-            next();
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected initCommonInputs(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): void {
-        try {
-            this.limit = Number(req.query[this.PARAM_LIMIT]) || this.limit;
-            this.offset = Number(req.query[this.PARAM_OFFSET]) || this.offset;
-            this.language =
-                CommonLanguageIndex[req.params[this.PARAM_LANGUAGE]] ??
-                this.language;
-
-            this.requestParams = req.params ?? {};
-            Object.keys(this.requestParams).forEach(
-                (key) =>
-                    !this.requestParams[key] && delete this.requestParams[key]
-            );
-
-            this.requestQuery = req.query ?? {};
-            Object.keys(this.requestQuery).forEach(
-                (key) =>
-                    !this.requestQuery[key] && delete this.requestQuery[key]
-            );
-
-            this.requestBody = req.body ?? {};
-            Object.keys(this.requestBody).forEach(
-                (key) => !this.requestBody[key] && delete this.requestBody[key]
-            );
-
-            next();
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    static sendResponse(
-        res: Response,
-        statusCode: number = ResponseStatusCode.INTERNAL_SERVER_ERROR,
-        body: Record<string, any> = {}
-    ): void {
+        const statusCode =
+            req.locals!.statusCode ?? ResponseStatusCode.INTERNAL_SERVER_ERROR;
+        const body = req.locals!.responseBody ?? {};
         if (statusCode === ResponseStatusCode.NO_CONTENT) {
             res.status(statusCode).json();
         } else {
@@ -202,107 +157,243 @@ export default abstract class ServiceControllerBase
         }
     }
 
-    protected createServiceError(
-        {
-            statusCode,
-            cause,
-            message,
-        }: {
-            statusCode?: number;
-            cause?:
-                | { wording: string[]; value: Array<string[] | number> }
-                | string;
-            message:
-                | { wording: string[]; value: Array<string[] | number> }
-                | string;
-        },
-        languageIndex: number
-    ): ExceptionCustomize {
-        let finalCause = Wording.CAUSE.CAU_CM_SER_3[languageIndex];
-        let finalMessage = '';
-        if (cause) {
-            if (typeof cause === 'string') {
-                finalCause = cause;
-            } else {
-                const causeValueByLanguage = cause.value.map((item):
-                    | string
-                    | number => {
-                    if (typeof item === 'number') {
-                        return item;
-                    }
-                    return Array.isArray(item) ? item[languageIndex] : item;
-                });
-                finalCause = replaceMetaDataString(
-                    cause.wording[languageIndex],
-                    causeValueByLanguage
-                );
-            }
-        }
-
-        if (message) {
-            if (typeof message === 'string') {
-                finalMessage = message;
-            } else {
-                const messageValueByLanguage = message.value.map((item):
-                    | string
-                    | number => {
-                    if (typeof item === 'number') {
-                        return item;
-                    }
-                    return Array.isArray(item) ? item[languageIndex] : item;
-                });
-                finalMessage = replaceMetaDataString(
-                    message.wording[languageIndex],
-                    messageValueByLanguage
-                );
-            }
-        }
-
-        return new ExceptionCustomize(
-            statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
-            finalCause,
-            finalMessage,
-            [this.requestParams, this.requestQuery, this.requestBody]
-        );
+    private initRequestLocalVariables(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void {
+        req.locals = {};
+        next();
     }
 
-    protected buildQueryConditions(
-        queryParams: Array<{ paramName: string; isString: boolean }>
-    ): Record<string, any> {
-        const conditions: { [key: string]: any } = {};
+    protected getAllPrepend(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void | Promise<void> {
+        next();
+    }
 
-        Object.entries(
-            this.requestQuery as { [key: string]: string | string[] }
-        ).forEach(([key, value]) => {
-            const param = queryParams.filter(
-                ({ paramName }) => paramName === key
-            )[0];
-            if (param) {
-                if (param.isString) {
-                    let pattern = '';
-                    if (typeof value !== 'string') {
-                        value.forEach((v): void => {
-                            pattern += `(?=.*${v}.*)`;
-                        });
-                    } else {
-                        pattern = value;
-                    }
-                    conditions[key] = { $regex: RegExp(pattern, 'i') };
-                } else {
-                    conditions[key] = value;
+    protected async getAllHandler(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const { documents, hasNext } = await this.logicInstance.getAll({
+                limit: this.limit,
+                offset: this.offset,
+                conditions: req.locals!.getConditions,
+            });
+            const responseBody = {
+                [this.commonName]: documents.map((document) =>
+                    this.logicInstance.convertToApiResponse(document)
+                ),
+                hasNext,
+            };
+
+            req.locals!.statusCode = ResponseStatusCode.OK;
+            req.locals!.responseBody = responseBody;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    protected getByIdPrepend(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void | Promise<void> {
+        next();
+    }
+
+    protected async getByIdHandler(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const id = Number(this.reqParam[this.PARAM_ID]);
+            await this.logicInstance.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: id,
+            });
+            const document = await this.logicInstance.getById(id);
+            const responseBody = {
+                [this.specifyName]: this.logicInstance.convertToApiResponse(
+                    document!
+                ),
+            };
+
+            req.locals!.statusCode = ResponseStatusCode.OK;
+            req.locals!.responseBody = responseBody;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    protected createPrepend(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void | Promise<void> {
+        next();
+    }
+
+    protected async createHandler(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const createdDocument = await this.logicInstance.create(
+                this.reqBody,
+                {
+                    exist: req.locals!.validateExist,
+                    notExist: req.locals!.validateNotExist,
                 }
-            }
-        });
+            );
+            const responseBody = this.logicInstance.convertToApiResponse(
+                createdDocument
+            );
 
-        return conditions;
+            req.locals!.statusCode = ResponseStatusCode.CREATED;
+            req.locals!.responseBody = responseBody;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    protected updatePrepend(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void | Promise<void> {
+        next();
+    }
+
+    protected async updateHandler(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const id = Number(this.reqParam[this.PARAM_ID]);
+            const editedDocument = await this.logicInstance.update(
+                id,
+                this.reqBody,
+                {
+                    exist: req.locals!.validateExist,
+                    notExist: req.locals!.validateNotExist,
+                }
+            );
+            const responseBody = this.logicInstance.convertToApiResponse(
+                editedDocument
+            );
+
+            req.locals!.statusCode = ResponseStatusCode.OK;
+            req.locals!.responseBody = responseBody;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    protected deletePrepend(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void | Promise<void> {
+        next();
+    }
+
+    protected async deleteHandler(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const id = Number(this.reqParam[this.PARAM_ID]);
+            await this.logicInstance.checkExisted({
+                [this.PARAM_DOCUMENT_ID]: id,
+            });
+            await this.logicInstance.delete(id);
+
+            req.locals!.statusCode = ResponseStatusCode.NO_CONTENT;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    protected getDocumentAmountPrepend(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void | Promise<void> {
+        next();
+    }
+
+    protected async getDocumentAmountHandler(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): Promise<void> {
+        try {
+            const documentAmount = await this.logicInstance.getDocumentAmount(
+                req.locals!.getConditions
+            );
+            const responseBody = { documentAmount };
+
+            req.locals!.statusCode = ResponseStatusCode.OK;
+            req.locals!.responseBody = responseBody;
+            next();
+        } catch (error) {
+            next(error);
+        }
     }
 
     protected initValidateSchema(): void {
         return undefined;
     }
 
-    protected validateInputParams(value: Record<string, any>): void {
-        const { error } = this.validateSchema.validate(value);
+    protected setRequiredInputForValidateSchema(): void {
+        return undefined;
+    }
+
+    private initDefaultQueryValidateSchema(): void {
+        this.reqQuerySchema = Joi.object<ReqQuerySchema>({
+            limit: Joi.number().integer().min(MIN_LIMIT).max(MAX_LIMIT),
+            offset: Joi.number().integer().min(MIN_OFFSET),
+        });
+    }
+
+    private initDefaultParamValidateSchema(): void {
+        this.reqParamSchema = Joi.object<ReqParamSchema>({
+            id: Joi.number().integer().min(MIN_ID),
+        });
+    }
+
+    private validateLogic(validationType: ValidationType): void {
+        let error: Joi.ValidationError | undefined;
+        switch (validationType) {
+            case ValidationType.BODY:
+                if (!this.reqBodySchema) break;
+                error = this.reqBodySchema.validate(this.reqBody)?.error;
+                break;
+
+            case ValidationType.PARAM:
+                if (!this.reqParamSchema) break;
+                error = this.reqParamSchema.validate(this.reqParam)?.error;
+                break;
+
+            case ValidationType.QUERY:
+                if (!this.reqQuerySchema) break;
+                error = this.reqQuerySchema.validate(this.reqQuery)?.error;
+                break;
+        }
 
         if (error) {
             const errorMessage = error.details
@@ -310,9 +401,73 @@ export default abstract class ServiceControllerBase
                 .join('. ');
             throw new ExceptionCustomize(
                 ResponseStatusCode.BAD_REQUEST,
-                Wording.CAUSE.CAU_CM_SER_4[this.language],
+                Wording.CAUSE.CAU_CM_SER_4,
                 errorMessage
             );
         }
+    }
+
+    protected validateInput(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void {
+        try {
+            this.validateLogic(ValidationType.PARAM);
+            this.validateLogic(ValidationType.QUERY);
+            if (req.method === 'POST' || req.method === 'PUT') {
+                if (req.method === 'POST') {
+                    this.setRequiredInputForValidateSchema();
+                }
+                this.validateLogic(ValidationType.BODY);
+            }
+            next();
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    private getInputFromRequest(
+        req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
+        res: Response,
+        next: NextFunction
+    ): void {
+        this.reqParam = req.params ?? {};
+        this.reqQuery = req.query ?? {};
+        this.reqBody = req.body ?? {};
+        this.limit = Number(this.reqQuery.limit) || MAX_LIMIT;
+        this.offset = Number(this.reqQuery.offset) || MIN_OFFSET;
+
+        next();
+    }
+
+    protected buildQueryConditions(
+        queryParams: Array<{ paramName: string; isString: boolean }>
+    ): Record<string, any> {
+        const conditions: Record<string, any> = {};
+        const cloneRequestQuery = this.reqQuery as Record<string, any>;
+
+        Object.keys(cloneRequestQuery).forEach((key) => {
+            const param = queryParams.find(
+                ({ paramName }) => paramName === key
+            );
+            if (param) {
+                if (param.isString) {
+                    let pattern = '';
+                    if (typeof cloneRequestQuery[key] !== 'string') {
+                        cloneRequestQuery[key].forEach((v: any): void => {
+                            pattern += `(?=.*${v}.*)`;
+                        });
+                    } else {
+                        pattern = cloneRequestQuery[key];
+                    }
+                    conditions[key] = { $regex: RegExp(pattern, 'i') };
+                } else {
+                    conditions[key] = cloneRequestQuery[key];
+                }
+            }
+        });
+
+        return conditions;
     }
 }

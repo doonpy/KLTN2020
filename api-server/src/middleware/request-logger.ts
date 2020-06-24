@@ -5,7 +5,7 @@ import ConsoleConstant from '@util/console/constant';
 export default (req: Request, res: Response, next: NextFunction): void => {
     new ConsoleLog(
         ConsoleConstant.Type.INFO,
-        `Request: ${req.method} | ${req.path} | ${res.statusCode}`
+        `Request: ${req.method} - ${req.originalUrl}`
     ).show();
     next();
 };

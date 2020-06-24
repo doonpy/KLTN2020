@@ -1,19 +1,29 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
-import ResponseStatusCode from '@common/response-status-code';
-import VisualCommonController from '../../VisualCommonController';
 import VisualAdministrativeCountryLogic from './VisualAdministrativeCountryLogic';
+import {
+    VisualAdministrativeCountryRequestBodySchema,
+    VisualAdministrativeCountryRequestParamSchema,
+    VisualAdministrativeCountryRequestQuerySchema,
+} from '@service/visual/administrative/country/interface';
 
-const commonPath = '/administrative/countries';
-const specifyIdPath = '/administrative/country/:id';
+const commonPath = '/visualization/administrative/countries';
+const commonName = 'countries';
+const specifyIdPath = '/visualization/administrative/country/:id';
+const specifyName = 'country';
 
-export default class VisualAdministrativeCountryController extends VisualCommonController {
+export default class VisualAdministrativeCountryController extends ServiceControllerBase<
+    VisualAdministrativeCountryRequestParamSchema,
+    VisualAdministrativeCountryRequestQuerySchema,
+    VisualAdministrativeCountryRequestBodySchema
+> {
     private static instance: VisualAdministrativeCountryController;
 
-    private visualAdministrativeCountryLogic = VisualAdministrativeCountryLogic.getInstance();
-
     constructor() {
-        super();
+        super(
+            commonName,
+            specifyName,
+            VisualAdministrativeCountryLogic.getInstance()
+        );
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -27,85 +37,5 @@ export default class VisualAdministrativeCountryController extends VisualCommonC
             this.instance = new VisualAdministrativeCountryController();
         }
         return this.instance;
-    }
-
-    protected async createRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async getAllRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const {
-                documents,
-                hasNext,
-            } = await this.visualAdministrativeCountryLogic.getAll({
-                limit: this.limit,
-                offset: this.offset,
-            });
-            const responseBody = {
-                countries: documents.map((document) =>
-                    this.visualAdministrativeCountryLogic.convertToApiResponse(
-                        document
-                    )
-                ),
-                hasNext,
-            };
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async updateRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.visualAdministrativeCountryLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'visual-administrative-country',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
     }
 }

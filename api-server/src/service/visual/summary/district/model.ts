@@ -12,6 +12,7 @@ const VisualSummaryDistrictSchema: Schema = new Schema(
             type: Schema.Types.Number,
             ref: 'visual_administrative_district',
             autopopulate: true,
+            required: true,
         },
         summaryAmount: { type: Schema.Types.Number },
         summary: [

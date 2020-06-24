@@ -7,21 +7,23 @@ autoIncrement.initialize(mongoose.connection);
 
 const catalogSchema = new Schema(
     {
-        title: { type: Schema.Types.String },
-        url: { type: Schema.Types.String },
+        title: { type: Schema.Types.String, required: true },
+        url: { type: Schema.Types.String, required: true },
         locator: {
-            detailUrl: { type: Schema.Types.String },
-            pageNumber: { type: Schema.Types.String },
+            detailUrl: { type: Schema.Types.String, required: true },
+            pageNumber: { type: Schema.Types.String, required: true },
         },
         hostId: {
             type: Schema.Types.Number,
             ref: 'host',
             autopopulate: true,
+            required: true,
         },
         patternId: {
             type: Schema.Types.Number,
             ref: 'pattern',
             autopopulate: true,
+            required: true,
         },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
