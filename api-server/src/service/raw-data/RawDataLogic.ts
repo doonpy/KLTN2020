@@ -11,7 +11,11 @@ import {
 } from '../coordinate/interface';
 import CoordinateLogic from '../coordinate/CoordinateLogic';
 import DetailUrlLogic from '../detail-url/DetailUrlLogic';
-import { RawDataApiModel, RawDataDocumentModel } from './interface';
+import {
+    RawDataApiModel,
+    RawDataDocumentModel,
+    RawDataPrice,
+} from './interface';
 import { MongooseFilterQuery } from 'mongoose';
 
 export default class RawDataLogic extends ServiceLogicBase<
@@ -93,14 +97,10 @@ export default class RawDataLogic extends ServiceLogicBase<
             }
         }
 
-        const priceClone: {
-            value: number;
-            currency: string;
-            timeUnit: { id: number; wording: string[] };
-        } = {
+        const priceClone: RawDataPrice = {
             value: price.value,
             currency: price.currency,
-            timeUnit: CommonConstant.PRICE_TIME_UNIT[price.timeUnit],
+            timeUnit: price.timeUnit,
         };
 
         return {

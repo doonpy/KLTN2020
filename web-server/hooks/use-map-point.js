@@ -15,7 +15,7 @@ export default function useMapPoint({
     },
 }) {
     return useSWR(
-        `/api/v1/vi/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}${
+        `/api/v1/visualization/map-points?minLat=${minLat}&maxLat=${maxLat}&minLng=${minLng}&maxLng=${maxLng}&minAcreage=${minAcreage}${
             minPrice !== 1 ? `&minPrice=${minPrice}` : ''
         }${propertyType !== 0 ? `&propertyType=${propertyType}` : ''}${
             transactionType !== 0 ? `&transactionType=${transactionType}` : ''

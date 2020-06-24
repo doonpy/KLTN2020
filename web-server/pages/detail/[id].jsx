@@ -91,7 +91,7 @@ const DetailRealEstate = ({ id, initialData }) => {
 };
 export async function getServerSideProps({ query }) {
     const res = await fetch(
-        `${process.env.API_URI}/api/v1/vi/raw-data/${query.id}?populate=1`
+        `${process.env.API_URI}/api/v1/raw-data/${query.id}`
     );
     const data = await res.json();
     return {

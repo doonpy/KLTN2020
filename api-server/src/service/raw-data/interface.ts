@@ -1,4 +1,10 @@
-import { ApiModelBase, DocumentModelBase } from '@service/interface';
+import {
+    ApiModelBase,
+    CommonRequestBodySchema,
+    CommonRequestParamSchema,
+    CommonRequestQuerySchema,
+    DocumentModelBase,
+} from '@service/interface';
 import {
     DetailUrlApiModel,
     DetailUrlDocumentModel,
@@ -7,6 +13,30 @@ import {
     CoordinateApiModel,
     CoordinateDocumentModel,
 } from '../coordinate/interface';
+import { CatalogLocator } from '@service/catalog/interface';
+
+export interface RawDataStatus {
+    isSummary: boolean;
+    isMapPoint: boolean;
+    isAnalytics: boolean;
+    isGrouped: boolean;
+}
+
+export interface RawDataPrice {
+    value: number;
+    currency: string;
+    timeUnit?: number;
+}
+
+export interface RawDataAcreage {
+    value: number;
+    measureUnit: string;
+}
+
+export interface RawDataOther {
+    name: string;
+    value: string;
+}
 
 export interface RawDataApiModel extends ApiModelBase {
     detailUrl: DetailUrlApiModel | number | null;
@@ -15,25 +45,10 @@ export interface RawDataApiModel extends ApiModelBase {
     postDate: string | null;
     title: string | null;
     describe: string | null;
-    price: {
-        value: number | null;
-        currency: string | null;
-        timeUnit: { id: number; wording: string[] } | null;
-    } | null;
-    acreage: {
-        value: number | null;
-        measureUnit: string | null;
-    } | null;
+    price: RawDataPrice | null;
+    acreage: RawDataAcreage | null;
     address: string | null;
-    others:
-        | [
-              {
-                  name: string | null;
-                  value: string | null;
-              }
-          ]
-        | []
-        | null;
+    others: RawDataOther[] | null;
     coordinate: CoordinateApiModel | number | null;
 }
 
@@ -44,27 +59,36 @@ export interface RawDataDocumentModel extends DocumentModelBase {
     postDate: string;
     title: string;
     describe: string;
-    price: {
-        value: number;
-        currency: string;
-        timeUnit: number;
-    };
-    acreage: {
-        value: number;
-        measureUnit: string;
-    };
+    price: RawDataPrice;
+    acreage: RawDataAcreage;
     address: string;
-    others: [
-        {
-            name: string;
-            value: string;
-        }
-    ];
+    others: RawDataOther[];
     coordinateId: CoordinateDocumentModel | number;
-    status: {
-        isSummary: boolean;
-        isMapPoint: boolean;
-        isAnalytics: boolean;
-        isGrouped: boolean;
-    };
+    status: RawDataStatus;
+}
+
+export interface RawDataRequestParamSchema extends CommonRequestParamSchema {}
+
+export interface RawDataRequestQuerySchema extends CommonRequestQuerySchema {
+    detailUrlId: string;
+    transactionType: string;
+    propertyType: string;
+    title: string;
+    describe: string;
+    address: string;
+}
+
+export interface RawDataRequestBodySchema extends CommonRequestBodySchema {
+    detailUrlId: number;
+    transactionType: number;
+    propertyType: number;
+    postDate: string;
+    title: string;
+    describe: string;
+    price: RawDataPrice;
+    acreage: RawDataAcreage;
+    address: string;
+    others: RawDataOther[];
+    coordinateId: number;
+    status: RawDataStatus;
 }

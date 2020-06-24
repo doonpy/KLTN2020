@@ -1,19 +1,32 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
-import VisualCommonController from '../../VisualCommonController';
 import VisualSummaryDistrictWardLogic from './VisualSummaryDistrictWardLogic';
+import {
+    VisualSummaryDistrictWardRequestBodySchema,
+    VisualSummaryDistrictWardRequestParamSchema,
+    VisualSummaryDistrictWardRequestQuerySchema,
+} from '@service/visual/summary/district-ward/interface';
+import { CommonRequest } from '@service/interface';
 
-const commonPath = '/summary-district-ward';
-const specifyIdPath = '/summary-district-ward/:id';
+const commonPath = '/visualization/summary-district-ward';
+const commonName = 'summaryDistrictWard';
+const specifyIdPath = '/visualization/summary-district-ward/:id';
+const specifyName = 'summaryDistrictWard';
 
-export default class VisualSummaryDistrictWardController extends VisualCommonController {
+export default class VisualSummaryDistrictWardController extends ServiceControllerBase<
+    VisualSummaryDistrictWardRequestParamSchema,
+    VisualSummaryDistrictWardRequestQuerySchema,
+    VisualSummaryDistrictWardRequestBodySchema
+> {
     private static instance: VisualSummaryDistrictWardController;
 
-    private visualSummaryDistrictWardLogic = VisualSummaryDistrictWardLogic.getInstance();
-
     constructor() {
-        super();
+        super(
+            commonName,
+            specifyName,
+            VisualSummaryDistrictWardLogic.getInstance()
+        );
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -29,78 +42,28 @@ export default class VisualSummaryDistrictWardController extends VisualCommonCon
         return this.instance;
     }
 
-    protected async createRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async getAllRoute(
-        req: Request,
+    protected async getAllHandler(
+        req: CommonRequest<
+            VisualSummaryDistrictWardRequestParamSchema,
+            VisualSummaryDistrictWardRequestBodySchema,
+            VisualSummaryDistrictWardRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            const {
-                documents,
-            } = await this.visualSummaryDistrictWardLogic.getAll({});
+            const { documents } = await this.logicInstance.getAll({});
             const responseBody = {
                 summaryDistrictWard: documents.map((document) =>
-                    this.visualSummaryDistrictWardLogic.convertToApiResponse(
-                        document
-                    )
+                    this.logicInstance.convertToApiResponse(document)
                 ),
             };
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
+
+            req.locals!.statusCode = ResponseStatusCode.OK;
+            req.locals!.responseBody = responseBody;
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async updateRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.visualSummaryDistrictWardLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'visual-summary-district-ward',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 }

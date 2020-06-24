@@ -1,37 +1,36 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
-import Validator from '@util/validator/Validator';
-import Checker from '@util/checker';
-import ResponseStatusCode from '@common/response-status-code';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
-import { CatalogDocumentModel } from './interface';
+import {
+    CatalogLocator,
+    CatalogRequestBodySchema,
+    CatalogRequestParamSchema,
+    CatalogRequestQuerySchema,
+} from './interface';
 import CatalogLogic from './CatalogLogic';
 import HostLogic from '../host/HostLogic';
 import PatternLogic from '../pattern/PatternLogic';
+import Joi from '@hapi/joi';
+import CommonConstant from '@common/constant';
+import { CommonRequest } from '@service/interface';
 
 const commonPath = '/catalogs';
+const commonName = 'catalogs';
 const specifyIdPath = '/catalog/:id';
+const specifyName = 'catalog';
 
-export default class CatalogController extends ServiceControllerBase {
+export default class CatalogController extends ServiceControllerBase<
+    CatalogRequestParamSchema,
+    CatalogRequestQuerySchema,
+    CatalogRequestBodySchema
+> {
     private static instance: CatalogController;
-
-    private catalogLogic = CatalogLogic.getInstance();
-
     private readonly PARAM_PATTERN_ID = 'patternId';
-
     private readonly PARAM_TITLE = 'title';
-
     private readonly PARAM_URL = 'url';
-
-    private readonly PARAM_LOCATOR = 'locator';
-
-    private readonly PARAM_DETAIL_URL = 'detailUrl';
-
-    private readonly PARAM_PAGE_NUMBER = 'pageNumber';
-
     private readonly PARAM_HOST_ID = 'hostId';
 
     constructor() {
-        super();
+        super(commonName, specifyName, CatalogLogic.getInstance());
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -47,363 +46,111 @@ export default class CatalogController extends ServiceControllerBase {
         return this.instance;
     }
 
-    protected getAllRoute = async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> => {
-        try {
-            this.validator = new Validator();
+    protected initValidateSchema(): void {
+        this.reqQuerySchema = this.reqQuerySchema.keys({
+            title: Joi.string(),
+            url: Joi.string(),
+            hostId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            patternId: Joi.number().integer().min(CommonConstant.MIN_ID),
+        });
 
-            this.validator.addParamValidator(
-                this.PARAM_HOST_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_HOST_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PATTERN_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PATTERN_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestQuery);
-
-            const { documents, hasNext } = await this.catalogLogic.getAll({
-                limit: this.limit,
-                offset: this.offset,
-                conditions: this.buildQueryConditions([
-                    { paramName: this.PARAM_HOST_ID, isString: false },
-                    { paramName: this.PARAM_PATTERN_ID, isString: false },
-                    { paramName: this.PARAM_TITLE, isString: true },
-                    { paramName: this.PARAM_URL, isString: true },
-                ]),
-            });
-            const responseBody = {
-                catalogs: documents.map((catalog) =>
-                    this.catalogLogic.convertToApiResponse(catalog)
-                ),
-                hasNext,
-            };
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    };
-
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const catalog = await this.catalogLogic.getById(idBody);
-            const responseBody = {
-                catalog: this.catalogLogic.convertToApiResponse(catalog!),
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+        this.reqBodySchema = Joi.object<CatalogRequestBodySchema>({
+            title: Joi.string(),
+            hostId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            patternId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            locator: Joi.object<CatalogLocator>({
+                pageNumber: Joi.string(),
+                detailUrl: Joi.string(),
+            }),
+            url: Joi.string()
+                .regex(/:\/\/[0-9a-z-.]+\.[a-z]+\/?/i)
+                .uri({
+                    scheme: [/https?/],
+                }),
+        });
     }
 
-    protected async createRoute(
-        req: Request,
+    protected setRequiredInputForValidateSchema(): void {
+        this.reqBodySchema = this.reqBodySchema.append({
+            title: Joi.required(),
+            hostId: Joi.required(),
+            patternId: Joi.required(),
+            locator: Joi.object<CatalogLocator>({
+                pageNumber: Joi.required(),
+                detailUrl: Joi.required(),
+            }),
+            url: Joi.required(),
+        });
+    }
+
+    protected getAllPrepend(
+        req: CommonRequest<
+            CatalogRequestParamSchema,
+            CatalogRequestBodySchema,
+            CatalogRequestQuerySchema
+        >,
+        res: Response,
+        next: NextFunction
+    ): void {
+        req.locals!.getConditions = this.buildQueryConditions([
+            { paramName: this.PARAM_HOST_ID, isString: false },
+            { paramName: this.PARAM_PATTERN_ID, isString: false },
+            { paramName: this.PARAM_TITLE, isString: true },
+            { paramName: this.PARAM_URL, isString: true },
+        ]);
+        next();
+    }
+
+    protected async createPrepend(
+        req: CommonRequest<
+            CatalogRequestParamSchema,
+            CatalogRequestBodySchema,
+            CatalogRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.StringLength(1, 100)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_LOCATOR,
-                new Checker.Type.Object()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_HOST_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_HOST_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PATTERN_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PATTERN_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PAGE_NUMBER,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.validate(this.requestBody);
-            this.validator.validate(
-                (this.requestBody[this.PARAM_LOCATOR] as Record<
-                    string,
-                    string
-                >) ?? {}
-            );
-
-            const catalogBody = (this
-                .requestBody as unknown) as CatalogDocumentModel;
             await HostLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: catalogBody.hostId,
+                hostId: this.reqBody.hostId,
             });
             await PatternLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
+                patternId: this.reqBody.patternId,
             });
 
-            const createdCatalog = await this.catalogLogic.create(catalogBody, {
-                notExist: { [this.PARAM_URL]: catalogBody.url },
-            });
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.CREATED,
-                this.catalogLogic.convertToApiResponse(createdCatalog)
-            );
+            req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 
-    protected async updateRoute(
-        req: Request,
+    protected async updatePrepend(
+        req: CommonRequest<
+            CatalogRequestParamSchema,
+            CatalogRequestBodySchema,
+            CatalogRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.StringLength(1, 100)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Url());
-
-            this.validator.addParamValidator(
-                this.PARAM_LOCATOR,
-                new Checker.Type.Object()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PAGE_NUMBER,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_HOST_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_HOST_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PATTERN_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PATTERN_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-            this.validator.validate(this.requestBody);
-            this.validator.validate(
-                (this.requestBody[this.PARAM_LOCATOR] as Record<
-                    string,
-                    string
-                >) ?? {}
-            );
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const catalogBody = (this
-                .requestBody as unknown) as CatalogDocumentModel;
-
-            if (catalogBody.hostId) {
+            if (this.reqBody.hostId) {
                 await HostLogic.getInstance().checkExisted({
-                    [this.PARAM_DOCUMENT_ID]: catalogBody.hostId,
+                    hostId: this.reqBody.hostId,
                 });
             }
 
-            if (catalogBody.patternId) {
+            if (this.reqBody.patternId) {
                 await PatternLogic.getInstance().checkExisted({
-                    [this.PARAM_DOCUMENT_ID]: catalogBody.patternId,
+                    patternId: this.reqBody.patternId,
                 });
             }
 
-            const editedCatalog = await this.catalogLogic.update(
-                idBody,
-                catalogBody,
-                { notExist: { [this.PARAM_URL]: catalogBody.url } }
-            );
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                this.catalogLogic.convertToApiResponse(editedCatalog)
-            );
+            req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.catalogLogic.delete(idBody);
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.NO_CONTENT,
-                {}
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.catalogLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'catalog',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 }

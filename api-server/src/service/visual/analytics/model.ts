@@ -7,23 +7,25 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualAnalyticsSchema: Schema = new Schema(
     {
-        month: { type: Schema.Types.Number },
-        year: { type: Schema.Types.Number },
+        month: { type: Schema.Types.Number, required: true },
+        year: { type: Schema.Types.Number, required: true },
         transactionType: {
             type: Schema.Types.Number,
             enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+            required: true,
         },
         propertyType: {
             type: Schema.Types.Number,
             enum: CommonConstant.PROPERTY_TYPE.map((item) => item.id),
+            required: true,
         },
-        amount: { type: Schema.Types.Number },
-        priceMax: { type: Schema.Types.Number },
-        priceMin: { type: Schema.Types.Number },
-        perMeterSum: { type: Schema.Types.Number },
-        perMeterAverage: { type: Schema.Types.Number },
-        perMeterMax: { type: Schema.Types.Number },
-        perMeterMin: { type: Schema.Types.Number },
+        amount: { type: Schema.Types.Number, required: true },
+        priceMax: { type: Schema.Types.Number, required: true },
+        priceMin: { type: Schema.Types.Number, required: true },
+        perMeterSum: { type: Schema.Types.Number, required: true },
+        perMeterAverage: { type: Schema.Types.Number, required: true },
+        perMeterMax: { type: Schema.Types.Number, required: true },
+        perMeterMin: { type: Schema.Types.Number, required: true },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );

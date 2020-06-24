@@ -60,10 +60,14 @@ export default class App {
     /**
      * Bind routes
      */
-    private bindRoutes(routes: ServiceControllerBase[]): void {
-        routes.forEach((controller: ServiceControllerBase): void => {
-            this.app.use('/api/v1', controller.router);
-        });
+    private bindRoutes(
+        routes: Array<ServiceControllerBase<any, any, any>>
+    ): void {
+        routes.forEach(
+            (controller: ServiceControllerBase<any, any, any>): void => {
+                this.app.use('/api/v1', controller.router);
+            }
+        );
 
         this.app.use(notFoundRoute, errorHandler);
     }

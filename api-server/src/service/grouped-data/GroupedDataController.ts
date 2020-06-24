@@ -1,24 +1,31 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
-import Validator from '@util/validator/Validator';
-import Checker from '@util/checker';
-import ResponseStatusCode from '@common/response-status-code';
 import GroupedDataLogic from './GroupedDataLogic';
-import { GroupedDataDocumentModel } from './interface';
+import {
+    GroupedDataRequestBodySchema,
+    GroupedDataRequestParamSchema,
+    GroupedDataRequestQuerySchema,
+} from './interface';
 import RawDataLogic from '../raw-data/RawDataLogic';
+import Joi from '@hapi/joi';
+import CommonConstant from '@common/constant';
+import { CommonRequest } from '@service/interface';
 
 const commonPath = '/grouped-dataset';
+const commonName = 'groupedDataset';
 const specifyIdPath = '/grouped-data/:id';
+const specifyName = 'groupedData';
 
-export default class GroupedDataController extends ServiceControllerBase {
+export default class GroupedDataController extends ServiceControllerBase<
+    GroupedDataRequestParamSchema,
+    GroupedDataRequestQuerySchema,
+    GroupedDataRequestBodySchema
+> {
     private static instance: GroupedDataController;
-
-    private groupedDataLogic = new GroupedDataLogic();
-
     private readonly PARAM_ITEMS = 'items';
 
     constructor() {
-        super();
+        super(commonName, specifyName, GroupedDataLogic.getInstance());
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -32,226 +39,83 @@ export default class GroupedDataController extends ServiceControllerBase {
         return this.instance;
     }
 
-    protected async getAllRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
+    protected initValidateSchema(): void {
+        this.reqQuerySchema = this.reqQuerySchema.keys({
+            items: Joi.alternatives().try(
+                Joi.number().integer().min(CommonConstant.MIN_ID),
+                Joi.array().items(
+                    Joi.number().integer().min(CommonConstant.MIN_ID)
+                )
+            ),
+        });
 
-            let items: string[];
-            if (!Array.isArray(this.requestQuery[this.PARAM_ITEMS])) {
-                items = [this.requestQuery[this.PARAM_ITEMS] as string];
-            } else {
-                items = this.requestQuery[this.PARAM_ITEMS] as string[];
-                items.forEach((item, index): void => {
-                    this.validator.addParamValidator(
-                        index.toString(),
-                        new Checker.Type.Integer()
-                    );
-                    this.validator.addParamValidator(
-                        index.toString(),
-                        new Checker.IntegerRange(1, null)
-                    );
-                });
-            }
-
-            this.validator.validate(items as string[]);
-
-            const { documents, hasNext } = await this.groupedDataLogic.getAll({
-                limit: this.limit,
-                offset: this.offset,
-                conditions: this.buildQueryConditions([
-                    { paramName: this.PARAM_ITEMS, isString: false },
-                ]),
-            });
-            const groupedDataList = documents.map(
-                (groupedData: GroupedDataDocumentModel) =>
-                    this.groupedDataLogic.convertToApiResponse(groupedData)
-            );
-            const responseBody = {
-                groupedDataset: groupedDataList,
-                hasNext,
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+        this.reqBodySchema = Joi.object<GroupedDataRequestBodySchema>({
+            items: Joi.array().items(
+                Joi.number().integer().min(CommonConstant.MIN_ID)
+            ),
+        });
     }
 
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const groupedData = await this.groupedDataLogic.getById(idBody);
-            const responseBody = {
-                groupedData: this.groupedDataLogic.convertToApiResponse(
-                    groupedData!
-                ),
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    protected setRequiredInputForValidateSchema(): void {
+        this.reqBodySchema = this.reqBodySchema.append({
+            items: Joi.required(),
+        });
     }
 
-    protected async createRoute(
-        req: Request,
+    protected getAllPrepend(
+        req: CommonRequest<
+            GroupedDataRequestParamSchema,
+            GroupedDataRequestBodySchema,
+            GroupedDataRequestQuerySchema
+        >,
+        res: Response,
+        next: NextFunction
+    ): void {
+        req.locals!.getConditions = this.buildQueryConditions([
+            { paramName: this.PARAM_ITEMS, isString: false },
+        ]);
+        next();
+    }
+
+    protected async createPrepend(
+        req: CommonRequest<
+            GroupedDataRequestParamSchema,
+            GroupedDataRequestBodySchema,
+            GroupedDataRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ITEMS,
-                new Checker.Type.Array()
-            );
-
-            this.validator.validate(this.requestBody);
-
-            const groupedDataBody = (this
-                .requestBody as unknown) as GroupedDataDocumentModel;
-            for (const item of groupedDataBody.items) {
+            for (const item of this.reqBody.items) {
                 await RawDataLogic.getInstance().checkExisted({
                     [this.PARAM_DOCUMENT_ID]: item,
                 });
             }
-            const createdGroupedData = await this.groupedDataLogic.create(
-                groupedDataBody
-            );
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.CREATED,
-                this.groupedDataLogic.convertToApiResponse(createdGroupedData)
-            );
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 
-    protected async updateRoute(
-        req: Request,
+    protected async updatePrepend(
+        req: CommonRequest<
+            GroupedDataRequestParamSchema,
+            GroupedDataRequestBodySchema,
+            GroupedDataRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_ITEMS,
-                new Checker.Type.Array()
-            );
-
-            this.validator.validate(this.requestParams);
-            this.validator.validate(this.requestBody);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const groupedDataBody = (this
-                .requestBody as unknown) as GroupedDataDocumentModel;
-            for (const item of groupedDataBody.items) {
+            for (const item of this.reqBody.items) {
                 await RawDataLogic.getInstance().checkExisted({
                     [this.PARAM_DOCUMENT_ID]: item,
                 });
             }
-            const editedGroupedData = await this.groupedDataLogic.update(
-                idBody,
-                groupedDataBody
-            );
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                this.groupedDataLogic.convertToApiResponse(editedGroupedData)
-            );
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.groupedDataLogic.delete(idBody);
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.NO_CONTENT,
-                {}
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.groupedDataLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'grouped-data',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 }

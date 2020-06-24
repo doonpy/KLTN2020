@@ -1,45 +1,33 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
-import Validator from '@util/validator/Validator';
-import Checker from '@util/checker';
-import ResponseStatusCode from '@common/response-status-code';
-import { PatternDocumentModel } from './interface';
+import {
+    PatternMainLocator,
+    PatternDocumentModel,
+    PatternRequestBodySchema,
+    PatternRequestParamSchema,
+    PatternRequestQuerySchema,
+    PatternPostDate,
+    PatternSubLocator,
+} from './interface';
 import PatternLogic from './PatternLogic';
+import Joi from '@hapi/joi';
+import { CommonRequest } from '@service/interface';
 
 const commonPath = '/patterns';
+const commonName = 'patterns';
 const specifyIdPath = '/pattern/:id';
+const specifyName = 'pattern';
 
-export default class PatternController extends ServiceControllerBase {
+export default class PatternController extends ServiceControllerBase<
+    PatternRequestParamSchema,
+    PatternRequestQuerySchema,
+    PatternRequestBodySchema
+> {
     private static instance: PatternController;
-
-    private patternLogic = PatternLogic.getInstance();
-
     private readonly PARAM_SOURCE_URL = 'sourceUrl';
 
-    private readonly PARAM_MAIN_LOCATOR = 'mainLocator';
-
-    private readonly PARAM_SUB_LOCATOR = 'subLocator';
-
-    private readonly PARAM_TITLE_LOCATOR = 'title';
-
-    private readonly PARAM_DESCRIBE_LOCATOR = 'describe';
-
-    private readonly PARAM_PRICE_LOCATOR = 'price';
-
-    private readonly PARAM_ACREAGE_LOCATOR = 'acreage';
-
-    private readonly PARAM_ADDRESS_LOCATOR = 'address';
-
-    private readonly PARAM_PROPERTY_TYPE_LOCATOR = 'propertyType';
-
-    private readonly PARAM_POST_DATE_LOCATOR = 'postDate';
-
-    private readonly PARAM_NAME_SUB_LOCATOR = 'name';
-
-    private readonly PARAM_VALUE_SUB_LOCATOR = 'value';
-
     constructor() {
-        super();
+        super(commonName, specifyName, PatternLogic.getInstance());
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -53,384 +41,102 @@ export default class PatternController extends ServiceControllerBase {
         return this.instance;
     }
 
-    protected async getAllRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
+    protected initValidateSchema(): void {
+        this.reqQuerySchema = this.reqQuerySchema.keys({
+            sourceUrl: Joi.string(),
+        });
 
-            this.validator.addParamValidator(
-                this.requestQuery[this.PARAM_SOURCE_URL] as string,
-                new Checker.Type.String()
-            );
-
-            this.validator.validate(this.requestQuery);
-
-            const { documents, hasNext } = await this.patternLogic.getAll({
-                limit: this.limit,
-                offset: this.offset,
-                conditions: this.buildQueryConditions([
-                    { paramName: this.PARAM_SOURCE_URL, isString: true },
-                ]),
-            });
-            const patterns = documents.map((pattern) =>
-                this.patternLogic.convertToApiResponse(pattern)
-            );
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                patterns,
-                hasNext,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+        this.reqBodySchema = Joi.object<PatternRequestBodySchema>({
+            sourceUrl: Joi.string()
+                .regex(/:\/\/[0-9a-z-.]+\.[a-z]+(\/.*)?/i)
+                .uri({
+                    scheme: [/https?/],
+                }),
+            mainLocator: Joi.object<PatternMainLocator>({
+                propertyType: Joi.string(),
+                title: Joi.string(),
+                describe: Joi.string(),
+                price: Joi.string(),
+                acreage: Joi.string(),
+                address: Joi.string(),
+                postDate: Joi.object<PatternPostDate>({
+                    locator: Joi.string(),
+                    format: Joi.string(),
+                    delimiter: Joi.string(),
+                }),
+            }),
+            subLocator: Joi.array().items(
+                Joi.object<PatternSubLocator>({
+                    name: Joi.string(),
+                    value: Joi.string(),
+                })
+            ),
+        });
     }
 
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const pattern = await this.patternLogic.getById(idBody);
-            const responseBody = {
-                pattern: this.patternLogic.convertToApiResponse(pattern!),
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    protected setRequiredInputForValidateSchema(): void {
+        this.reqBodySchema = this.reqBodySchema.append({
+            sourceUrl: Joi.required(),
+            mainLocator: Joi.object<PatternMainLocator>({
+                propertyType: Joi.required(),
+                title: Joi.required(),
+                describe: Joi.required(),
+                price: Joi.required(),
+                acreage: Joi.required(),
+                address: Joi.required(),
+                postDate: Joi.object<PatternPostDate>({
+                    locator: Joi.required(),
+                    format: Joi.required(),
+                    delimiter: Joi.required(),
+                }),
+            }),
+            subLocator: Joi.array().items(
+                Joi.object<PatternSubLocator>({
+                    name: Joi.required(),
+                    value: Joi.required(),
+                })
+            ),
+        });
     }
 
-    protected async createRoute(
-        req: Request,
+    protected getAllPrepend(
+        req: CommonRequest<
+            PatternRequestParamSchema,
+            PatternRequestBodySchema,
+            PatternRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_SOURCE_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_SOURCE_URL,
-                new Checker.Url()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_MAIN_LOCATOR,
-                new Checker.Type.Object()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_TITLE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_TITLE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_DESCRIBE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DESCRIBE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PRICE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PRICE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_ACREAGE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ACREAGE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_ADDRESS_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ADDRESS_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_POST_DATE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_POST_DATE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_SUB_LOCATOR,
-                new Checker.Type.Object()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_VALUE_SUB_LOCATOR,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_NAME_SUB_LOCATOR,
-                new Checker.Type.String()
-            );
-
-            this.validator.validate(this.requestBody);
-
-            const patternBody = (this
-                .requestBody as unknown) as PatternDocumentModel;
-            const createdPattern = await this.patternLogic.create(patternBody, {
-                notExist: { [this.PARAM_SOURCE_URL]: patternBody.sourceUrl },
-            });
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.CREATED,
-                this.patternLogic.convertToApiResponse(createdPattern)
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    ): void {
+        req.locals!.getConditions = this.buildQueryConditions([
+            { paramName: this.PARAM_SOURCE_URL, isString: true },
+        ]);
+        next();
     }
 
-    protected async updateRoute(
-        req: Request,
+    protected createPrepend(
+        req: CommonRequest<
+            PatternRequestParamSchema,
+            PatternRequestBodySchema,
+            PatternRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_SOURCE_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_SOURCE_URL,
-                new Checker.Url()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_MAIN_LOCATOR,
-                new Checker.Type.Object()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_TITLE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_TITLE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_DESCRIBE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DESCRIBE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PRICE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PRICE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_ACREAGE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ACREAGE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_ADDRESS_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ADDRESS_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_POST_DATE_LOCATOR,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_POST_DATE_LOCATOR,
-                new Checker.StringLength(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_SUB_LOCATOR,
-                new Checker.Type.Object()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_VALUE_SUB_LOCATOR,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_NAME_SUB_LOCATOR,
-                new Checker.Type.String()
-            );
-
-            this.validator.validate(this.requestParams);
-            this.validator.validate(this.requestBody);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const patternBody = (this
-                .requestBody as unknown) as PatternDocumentModel;
-            const currentPattern = await this.patternLogic.getById(idBody);
-            let editedPattern: PatternDocumentModel;
-            if (patternBody.sourceUrl !== currentPattern!.sourceUrl) {
-                editedPattern = await this.patternLogic.update(
-                    idBody,
-                    patternBody,
-                    {
-                        notExist: {
-                            [this.PARAM_SOURCE_URL]: patternBody.sourceUrl,
-                        },
-                    }
-                );
-            } else {
-                editedPattern = await this.patternLogic.update(
-                    idBody,
-                    patternBody
-                );
-            }
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                this.patternLogic.convertToApiResponse(editedPattern)
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    ): void {
+        req.locals!.validateNotExist = [{ sourceUrl: this.reqBody.sourceUrl }];
+        next();
     }
 
-    protected async deleteRoute(
-        req: Request,
+    protected updatePrepend(
+        req: CommonRequest<
+            PatternRequestParamSchema,
+            PatternRequestBodySchema,
+            PatternRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.patternLogic.delete(idBody);
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.NO_CONTENT,
-                {}
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.patternLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'pattern',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    ): void {
+        req.locals!.validateNotExist = [{ sourceUrl: this.reqBody.sourceUrl }];
+        next();
     }
 }

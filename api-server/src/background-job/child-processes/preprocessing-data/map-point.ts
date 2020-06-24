@@ -1,6 +1,6 @@
 import { RawDataDocumentModel } from '@service/raw-data/interface';
 import {
-    MapPoint,
+    RawDatasetItem,
     VisualMapPointDocumentModel,
 } from '@service/visual/map-point/interface';
 import CommonConstant from '@common/constant';
@@ -57,7 +57,7 @@ const handleVisualizationMapPoint = async (
         lng,
     });
 
-    const newPoint: MapPoint = {
+    const newPoint: RawDatasetItem = {
         rawDataId: _id,
         acreage: acreage.value,
         price: price.value,
