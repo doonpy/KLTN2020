@@ -14,7 +14,6 @@ import {
     DocumentModelBase,
 } from '@service/interface';
 import ExceptionCustomize from '@util/exception/ExceptionCustomize';
-import Validator from '@util/validator/Validator';
 import Wording from '@service/wording';
 import Joi from '@hapi/joi';
 import ServiceLogicBase from '@service/ServiceLogicBase';
@@ -49,8 +48,7 @@ export default abstract class ServiceControllerBase<
     protected reqBody!: ReqBodySchema;
     protected reqParam!: ReqParamSchema;
     protected reqQuery!: ReqQuerySchema;
-    protected validator: Validator = new Validator();
-    public router: RouterType = Router();
+    public router: RouterType;
     protected readonly PARAM_DOCUMENT_ID = '_id';
     protected readonly PARAM_ID: string = 'id';
 
@@ -59,6 +57,7 @@ export default abstract class ServiceControllerBase<
         specifyName: string,
         logicInstance: ServiceLogicBase<DocumentModelBase, ApiModelBase>
     ) {
+        this.router = Router();
         this.logicInstance = logicInstance;
         this.commonName = commonName;
         this.specifyName = specifyName;
