@@ -106,12 +106,13 @@ export default class ScrapeRawData extends ScrapeBase {
                         targetDetailUrl.url,
                         async ($: CheerioStatic): Promise<void> => {
                             await this.handleSuccess($, targetDetailUrl);
+                            requestCounter--;
                         },
                         async (): Promise<void> => {
                             await this.handleFailed(targetDetailUrl);
+                            requestCounter--;
                         }
                     );
-                    requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
                         ConsoleConstant.Type.ERROR,
@@ -136,7 +137,7 @@ export default class ScrapeRawData extends ScrapeBase {
 
     protected async handleSuccess(
         $: CheerioStatic,
-        currentDetailUrlDocument: DetailUrlDocumentModel
+        currentDetailUrl: DetailUrlDocumentModel
     ): Promise<void> {
         const {
             propertyType,
@@ -188,7 +189,7 @@ export default class ScrapeRawData extends ScrapeBase {
             .filter((item) => !!item.value);
 
         const rawData = this.handleScrapedData(
-            currentDetailUrlDocument._id,
+            currentDetailUrl._id,
             propertyTypeData,
             postDateData,
             titleData,
@@ -198,27 +199,27 @@ export default class ScrapeRawData extends ScrapeBase {
             addressData,
             othersData
         );
-        currentDetailUrlDocument.isExtracted = EXTRACTED;
-        currentDetailUrlDocument.requestRetries++;
+        currentDetailUrl.isExtracted = EXTRACTED;
+        currentDetailUrl.requestRetries++;
 
         if (this.isHasEmptyProperty(rawData)) {
-            await this.detailUrlLogic.update(
-                currentDetailUrlDocument._id,
-                currentDetailUrlDocument
-            );
+            await this.detailUrlLogic.update(currentDetailUrl._id, {
+                isExtracted: currentDetailUrl.isExtracted,
+                requestRetries: currentDetailUrl.requestRetries,
+            });
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
-                `Scrape raw data -> DID: ${currentDetailUrlDocument._id} - Error: Invalid value.`
+                `Scrape raw data -> DID: ${currentDetailUrl._id} - Error: Invalid value.`
             ).show();
 
             return;
         }
 
         const result = await Promise.all([
-            this.detailUrlLogic.update(
-                currentDetailUrlDocument._id,
-                currentDetailUrlDocument
-            ),
+            this.detailUrlLogic.update(currentDetailUrl._id, {
+                isExtracted: currentDetailUrl.isExtracted,
+                requestRetries: currentDetailUrl.requestRetries,
+            }),
             this.rawDataLogic.create(rawData),
         ]);
         new ConsoleLog(
@@ -275,19 +276,19 @@ export default class ScrapeRawData extends ScrapeBase {
     }
 
     protected async handleFailed(
-        currentDetailUrlDocument: DetailUrlDocumentModel
+        currentDetailUrl: DetailUrlDocumentModel
     ): Promise<void> {
-        currentDetailUrlDocument.requestRetries++;
-        if (currentDetailUrlDocument.requestRetries < MAX_REQUEST_RETRIES) {
-            this.detailUrls.push(currentDetailUrlDocument);
+        currentDetailUrl.requestRetries++;
+        if (currentDetailUrl.requestRetries < MAX_REQUEST_RETRIES) {
+            this.detailUrls.push(currentDetailUrl);
         } else {
-            await this.detailUrlLogic.update(
-                currentDetailUrlDocument._id,
-                currentDetailUrlDocument
-            );
+            await this.detailUrlLogic.update(currentDetailUrl._id, {
+                isExtracted: currentDetailUrl.isExtracted,
+                requestRetries: currentDetailUrl.requestRetries,
+            });
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,
-                `Scrape raw data -> DID: ${currentDetailUrlDocument._id}`
+                `Scrape raw data -> DID: ${currentDetailUrl._id}`
             ).show();
         }
     }
