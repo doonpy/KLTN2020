@@ -36,9 +36,7 @@ const VisualMapPointSchema: Schema = new Schema(
                         acreage: { type: Schema.Types.Number, required: true },
                         price: { type: Schema.Types.Number, required: true },
                         currency: { type: Schema.Types.String, required: true },
-                        timeUnit: [
-                            { type: Schema.Types.String, required: true },
-                        ],
+                        timeUnit: [{ type: Schema.Types.String }],
                     },
                 ],
                 transactionType: {
