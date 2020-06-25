@@ -1,7 +1,6 @@
 import './prepend';
 import * as bodyParser from 'body-parser';
 import checkCors from '@middleware/check-cors';
-import requestLogger from '@middleware/request-logger';
 import HostController from '@service/host/HostController';
 import CatalogController from '@service/catalog/CatalogController';
 import PatternController from '@service/pattern/PatternController';
@@ -16,34 +15,43 @@ import VisualAdministrativeWardController from '@service/visual/administrative/w
 import VisualSummaryDistrictWardController from '@service/visual/summary/district-ward/VisualSummaryDistrictWardController';
 import VisualMapPointController from '@service/visual/map-point/VisualMapPointController';
 import VisualAnalyticsController from '@service/visual/analytics/VisualAnalyticsController';
-import App from './app';
+import { App } from './App';
+import morgan from 'morgan';
 
 /**
  * Main
  */
-(async (): Promise<void> => {
-    await App.getInstance().start(
-        [
+((): void => {
+    new App({
+        protocol: process.env.API_SERVER_PROTOCOL ?? '',
+        domain: process.env.API_SERVER_DOMAIN ?? '',
+        port: process.env.API_SERVER_PORT ?? '',
+        middlewares: [
             bodyParser.json(),
             bodyParser.urlencoded({ extended: true }),
-            requestLogger,
+            morgan('dev'),
             checkCors,
         ],
-        [
-            HostController.getInstance(),
-            CatalogController.getInstance(),
-            PatternController.getInstance(),
-            DetailUrlController.getInstance(),
-            RawDataController.getInstance(),
-            GroupedDataController.getInstance(),
-            VisualAdministrativeCountryController.getInstance(),
-            VisualAdministrativeProvinceController.getInstance(),
-            VisualAdministrativeDistrictController.getInstance(),
-            VisualAdministrativeWardController.getInstance(),
-            VisualSummaryDistrictController.getInstance(),
-            VisualSummaryDistrictWardController.getInstance(),
-            VisualMapPointController.getInstance(),
-            VisualAnalyticsController.getInstance(),
-        ]
-    );
+        controllers: [
+            {
+                cPath: '/api/v1',
+                controllers: [
+                    HostController.getInstance(),
+                    CatalogController.getInstance(),
+                    PatternController.getInstance(),
+                    DetailUrlController.getInstance(),
+                    RawDataController.getInstance(),
+                    GroupedDataController.getInstance(),
+                    VisualAdministrativeCountryController.getInstance(),
+                    VisualAdministrativeProvinceController.getInstance(),
+                    VisualAdministrativeDistrictController.getInstance(),
+                    VisualAdministrativeWardController.getInstance(),
+                    VisualSummaryDistrictController.getInstance(),
+                    VisualSummaryDistrictWardController.getInstance(),
+                    VisualMapPointController.getInstance(),
+                    VisualAnalyticsController.getInstance(),
+                ],
+            },
+        ],
+    }).start();
 })();
