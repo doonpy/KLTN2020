@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import DetailUrlLogic from './DetailUrlLogic';
 import {
+    DetailUrlDocumentModel,
     DetailUrlRequestBodySchema,
     DetailUrlRequestParamSchema,
     DetailUrlRequestQuerySchema,
@@ -121,8 +122,12 @@ export default class DetailUrlController extends ServiceControllerBase<
                     [this.PARAM_DOCUMENT_ID]: this.reqBody.catalogId,
                 });
             }
-
-            req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            const currentDetailUrl = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as DetailUrlDocumentModel;
+            if (currentDetailUrl && currentDetailUrl.url !== this.reqBody.url) {
+                req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            }
             next();
         } catch (error) {
             next(error);

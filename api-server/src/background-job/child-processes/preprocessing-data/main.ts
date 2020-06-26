@@ -22,8 +22,8 @@ async function* generateScript() {
         `Preprocessing data - Start`
     ).show();
 
-    await addCoordinatePhase(script);
-    yield 'Phase 1: Add coordinate';
+    // await addCoordinatePhase(script);
+    // yield 'Phase 1: Add coordinate';
 
     await preprocessingDataPhase(script);
     yield 'Phase 2: Preprocessing data';

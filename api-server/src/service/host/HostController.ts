@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import HostLogic from './HostLogic';
 import {
+    HostDocumentModel,
     HostRequestBodySchema,
     HostRequestParamSchema,
     HostRequestQuerySchema,
@@ -90,7 +91,7 @@ export default class HostController extends ServiceControllerBase<
         next();
     }
 
-    protected updatePrepend(
+    protected async updatePrepend(
         req: CommonRequest<
             HostRequestParamSchema,
             HostRequestBodySchema,
@@ -98,8 +99,19 @@ export default class HostController extends ServiceControllerBase<
         >,
         res: Response,
         next: NextFunction
-    ): void | Promise<void> {
-        req.locals!.validateNotExist = [{ domain: this.reqBody.domain }];
-        next();
+    ): Promise<void> {
+        try {
+            const currentHost = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as HostDocumentModel;
+            if (currentHost && currentHost.domain !== this.reqBody.domain) {
+                req.locals!.validateNotExist = [
+                    { domain: this.reqBody.domain },
+                ];
+            }
+            next();
+        } catch (error) {
+            next(error);
+        }
     }
 }
