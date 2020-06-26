@@ -4,6 +4,7 @@ import CommonConstant from '@common/constant';
 import RawDataLogic from './RawDataLogic';
 import {
     RawDataAcreage,
+    RawDataDocumentModel,
     RawDataOther,
     RawDataPrice,
     RawDataRequestBodySchema,
@@ -174,9 +175,17 @@ export default class RawDataController extends ServiceControllerBase<
                 });
             }
 
-            req.locals!.validateNotExist = [
-                { detailUrlId: this.reqBody.detailUrlId },
-            ];
+            const currentRawData = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as RawDataDocumentModel;
+            if (
+                currentRawData &&
+                currentRawData.detailUrlId !== this.reqBody.detailUrlId
+            ) {
+                req.locals!.validateNotExist = [
+                    { detailUrlId: this.reqBody.detailUrlId },
+                ];
+            }
             next();
         } catch (error) {
             next(error);
