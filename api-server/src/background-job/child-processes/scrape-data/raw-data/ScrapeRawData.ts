@@ -81,35 +81,34 @@ export default class ScrapeRawData extends ScrapeBase {
             const domain = (this.catalog.hostId as HostDocumentModel).domain;
             let requestCounter = 0;
             const loop = setInterval(async (): Promise<void> => {
-                if (this.detailUrls.length === 0 && requestCounter === 0) {
-                    clearInterval(loop);
-                    await this.finishAction();
-                    return;
-                }
-
-                if (requestCounter > MAX_REQUEST) {
-                    return;
-                }
-
-                const targetDetailUrl = this.detailUrls.shift();
-                if (!targetDetailUrl) {
-                    return;
-                }
-
                 try {
+                    if (this.detailUrls.length === 0 && requestCounter === 0) {
+                        clearInterval(loop);
+                        await this.finishAction();
+                        return;
+                    }
+
+                    if (requestCounter > MAX_REQUEST) {
+                        return;
+                    }
+
                     requestCounter++;
-                    await this.scrapeAction(
+                    const targetDetailUrl = this.detailUrls.shift();
+                    if (!targetDetailUrl) {
+                        requestCounter--;
+                        return;
+                    }
+
+                    const $ = await this.getStaticBody(
                         domain,
-                        targetDetailUrl.url,
-                        async ($: CheerioStatic): Promise<void> => {
-                            await this.handleSuccess($, targetDetailUrl);
-                            requestCounter--;
-                        },
-                        async (): Promise<void> => {
-                            await this.handleFailed(targetDetailUrl);
-                            requestCounter--;
-                        }
+                        targetDetailUrl.url
                     );
+                    if (!$) {
+                        await this.handleFailed(targetDetailUrl);
+                    } else {
+                        await this.handleSuccess($, targetDetailUrl);
+                    }
+                    requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
                         ConsoleConstant.Type.ERROR,

@@ -18,30 +18,27 @@ const DEFAULT_REQUEST_OPTIONS: AxiosRequestConfig = {
 
 export default abstract class ScrapeBase {
     protected startTime: [number, number] | undefined;
-
     protected readonly catalog: CatalogDocumentModel;
-
     protected isRunning = false;
-
     protected telegramChatBotInstance = ChatBotTelegram.getInstance();
 
     protected constructor(catalog: CatalogDocumentModel) {
         this.catalog = catalog;
     }
 
-    private async getStaticBody(
+    protected async getStaticBody(
         domain: string,
         path: string
     ): Promise<CheerioStatic | null> {
-        const DOMAIN_PATTERN = RegExp(
-            /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
-        );
-        const originDomain = domain.replace(/\/{2,}$/, '');
-        const url = DOMAIN_PATTERN.test(path)
-            ? path
-            : originDomain + (/^\//.test(path) ? path : `/${path}`);
-
         try {
+            const DOMAIN_PATTERN = RegExp(
+                /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
+            );
+            const originDomain = domain.replace(/\/{2,}$/, '');
+            const url = DOMAIN_PATTERN.test(path)
+                ? path
+                : originDomain + (/^\//.test(path) ? path : `/${path}`);
+
             const { data, status, request } = await sendRequest<string>({
                 ...DEFAULT_REQUEST_OPTIONS,
                 url,
@@ -94,22 +91,5 @@ export default abstract class ScrapeBase {
         }
 
         return data;
-    }
-
-    protected async scrapeAction(
-        domain: string,
-        url: string,
-        successHandler: ($: CheerioStatic) => Promise<void>,
-        failedHandler?: () => Promise<void>
-    ): Promise<void> {
-        const $ = await this.getStaticBody(domain, url);
-
-        if (!$) {
-            if (failedHandler) {
-                await failedHandler();
-            }
-        } else {
-            await successHandler($);
-        }
     }
 }
