@@ -117,7 +117,7 @@ export default abstract class ServiceLogicBase<
 
     public async update(
         id: number,
-        input: CommonRequestBodySchema,
+        input: FilterQuery<CommonRequestBodySchema>,
         { exist, notExist }: ValidateProperties<DocumentModel> = {}
     ): Promise<DocumentModel | never> {
         await this.checkExisted({ _id: id } as FilterQuery<DocumentModel>);

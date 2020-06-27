@@ -51,7 +51,7 @@ export default class DetailUrlController extends ServiceControllerBase<
             requestRetries: Joi.number().integer().min(0).max(3),
         });
 
-        this.reqBodySchema = Joi.object<DetailUrlRequestBodySchema>({
+        this.reqBodySchema = this.reqBodySchema.keys({
             catalogId: Joi.number().integer().min(CommonConstant.MIN_ID),
             url: Joi.string()
                 .regex(/:\/\/[0-9a-z-.]+\.[a-z]+\/?/i)

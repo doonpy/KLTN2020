@@ -55,7 +55,7 @@ export default class CatalogController extends ServiceControllerBase<
             patternId: Joi.number().integer().min(CommonConstant.MIN_ID),
         });
 
-        this.reqBodySchema = Joi.object<CatalogRequestBodySchema>({
+        this.reqBodySchema = this.reqBodySchema.keys({
             title: Joi.string(),
             hostId: Joi.number().integer().min(CommonConstant.MIN_ID),
             patternId: Joi.number().integer().min(CommonConstant.MIN_ID),

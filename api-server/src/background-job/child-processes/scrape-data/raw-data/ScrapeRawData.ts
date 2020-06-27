@@ -33,11 +33,8 @@ const MAX_REQUEST = Number(process.env.BGR_SCRAPE_RAW_DATA_MAX_REQUEST || '1');
 
 export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic;
-
     private readonly rawDataLogic: RawDataLogic;
-
     private detailUrls: DetailUrlDocumentModel[];
-
     private pattern: PatternDocumentModel;
 
     constructor(catalog: CatalogDocumentModel) {

@@ -18,9 +18,7 @@ const ATTRIBUTE_TO_GET_DATA = 'href';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic;
-
     private pageNumberQueue: string[];
-
     private scrapedPageNumber: string[];
 
     constructor(catalog: CatalogDocumentModel) {

@@ -49,7 +49,7 @@ export default class GroupedDataController extends ServiceControllerBase<
             ),
         });
 
-        this.reqBodySchema = Joi.object<GroupedDataRequestBodySchema>({
+        this.reqBodySchema = this.reqBodySchema.keys({
             items: Joi.array().items(
                 Joi.number().integer().min(CommonConstant.MIN_ID)
             ),

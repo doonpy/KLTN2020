@@ -46,7 +46,7 @@ export default class PatternController extends ServiceControllerBase<
             sourceUrl: Joi.string(),
         });
 
-        this.reqBodySchema = Joi.object<PatternRequestBodySchema>({
+        this.reqBodySchema = this.reqBodySchema.keys({
             sourceUrl: Joi.string()
                 .regex(/:\/\/[0-9a-z-.]+\.[a-z]+(\/.*)?/i)
                 .uri({
