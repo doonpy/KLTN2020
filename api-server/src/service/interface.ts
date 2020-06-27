@@ -52,4 +52,8 @@ export interface CommonRequestQuerySchema {
     offset: string;
 }
 
-export interface CommonRequestBodySchema {}
+export interface CommonRequestBodySchema {
+    id: number;
+    createAt: string;
+    updateAt: string;
+}

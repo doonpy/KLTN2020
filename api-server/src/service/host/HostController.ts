@@ -45,18 +45,16 @@ export default class HostController extends ServiceControllerBase<
             domain: Joi.string(),
         });
 
-        this.reqBodySchema = Joi.object<HostRequestBodySchema>({
+        this.reqBodySchema = this.reqBodySchema.keys({
             name: Joi.string(),
             domain: Joi.string()
-                .regex(/:\/\/[0-9a-z-.]+\.[a-z]+\/?/i)
-                .uri({
-                    scheme: [/https?/],
-                }),
+                .regex(/[0-9a-z-.]+\.[a-z]+\/?/i)
+                .domain(),
         });
     }
 
     protected setRequiredInputForValidateSchema(): void {
-        this.reqBodySchema = this.reqBodySchema.append({
+        this.reqBodySchema = this.reqBodySchema.keys({
             name: Joi.required(),
             domain: Joi.required(),
         });

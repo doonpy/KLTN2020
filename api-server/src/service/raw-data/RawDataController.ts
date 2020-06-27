@@ -59,7 +59,7 @@ export default class RawDataController extends ServiceControllerBase<
             address: Joi.string(),
         });
 
-        this.reqBodySchema = Joi.object<RawDataRequestBodySchema>({
+        this.reqBodySchema = this.reqBodySchema.keys({
             detailUrlId: Joi.number().integer().min(CommonConstant.MIN_ID),
             transactionType: Joi.number().integer().min(CommonConstant.MIN_ID),
             propertyType: Joi.number().integer().min(CommonConstant.MIN_ID),

@@ -63,6 +63,7 @@ export default abstract class ServiceControllerBase<
         this.specifyName = specifyName;
         this.initDefaultParamValidateSchema();
         this.initDefaultQueryValidateSchema();
+        this.initDefaultBodyValidateSchema();
         this.initValidateSchema();
     }
 
@@ -376,6 +377,14 @@ export default abstract class ServiceControllerBase<
         });
     }
 
+    private initDefaultBodyValidateSchema(): void {
+        this.reqBodySchema = Joi.object<ReqBodySchema>({
+            id: Joi.number().integer().min(MIN_ID),
+            createAt: Joi.date().iso(),
+            updateAt: Joi.date().iso(),
+        });
+    }
+
     private validateLogic(validationType: ValidationType): void {
         let error: Joi.ValidationError | undefined;
         switch (validationType) {
@@ -416,9 +425,6 @@ export default abstract class ServiceControllerBase<
             this.validateLogic(ValidationType.PARAM);
             this.validateLogic(ValidationType.QUERY);
             if (req.method === 'POST' || req.method === 'PATCH') {
-                if (req.method === 'POST') {
-                    this.setRequiredInputForValidateSchema();
-                }
                 this.validateLogic(ValidationType.BODY);
             }
             next();
