@@ -74,9 +74,9 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                         targetUrl,
                         async ($: CheerioStatic): Promise<void> => {
                             await this.handleSuccess($);
+                            requestCounter--;
                         }
                     );
-                    requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
                         ConsoleConstant.Type.ERROR,
