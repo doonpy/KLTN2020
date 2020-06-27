@@ -1,4 +1,4 @@
-/*!
+/* !
 
 =========================================================
 * Material Dashboard React - v1.9.0
@@ -34,7 +34,7 @@ import Icons from 'views/Icons/Icons.js';
 import Maps from 'views/Maps/Maps.js';
 import NotificationsPage from 'views/Notifications/Notifications.js';
 import UpgradeToPro from 'views/UpgradeToPro/UpgradeToPro.js';
-import Host from './views/Host/Host';
+import HostIndex from './views/Host/HostIndex';
 // core components/views for RTL layout
 import RTLPage from 'views/RTLPage/RTLPage.js';
 
@@ -44,8 +44,9 @@ const dashboardRoutes = [
         name: 'Máy chủ',
         rtlName: 'لوحة القيادة',
         icon: Storage,
-        component: Host,
+        component: HostIndex,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/dashboard',
@@ -54,6 +55,7 @@ const dashboardRoutes = [
         icon: Dashboard,
         component: DashboardPage,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/user',
@@ -62,6 +64,7 @@ const dashboardRoutes = [
         icon: Person,
         component: UserProfile,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/table',
@@ -70,6 +73,7 @@ const dashboardRoutes = [
         icon: 'content_paste',
         component: TableList,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/typography',
@@ -78,6 +82,7 @@ const dashboardRoutes = [
         icon: LibraryBooks,
         component: Typography,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/icons',
@@ -86,6 +91,7 @@ const dashboardRoutes = [
         icon: BubbleChart,
         component: Icons,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/maps',
@@ -94,6 +100,7 @@ const dashboardRoutes = [
         icon: LocationOn,
         component: Maps,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/notifications',
@@ -102,6 +109,7 @@ const dashboardRoutes = [
         icon: Notifications,
         component: NotificationsPage,
         layout: '/admin',
+        isChildRoute: false,
     },
     {
         path: '/rtl-page',
@@ -110,6 +118,7 @@ const dashboardRoutes = [
         icon: Language,
         component: RTLPage,
         layout: '/rtl',
+        isChildRoute: false,
     },
     {
         path: '/upgrade-to-pro',
@@ -118,6 +127,7 @@ const dashboardRoutes = [
         icon: Unarchive,
         component: UpgradeToPro,
         layout: '/admin',
+        isChildRoute: false,
     },
 ];
 
