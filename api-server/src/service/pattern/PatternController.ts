@@ -127,7 +127,7 @@ export default class PatternController extends ServiceControllerBase<
         next();
     }
 
-    protected updatePrepend(
+    protected async updatePrepend(
         req: CommonRequest<
             PatternRequestParamSchema,
             PatternRequestBodySchema,
@@ -135,8 +135,23 @@ export default class PatternController extends ServiceControllerBase<
         >,
         res: Response,
         next: NextFunction
-    ): void {
-        req.locals!.validateNotExist = [{ sourceUrl: this.reqBody.sourceUrl }];
+    ): Promise<void> {
+        try {
+            const currentPattern = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as PatternDocumentModel;
+            if (
+                currentPattern &&
+                currentPattern.sourceUrl !== this.reqBody.sourceUrl
+            ) {
+                req.locals!.validateNotExist = [
+                    { sourceUrl: this.reqBody.sourceUrl },
+                ];
+            }
+            next();
+        } catch (error) {
+            next(error);
+        }
         next();
     }
 }

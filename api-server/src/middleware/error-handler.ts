@@ -21,6 +21,7 @@ interface ErrorResponseBody {
         input: string;
         stack?: string;
     };
+    statusCode: number;
 }
 
 const convertToString = (
@@ -106,6 +107,7 @@ export const errorHandler = (
                 message: upperCaseFirstCharacter(message),
                 input: convertToString([req.params, req.query, req.body]),
             },
+            statusCode: statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
         };
     } else {
         body = {
@@ -115,10 +117,8 @@ export const errorHandler = (
                 input: convertToString([req.params, req.query, req.body]),
                 stack,
             },
+            statusCode: statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
         };
     }
-
-    res.status(statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR).json(
-        body
-    );
+    res.status(ResponseStatusCode.OK).json(body);
 };

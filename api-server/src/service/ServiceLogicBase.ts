@@ -130,8 +130,8 @@ export default abstract class ServiceLogicBase<
             await this.validate(notExist, ValidateType.NOT_EXISTED);
         }
 
-        const document = (await this.getById(id))! as Record<string, any>;
-        this.updateProperty(input, document);
+        const document = await this.getById(id);
+        this.updateProperty(input, document!);
         return document!.save();
     }
 

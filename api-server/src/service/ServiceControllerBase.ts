@@ -149,10 +149,11 @@ export default abstract class ServiceControllerBase<
         const statusCode =
             req.locals!.statusCode ?? ResponseStatusCode.INTERNAL_SERVER_ERROR;
         const body = req.locals!.responseBody ?? {};
+        body.statusCode = statusCode;
         if (statusCode === ResponseStatusCode.NO_CONTENT) {
-            res.status(statusCode).json();
+            res.status(ResponseStatusCode.OK).json(body);
         } else {
-            res.status(statusCode).json(body);
+            res.status(ResponseStatusCode.OK).json(body);
         }
     }
 
@@ -414,7 +415,7 @@ export default abstract class ServiceControllerBase<
         try {
             this.validateLogic(ValidationType.PARAM);
             this.validateLogic(ValidationType.QUERY);
-            if (req.method === 'POST' || req.method === 'PUT') {
+            if (req.method === 'POST' || req.method === 'PATCH') {
                 if (req.method === 'POST') {
                     this.setRequiredInputForValidateSchema();
                 }

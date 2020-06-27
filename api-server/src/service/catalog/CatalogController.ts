@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import {
+    CatalogDocumentModel,
     CatalogLocator,
     CatalogRequestBodySchema,
     CatalogRequestParamSchema,
@@ -147,7 +148,12 @@ export default class CatalogController extends ServiceControllerBase<
                 });
             }
 
-            req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            const currentCatalog = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as CatalogDocumentModel;
+            if (currentCatalog && currentCatalog.url !== this.reqBody.url) {
+                req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            }
             next();
         } catch (error) {
             next(error);
