@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useRouteMatch, Route, Switch } from 'react-router-dom';
+import { useRouteMatch, Route, Switch, Redirect } from 'react-router-dom';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 // react plugin for creating charts
 // @material-ui/core
 import { makeStyles } from '@material-ui/core/styles';
 // @material-ui/icons
-import { CheckCircle, Delete, Error, Info } from '@material-ui/icons';
+import { AddAlert, CheckCircle, Delete, Info } from '@material-ui/icons';
 import { Edit } from '@material-ui/icons';
 import { Add } from '@material-ui/icons';
 // core components
@@ -18,14 +20,10 @@ import Button from 'components/CustomButtons/Button.js';
 import CardFooter from '../../components/Card/CardFooter';
 import { Link } from 'react-router-dom';
 // services
-import {
-    createData,
-    deleteData,
-    getData,
-    updateData,
-} from '../../services/ApiService';
+import { deleteData, getData } from '../../services/ApiService';
 import HostEdit from './HostEdit';
 import HostDetail from './HostDetail';
+import { win } from 'leaflet/src/core/Browser';
 import Snackbar from '../../components/Snackbar/Snackbar';
 
 const styles = {
@@ -62,6 +60,7 @@ const styles = {
 };
 const useStyles = makeStyles(styles);
 const LIMIT = 100;
+const ROOT_PATH = '/admin/host';
 const ADD_PATH = '/admin/host/create';
 const DETAIL_PATH = '/admin/host/detail';
 const EDIT_PATH = '/admin/host/edit';
@@ -72,41 +71,81 @@ const notificationType = {
 
 export default function HostIndex() {
     const match = useRouteMatch();
+    console.log(match);
     const classes = useStyles();
-    const [hosts, setHosts] = useState({ hosts: [], hasNext: false });
-    const [host, setHost] = useState(false);
-    const [hostId, setHostId] = useState(NaN);
-    const [pageNumber, setPageNumber] = useState(0);
     const [successNotification, setSuccessNotification] = useState(false);
     const [failedNotification, setFailedNotification] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [hosts, setHosts] = useState({ hosts: [], hasNext: false });
+    const [pageNumber, setPageNumber] = useState(0);
+
     const showNotification = (type) => {
         if (type === notificationType.SUCCESS) {
+            setFailedNotification(false);
             setSuccessNotification(true);
             setTimeout(() => setSuccessNotification(false), 5000);
         } else {
+            setSuccessNotification(false);
             setFailedNotification(true);
             setTimeout(() => setFailedNotification(false), 5000);
         }
     };
-
     const handlePreviousPageChange = () => {
         setPageNumber(pageNumber - 1);
     };
     const handleNextPageChange = () => {
         setPageNumber(pageNumber + 1);
     };
-    const handleShowDetail = (id) => {
-        if (!id) return;
-        setHostId(id);
-    };
-    const handleDelete = async () => {
-        const result = window.confirm('Bạn chắc chắn muốn xóa máy chủ này?');
-        if (result) {
-            const { error } = await deleteData(`host/${host.id}`);
-            if (error) {
-                window.alert(error.cause);
-            }
+    const handleDelete = async (id) => {
+        try {
+            confirmAlert({
+                customUI: ({ onClose }) => {
+                    return (
+                        <Card>
+                            <CardHeader color={'info'}>
+                                <h2>Bạn có chắc?</h2>
+                            </CardHeader>
+                            <CardBody>
+                                <p>Bạn có chắc muốn xóa máy chủ này?</p>
+                            </CardBody>
+                            <CardFooter>
+                                <Button
+                                    color={'danger'}
+                                    onClick={async () => {
+                                        onClose();
+                                        const { error } = await deleteData(
+                                            `host/${id}`
+                                        );
+                                        if (error) {
+                                            setErrorMessage(error.cause);
+                                            showNotification(
+                                                notificationType.FAILED
+                                            );
+                                            return;
+                                        }
+                                        showNotification(
+                                            notificationType.SUCCESS
+                                        );
+                                        window.location.href = ROOT_PATH;
+                                    }}
+                                >
+                                    Xác nhận
+                                </Button>
+                                <Button
+                                    color={'primary'}
+                                    onClick={onClose}
+                                    className={classes.actionButton}
+                                >
+                                    Thoát
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    );
+                },
+            });
+        } catch (error) {
+            setErrorMessage(error.message);
+            showNotification(notificationType.FAILED);
         }
     };
 
@@ -121,15 +160,16 @@ export default function HostIndex() {
                 name,
                 domain,
                 <div>
-                    <Button
-                        color={'info'}
-                        size={'sm'}
-                        className={classes.actionButton}
-                        onClick={() => handleShowDetail(id)}
-                    >
-                        <Info />
-                    </Button>
-                    <Link to={`${EDIT_PATH}/${host.id}`}>
+                    <Link to={`${DETAIL_PATH}/${id}`}>
+                        <Button
+                            color={'info'}
+                            size={'sm'}
+                            className={classes.actionButton}
+                        >
+                            <Info />
+                        </Button>
+                    </Link>
+                    <Link to={`${EDIT_PATH}/${id}`}>
                         <Button
                             color={'warning'}
                             size={'sm'}
@@ -142,7 +182,7 @@ export default function HostIndex() {
                         color={'danger'}
                         size={'sm'}
                         className={classes.actionButton}
-                        onClick={handleDelete}
+                        onClick={() => handleDelete(id)}
                     >
                         <Delete />
                     </Button>
@@ -152,17 +192,7 @@ export default function HostIndex() {
         })();
     }, [pageNumber]);
 
-    useEffect(() => {
-        (async () => {
-            const { host } = await getData(`host/${hostId}`);
-            if (!host) {
-                return;
-            }
-            setHost(host);
-        })();
-    }, [hostId]);
-
-    return match.isExact ? (
+    return (
         <GridContainer>
             <Snackbar
                 place="tc"
@@ -176,7 +206,7 @@ export default function HostIndex() {
             <Snackbar
                 place="tc"
                 color="danger"
-                icon={Error}
+                icon={AddAlert}
                 message={errorMessage}
                 open={failedNotification}
                 closeNotification={() => setFailedNotification(false)}
@@ -226,23 +256,22 @@ export default function HostIndex() {
                 </Card>
             </GridItem>
             <GridItem xs={12} sm={12} md={4}>
-                <HostDetail host={host} />
+                <Switch>
+                    <Route
+                        path={`${match.path}/detail/:id`}
+                        component={HostDetail}
+                    />
+                    <Route
+                        path={`${match.path}/edit/:id`}
+                        component={HostEdit}
+                    />
+                    <Route
+                        path={`${match.path}/create`}
+                        component={() => <HostEdit isCreate={true} />}
+                    />
+                    <Redirect from={`${ROOT_PATH}/`} to={ROOT_PATH} />
+                </Switch>
             </GridItem>
         </GridContainer>
-    ) : (
-        <Switch>
-            <Route
-                path={`${match.path}/detail/:hostId`}
-                component={() => <HostDetail />}
-            />
-            <Route
-                path={`${match.path}/edit/:hostId`}
-                component={() => <HostEdit isCreate={false} />}
-            />
-            <Route
-                path={`${match.path}/create`}
-                component={() => <HostEdit isCreate={true} />}
-            />
-        </Switch>
     );
 }
