@@ -18,7 +18,6 @@ if (typeof Highcharts === 'object') {
 
 const ParetoChart = ({ categoriesData, ammountData, priceData, title }) => {
     const TYPE_TEXT = {
-        color: '#ffffff',
         fontSize: '10px',
     };
     const [paretoChartOption, setParetoChartOption] = useState({

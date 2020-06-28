@@ -35,10 +35,10 @@ const LegendMap = ({ typeLegend, setOnLegend, transactionStage }) => {
     let fromScope;
     let toCope;
     return (
-        <div className="border relative mt-4">
+        <div className="border relative mt-4 shadow dark:border-white">
             <div
-                className="bg-gray-900 flex justify-center items-center relative"
-                style={{ height: '25px' }}
+                className="dark:bg-gray-900 flex justify-center items-center relative bg-white text-primary dark:text-white font-bold border-b boder-primary border-solid"
+                style={{ height: '25px', borderBottom: '1px solid #ebedf3' }}
             >
                 Chú thích
                 <FaRegTimesCircle
@@ -48,7 +48,8 @@ const LegendMap = ({ typeLegend, setOnLegend, transactionStage }) => {
                     }}
                 />
             </div>
-            <div className="px-4 py-4" style={{ backgroundColor: '#191919' }}>
+            {/*  */}
+            <div className="px-4 py-4 dark:bg-dark bg-white text-dark dark:text-white font-normal">
                 <ul>
                     {grades.map((e, index) => {
                         fromScope = grades[index];

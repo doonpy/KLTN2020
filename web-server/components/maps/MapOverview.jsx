@@ -38,8 +38,6 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
                 'Bản đồ thể hiện mật độ bất động sản của Thành Phố Hồ Chí Minh',
             style: {
                 fontSize: '12px',
-                backgroundColor: 'rgba(0,0,0,0)',
-                color: '#fff',
             },
         },
         chart: getCustomHighmaps({
@@ -59,7 +57,7 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
     return dataMap ? (
         <HighchartsReact
             ref={chartRef}
-            containerProps={{ style: { height: 'calc(100vh - 100px)' } }}
+            containerProps={{ style: { height: 'calc(100vh - 104px)' } }}
             constructorType="mapChart"
             highcharts={Highcharts}
             options={mapOptions}

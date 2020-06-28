@@ -1,12 +1,14 @@
 import React from 'react';
-import fetch from 'isomorphic-unfetch';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 import NProgress from 'nprogress';
+import GroupData from '../../components/detail/GroupData';
 import { numberWithCommas } from '../../util/services/helper';
 import useRawDataDetail from '../../hooks/use-raw-data-detail';
 import PageLayout from '../../components/page-layout';
+import Loading from '../../components/Loading';
 
 const MapItem = dynamic(() => import('../../components/maps/MapItem'), {
     ssr: false,
@@ -24,78 +26,191 @@ Router.events.on('routeChangeStart', () => {
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
-const DetailRealEstate = ({ id, initialData }) => {
-    const { data } = useRawDataDetail(id, initialData);
+const Tag = ({ value, className }) => (
+    <div className={`tag uppercase text-xs ${className}`}>{value}</div>
+);
+Tag.propTypes = {
+    value: PropTypes.string,
+    className: PropTypes.string,
+};
+const DetailRealEstate = () => {
+    const router = useRouter();
+
+    const { id } = router.query;
+
+    const { data, isValidating, error } = useRawDataDetail(id);
+
     return (
-        <PageLayout>
-            <div
-                className="m-0 m-auto max-w-screen-xl pt-12"
-                style={{ height: 'calc(100vh - 100px)' }}
-            >
-                <h1 className="uppercase font-semibold text-xl text-blue-400 text-3xl">
-                    {data.rawData.title}
-                </h1>
-                <div className="text-white w-full flex">
-                    <div className="w-1/2 mr-6">
-                        <div>
-                            <div className="flex">
-                                <span className="text-blue-600 font-bold">
-                                    Địa chỉ:
-                                </span>
-                                <p className="pl-2">{data.rawData.address}</p>
-                            </div>
-                            <div className="flex">
-                                <span className="text-blue-600 font-bold">
-                                    Giá:
-                                </span>
-                                <p className="pl-1">
-                                    {numberWithCommas(data.rawData.price.value)}
-                                    <span className="uppercase pl-2">
-                                        {data.rawData.price.currency}
-                                    </span>
-                                </p>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-blue-600 font-bold">
-                                    Miêu tả:
-                                </span>
-                                <p className="pl-2">{data.rawData.describe}</p>
-                            </div>
-                            <div className="flex">
-                                <span className="text-blue-600 font-bold">
-                                    Ngày cập nhật:
-                                </span>
-                                <p className="pl-2">
-                                    {moment(data.rawData.updateAt)
-                                        .locale('vi')
-                                        .format('LLL')}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="w-1/2">
-                        <span className="text-blue-600 font-bold mb-2">
-                            Vị trí:
-                        </span>
-                        <MapItem
-                            position={[
-                                data.rawData.coordinate.lat,
-                                data.rawData.coordinate.lng,
-                            ]}
+        <>
+            <style jsx>{`
+                .txt-primary {
+                    color: #101425;
+                }
+                .txt-paragraph {
+                    color: #666;
+                }
+            `}</style>
+            {data && !isValidating ? (
+                <PageLayout>
+                    <div style={{ paddingTop: '100px' }}>
+                        <div
+                            className="w-full m-0 p-0 bg-cover bg-bottom"
+                            style={{
+                                backgroundImage: 'url("/images/banner.jpg")',
+                                height: '60vh',
+                                maxHeight: '460px',
+                            }}
                         />
+                        <div
+                            className=" px-4 py-12 md:px-0  max-w-screen-xl mx-auto -mt-32 rounded overflow-hidden shadow-lg"
+                            style={{ background: '#fff' }}
+                        >
+                            <div className="mx-0 sm:mx-6">
+                                <div className="bg-gray-200 w-full leading-normal rounded-t">
+                                    <div
+                                        className="flex h-full flex-col"
+                                        style={{ background: '#fff' }}
+                                    >
+                                        <h1 className="uppercase text-center font-semibold txt-primary text-3xl w-full pt-4 pb-8">
+                                            {data.rawData?.title}
+                                        </h1>
+                                        <div className="text-white w-full flex">
+                                            <div className="w-1/2 mr-6">
+                                                <div>
+                                                    {data.rawData
+                                                        .transactionType && (
+                                                        <Tag
+                                                            className="bg-red-700"
+                                                            value={
+                                                                data.rawData
+                                                                    .transactionType
+                                                                    .wording[0]
+                                                            }
+                                                        />
+                                                    )}
+                                                    {data.rawData
+                                                        .propertyType && (
+                                                        <Tag
+                                                            className="bg-blue-500"
+                                                            value={
+                                                                data.rawData
+                                                                    ?.propertyType
+                                                                    ?.wording[0]
+                                                            }
+                                                        />
+                                                    )}
+
+                                                    <div className="flex pt-2">
+                                                        <span className="txt-primary font-bold">
+                                                            Địa chỉ:
+                                                        </span>
+                                                        <p className="pl-8 txt-paragraph">
+                                                            {
+                                                                data.rawData
+                                                                    .address
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex pt-2">
+                                                        <span className="txt-primary font-bold">
+                                                            Diện tích:
+                                                        </span>
+                                                        <p className="pl-8 txt-paragraph">
+                                                            {`${numberWithCommas(
+                                                                data.rawData
+                                                                    .acreage
+                                                                    ?.value
+                                                            )} ${
+                                                                data.rawData
+                                                                    .acreage
+                                                                    ?.measureUnit
+                                                            }`}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex py-2">
+                                                        <span className="txt-primary font-bold">
+                                                            Giá:
+                                                        </span>
+                                                        <p className="pl-8 txt-paragraph">
+                                                            {numberWithCommas(
+                                                                data.rawData
+                                                                    .price.value
+                                                            )}
+                                                            <span className="uppercase pl-1">
+                                                                {
+                                                                    data.rawData
+                                                                        .price
+                                                                        .currency
+                                                                }
+                                                            </span>
+                                                            <span>
+                                                                {data.rawData
+                                                                    .price
+                                                                    ?.timeUnit &&
+                                                                    `/${data.rawData.price?.timeUnit?.wording[0]}`}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col pt-2">
+                                                        <span className="txt-primary font-bold">
+                                                            Thông tin mô tả:
+                                                        </span>
+                                                        <p className="txt-paragraph">
+                                                            {
+                                                                data.rawData
+                                                                    .describe
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex py-2">
+                                                        <span className="txt-primary font-bold">
+                                                            Ngày cập nhật:
+                                                        </span>
+                                                        <p className="pl-8  txt-paragraph ">
+                                                            {moment(
+                                                                data.rawData
+                                                                    .updateAt
+                                                            )
+                                                                .locale('vi')
+                                                                .format('LLL')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {/* <div className="w-1/2">
+                                                <div className="border border-gray-800 rounded shadow p-2">
+                                                    <div className="py-2 w-full text-center text-blue-600 font-bold">
+                                                        Vị trí - tiện ích xung
+                                                        quanh
+                                                    </div>
+                                                    <MapItem
+                                                        position={[
+                                                            data.rawData
+                                                                .coordinate.lat,
+                                                            data.rawData
+                                                                .coordinate.lng,
+                                                        ]}
+                                                    />
+                                                </div>
+                                            </div> */}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <GroupData id={id} />
+                        </div>
+                        <div className="py-4" />
+                    </div>
+                </PageLayout>
+            ) : (
+                <div className="w-full h-screen bg-gray-900 max-h-screen">
+                    <div className="flex justify-center items-center h-full">
+                        <Loading />
                     </div>
                 </div>
-            </div>
-        </PageLayout>
+            )}
+        </>
     );
 };
-export async function getServerSideProps({ query }) {
-    const res = await fetch(
-        `${process.env.API_URI}/api/v1/vi/raw-data/${query.id}?populate=1`
-    );
-    const data = await res.json();
-    return {
-        props: { initialData: data, id: query.id }, // will be passed to the page component as props
-    };
-}
+
 export default DetailRealEstate;

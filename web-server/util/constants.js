@@ -5,13 +5,13 @@ export const COLOR_CODE = [
     '#85929E',
     '#CCD1D1',
     '#CA6F1E',
-    '#F1C40F',
+    '#7D6608',
     '#40C8F6',
-    '#8597FE',
-    '#48C9B0',
+    '#633974 ',
+    'green',
     '#2980B9',
-    '#9B59B6',
-    '#E74C3C',
+    '#154360',
+    'red',
 ];
 export const UNIT_OF_MEASURE = {
     SQUARE_METER: 'm²',
@@ -21,54 +21,67 @@ export const PROPERTY_TYPE_NUMBER = [
     {
         id: 0,
         wording: ['Tổng hợp', 'Total RealEstate'],
+        img: '/images/property/chung.jpg',
     },
     {
         id: 1,
         wording: ['Căn hộ, chung cư', 'apartment'],
+        img: '/images/property/chung_cu.jpg',
     },
     {
         id: 2,
         wording: ['Nhà, nhà riêng, nhà nguyên căn', 'individual house'],
+        img: '/images/property/nha_rieng.jpg',
     },
     {
         id: 3,
         wording: ['Biệt thự, nhà liền kề', 'villa'],
+        img: '/images/property/biet_thu.jpg',
     },
     {
         id: 4,
         wording: ['Nhà mặt tiền, nhà mặt phố, nhà phố', 'townhouse'],
+        img: '/images/property/nhamatien.jpg',
     },
     {
         id: 5,
         wording: ['Đất nền dự án', 'project land'],
+        img: '/images/property/dat_nen_du_an.jpg',
     },
     {
         id: 6,
         wording: ['Đất', 'land'],
+        img: '/images/property/dat.jpg',
     },
     {
         id: 7,
         wording: ['Trang trại, khu nghỉ dưỡng', 'farm, resort'],
+        img: '/images/property/khu_du_lich.jpg',
     },
     {
         id: 8,
         wording: ['Kho, nhà xưởng', 'warehouse, factory'],
+        img: '/images/property/kho_xuong.jpg',
     },
     {
         id: 9,
         wording: ['Nhà trọ, phòng trọ', 'room'],
+        img: '/images/property/nha_tro.jpg',
     },
     {
         id: 10,
         wording: ['Văn phòng, mặt bằng', 'office, ground'],
+        img: '/images/property/van_phong.jpg',
     },
     {
         id: 11,
         wording: ['Cửa hàng, bán lẻ, ki ốt', 'shop'],
+        img: '/images/property/cua_hang.jpg',
     },
     {
         id: 12,
         wording: ['Nhà hàng, khách sạn, nhà nghỉ', 'restaurant, hotel'],
+        img: '/images/property/khach_san.jpg',
     },
 ];
 export const MODEL_URL = {

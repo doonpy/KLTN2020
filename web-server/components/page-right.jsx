@@ -7,13 +7,21 @@ import { TRANSATION_TYPE } from '../util/constants';
 const TabButton = ({ title, onClick, isActive }) => {
     return (
         <>
+            <style jsx>{`
+                .tab {
+                    border-bottom: 1px solid #ebedf3;  
+                    width: '100%;
+                }
+                .txt-white{
+                    color: '#fff';
+                }
+            `}</style>
+
             <div
                 role="presentation"
                 type="button"
-                className={` w-full hover:bg-gray-800 text-center cursor-pointer ${
-                    isActive
-                        ? 'border-b-2 border-blue-400 py-1'
-                        : 'border-b-1  border-light-primary dark:border-primary py-1'
+                className={` w-full tab hover:bg-green-light border-b-1 py-1 text-center cursor-pointer text-dark hover:text-white ${
+                    isActive ? 'bg-green-light txt-white' : ''
                 }`}
                 onClick={onClick}
             >
@@ -29,8 +37,11 @@ const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
     });
 
     return (
-        <div className="w-3/12 dark:bg-gray-900 bg-white border-l border-solid border-light-primary dark:border-primary h-full flex flex-col">
-            <div className="dark:bg-gray-900 bg-white h-6">
+        <div
+            className="w-5/12 bg-white  h-full flex flex-col shadow"
+            style={{ height: 'calc(100vh - 100px)' }}
+        >
+            <div className="bg-white h-6">
                 <div className="text-xs w-full flex justify-around">
                     <TabButton
                         title="Bán"
@@ -38,18 +49,18 @@ const PageRight = ({ dataSummary, transactionStage, setTransaction }) => {
                         isActive={transactionStage === TRANSATION_TYPE.SALE}
                     />
                     <TabButton
-                        title="Tổng"
-                        onClick={() => setTransaction(TRANSATION_TYPE.TOTAL)}
-                        isActive={transactionStage === TRANSATION_TYPE.TOTAL}
-                    />
-                    <TabButton
                         title="Thuê"
                         onClick={() => setTransaction(TRANSATION_TYPE.RENT)}
                         isActive={transactionStage === TRANSATION_TYPE.RENT}
                     />
+                    <TabButton
+                        title="Tổng"
+                        onClick={() => setTransaction(TRANSATION_TYPE.TOTAL)}
+                        isActive={transactionStage === TRANSATION_TYPE.TOTAL}
+                    />
                 </div>
             </div>
-            <div style={{ height: 'calc(100vh - 140px)' }}>
+            <div style={{ height: 'calc(100vh - 140px)', width: '100%' }}>
                 <div style={{ height: '50%' }}>
                     <TypeTransactionBox data={dataSummary} />
                 </div>

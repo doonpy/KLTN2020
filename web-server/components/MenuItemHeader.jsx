@@ -9,9 +9,9 @@ const MenuItem = ({ children, href }) => {
         <li className="mr-6 my-2 md:my-0">
             <Link href={href}>
                 <div
-                    className={`font-medium cursor-pointer flex items-center justify-center py-1 md:py-3 pl-1 align-middle text-gray-500 no-underline hover:text-gray-100 hover:border-pink-400 ${
+                    className={`font-medium cursor-pointer flex items-center justify-center py-1 md:py-3 pl-1 align-middle text-gray-500 no-underline hover:text-primary hover:border-green-light ${
                         router.pathname === href
-                            ? 'dark:border-blue-400 border-b-2 text-orange-700 dark:text-blue-400 border-orange-700'
+                            ? 'dark:border-blue-400 border-b-2 text-primary dark:text-blue-400 border-green-light'
                             : ''
                     }`}
                 >

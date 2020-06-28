@@ -36,9 +36,9 @@ const Analytics = ({ analyticsData }) => {
         },
     });
 
-    const dataSortByMonthYear = dataAnalytics?.analytics?.sort((a, b) => {
-        return a.year - b.year || a.month - b.month;
-    });
+    const dataSortByMonthYear = dataAnalytics?.analytics?.sort(
+        (a, b) => a.year - b.year || a.month - b.month
+    );
     const dataPriceMax =
         dataSortByMonthYear?.find((c) => Math.max(c.priceMax)) || 0;
     const dataPriceMin =
@@ -64,9 +64,12 @@ const Analytics = ({ analyticsData }) => {
 
     return (
         <PageLayout>
-            <div className="max-w-screen-xl m-0 m-auto text-white pb-64 bg-dark">
+            <div
+                className="max-w-screen-xl m-auto text-white pb-64"
+                style={{ color: '#BDD1F8', paddingTop: '100px' }}
+            >
                 {dataSortByMonthYear ? (
-                    <div className="flex flex-col h-full ">
+                    <div className="flex flex-col h-full">
                         {dataAnalytics && (
                             <PriceStatistics
                                 maxPrice={+dataPriceMax.priceMax || 0}
@@ -92,23 +95,19 @@ const Analytics = ({ analyticsData }) => {
                             </div>
                             <hr className="border-b-2 border-gray-600 my-8 mx-4" />
                             <div className="flex mt-12">
-                                <div className="w-1/2 mr-2">
-                                    <PropertyLineChartWrapper
-                                        data={analyticsData}
-                                        catagoriesYear={Object.keys(
-                                            dataGroupBy
-                                        )}
-                                    />
-                                </div>
-                                <div className="w-1/2 ml-2">
+                                <div className="w-full ml-2">
                                     <TransactionLinChartWrapper
-                                        data={analyticsData}
+                                        data={dataAnalytics}
                                         catagoriesYear={Object.keys(
                                             dataGroupBy
                                         )}
                                     />
                                 </div>
                             </div>
+                            <PropertyLineChartWrapper
+                                data={dataAnalytics}
+                                catagoriesYear={Object.keys(dataGroupBy)}
+                            />
                         </div>
                     </div>
                 ) : (
@@ -125,13 +124,15 @@ const Analytics = ({ analyticsData }) => {
     );
 };
 
-export async function getServerSideProps(context) {
-    const res = await fetch(
-        `${process.env.API_URI}/api/v1/vi/visualization/analytics?fromMonth=6&fromYear=2019&toYear=2020&toMonth=6`
-    );
-    const data = await res.json();
-    return {
-        props: { analyticsData: data },
-    };
-}
+// export async function getServerSideProps(context) {
+//     const res = await fetch(
+//         `${process.env.API_URI}/api/v1/vi/visualization/analytics?fromMonth=6&fromYear=2019&toYear=2020&toMonth=6`
+//     );
+//     const data = await res.json();
+//     console.log(data);
+
+//     // return {
+//     //     props: { analyticsData: data },
+//     // };
+// }
 export default Analytics;

@@ -11,35 +11,41 @@ const MapLeafLeftSide = ({ resetState }) => {
     const { modeMap } = useSelector((state) => state.modeMap);
     return (
         <div
-            className="h-full absolute bg-black"
+            className="h-full absolute flex flex-col justify-center"
             style={{
-                width: '45px',
-                zIndex: 9999,
-                top: '10%',
+                zIndex: 980,
                 backgroundColor: 'rgba(0,0,0,0)',
             }}
         >
-            <div className="flex justify-center flex-col items-center mt-4">
-                <GiSwitzerland
-                    size={32}
-                    className={`${
-                        modeMap === MAP_MODE.AREA_MODE ? `text-blue-600` : ``
-                    } mt-2`}
-                    onClick={() => {
-                        dispatch(action.getMapMode(MAP_MODE.AREA_MODE));
-                        resetState();
-                    }}
-                />
-                <AiFillDollarCircle
-                    size={32}
-                    className={`${
-                        modeMap === MAP_MODE.PRICE_MODE ? `text-blue-600` : ``
-                    } mt-4`}
-                    onClick={() => {
-                        dispatch(action.getMapMode(MAP_MODE.PRICE_MODE));
-                        resetState();
-                    }}
-                />
+            <div className="flex justify-center flex-col items-center ml-2 py-8 px-1 rounded-sm bg-white shadow">
+                <div className="p-2">
+                    <GiSwitzerland
+                        size={24}
+                        className={`${
+                            modeMap === MAP_MODE.AREA_MODE
+                                ? `text-primary`
+                                : `text-fill`
+                        }`}
+                        onClick={() => {
+                            dispatch(action.getMapMode(MAP_MODE.AREA_MODE));
+                            resetState();
+                        }}
+                    />
+                </div>
+                <div className="p-2 mt-3">
+                    <AiFillDollarCircle
+                        size={24}
+                        className={`${
+                            modeMap === MAP_MODE.PRICE_MODE
+                                ? `text-primary`
+                                : `text-fill`
+                        }`}
+                        onClick={() => {
+                            dispatch(action.getMapMode(MAP_MODE.PRICE_MODE));
+                            resetState();
+                        }}
+                    />
+                </div>
             </div>
         </div>
     );

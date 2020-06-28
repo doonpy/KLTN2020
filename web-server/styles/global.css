@@ -4,10 +4,37 @@
 /* purgecss end ignore */
 @import 'spinner.css';
 @import 'legend.css';
+@import 'error.css';
 
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;
 }
+
+.tag {
+    border-radius: 4px 4px 4px 4px;
+    color: white;
+    display: inline-block;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 20px 0 23px;
+    position: relative;
+    margin: 0 10px 10px 0;
+    text-decoration: none;
+    -webkit-transition: color 0.2s;
+}
+
+.tag::before {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: inset 0 1px rgba(0, 0, 0, 0.25);
+    content: '';
+    height: 6px;
+    left: 10px;
+    position: absolute;
+    width: 6px;
+    top: 10px;
+}
+
 #style-scroll::-webkit-scrollbar {
     width: 10px;
 }

@@ -44,8 +44,8 @@ const TypeTransactionBox = ({ data }) => {
         return dataPieChart;
     };
     return (
-        <div className="m-0 m-auto h-full mt-4" style={{ maxWidth: '90%' }}>
-            <div className="dark:bg-gray-900 bg-white border border-light-primary dark:border-primary border-solid">
+        <div className="m-auto h-full mt-4" style={{ maxWidth: '90%' }}>
+            <div className="shadow bg-white">
                 <TypePropertyPieChart
                     data={resultPropertyData()}
                     title="Biểu đồ thể hiện các loại bất động sản TPHCM (đơn vị %)"

@@ -17,20 +17,20 @@ if (typeof Highcharts === 'object') {
 
 const BarChart = ({ data, title }) => {
     const TEXT_COLOR = {
-        color: '#ffffff',
+        fontWeight: 600,
     };
     const [barChartOption, setBarChartOption] = useState({
         ...CUSTOM_CHART,
         ...BUTTON_VIEW_FULLSCREEN,
         chart: {
-            type: 'bar',
+            type: 'column',
             backgroundColor: 'rgba(0,0,0,0)',
         },
         colors: DARK_UNICA_COLOR,
         title: {
             text: title,
             style: {
-                fontSize: '10px',
+                fontSize: '13px',
                 ...TEXT_COLOR,
             },
         },
@@ -38,8 +38,7 @@ const BarChart = ({ data, title }) => {
             type: 'category',
             labels: {
                 style: {
-                    fontSize: '6px',
-                    color: '#ffffff',
+                    fontSize: '9px',
                 },
             },
         },
@@ -49,7 +48,6 @@ const BarChart = ({ data, title }) => {
             title: {
                 text: 'Số lượng (bất động sản)',
                 style: {
-                    fontSize: '9px',
                     ...TEXT_COLOR,
                 },
             },

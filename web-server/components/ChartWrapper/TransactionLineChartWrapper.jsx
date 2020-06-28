@@ -5,14 +5,15 @@ import LineChart from '../charts/LineChart';
 import { TRANSATION_SELECT } from '../../util/constants';
 
 const BILLION = 1000000;
-const TransactionLineChartWrapper = ({ catagoriesYear, data }) => {
+const TRANSACTION_ARR = [1, 2];
+const TransactionLineChartWrapper = ({ data }) => {
     const dataGroupByTransaction = groupBy(data?.analytics, (c) => {
         return c.transactionType;
     });
-
+    const dataYears = groupBy(data?.analytics, (c) => `${c.month}-${c.year}`);
     const getDataTransaction = () => {
-        const dataResult = [];
         const dataTransaction = [];
+        let dataResult = [];
         for (const key in dataGroupByTransaction) {
             if ({}.hasOwnProperty.call(dataGroupByTransaction, key)) {
                 const dataProperty = dataGroupByTransaction[key].map((c) =>
@@ -26,6 +27,8 @@ const TransactionLineChartWrapper = ({ catagoriesYear, data }) => {
                     dataProperty,
                     (c) => c.time
                 );
+
+                console.log(Object.keys(dataTransGroupByTime));
                 for (const keyData in dataTransGroupByTime) {
                     if ({}.hasOwnProperty.call(dataTransGroupByTime, keyData)) {
                         const priceAverage =
@@ -35,17 +38,24 @@ const TransactionLineChartWrapper = ({ catagoriesYear, data }) => {
                                 },
                                 0
                             ) / dataTransGroupByTime[keyData].length;
-                        dataTransaction.push(
-                            Math.round((priceAverage * 100) / 100)
-                        );
+
+                        dataTransaction.push({
+                            key: Number(key),
+                            priceAverage: Math.round(priceAverage * 100) / 100,
+                        });
                     }
                 }
-                dataResult.push({
-                    name: TRANSATION_SELECT[key].type,
-                    data: dataTransaction,
-                });
             }
         }
+
+        dataResult = TRANSACTION_ARR.map((c) => {
+            return {
+                name: TRANSATION_SELECT[c].type,
+                data: dataTransaction
+                    .filter((d) => d.key === c)
+                    .map((d) => d.priceAverage),
+            };
+        });
 
         return dataResult;
     };
@@ -54,7 +64,7 @@ const TransactionLineChartWrapper = ({ catagoriesYear, data }) => {
         <div className="pt-10 pr-4 dark:bg-gray-900 bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
             <LineChart
                 title="Biểu đồ thể hiện sự biến động giá của giao dịch bán và mua qua từng năm"
-                catagoriesData={catagoriesYear}
+                catagoriesData={Object.keys(dataYears)}
                 data={getDataTransaction()}
             />
         </div>

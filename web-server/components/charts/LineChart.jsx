@@ -8,7 +8,7 @@ import {
     CUSTOM_CHART,
     TURN_OFF_CONTEXT_MENU,
 } from '../../custom/custom-charts';
-import { SAND_COLOR } from '../../themes/color';
+import { DARK_UNICA_COLOR } from '../../themes/color';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -17,13 +17,12 @@ if (typeof Highcharts === 'object') {
 
 const LineChart = ({ catagoriesData, data, title }) => {
     const TYPE_TEXT = {
-        color: '#ffffff',
         fontSize: '10px',
     };
     const [lineChartOption, setLineChartOption] = useState({
         ...CUSTOM_CHART,
         ...TURN_OFF_CONTEXT_MENU,
-        colors: SAND_COLOR,
+        colors: DARK_UNICA_COLOR,
         title: {
             text: title,
             style: TYPE_TEXT,
@@ -38,7 +37,7 @@ const LineChart = ({ catagoriesData, data, title }) => {
             },
             labels: {
                 formatter: function (e) {
-                    return `${e.value} tr/m²`;
+                    return `${e.value} triệu/m²`;
                 },
                 style: TYPE_TEXT,
             },

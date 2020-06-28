@@ -4,7 +4,7 @@ import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import PropTypes from 'prop-types';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { DARK_UNICA_COLOR } from '../../themes/color';
+import { SAND_COLOR } from '../../themes/color';
 import {
     CUSTOM_CHART,
     TURN_OFF_CONTEXT_MENU,
@@ -17,18 +17,16 @@ if (typeof Highcharts === 'object') {
 
 const PieChart = ({ data, title }) => {
     const TEXT_STYLE = {
-        fontSize: '10px',
-        color: '#ffffff',
+        fontSize: '13px',
+        fontWeight: 600,
     };
     const [chartOptions, setChartOptions] = useState({
         ...CUSTOM_CHART,
         ...TURN_OFF_CONTEXT_MENU,
         chart: {
             type: 'pie',
-            backgroundColor: 'rgba(0,0,0,0)',
-            height: '100%',
         },
-        colors: DARK_UNICA_COLOR,
+        colors: SAND_COLOR,
         title: {
             text: title,
             style: TEXT_STYLE,
@@ -55,6 +53,7 @@ const PieChart = ({ data, title }) => {
                 dataLabels: {
                     enabled: false,
                 },
+                showInLegend: true,
             },
             series: {
                 dataLabels: {
@@ -99,7 +98,15 @@ const PieChart = ({ data, title }) => {
     }, [data]);
     return (
         <div className="relative z-1000">
-            <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={chartOptions}
+                containerProps={{
+                    style: {
+                        height: 'calc((100vh - 172px)/2)',
+                    },
+                }}
+            />
         </div>
     );
 };

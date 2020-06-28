@@ -3,17 +3,8 @@ export const CUSTOM_STYLE_HIGHMAPS = {
         enabled: false,
     },
     colorAxis: {
-        labels: {
-            style: {
-                borderColor: '#fff',
-                color: '#fff',
-                textTransform: 'uppercase',
-            },
-        },
         min: 1,
         type: 'logarithmic',
-        borderColor: '#fff',
-        borderWidth: 1,
         minColor: '#EEEEFF',
         maxColor: '#000022',
         stops: [
@@ -84,7 +75,7 @@ export const CUSTOM_SERIES_HIGHMAPS = {
 export const getCustomHighmaps = (events) => {
     return {
         type: 'map',
-        backgroundColor: 'rgba(0,0,0,0)',
+        backgroundColor: '#ffffff',
         events,
     };
 };

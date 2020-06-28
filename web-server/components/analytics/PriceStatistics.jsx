@@ -11,7 +11,16 @@ const MILLION = { unit: 'tỷ', value: 100000000 };
 const PriceStatisticsCard = ({ titlePrice, valuePrice, unitPrice }) => {
     return (
         <div className="w-1/3 p-3">
-            <div className="bg-gray-900 border border-gray-800 rounded shadow p-2">
+            <style jsx>{`
+                .card {
+                    background-color: #fff;
+                    background-clip: border-box;
+                    border-radius: 0.42rem;
+                    box-shadow: 0 0 30px 0 rgba(82, 63, 105, 0.05);
+                    border: 0;
+                }
+            `}</style>
+            <div className="bg-gray-900 border border-gray-800 rounded shadow p-2 card">
                 <div className="flex flex-row items-center">
                     <div className="flex-shrink pr-4">
                         <div className="rounded p-3 bg-green-600">
