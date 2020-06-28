@@ -5,8 +5,8 @@
   "scripts": {
     "clean": "rm -rf dist",
     "tsc:api": "tsc --watch -p api-server",
-    "dev:api": "nodemon -w api-server/src -e ts --exec 'ts-node --dir api-server src/server.ts'",
-    "dev:bgr-job": "nodemon -w api-server/src -e ts --exec 'ts-node --dir api-server src/background-job/main.ts'",
+    "dev:api": "nodemon -w api-server/src -e ts --exec 'npm run start:api'",
+    "dev:bgr-job": "nodemon -w api-server/src -e ts --exec 'npm run start:bgr-job'",
     "dev:web": "next dev web-server -p 3001",
     "start:api": "node dist/api-bgr-job/server.js",
     "start:bgr-job": "node --max-old-space-size=8192 dist/api-bgr-job/background-job/main.js",

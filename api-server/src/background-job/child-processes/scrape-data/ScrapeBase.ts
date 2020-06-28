@@ -13,7 +13,7 @@ const DEFAULT_REQUEST_OPTIONS: AxiosRequestConfig = {
             'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
         Accept: 'text/plain,text/html,*/*',
     },
-    timeout: Number(process.env.REQUEST_TIMEOUT || '10000'),
+    timeout: Number(process.env.BGR_REQUEST_TIMEOUT || '10000'),
 };
 
 export default abstract class ScrapeBase {
@@ -48,9 +48,17 @@ export default abstract class ScrapeBase {
                 status !== ResponseStatusCode.OK ||
                 !url.includes(request.path)
             ) {
+                new ConsoleLog(
+                    ConsoleConstant.Type.ERROR,
+                    `Scrape -> ${domain}${request.path} - ${status}`
+                ).show();
                 return null;
             }
 
+            new ConsoleLog(
+                ConsoleConstant.Type.INFO,
+                `Scrape -> ${domain}${request.path} - ${status}`
+            ).show();
             return cherrio.load(data);
         } catch (error) {
             new ConsoleLog(
@@ -87,7 +95,7 @@ export default abstract class ScrapeBase {
         if (attribute) {
             data = element.attr(attribute) || '';
         } else {
-            data += `${element.text()}`;
+            data += element.text();
         }
 
         return data;
