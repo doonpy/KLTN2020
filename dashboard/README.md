@@ -125,8 +125,8 @@ material-dashboard-react
     │   │   └── CardIcon.js
     │   ├── CustomButtons
     │   │   └── Button.js
-    │   ├── CustomInput
-    │   │   └── CustomInput.js
+    │   ├── CustomSelect
+    │   │   └── CustomSelect.js
     │   ├── CustomTabs
     │   │   └── CustomTabs.js
     │   ├── FixedPlugin

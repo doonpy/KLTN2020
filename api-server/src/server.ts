@@ -17,11 +17,28 @@ import VisualMapPointController from '@service/visual/map-point/VisualMapPointCo
 import VisualAnalyticsController from '@service/visual/analytics/VisualAnalyticsController';
 import { App } from './App';
 import morgan from 'morgan';
+import path from 'path';
+import fs from 'fs';
+
+const initDefaultFolder = (): void => {
+    const staticFolder = process.env.STATIC_FOLDER;
+    const reviewFolder = process.env.REVIEW_FOLDER;
+    if (!staticFolder || !reviewFolder) {
+        throw new Error('Static folder or review folder is invalid!');
+    }
+    if (!fs.existsSync(staticFolder)) {
+        fs.mkdirSync(staticFolder);
+    }
+    if (!fs.existsSync(reviewFolder)) {
+        fs.mkdirSync(reviewFolder);
+    }
+};
 
 /**
  * Main
  */
 ((): void => {
+    initDefaultFolder();
     new App({
         protocol: process.env.API_SERVER_PROTOCOL ?? '',
         domain: process.env.API_SERVER_DOMAIN ?? '',
@@ -53,5 +70,6 @@ import morgan from 'morgan';
                 ],
             },
         ],
+        staticPath: path.join(__dirname, './public'),
     }).start();
 })();

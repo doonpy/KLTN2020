@@ -105,13 +105,7 @@ export default abstract class ServiceLogicBase<
         document: Record<string, any>
     ) {
         for (const key of Object.keys(input)) {
-            if (input[key]) {
-                if (typeof input[key] === 'object') {
-                    this.updateProperty(input[key], document[key]);
-                } else if (input[key] !== document[key]) {
-                    document[key] = input[key];
-                }
-            }
+            document[key] = input[key];
         }
     }
 

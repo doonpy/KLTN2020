@@ -65,6 +65,7 @@ export default abstract class ServiceControllerBase<
         this.initDefaultQueryValidateSchema();
         this.initDefaultBodyValidateSchema();
         this.initValidateSchema();
+        // this.setRequiredInputForValidateSchema();
     }
 
     /**
@@ -158,7 +159,7 @@ export default abstract class ServiceControllerBase<
         }
     }
 
-    private initRequestLocalVariables(
+    protected initRequestLocalVariables(
         req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
         res: Response,
         next: NextFunction
@@ -379,9 +380,9 @@ export default abstract class ServiceControllerBase<
 
     private initDefaultBodyValidateSchema(): void {
         this.reqBodySchema = Joi.object<ReqBodySchema>({
-            id: Joi.number().integer().min(MIN_ID),
-            createAt: Joi.date().iso(),
-            updateAt: Joi.date().iso(),
+            id: Joi.alternatives(Joi.number().integer().min(MIN_ID), Joi.any()),
+            createAt: Joi.alternatives(Joi.date().iso(), Joi.any()),
+            updateAt: Joi.alternatives(Joi.date().iso(), Joi.any()),
         });
     }
 
@@ -433,7 +434,7 @@ export default abstract class ServiceControllerBase<
         }
     }
 
-    private getInputFromRequest(
+    protected getInputFromRequest(
         req: CommonRequest<ReqParamSchema, ReqBodySchema, ReqQuerySchema>,
         res: Response,
         next: NextFunction
