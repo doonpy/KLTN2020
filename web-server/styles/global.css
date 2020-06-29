@@ -5,6 +5,7 @@
 @import 'spinner.css';
 @import 'legend.css';
 @import 'error.css';
+@import 'circle-percentage.css';
 
 .dark-mode-transition * {
     @apply transition duration-500 ease-in-out;

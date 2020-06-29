@@ -329,7 +329,7 @@ const Error = () => {
                     </g>
                 </svg>
 
-                <div className="text-white w-full text-center">
+                <div className="text-white w-full text-center px-2">
                     Hiện trang web không hỗ trợ màn hình này!
                     <p className="m-xs:text-xs">
                         Vui lòng mở màn hình laptop để trải nghiệm ứng dụng

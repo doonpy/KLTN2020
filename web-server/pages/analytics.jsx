@@ -25,7 +25,7 @@ Router.events.on('routeChangeStart', () => {
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
-const Analytics = ({ analyticsData }) => {
+const Analytics = () => {
     const analytics = useSelector((state) => state.analytics);
     const { data: dataAnalytics, isValidating } = useAnalytics({
         variables: {
@@ -52,7 +52,7 @@ const Analytics = ({ analyticsData }) => {
         dataSortByMonthYear?.reduce((sum, p) => sum + p.amount, 0) || 0;
 
     const averagePrice =
-        dataSortByMonthYear?.reduce(
+        dataAnalytics?.analytics?.reduce(
             (sum, p) => sum + p.perMeterSum / p.amount,
             0
         ) / dataSortByMonthYear?.length || 0;
@@ -63,76 +63,70 @@ const Analytics = ({ analyticsData }) => {
     );
 
     return (
-        <PageLayout>
-            <div
-                className="max-w-screen-xl m-auto text-white pb-64"
-                style={{ color: '#BDD1F8', paddingTop: '100px' }}
-            >
-                {dataSortByMonthYear ? (
-                    <div className="flex flex-col h-full">
-                        {dataAnalytics && (
-                            <PriceStatistics
-                                maxPrice={+dataPriceMax.priceMax || 0}
-                                minPrice={+dataPriceMin.priceMin || 0}
-                                minPricePerMeter={
-                                    +dataPerMeterMin.perMeterMin || 0
-                                }
-                                maxPricePerMeter={
-                                    +dataPerMeterMax.perMeterMax || 0
-                                }
-                                amountTotal={amountTotal}
-                                averagePrice={averagePrice}
-                            />
-                        )}
-
-                        <div className="w-full h-full">
-                            <div className="flex">
-                                <AnalysticsSelect />
-                                <PricePeratoWrapper
-                                    dataGroupBy={dataGroupBy}
-                                    loading={!dataAnalytics && isValidating}
+        <>
+            {dataSortByMonthYear ? (
+                <PageLayout>
+                    <div
+                        className="max-w-screen-xl m-auto text-white pb-64"
+                        style={{ color: '#BDD1F8', paddingTop: '100px' }}
+                    >
+                        <div className="flex flex-col h-full">
+                            {dataAnalytics && (
+                                <PriceStatistics
+                                    maxPrice={+dataPriceMax.priceMax || 0}
+                                    minPrice={
+                                        Number(dataPriceMin.priceMin) || 0
+                                    }
+                                    minPricePerMeter={
+                                        +dataPerMeterMin.perMeterMin || 0
+                                    }
+                                    maxPricePerMeter={
+                                        +dataPerMeterMax.perMeterMax || 0
+                                    }
+                                    amountTotal={amountTotal}
+                                    averagePrice={averagePrice}
                                 />
-                            </div>
-                            <hr className="border-b-2 border-gray-600 my-8 mx-4" />
-                            <div className="flex mt-12">
-                                <div className="w-full ml-2">
-                                    <TransactionLinChartWrapper
-                                        data={dataAnalytics}
-                                        catagoriesYear={Object.keys(
-                                            dataGroupBy
-                                        )}
+                            )}
+
+                            <div className="w-full h-full">
+                                <div className="flex">
+                                    <AnalysticsSelect />
+                                    <PricePeratoWrapper
+                                        dataGroupBy={dataGroupBy}
+                                        loading={!dataAnalytics && isValidating}
                                     />
                                 </div>
+                                <hr className="border-b-2 border-gray-600 my-8 mx-4" />
+                                <div className="flex mt-12">
+                                    <div className="w-full ml-2">
+                                        <TransactionLinChartWrapper
+                                            data={dataAnalytics}
+                                            catagoriesYear={Object.keys(
+                                                dataGroupBy
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                                <PropertyLineChartWrapper
+                                    data={dataAnalytics}
+                                    catagoriesYear={Object.keys(dataGroupBy)}
+                                />
                             </div>
-                            <PropertyLineChartWrapper
-                                data={dataAnalytics}
-                                catagoriesYear={Object.keys(dataGroupBy)}
-                            />
                         </div>
                     </div>
-                ) : (
-                    <div
-                        style={{
-                            height: 'calc(100vh - 100px)',
-                        }}
-                    >
-                        <Loading />
-                    </div>
-                )}
-            </div>
-        </PageLayout>
+                </PageLayout>
+            ) : (
+                <div
+                    className="flex bg-gray-900 h-full w-full justify-center"
+                    style={{
+                        height: 'calc(100vh)',
+                    }}
+                >
+                    <Loading />
+                </div>
+            )}
+        </>
     );
 };
 
-// export async function getServerSideProps(context) {
-//     const res = await fetch(
-//         `${process.env.API_URI}/api/v1/vi/visualization/analytics?fromMonth=6&fromYear=2019&toYear=2020&toMonth=6`
-//     );
-//     const data = await res.json();
-//     console.log(data);
-
-//     // return {
-//     //     props: { analyticsData: data },
-//     // };
-// }
 export default Analytics;

@@ -122,7 +122,7 @@ export default function MapLeaf({
                     zIndex: 9999,
                     padding: '10px',
                     fontSize: '10px',
-                    opacity: '0.7',
+                    opacity: '0.4',
                 }}
             >
                 *Phóng to để xem được nhiều dữ liệu hơn

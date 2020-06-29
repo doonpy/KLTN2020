@@ -34,7 +34,7 @@ const PriceStatisticsCard = ({ titlePrice, valuePrice, unitPrice }) => {
                         <h3 className="font-bold text-gray-600">
                             <div className="flex justify-center items-center">
                                 <div className="text-3xl">
-                                    {Math.round(valuePrice)}
+                                    {Math.round(valuePrice * 1000) / 1000}
                                 </div>
                                 <div className="pl-2 text-2xl">{unitPrice}</div>
                             </div>
@@ -101,5 +101,7 @@ PriceStatistics.propTypes = {
     maxPrice: PropTypes.number,
     minPricePerMeter: PropTypes.number,
     maxPricePerMeter: PropTypes.number,
+    amountTotal: PropTypes.any,
+    averagePrice: PropTypes.any,
 };
 export default PriceStatistics;

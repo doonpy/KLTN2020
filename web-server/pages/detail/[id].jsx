@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import NProgress from 'nprogress';
-import GroupData from '../../components/detail/GroupData';
 import { numberWithCommas } from '../../util/services/helper';
 import useRawDataDetail from '../../hooks/use-raw-data-detail';
 import PageLayout from '../../components/page-layout';
@@ -177,11 +176,10 @@ const DetailRealEstate = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            {/* <div className="w-1/2">
-                                                <div className="border border-gray-800 rounded shadow p-2">
-                                                    <div className="py-2 w-full text-center text-blue-600 font-bold">
-                                                        Vị trí - tiện ích xung
-                                                        quanh
+                                            <div className="w-1/2">
+                                                <div className="rounded shadow p-2">
+                                                    <div className="py-2 w-full text-center txt-primary font-bold">
+                                                        Bản đồ
                                                     </div>
                                                     <MapItem
                                                         position={[
@@ -192,12 +190,11 @@ const DetailRealEstate = () => {
                                                         ]}
                                                     />
                                                 </div>
-                                            </div> */}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <GroupData id={id} />
                         </div>
                         <div className="py-4" />
                     </div>

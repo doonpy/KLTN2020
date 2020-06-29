@@ -28,7 +28,6 @@ const TransactionLineChartWrapper = ({ data }) => {
                     (c) => c.time
                 );
 
-                console.log(Object.keys(dataTransGroupByTime));
                 for (const keyData in dataTransGroupByTime) {
                     if ({}.hasOwnProperty.call(dataTransGroupByTime, keyData)) {
                         const priceAverage =

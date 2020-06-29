@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { TRANSATION_TYPE } from '../../util/constants';
 
 const ButtonTransaction = ({ onClick, isActive, title }) => (
@@ -13,6 +14,11 @@ const ButtonTransaction = ({ onClick, isActive, title }) => (
     </button>
 );
 
+ButtonTransaction.propTypes = {
+    onClick: PropTypes.func,
+    title: PropTypes.string,
+    isActive: PropTypes.bool,
+};
 const TransactionOptionBottom = ({ setTransaction, transactionStage }) => {
     return (
         <h1
@@ -20,10 +26,10 @@ const TransactionOptionBottom = ({ setTransaction, transactionStage }) => {
             style={{ zIndex: 800, left: '35px', marginBottom: '10px' }}
         >
             <div
-                className="bg-white shadow rounded-sm "
-                style={{ width: '400px' }}
+                className="bg-white shadow rounded-sm"
+                style={{ width: '354px' }}
             >
-                <div className="flex justify-around py-2">
+                <div className="flex justify-around py-1">
                     <ButtonTransaction
                         title="Tổng"
                         onClick={() => setTransaction(TRANSATION_TYPE.TOTAL)}
@@ -44,5 +50,8 @@ const TransactionOptionBottom = ({ setTransaction, transactionStage }) => {
         </h1>
     );
 };
-
+TransactionOptionBottom.propTypes = {
+    setTransaction: PropTypes.func,
+    transactionStage: PropTypes.any,
+};
 export default TransactionOptionBottom;

@@ -12,10 +12,16 @@ const PageLayout = (props) => {
     );
 
     return (
-        <div className="bg-gray-200 dark:bg-dark">
-            <PageHeader />
-            {props.children}
-        </div>
+        <>
+            {media > 4 ? (
+                <div className="bg-gray-200 dark:bg-dark">
+                    <PageHeader />
+                    {props.children}
+                </div>
+            ) : (
+                <Error />
+            )}
+        </>
     );
 };
 

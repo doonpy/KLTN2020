@@ -8,6 +8,7 @@ export function useHover() {
     const handleMouseOver = () => setValue(true);
     const handleMouseOut = () => setValue(false);
 
+    // eslint-disable-next-line consistent-return
     useEffect(() => {
         const node = ref.current;
         if (node) {

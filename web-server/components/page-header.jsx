@@ -63,13 +63,25 @@ const PageHeader = () => {
                                         {numberWithCommas(saleAmount)}
                                     </h1>
                                 </div>
-                                <div className="ml-3 text-xs flex flex-col items-center text-primary">
-                                    <div>Tỷ lệ</div>
-                                    <div>
-                                        {`${calculatePercentage(
-                                            saleAmount,
-                                            saleAmount + rentAmount
-                                        )} %`}
+                                <div className="ml-3 text-xs flex flex-col items-center text-primary font-semibold">
+                                    <div
+                                        className={`c100 p${Math.round(
+                                            calculatePercentage(
+                                                saleAmount,
+                                                saleAmount + rentAmount
+                                            )
+                                        )} small green text-primary`}
+                                    >
+                                        <span>{`${Math.round(
+                                            calculatePercentage(
+                                                saleAmount,
+                                                saleAmount + rentAmount
+                                            )
+                                        )} %`}</span>
+                                        <div className="slice">
+                                            <div className="bar" />
+                                            <div className="fill" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -103,12 +115,24 @@ const PageHeader = () => {
                                     </h1>
                                 </div>
                                 <div className="ml-3 text-xs flex flex-col items-center font-bold text-danger">
-                                    <div>Tỷ lệ</div>
-                                    <div>
-                                        {`${calculatePercentage(
-                                            rentAmount,
-                                            saleAmount + rentAmount
-                                        )} %`}
+                                    <div
+                                        className={`c100 p${Math.round(
+                                            calculatePercentage(
+                                                rentAmount,
+                                                saleAmount + rentAmount
+                                            )
+                                        )} small red text-danger`}
+                                    >
+                                        <span>{`${Math.round(
+                                            calculatePercentage(
+                                                rentAmount,
+                                                saleAmount + rentAmount
+                                            )
+                                        )} %`}</span>
+                                        <div className="slice">
+                                            <div className="bar" />
+                                            <div className="fill" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

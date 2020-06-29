@@ -25,6 +25,21 @@ const PropertyLineChartWrapper = ({ data, catagoriesYear }) => {
         },
     });
 
+    /**
+     *
+     * @param {array} arr
+     * @return {bool}
+     */
+    const checkAllZero = (arr) => {
+        let countZero = 0;
+        arr.forEach((a) => {
+            if (a === 0) {
+                countZero++;
+            }
+        });
+        if (arr.length === countZero) return true;
+        return false;
+    };
     const getDataProperty = (dataAnalytics) => {
         const dataGroupByProperty = groupBy(dataAnalytics?.analytics, (c) => {
             return c.propertyType;
@@ -39,10 +54,12 @@ const PropertyLineChartWrapper = ({ data, catagoriesYear }) => {
                     );
                 });
 
-                dataResult.push({
-                    name: PROPERTY_TYPE_NUMBER[key].wording[0],
-                    data: dataProperty,
-                });
+                if (!checkAllZero(dataProperty)) {
+                    dataResult.push({
+                        name: PROPERTY_TYPE_NUMBER[key].wording[0],
+                        data: dataProperty,
+                    });
+                } else continue;
             }
         }
         return dataResult;

@@ -2,11 +2,11 @@ export const AREA_LEGEND = [0, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
 export const PRICE_LEGEND = [0, 0.5, 1, 5, 10, 50, 100, 500, 1000, 5000];
 
 export const COLOR_CODE = [
-    '#85929E',
-    '#CCD1D1',
+    '#F6DB00',
+    '#768603',
     '#CA6F1E',
     '#7D6608',
-    '#40C8F6',
+    '#000080',
     '#633974 ',
     'green',
     '#2980B9',
