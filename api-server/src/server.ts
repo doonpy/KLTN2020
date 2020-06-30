@@ -47,7 +47,7 @@ const initDefaultFolder = (): void => {
             bodyParser.json(),
             bodyParser.urlencoded({ extended: true }),
             morgan('dev'),
-            checkCors,
+            // checkCors,
         ],
         controllers: [
             {

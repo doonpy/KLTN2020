@@ -1,3 +1,3 @@
 #!/bin/bash
 
-serve -s dist/dashboard
+./node_modules/.bin/serve -s dist/dashboard
