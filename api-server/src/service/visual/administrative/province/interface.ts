@@ -1,4 +1,10 @@
-import { ApiModelBase, DocumentModelBase } from '@service/interface';
+import {
+    ApiModelBase,
+    CommonRequestBodySchema,
+    CommonRequestParamSchema,
+    CommonRequestQuerySchema,
+    DocumentModelBase,
+} from '@service/interface';
 import {
     VisualAdministrativeCountryApiModel,
     VisualAdministrativeCountryDocumentModel,
@@ -17,4 +23,18 @@ export interface VisualAdministrativeProvinceApiModel extends ApiModelBase {
     code: string | null;
     country: number | VisualAdministrativeCountryApiModel | null;
     acreage: number | null;
+}
+
+export interface VisualAdministrativeProvinceRequestParamSchema
+    extends CommonRequestParamSchema {}
+
+export interface VisualAdministrativeProvinceRequestQuerySchema
+    extends CommonRequestQuerySchema {}
+
+export interface VisualAdministrativeProvinceRequestBodySchema
+    extends CommonRequestBodySchema {
+    name: string;
+    code: string;
+    countryId: number;
+    acreage: number;
 }

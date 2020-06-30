@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-export const CommonLanguageIndex: { [key: string]: number } = {
+export const CommonLanguageIndex: Record<string, number> = {
     vi: 0,
     en: 1,
 };

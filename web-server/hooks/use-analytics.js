@@ -12,7 +12,7 @@ export default function useAnalytics({
         propertyType = 0,
     },
 }) {
-    const URL = `/api/v1/vi/visualization/analytics?fromMonth=${fromMonth}&fromYear=${fromYear}&toMonth=${toMonth}&toYear=${toYear}${
+    const URL = `/api/v1/visualization/analytics?fromMonth=${fromMonth}&fromYear=${fromYear}&toMonth=${toMonth}&toYear=${toYear}${
         propertyType !== 0 ? `&propertyType=${propertyType}` : ''
     }${transactionType !== 0 ? `&transactionType=${transactionType}` : ''}`;
 

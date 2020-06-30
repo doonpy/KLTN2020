@@ -6,6 +6,7 @@ import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
 import CatalogLogic from '@service/catalog/CatalogLogic';
 import { isExactTime } from '@util/helper/datetime';
+import { initData } from '@background-job/initialize-data/main';
 
 let isCrawlerRunning = false;
 let script: AsyncGenerator;
@@ -111,6 +112,7 @@ async function* generateScript() {
  */
 (async (): Promise<void> => {
     try {
+        await initData();
         setInterval(async (): Promise<void> => {
             const expectTime = new Date();
             expectTime.setUTCHours(

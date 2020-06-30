@@ -72,7 +72,7 @@ const PageHeader = () => {
                                             )
                                         )} small green text-primary`}
                                     >
-                                        <span>{`${Math.round(
+                                        <span className="text-primary">{`${Math.round(
                                             calculatePercentage(
                                                 saleAmount,
                                                 saleAmount + rentAmount
@@ -123,7 +123,7 @@ const PageHeader = () => {
                                             )
                                         )} small red text-danger`}
                                     >
-                                        <span>{`${Math.round(
+                                        <span className="text-danger">{`${Math.round(
                                             calculatePercentage(
                                                 rentAmount,
                                                 saleAmount + rentAmount

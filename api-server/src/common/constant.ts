@@ -77,6 +77,7 @@ const CommonConstant = {
             wording: 'usd',
         },
     ],
+    MIN_ID: 1,
 };
 
 export default CommonConstant;

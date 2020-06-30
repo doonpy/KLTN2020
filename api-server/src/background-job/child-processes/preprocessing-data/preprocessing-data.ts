@@ -85,29 +85,7 @@ const rollback = async (): Promise<void> => {
                     await visualAnalyticsLogic.delete(id);
             }
         } else if (cloneStateCache[key]) {
-            const id = cloneStateCache[key]._id;
-            switch (key) {
-                case StateCacheProperties.MAP_POINT:
-                    await visualMapPointLogic.update(id, cloneStateCache[key]);
-                    break;
-                case StateCacheProperties.GROUPED:
-                    await groupedDataLogic.update(id, cloneStateCache[key]);
-                    break;
-                case StateCacheProperties.SUMMARY_DISTRICT:
-                    await visualSummaryDistrictLogic.update(
-                        id,
-                        cloneStateCache[key]
-                    );
-                    break;
-                case StateCacheProperties.SUMMARY_DISTRICT_WARD:
-                    await visualSummaryDistrictWardLogic.update(
-                        id,
-                        cloneStateCache[key]
-                    );
-                    break;
-                default:
-                    await visualAnalyticsLogic.update(id, cloneStateCache[key]);
-            }
+            await cloneStateCache[key].updateOne(cloneStateCache[key]);
         }
     }
 };

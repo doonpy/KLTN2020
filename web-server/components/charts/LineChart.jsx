@@ -8,7 +8,7 @@ import {
     CUSTOM_CHART,
     TURN_OFF_CONTEXT_MENU,
 } from '../../custom/custom-charts';
-import { DARK_UNICA_COLOR } from '../../themes/color';
+import { SAND_COLOR } from '../../themes/color';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -22,10 +22,10 @@ const LineChart = ({ catagoriesData, data, title }) => {
     const [lineChartOption, setLineChartOption] = useState({
         ...CUSTOM_CHART,
         ...TURN_OFF_CONTEXT_MENU,
-        colors: DARK_UNICA_COLOR,
+        colors: SAND_COLOR,
         title: {
             text: title,
-            style: TYPE_TEXT,
+            style: { fontSize: '11px', fontWeight: 600 },
         },
         chart: {
             backgroundColor: 'rgba(0,0,0,0)',
@@ -71,6 +71,7 @@ const LineChart = ({ catagoriesData, data, title }) => {
             },
             series: data,
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [catagoriesData, data]);
     return (
         <div>

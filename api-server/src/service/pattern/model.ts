@@ -4,18 +4,22 @@ import { PatternDocumentModel } from './interface';
 
 const patternSchema: Schema = new Schema(
     {
-        sourceUrl: { type: Schema.Types.String },
+        sourceUrl: { type: Schema.Types.String, required: true },
         mainLocator: {
-            propertyType: { type: Schema.Types.String },
-            title: { type: Schema.Types.String },
-            describe: { type: Schema.Types.String },
-            price: { type: Schema.Types.String },
-            acreage: { type: Schema.Types.String },
-            address: { type: Schema.Types.String },
+            propertyType: { type: Schema.Types.String, required: true },
+            title: { type: Schema.Types.String, required: true },
+            describe: { type: Schema.Types.String, required: true },
+            price: { type: Schema.Types.String, required: true },
+            acreage: { type: Schema.Types.String, required: true },
+            address: { type: Schema.Types.String, required: true },
             postDate: {
-                locator: { type: Schema.Types.String },
-                format: { type: Schema.Types.String },
-                delimiter: { type: Schema.Types.String, enum: ['-', '/', '.'] },
+                locator: { type: Schema.Types.String, required: true },
+                format: { type: Schema.Types.String, required: true },
+                delimiter: {
+                    type: Schema.Types.String,
+                    enum: ['-', '/', '.'],
+                    required: true,
+                },
             },
         },
         subLocator: [

@@ -1,9 +1,3 @@
-/****************************************************************
- *
- * CSS Percentage Circle
- * Author: Andre Firchow
- *
-*****************************************************************/
 .rect-auto,
 .c100.p51 .slice,
 .c100.p52 .slice,
@@ -275,7 +269,6 @@
     width: 5em;
     line-height: 5em;
     font-size: 0.2em;
-    color: #cccccc;
     display: block;
     text-align: center;
     white-space: nowrap;

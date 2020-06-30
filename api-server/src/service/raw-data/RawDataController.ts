@@ -1,63 +1,41 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
-import Validator from '@util/validator/Validator';
-import Checker from '@util/checker';
-import ResponseStatusCode from '@common/response-status-code';
 import CommonConstant from '@common/constant';
 import RawDataLogic from './RawDataLogic';
-import { RawDataDocumentModel } from './interface';
+import {
+    RawDataAcreage,
+    RawDataDocumentModel,
+    RawDataOther,
+    RawDataPrice,
+    RawDataRequestBodySchema,
+    RawDataRequestParamSchema,
+    RawDataRequestQuerySchema,
+    RawDataStatus,
+} from './interface';
 import DetailUrlLogic from '../detail-url/DetailUrlLogic';
+import Joi from '@hapi/joi';
+import { CommonRequest } from '@service/interface';
 
 const commonPath = '/raw-dataset';
+const commonName = 'rawDataset';
 const specifyIdPath = '/raw-data/:id';
+const specifyName = 'rawData';
 
-export default class RawDataController extends ServiceControllerBase {
+export default class RawDataController extends ServiceControllerBase<
+    RawDataRequestParamSchema,
+    RawDataRequestQuerySchema,
+    RawDataRequestBodySchema
+> {
     private static instance: RawDataController;
-
-    private rawDataLogic = new RawDataLogic();
-
-    private bodyValidator = new Validator();
-
-    private priceValidator = new Validator();
-
-    private acreageValidator = new Validator();
-
-    private othersValidator = new Validator();
-
     private readonly PARAM_DETAIL_URL_ID = 'detailUrlId';
-
     private readonly PARAM_TRANSACTION_TYPE = 'transactionType';
-
     private readonly PARAM_PROPERTY_TYPE = 'propertyType';
-
-    private readonly PARAM_POST_DATE = 'postDate';
-
     private readonly PARAM_TITLE = 'title';
-
     private readonly PARAM_DESCRIBE = 'describe';
-
-    private readonly PARAM_PRICE = 'price';
-
-    private readonly PARAM_PRICE_CURRENCY = 'currency';
-
-    private readonly PARAM_PRICE_TIME_UNIT = 'timeUnit';
-
-    private readonly PARAM_ACREAGE = 'acreage';
-
-    private readonly PARAM_ACREAGE_MEASURE_UNIT = 'measureUnit';
-
     private readonly PARAM_ADDRESS = 'address';
 
-    private readonly PARAM_OTHERS = 'others';
-
-    private readonly PARAM_OTHERS_NAME = 'name';
-
-    private readonly PARAM_VALUE = 'value';
-
-    private readonly PRAM_IS_GROUPED = 'isGrouped';
-
     constructor() {
-        super();
+        super(commonName, specifyName, RawDataLogic.getInstance());
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -71,602 +49,162 @@ export default class RawDataController extends ServiceControllerBase {
         return this.instance;
     }
 
-    protected async getAllRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
+    protected initValidateSchema(): void {
+        this.reqQuerySchema = this.reqQuerySchema.keys({
+            detailUrlId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            propertyType: Joi.number().integer().min(CommonConstant.MIN_ID),
+            transactionType: Joi.number().integer().min(CommonConstant.MIN_ID),
+            title: Joi.string(),
+            describe: Joi.string(),
+            address: Joi.string(),
+        });
 
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_DETAIL_URL_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(0, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(0, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_DESCRIBE,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_ADDRESS,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PRAM_IS_GROUPED,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PRAM_IS_GROUPED,
-                new Checker.IntegerRange(0, 1)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const { documents, hasNext } = await this.rawDataLogic.getAll({
-                limit: this.limit,
-                offset: this.offset,
-                conditions: this.buildQueryConditions([
-                    { paramName: this.PARAM_DETAIL_URL_ID, isString: false },
-                    { paramName: this.PARAM_TRANSACTION_TYPE, isString: false },
-                    { paramName: this.PARAM_PROPERTY_TYPE, isString: false },
-                    { paramName: this.PARAM_TITLE, isString: true },
-                    { paramName: this.PARAM_DESCRIBE, isString: true },
-                    { paramName: this.PARAM_ADDRESS, isString: true },
-                    { paramName: this.PRAM_IS_GROUPED, isString: false },
-                ]),
-            });
-            const rawDataList = documents.map(
-                (rawDataItem: RawDataDocumentModel) =>
-                    this.rawDataLogic.convertToApiResponse(rawDataItem)
-            );
-            const responseBody = {
-                rawDataset: rawDataList,
-                hasNext,
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+        this.reqBodySchema = this.reqBodySchema.keys({
+            detailUrlId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            transactionType: Joi.number().integer().min(CommonConstant.MIN_ID),
+            propertyType: Joi.number().integer().min(CommonConstant.MIN_ID),
+            postDate: Joi.date(),
+            title: Joi.string().trim(),
+            describe: Joi.string().trim(),
+            price: Joi.object<RawDataPrice>({
+                value: Joi.number().min(0),
+                currency: Joi.string().allow(
+                    CommonConstant.PRICE_CURRENCY[0].wording,
+                    CommonConstant.PRICE_CURRENCY[1].wording
+                ),
+                timeUnit: Joi.number().integer().min(1),
+            }),
+            acreage: Joi.object<RawDataAcreage>({
+                value: Joi.number().min(0),
+                measureUnit: Joi.string().allow('m²'),
+            }),
+            address: Joi.string().trim(),
+            others: Joi.array().items(
+                Joi.object<RawDataOther>({
+                    name: Joi.string(),
+                    value: Joi.string(),
+                })
+            ),
+            coordinateId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            status: Joi.object<RawDataStatus>({
+                isSummary: Joi.boolean(),
+                isMapPoint: Joi.boolean(),
+                isAnalytics: Joi.boolean(),
+                isGrouped: Joi.boolean(),
+            }),
+        });
     }
 
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const rawData = await this.rawDataLogic.getById(idBody);
-            const responseBody = {
-                rawData: this.rawDataLogic.convertToApiResponse(rawData!),
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    protected setRequiredInputForValidateSchema(): void {
+        this.reqBodySchema = this.reqBodySchema.append({
+            detailUrlId: Joi.required(),
+            transactionType: Joi.required(),
+            propertyType: Joi.required(),
+            postDate: Joi.required(),
+            title: Joi.required(),
+            describe: Joi.required(),
+            price: Joi.object<RawDataPrice>({
+                value: Joi.required(),
+                currency: Joi.required(),
+            }),
+            acreage: Joi.object<RawDataAcreage>({
+                value: Joi.required(),
+                measureUnit: Joi.required(),
+            }),
+            address: Joi.required(),
+            coordinateId: Joi.required(),
+        });
     }
 
-    protected async createRoute(
-        req: Request,
+    protected getAllPrepend(
+        req: CommonRequest<
+            RawDataRequestParamSchema,
+            RawDataRequestBodySchema,
+            RawDataRequestQuerySchema
+        >,
+        res: Response,
+        next: NextFunction
+    ): void {
+        req.locals!.getConditions = this.buildQueryConditions([
+            { paramName: this.PARAM_DETAIL_URL_ID, isString: false },
+            { paramName: this.PARAM_TRANSACTION_TYPE, isString: false },
+            { paramName: this.PARAM_PROPERTY_TYPE, isString: false },
+            { paramName: this.PARAM_TITLE, isString: true },
+            { paramName: this.PARAM_DESCRIBE, isString: true },
+            { paramName: this.PARAM_ADDRESS, isString: true },
+        ]);
+        next();
+    }
+
+    protected async createPrepend(
+        req: CommonRequest<
+            RawDataRequestParamSchema,
+            RawDataRequestBodySchema,
+            RawDataRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.bodyValidator = new Validator();
-            this.priceValidator = new Validator();
-            this.acreageValidator = new Validator();
-            this.othersValidator = new Validator();
-
-            // Validate request body
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DETAIL_URL_ID,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DETAIL_URL_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(
-                    1,
-                    CommonConstant.TRANSACTION_TYPE.length
-                )
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_POST_DATE,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_POST_DATE,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DESCRIBE,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DESCRIBE,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_PRICE,
-                new Checker.Type.Object()
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ACREAGE,
-                new Checker.Type.Object()
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ADDRESS,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ADDRESS,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_OTHERS,
-                new Checker.Type.Object()
-            );
-
-            // Validate price object
-            this.priceValidator.addParamValidator(
-                this.PARAM_PRICE_CURRENCY,
-                new Checker.Type.String()
-            );
-
-            this.priceValidator.addParamValidator(
-                this.PARAM_PRICE_TIME_UNIT,
-                new Checker.Type.Integer()
-            );
-            this.priceValidator.addParamValidator(
-                this.PARAM_PRICE_TIME_UNIT,
-                new Checker.IntegerRange(0, 2)
-            );
-
-            this.priceValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.Type.Decimal()
-            );
-            this.priceValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.DecimalRange(0, null)
-            );
-
-            // Validate acreage object
-            this.acreageValidator.addParamValidator(
-                this.PARAM_ACREAGE_MEASURE_UNIT,
-                new Checker.Type.String()
-            );
-            this.acreageValidator.addParamValidator(
-                this.PARAM_ACREAGE_MEASURE_UNIT,
-                new Checker.MeasureUnit('m²')
-            );
-
-            this.acreageValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.Type.Decimal()
-            );
-            this.acreageValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.DecimalRange(0, null)
-            );
-
-            // Validate others object
-            this.othersValidator.addParamValidator(
-                this.PARAM_OTHERS_NAME,
-                new Checker.Type.String()
-            );
-
-            this.othersValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.Type.String()
-            );
-
-            this.bodyValidator.validate(this.requestBody);
-            this.priceValidator.validate(
-                (this.requestBody[this.PARAM_PRICE] as Record<string, any>) ??
-                    {}
-            );
-            this.acreageValidator.validate(
-                (this.requestBody[this.PARAM_ACREAGE] as Record<string, any>) ??
-                    {}
-            );
-            this.othersValidator.validate(
-                (this.requestBody[this.PARAM_OTHERS] as Record<string, any>) ??
-                    {}
-            );
-
-            const rawDataBody = (this
-                .requestBody as unknown) as RawDataDocumentModel;
             await DetailUrlLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId,
-            });
-            const createdRawData = await this.rawDataLogic.create(rawDataBody, {
-                notExist: {
-                    [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId,
-                },
+                detailUrlId: this.reqBody.detailUrlId,
             });
 
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.CREATED,
-                this.rawDataLogic.convertToApiResponse(createdRawData)
-            );
+            req.locals!.validateNotExist = [
+                { detailUrlId: this.reqBody.detailUrlId },
+            ];
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 
-    protected async updateRoute(
-        req: Request,
+    protected async updatePrepend(
+        req: CommonRequest<
+            RawDataRequestParamSchema,
+            RawDataRequestBodySchema,
+            RawDataRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.bodyValidator = new Validator();
-            this.priceValidator = new Validator();
-            this.acreageValidator = new Validator();
-            this.othersValidator = new Validator();
-
-            // Validate request body
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DETAIL_URL_ID,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DETAIL_URL_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_POST_DATE,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_POST_DATE,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_TITLE,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DESCRIBE,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_DESCRIBE,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_PRICE,
-                new Checker.Type.Object()
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ACREAGE,
-                new Checker.Type.Object()
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ADDRESS,
-                new Checker.Type.String()
-            );
-            this.bodyValidator.addParamValidator(
-                this.PARAM_ADDRESS,
-                new Checker.StringLength(1, null)
-            );
-
-            this.bodyValidator.addParamValidator(
-                this.PARAM_OTHERS,
-                new Checker.Type.Object()
-            );
-
-            // Validate price object
-            this.priceValidator.addParamValidator(
-                this.PARAM_PRICE_CURRENCY,
-                new Checker.Type.String()
-            );
-
-            this.priceValidator.addParamValidator(
-                this.PARAM_PRICE_TIME_UNIT,
-                new Checker.Type.Integer()
-            );
-            this.priceValidator.addParamValidator(
-                this.PARAM_PRICE_TIME_UNIT,
-                new Checker.IntegerRange(
-                    1,
-                    CommonConstant.PRICE_TIME_UNIT.length
-                )
-            );
-
-            this.priceValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.Type.Decimal()
-            );
-            this.priceValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.DecimalRange(0, null)
-            );
-
-            // Validate acreage object
-            this.acreageValidator.addParamValidator(
-                this.PARAM_ACREAGE_MEASURE_UNIT,
-                new Checker.Type.String()
-            );
-            this.acreageValidator.addParamValidator(
-                this.PARAM_ACREAGE_MEASURE_UNIT,
-                new Checker.MeasureUnit('m²')
-            );
-
-            this.acreageValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.Type.Decimal()
-            );
-            this.acreageValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.DecimalRange(0, null)
-            );
-
-            // Validate others object
-            this.othersValidator.addParamValidator(
-                this.PARAM_OTHERS_NAME,
-                new Checker.Type.String()
-            );
-
-            this.othersValidator.addParamValidator(
-                this.PARAM_VALUE,
-                new Checker.Type.String()
-            );
-
-            this.bodyValidator.validate(this.requestBody);
-            this.priceValidator.validate(
-                (this.requestBody[this.PARAM_PRICE] as Record<string, any>) ??
-                    {}
-            );
-            this.acreageValidator.validate(
-                (this.requestBody[this.PARAM_ACREAGE] as Record<string, any>) ??
-                    {}
-            );
-            this.othersValidator.validate(
-                (this.requestBody[this.PARAM_OTHERS] as Record<string, any>) ??
-                    {}
-            );
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const rawDataBody = (this
-                .requestBody as unknown) as RawDataDocumentModel;
-            const currentRawData = await this.rawDataLogic.getById(idBody);
-
-            if (rawDataBody.detailUrlId) {
+            if (this.reqBody.detailUrlId) {
                 await DetailUrlLogic.getInstance().checkExisted({
-                    [this.PARAM_DOCUMENT_ID]: rawDataBody.detailUrlId,
+                    detailUrlId: this.reqBody.detailUrlId,
                 });
             }
 
-            let editedRawData: RawDataDocumentModel;
-
-            if (currentRawData!.detailUrlId !== rawDataBody.detailUrlId) {
-                editedRawData = await this.rawDataLogic.update(
-                    idBody,
-                    rawDataBody,
-                    {
-                        notExist: {
-                            [this.PARAM_DETAIL_URL_ID]: rawDataBody.detailUrlId,
-                        },
-                    }
-                );
-            } else {
-                editedRawData = await this.rawDataLogic.update(
-                    idBody,
-                    rawDataBody
-                );
+            const currentRawData = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as RawDataDocumentModel;
+            if (
+                currentRawData &&
+                currentRawData.detailUrlId !== this.reqBody.detailUrlId
+            ) {
+                req.locals!.validateNotExist = [
+                    { detailUrlId: this.reqBody.detailUrlId },
+                ];
             }
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                this.rawDataLogic.convertToApiResponse(editedRawData)
-            );
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 
-    protected async deleteRoute(
-        req: Request,
+    protected getDocumentAmountPrepend(
+        req: CommonRequest<
+            RawDataRequestParamSchema,
+            RawDataRequestBodySchema,
+            RawDataRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.rawDataLogic.delete(idBody);
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.NO_CONTENT,
-                {}
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_TRANSACTION_TYPE,
-                new Checker.IntegerRange(
-                    1,
-                    CommonConstant.TRANSACTION_TYPE.length
-                )
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_PROPERTY_TYPE,
-                new Checker.IntegerRange(1, CommonConstant.PROPERTY_TYPE.length)
-            );
-
-            this.validator.validate(this.requestQuery);
-
-            const documentAmount = await this.rawDataLogic.getDocumentAmount(
-                this.buildQueryConditions([
-                    { paramName: this.PARAM_TRANSACTION_TYPE, isString: false },
-                    { paramName: this.PARAM_PROPERTY_TYPE, isString: false },
-                ])
-            );
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'raw-data',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    ): void {
+        req.locals!.getConditions = this.buildQueryConditions([
+            { paramName: this.PARAM_TRANSACTION_TYPE, isString: false },
+            { paramName: this.PARAM_PROPERTY_TYPE, isString: false },
+        ]);
+        next();
     }
 }

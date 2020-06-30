@@ -37,7 +37,7 @@ const DetailRealEstate = () => {
 
     const { id } = router.query;
 
-    const { data, isValidating, error } = useRawDataDetail(id);
+    const { data, isValidating } = useRawDataDetail(id);
 
     return (
         <>
@@ -77,7 +77,7 @@ const DetailRealEstate = () => {
                                             <div className="w-1/2 mr-6">
                                                 <div>
                                                     {data.rawData
-                                                        .transactionType && (
+                                                        ?.transactionType && (
                                                         <Tag
                                                             className="bg-red-700"
                                                             value={
@@ -88,7 +88,7 @@ const DetailRealEstate = () => {
                                                         />
                                                     )}
                                                     {data.rawData
-                                                        .propertyType && (
+                                                        ?.propertyType && (
                                                         <Tag
                                                             className="bg-blue-500"
                                                             value={
@@ -209,5 +209,4 @@ const DetailRealEstate = () => {
         </>
     );
 };
-
 export default DetailRealEstate;

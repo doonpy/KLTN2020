@@ -18,9 +18,7 @@ const ATTRIBUTE_TO_GET_DATA = 'href';
 
 export default class ScrapeDetailUrl extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic;
-
     private pageNumberQueue: string[];
-
     private scrapedPageNumber: string[];
 
     constructor(catalog: CatalogDocumentModel) {
@@ -53,31 +51,31 @@ export default class ScrapeDetailUrl extends ScrapeBase {
             let requestCounter = 0;
             this.pageNumberQueue = [this.catalog.url];
             const loop = setInterval(async (): Promise<void> => {
-                if (this.pageNumberQueue.length === 0 && requestCounter === 0) {
-                    clearInterval(loop);
-                    await this.finishAction();
-                    return;
-                }
-
-                if (requestCounter > MAX_REQUEST) {
-                    return;
-                }
-
-                const targetUrl = this.pageNumberQueue.shift();
-                if (!targetUrl) {
-                    return;
-                }
-
                 try {
+                    if (
+                        this.pageNumberQueue.length === 0 &&
+                        requestCounter === 0
+                    ) {
+                        clearInterval(loop);
+                        await this.finishAction();
+                        return;
+                    }
+
+                    if (requestCounter > MAX_REQUEST) {
+                        return;
+                    }
+
                     requestCounter++;
+                    const targetUrl = this.pageNumberQueue.shift();
+                    if (!targetUrl) {
+                        requestCounter--;
+                        return;
+                    }
                     this.scrapedPageNumber.push(targetUrl);
-                    await this.scrapeAction(
-                        domain,
-                        targetUrl,
-                        async ($: CheerioStatic): Promise<void> => {
-                            await this.handleSuccess($);
-                        }
-                    );
+                    const $ = await this.getStaticBody(domain, targetUrl);
+                    if ($) {
+                        await this.handleSuccess($);
+                    }
                     requestCounter--;
                 } catch (error) {
                     new ConsoleLog(
@@ -103,12 +101,26 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     }
 
     protected async handleSuccess($: CheerioStatic): Promise<void> {
+        let newPageNumberUrls = ScrapeBase.extractData(
+            $,
+            this.catalog.locator.pageNumber,
+            ATTRIBUTE_TO_GET_DATA
+        );
+        newPageNumberUrls = newPageNumberUrls.map((url) => sanitizeUrl(url));
+        for (const newPageNumberUrl of newPageNumberUrls) {
+            if (
+                this.pageNumberQueue.indexOf(newPageNumberUrl) < 0 &&
+                this.scrapedPageNumber.indexOf(newPageNumberUrl) < 0
+            ) {
+                this.pageNumberQueue.push(newPageNumberUrl);
+            }
+        }
+
         let newDetailUrlList = ScrapeBase.extractData(
             $,
             this.catalog.locator.detailUrl,
             ATTRIBUTE_TO_GET_DATA
         );
-
         newDetailUrlList = newDetailUrlList.map((url) => sanitizeUrl(url));
         for (const newDetailUrl of newDetailUrlList) {
             const isExists: boolean = await this.detailUrlLogic.isExists({
@@ -133,21 +145,6 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                         `Scrape detail URL -> DID: 'N/A' - Error: ${error.message}`
                     ).show();
                 }
-            }
-        }
-
-        let newPageNumberUrls = ScrapeBase.extractData(
-            $,
-            this.catalog.locator.pageNumber,
-            ATTRIBUTE_TO_GET_DATA
-        );
-        newPageNumberUrls = newPageNumberUrls.map((url) => sanitizeUrl(url));
-        for (const newPageNumberUrl of newPageNumberUrls) {
-            if (
-                this.pageNumberQueue.indexOf(newPageNumberUrl) < 0 &&
-                this.scrapedPageNumber.indexOf(newPageNumberUrl) < 0
-            ) {
-                this.pageNumberQueue.push(newPageNumberUrl);
             }
         }
     }

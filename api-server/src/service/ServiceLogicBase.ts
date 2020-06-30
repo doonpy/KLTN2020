@@ -4,20 +4,22 @@ import {
     CommonOptions,
     GetAllReturnData,
     ValidateProperties,
+    CommonRequestBodySchema,
 } from '@service/interface';
-import {
-    CreateQuery,
-    FilterQuery,
-    Model,
-    MongooseFilterQuery,
-    UpdateQuery,
-} from 'mongoose';
+import { CreateQuery, FilterQuery, Model } from 'mongoose';
 import ResponseStatusCode from '@common/response-status-code';
 import Wording from '@service/wording';
+import ExceptionCustomize from '@util/exception/ExceptionCustomize';
+import { replaceMetaDataString } from '@util/helper/string';
 
 enum ValidateType {
     EXISTED,
     NOT_EXISTED,
+}
+
+interface ValidateExist<D extends DocumentModelBase> {
+    exist?: Array<FilterQuery<D>>;
+    notExist?: Array<FilterQuery<D>>;
 }
 
 export default abstract class ServiceLogicBase<
@@ -25,22 +27,6 @@ export default abstract class ServiceLogicBase<
     ApiModel extends ApiModelBase
 > {
     protected constructor(protected model: Model<DocumentModel>) {}
-
-    private async validate(
-        properties: MongooseFilterQuery<DocumentModel>,
-        type: ValidateType
-    ): Promise<void> {
-        const promise: Array<Promise<void>> = [];
-        Object.keys(properties).forEach((key) => {
-            if (type === ValidateType.EXISTED) {
-                promise.push(this.checkExisted(properties[key]));
-            } else {
-                promise.push(this.checkNotExisted(properties[key]));
-            }
-        });
-
-        await Promise.all(promise);
-    }
 
     public async getAll({
         limit,
@@ -78,14 +64,30 @@ export default abstract class ServiceLogicBase<
     }
 
     public async getOne(
-        conditions: MongooseFilterQuery<DocumentModel>
+        conditions: FilterQuery<DocumentModel>
     ): Promise<DocumentModel | null> {
         return this.model.findOne(conditions);
     }
 
+    private async validate(
+        properties: Array<FilterQuery<DocumentModel>>,
+        type: ValidateType
+    ): Promise<void> {
+        const promise: Array<Promise<void>> = [];
+        properties.forEach((property) => {
+            if (type === ValidateType.EXISTED) {
+                promise.push(this.checkExisted(property));
+            } else {
+                promise.push(this.checkNotExisted(property));
+            }
+        });
+
+        await Promise.all(promise);
+    }
+
     public async create(
-        input: DocumentModel,
-        { exist, notExist }: ValidateProperties<DocumentModel> = {}
+        input: Record<string, any>,
+        { exist, notExist }: ValidateExist<DocumentModel> = {}
     ): Promise<DocumentModel> {
         if (exist) {
             await this.validate(exist, ValidateType.EXISTED);
@@ -98,11 +100,28 @@ export default abstract class ServiceLogicBase<
         return this.model.create(input as CreateQuery<DocumentModel>);
     }
 
+    private updateProperty(
+        input: Record<string, any>,
+        document: Record<string, any>
+    ) {
+        for (const key of Object.keys(input)) {
+            if (input[key]) {
+                if (typeof input[key] === 'object') {
+                    this.updateProperty(input[key], document[key]);
+                } else if (input[key] !== document[key]) {
+                    document[key] = input[key];
+                }
+            }
+        }
+    }
+
     public async update(
         id: number,
-        input: UpdateQuery<DocumentModel>,
+        input: FilterQuery<CommonRequestBodySchema>,
         { exist, notExist }: ValidateProperties<DocumentModel> = {}
     ): Promise<DocumentModel | never> {
+        await this.checkExisted({ _id: id } as FilterQuery<DocumentModel>);
+
         if (exist) {
             await this.validate(exist, ValidateType.EXISTED);
         }
@@ -111,10 +130,9 @@ export default abstract class ServiceLogicBase<
             await this.validate(notExist, ValidateType.NOT_EXISTED);
         }
 
-        await this.checkExisted({ _id: id } as MongooseFilterQuery<
-            DocumentModel
-        >);
-        return (await this.model.findByIdAndUpdate(id, input))!;
+        const document = await this.getById(id);
+        this.updateProperty(input, document!);
+        return document!.save();
     }
 
     public async delete(id: number): Promise<DocumentModel | null> {
@@ -130,44 +148,36 @@ export default abstract class ServiceLogicBase<
     }
 
     public async isExists(
-        conditions: MongooseFilterQuery<DocumentModel>
+        conditions: FilterQuery<DocumentModel>
     ): Promise<boolean> {
         return (await this.model.findOne(conditions)) !== null;
     }
 
     public async checkExisted(
-        conditions: MongooseFilterQuery<DocumentModel>
+        conditions: FilterQuery<DocumentModel>
     ): Promise<void> {
         if (!(await this.isExists(conditions))) {
-            throw {
-                statusCode: ResponseStatusCode.BAD_REQUEST,
-                cause: {
-                    wording: Wording.CAUSE.CAU_CM_SER_1,
-                    value: [],
-                },
-                message: {
-                    wording: Wording.MESSAGE.MSG_CM_SER_1,
-                    value: [Wording.RESOURCE.RSC_CM_SER_1, conditions],
-                },
-            };
+            throw new ExceptionCustomize(
+                ResponseStatusCode.BAD_REQUEST,
+                Wording.CAUSE.CAU_CM_SER_1,
+                replaceMetaDataString(Wording.MESSAGE.MSG_CM_SER_1, [
+                    conditions,
+                ])
+            );
         }
     }
 
     public async checkNotExisted(
-        conditions: MongooseFilterQuery<DocumentModel>
+        conditions: FilterQuery<DocumentModel>
     ): Promise<void> {
         if (await this.isExists(conditions)) {
-            throw {
-                statusCode: ResponseStatusCode.BAD_REQUEST,
-                cause: {
-                    wording: Wording.CAUSE.CAU_CM_SER_2,
-                    value: [],
-                },
-                message: {
-                    wording: Wording.MESSAGE.MSG_CM_SER_2,
-                    value: [Wording.RESOURCE.RSC_CM_SER_1, conditions],
-                },
-            };
+            throw new ExceptionCustomize(
+                ResponseStatusCode.BAD_REQUEST,
+                Wording.CAUSE.CAU_CM_SER_2,
+                replaceMetaDataString(Wording.MESSAGE.MSG_CM_SER_2, [
+                    conditions,
+                ])
+            );
         }
     }
 
@@ -175,7 +185,7 @@ export default abstract class ServiceLogicBase<
      * Get current amount document
      */
     public async getDocumentAmount(
-        conditions?: MongooseFilterQuery<DocumentModel>
+        conditions?: FilterQuery<DocumentModel>
     ): Promise<number> {
         return this.model.countDocuments(conditions ?? {});
     }

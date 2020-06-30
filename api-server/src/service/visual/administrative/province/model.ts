@@ -7,14 +7,15 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualAdministrativeProvinceSchema: Schema = new Schema(
     {
-        name: { type: Schema.Types.String },
-        code: { type: Schema.Types.String },
+        name: { type: Schema.Types.String, required: true },
+        code: { type: Schema.Types.String, required: true },
         countryId: {
             type: Schema.Types.Number,
             ref: 'visual_administrative_country',
             autopopulate: true,
+            required: true,
         },
-        acreage: { type: Schema.Types.Number },
+        acreage: { type: Schema.Types.Number, required: true },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }
 );

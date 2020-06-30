@@ -1,19 +1,32 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
 import ResponseStatusCode from '@common/response-status-code';
 import VisualSummaryDistrictLogic from './VisualSummaryDistrictLogic';
-import VisualCommonController from '../../VisualCommonController';
+import {
+    VisualSummaryDistrictRequestBodySchema,
+    VisualSummaryDistrictRequestParamSchema,
+    VisualSummaryDistrictRequestQuerySchema,
+} from '@service/visual/summary/district/interface';
+import { CommonRequest } from '@service/interface';
 
-const commonPath = '/summary-district';
-const specifyIdPath = '/summary-district/:id';
+const commonPath = '/visualization/summary-district';
+const commonName = 'summaryDistrict';
+const specifyIdPath = '/visualization/summary-district/:id';
+const specifyName = 'summaryDistrict';
 
-export default class VisualSummaryDistrictController extends VisualCommonController {
+export default class VisualSummaryDistrictController extends ServiceControllerBase<
+    VisualSummaryDistrictRequestParamSchema,
+    VisualSummaryDistrictRequestQuerySchema,
+    VisualSummaryDistrictRequestBodySchema
+> {
     private static instance: VisualSummaryDistrictController;
 
-    private visualSummaryDistrictLogic = VisualSummaryDistrictLogic.getInstance();
-
     constructor() {
-        super();
+        super(
+            commonName,
+            specifyName,
+            VisualSummaryDistrictLogic.getInstance()
+        );
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -29,80 +42,28 @@ export default class VisualSummaryDistrictController extends VisualCommonControl
         return this.instance;
     }
 
-    protected async createRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async getAllRoute(
-        req: Request,
+    protected async getAllHandler(
+        req: CommonRequest<
+            VisualSummaryDistrictRequestParamSchema,
+            VisualSummaryDistrictRequestBodySchema,
+            VisualSummaryDistrictRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            const { documents } = await this.visualSummaryDistrictLogic.getAll(
-                {}
-            );
-
+            const { documents } = await this.logicInstance.getAll({});
             const responseBody = {
                 summaryDistrict: documents.map((document) =>
-                    this.visualSummaryDistrictLogic.convertToApiResponse(
-                        document
-                    )
+                    this.logicInstance.convertToApiResponse(document)
                 ),
             };
 
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
+            req.locals!.statusCode = ResponseStatusCode.OK;
+            req.locals!.responseBody = responseBody;
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async updateRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        next();
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.visualSummaryDistrictLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'visual-summary-district',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 }

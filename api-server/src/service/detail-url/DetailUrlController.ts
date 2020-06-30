@@ -1,30 +1,35 @@
-import { NextFunction, Request, Response } from 'express-serve-static-core';
+import { NextFunction, Response } from 'express-serve-static-core';
 import ServiceControllerBase from '@service/ServiceControllerBase';
-import Validator from '@util/validator/Validator';
-import Checker from '@util/checker';
-import ResponseStatusCode from '@common/response-status-code';
 import DetailUrlLogic from './DetailUrlLogic';
-import { DetailUrlDocumentModel } from './interface';
+import {
+    DetailUrlDocumentModel,
+    DetailUrlRequestBodySchema,
+    DetailUrlRequestParamSchema,
+    DetailUrlRequestQuerySchema,
+} from './interface';
 import CatalogLogic from '../catalog/CatalogLogic';
+import Joi from '@hapi/joi';
+import CommonConstant from '@common/constant';
+import { CommonRequest } from '@service/interface';
 
 const commonPath = '/detail-urls';
+const commonName = 'detailUrls';
 const specifyIdPath = '/detail-url/:id';
+const specifyName = 'detailUrl';
 
-export default class DetailUrlController extends ServiceControllerBase {
+export default class DetailUrlController extends ServiceControllerBase<
+    DetailUrlRequestParamSchema,
+    DetailUrlRequestQuerySchema,
+    DetailUrlRequestBodySchema
+> {
     private static instance: DetailUrlController;
-
-    private detailUrlLogic = new DetailUrlLogic();
-
     private readonly PARAM_CATALOG_ID = 'catalogId';
-
     private readonly PARAM_URL = 'url';
-
     private readonly PARAM_IS_EXTRACTED = 'isExtracted';
-
     private readonly PARAM_REQUEST_RETRIES = 'requestRetries';
 
     constructor() {
-        super();
+        super(commonName, specifyName, DetailUrlLogic.getInstance());
         this.commonPath += commonPath;
         this.specifyIdPath += specifyIdPath;
         this.initRoutes();
@@ -38,285 +43,94 @@ export default class DetailUrlController extends ServiceControllerBase {
         return this.instance;
     }
 
-    protected async getAllRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
+    protected initValidateSchema(): void {
+        this.reqQuerySchema = this.reqQuerySchema.keys({
+            catalogId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            url: Joi.string(),
+            isExtracted: Joi.number().integer().valid(0, 1),
+            requestRetries: Joi.number().integer().min(0).max(3),
+        });
 
-            this.validator.addParamValidator(
-                this.PARAM_CATALOG_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_CATALOG_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.Type.String()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_IS_EXTRACTED,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_IS_EXTRACTED,
-                new Checker.IntegerRange(0, 1)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_REQUEST_RETRIES,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_REQUEST_RETRIES,
-                new Checker.IntegerRange(0, null)
-            );
-
-            this.validator.validate(this.requestQuery);
-
-            const { documents, hasNext } = await this.detailUrlLogic.getAll({
-                limit: this.limit,
-                offset: this.offset,
-                conditions: this.buildQueryConditions([
-                    { paramName: this.PARAM_CATALOG_ID, isString: false },
-                    { paramName: this.PARAM_URL, isString: true },
-                    { paramName: this.PARAM_IS_EXTRACTED, isString: false },
-                    { paramName: this.PARAM_REQUEST_RETRIES, isString: false },
-                ]),
-            });
-            const detailUrlList = documents.map((detailUrl) =>
-                this.detailUrlLogic.convertToApiResponse(detailUrl)
-            );
-
-            const responseBody = {
-                detailUrls: detailUrlList,
-                hasNext,
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+        this.reqBodySchema = this.reqBodySchema.keys({
+            catalogId: Joi.number().integer().min(CommonConstant.MIN_ID),
+            url: Joi.string()
+                .regex(/:\/\/[0-9a-z-.]+\.[a-z]+\/?/i)
+                .uri({
+                    scheme: [/https?/],
+                }),
+        });
     }
 
-    protected async getByIdRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const detailUrl = await this.detailUrlLogic.getById(idBody);
-            const responseBody = {
-                detailUrl: this.detailUrlLogic.convertToApiResponse(detailUrl!),
-            };
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                responseBody
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
+    protected setRequiredInputForValidateSchema(): void {
+        this.reqBodySchema = this.reqBodySchema.append({
+            catalogId: Joi.required(),
+            url: Joi.required(),
+        });
     }
 
-    protected async createRoute(
-        req: Request,
+    protected getAllPrepend(
+        req: CommonRequest<
+            DetailUrlRequestParamSchema,
+            DetailUrlRequestBodySchema,
+            DetailUrlRequestQuerySchema
+        >,
+        res: Response,
+        next: NextFunction
+    ): void {
+        req.locals!.getConditions = this.buildQueryConditions([
+            { paramName: this.PARAM_CATALOG_ID, isString: false },
+            { paramName: this.PARAM_URL, isString: true },
+            { paramName: this.PARAM_IS_EXTRACTED, isString: false },
+            { paramName: this.PARAM_REQUEST_RETRIES, isString: false },
+        ]);
+        next();
+    }
+
+    protected async createPrepend(
+        req: CommonRequest<
+            DetailUrlRequestParamSchema,
+            DetailUrlRequestBodySchema,
+            DetailUrlRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_CATALOG_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_CATALOG_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.StringLength(1, null)
-            );
-            this.validator.addParamValidator(this.PARAM_URL, new Checker.Url());
-
-            this.validator.validate(this.requestBody);
-
-            const detailUrlBody = (this
-                .requestBody as unknown) as DetailUrlDocumentModel;
             await CatalogLogic.getInstance().checkExisted({
-                [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId,
+                [this.PARAM_DOCUMENT_ID]: this.reqBody.catalogId,
             });
-            const createdDetailUrl = await this.detailUrlLogic.create(
-                detailUrlBody,
-                { notExist: { [this.PARAM_URL]: detailUrlBody.url } }
-            );
 
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.CREATED,
-                this.detailUrlLogic.convertToApiResponse(createdDetailUrl)
-            );
+            req.locals!.validateNotExist = [{ url: this.reqBody }];
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 
-    protected async updateRoute(
-        req: Request,
+    protected async updatePrepend(
+        req: CommonRequest<
+            DetailUrlRequestParamSchema,
+            DetailUrlRequestBodySchema,
+            DetailUrlRequestQuerySchema
+        >,
         res: Response,
         next: NextFunction
     ): Promise<void> {
         try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_CATALOG_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_CATALOG_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.Type.String()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_URL,
-                new Checker.StringLength(1, 100)
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_IS_EXTRACTED,
-                new Checker.Type.Boolean()
-            );
-
-            this.validator.addParamValidator(
-                this.PARAM_REQUEST_RETRIES,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_REQUEST_RETRIES,
-                new Checker.IntegerRange(0, null)
-            );
-
-            this.validator.validate(this.requestParams);
-            this.validator.validate(this.requestBody);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            const detailUrlBody = (this
-                .requestBody as unknown) as DetailUrlDocumentModel;
-
-            if (detailUrlBody.catalogId) {
+            if (this.reqBody.catalogId) {
                 await CatalogLogic.getInstance().checkExisted({
-                    [this.PARAM_DOCUMENT_ID]: detailUrlBody.catalogId,
+                    [this.PARAM_DOCUMENT_ID]: this.reqBody.catalogId,
                 });
             }
-
-            const editedDetailUrl = await this.detailUrlLogic.update(
-                idBody,
-                detailUrlBody,
-                { notExist: { [this.PARAM_URL]: detailUrlBody.url } }
-            );
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.OK,
-                this.detailUrlLogic.convertToApiResponse(editedDetailUrl)
-            );
+            const currentDetailUrl = (await this.logicInstance.getById(
+                Number(this.reqParam.id)
+            )) as DetailUrlDocumentModel;
+            if (currentDetailUrl && currentDetailUrl.url !== this.reqBody.url) {
+                req.locals!.validateNotExist = [{ url: this.reqBody.url }];
+            }
+            next();
         } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async deleteRoute(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            this.validator = new Validator();
-
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.Type.Integer()
-            );
-            this.validator.addParamValidator(
-                this.PARAM_ID,
-                new Checker.IntegerRange(1, null)
-            );
-
-            this.validator.validate(this.requestParams);
-
-            const idBody = Number(this.requestParams[this.PARAM_ID]);
-            await this.detailUrlLogic.delete(idBody);
-
-            ServiceControllerBase.sendResponse(
-                res,
-                ResponseStatusCode.NO_CONTENT,
-                {}
-            );
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
-        }
-    }
-
-    protected async getDocumentAmount(
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<void> {
-        try {
-            const documentAmount = await this.detailUrlLogic.getDocumentAmount();
-
-            ServiceControllerBase.sendResponse(res, ResponseStatusCode.OK, {
-                schema: 'detail-url',
-                documentAmount,
-            });
-        } catch (error) {
-            next(this.createServiceError(error, this.language));
+            next(error);
         }
     }
 }

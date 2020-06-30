@@ -7,12 +7,13 @@ autoIncrement.initialize(mongoose.connection);
 
 const VisualAdministrativeWardSchema: Schema = new Schema(
     {
-        name: { type: Schema.Types.String },
-        code: { type: Schema.Types.String },
+        name: { type: Schema.Types.String, required: true },
+        code: { type: Schema.Types.String, required: true },
         districtId: {
             type: Schema.Types.Number,
             ref: 'visual_administrative_district',
             autopopulate: true,
+            required: true,
         },
     },
     { timestamps: { createdAt: 'cTime', updatedAt: 'mTime' } }

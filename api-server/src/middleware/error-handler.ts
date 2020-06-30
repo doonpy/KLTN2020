@@ -5,15 +5,24 @@ import {
     replaceMetaDataString,
     upperCaseFirstCharacter,
 } from '@util/helper/string';
-import { getLanguageIndexOfRequest } from '@common/language';
 
 const MESSAGE = {
-    MSG_ERR_1: ['đường dẫn không tồn tại', 'specify path does not exist'],
+    MSG_ERR_1: 'specify path does not exist',
 };
 const CAUSE = {
-    CAU_ERR_1: ['%s không tồn tại', '%s does not exits'],
-    CAU_ERR_2: ['lỗi không xác định', 'unknown error'],
+    CAU_ERR_1: '%s does not exits',
+    CAU_ERR_2: 'unknown error',
 };
+
+interface ErrorResponseBody {
+    error: {
+        cause: string;
+        message: string;
+        input: string;
+        stack?: string;
+    };
+    statusCode: number;
+}
 
 const convertToString = (
     input: Array<{ [key: string]: string | number }>
@@ -72,12 +81,11 @@ export const notFoundRoute = (
     res: Response,
     next: NextFunction
 ): void => {
-    const language = getLanguageIndexOfRequest(req);
     next(
         new ExceptionCustomize(
             ResponseStatusCode.NOT_FOUND,
-            replaceMetaDataString(CAUSE.CAU_ERR_1[language], [req.path]),
-            MESSAGE.MSG_ERR_1[language]
+            MESSAGE.MSG_ERR_1,
+            replaceMetaDataString(CAUSE.CAU_ERR_1, [req.path])
         )
     );
 };
@@ -86,45 +94,31 @@ export const notFoundRoute = (
  * Error handler
  */
 export const errorHandler = (
-    { statusCode, message, cause, stack, input }: ExceptionCustomize,
+    { statusCode, message, cause, stack }: ExceptionCustomize,
     req: Request,
     res: Response,
     next: NextFunction
 ): void => {
-    let body = {};
-    const language = getLanguageIndexOfRequest(req);
+    let body: ErrorResponseBody;
     if (process.env.NODE_ENV === 'production') {
         body = {
             error: {
-                cause: upperCaseFirstCharacter(
-                    cause || CAUSE.CAU_ERR_2[language]
-                ),
+                cause: upperCaseFirstCharacter(cause || CAUSE.CAU_ERR_2),
                 message: upperCaseFirstCharacter(message),
-                input: convertToString(
-                    input as Array<{ [key: string]: string | number }>
-                ),
+                input: convertToString([req.params, req.query, req.body]),
             },
+            statusCode: statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
         };
     } else {
         body = {
             error: {
-                cause: upperCaseFirstCharacter(
-                    cause || CAUSE.CAU_ERR_2[language]
-                ),
+                cause: upperCaseFirstCharacter(cause || CAUSE.CAU_ERR_2),
                 message: upperCaseFirstCharacter(message),
-                input: convertToString(
-                    input as Array<{ [key: string]: string | number }>
-                ),
+                input: convertToString([req.params, req.query, req.body]),
                 stack,
             },
+            statusCode: statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR,
         };
     }
-
-    if (statusCode === ResponseStatusCode.NO_CONTENT) {
-        res.status(statusCode).json();
-    } else {
-        res.status(statusCode || ResponseStatusCode.INTERNAL_SERVER_ERROR).json(
-            body
-        );
-    }
+    res.status(ResponseStatusCode.OK).json(body);
 };
