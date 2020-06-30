@@ -78,6 +78,7 @@ const CommonConstant = {
         },
     ],
     MIN_ID: 1,
+    REVIEW_FOLDER_PATH: '/review',
 };
 
 export default CommonConstant;

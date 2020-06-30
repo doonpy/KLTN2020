@@ -12,6 +12,7 @@ export interface CommonRequest<
         validateNotExist?: Array<FilterQuery<DocumentModelBase>>;
         responseBody?: Record<string, any>;
         statusCode?: number;
+        [extraProps: string]: any;
     };
 }
 

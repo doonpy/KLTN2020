@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouteMatch } from 'react-router-dom';
+import { useRouteMatch } from 'react-router-dom';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
 // core components
 import GridItem from 'components/Grid/GridItem.js';
 import GridContainer from 'components/Grid/GridContainer.js';
@@ -13,7 +12,7 @@ import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import CardFooter from 'components/Card/CardFooter.js';
 import { createData, getData, updateData } from '../../services/ApiService';
-import { AddAlert, CheckCircle, Error } from '@material-ui/icons';
+import { CheckCircle, Error } from '@material-ui/icons';
 import Snackbar from '../../components/Snackbar/Snackbar';
 
 const styles = {
@@ -63,7 +62,7 @@ export default function HostEdit({ isCreate }) {
     };
     const handleSaveButton = async () => {
         try {
-            const { error } = isCreate
+            const { error, id } = isCreate
                 ? await createData(`hosts`, host)
                 : await updateData(`host/${host.id}`, host);
 
@@ -72,7 +71,7 @@ export default function HostEdit({ isCreate }) {
                 showNotification(notificationType.FAILED);
             } else {
                 showNotification(notificationType.SUCCESS);
-                window.location.href = `/admin/host/detail/${host.id}`;
+                window.location.href = `/admin/host/detail/${id}`;
             }
         } catch (error) {
             setErrorMessage(error.message);
@@ -98,7 +97,7 @@ export default function HostEdit({ isCreate }) {
             }
             setHost(host);
         })();
-    }, [hostId]);
+    }, [hostId, isCreate]);
 
     return (
         <div>
@@ -114,7 +113,7 @@ export default function HostEdit({ isCreate }) {
             <Snackbar
                 place="tc"
                 color="danger"
-                icon={AddAlert}
+                icon={Error}
                 message={errorMessage}
                 open={failedNotification}
                 closeNotification={() => setFailedNotification(false)}
@@ -126,7 +125,7 @@ export default function HostEdit({ isCreate }) {
                 </CardHeader>
                 <CardBody>
                     <GridContainer>
-                        <GridItem xs={12} sm={12} md={6}>
+                        <GridItem xs={12} sm={12} md={12}>
                             <CustomInput
                                 labelText="Tên"
                                 id="name"
@@ -134,12 +133,13 @@ export default function HostEdit({ isCreate }) {
                                     fullWidth: true,
                                 }}
                                 inputProps={{
+                                    required: true,
                                     value: host.name,
                                     onChange: handleNameChange,
                                 }}
                             />
                         </GridItem>
-                        <GridItem xs={12} sm={12} md={6}>
+                        <GridItem xs={12} sm={12} md={12}>
                             <CustomInput
                                 labelText="Tên miền"
                                 id="domain"
@@ -147,6 +147,7 @@ export default function HostEdit({ isCreate }) {
                                     fullWidth: true,
                                 }}
                                 inputProps={{
+                                    required: true,
                                     value: host.domain,
                                     onChange: handleDomainChange,
                                 }}

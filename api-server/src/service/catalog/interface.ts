@@ -32,6 +32,7 @@ export interface CatalogDocumentModel extends DocumentModelBase {
 export interface CatalogRequestParamSchema extends CommonRequestParamSchema {}
 
 export interface CatalogRequestQuerySchema extends CommonRequestQuerySchema {
+    id: string;
     title: string;
     url: string;
     hostId: string;

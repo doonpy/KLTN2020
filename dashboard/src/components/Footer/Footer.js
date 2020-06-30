@@ -18,28 +18,30 @@ export default function Footer(props) {
                 <div className={classes.left}>
                     <List className={classes.list}>
                         <ListItem className={classes.inlineBlock}>
-                            <a href="#home" className={classes.block}>
-                                Home
+                            <a href="/admin" className={classes.block}>
+                                Trang chủ
                             </a>
                         </ListItem>
                         <ListItem className={classes.inlineBlock}>
-                            <a href="#company" className={classes.block}>
-                                Company
+                            <a href="/admin/host" className={classes.block}>
+                                Máy chủ
                             </a>
                         </ListItem>
                         <ListItem className={classes.inlineBlock}>
-                            <a href="#portfolio" className={classes.block}>
-                                Portfolio
+                            <a href="/admin/catalog" className={classes.block}>
+                                Danh mục
                             </a>
                         </ListItem>
                         <ListItem className={classes.inlineBlock}>
-                            <a href="#blog" className={classes.block}>
-                                Blog
+                            <a href="/admin/pattern" className={classes.block}>
+                                Mẫu dữ liệu
                             </a>
                         </ListItem>
                     </List>
                 </div>
                 <p className={classes.right}>
+                    <span>&copy; {1900 + new Date().getYear()} </span>
+                    PK | Template at{' '}
                     <span>
                         &copy; {1900 + new Date().getYear()}{' '}
                         <a

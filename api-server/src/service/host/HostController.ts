@@ -54,7 +54,7 @@ export default class HostController extends ServiceControllerBase<
     }
 
     protected setRequiredInputForValidateSchema(): void {
-        this.reqBodySchema = this.reqBodySchema.keys({
+        this.reqBodySchema = this.reqBodySchema.append({
             name: Joi.required(),
             domain: Joi.required(),
         });

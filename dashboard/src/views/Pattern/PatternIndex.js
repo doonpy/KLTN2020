@@ -21,9 +21,9 @@ import CardFooter from '../../components/Card/CardFooter';
 import { Link } from 'react-router-dom';
 // services
 import { deleteData, getData } from '../../services/ApiService';
-import HostEdit from './HostEdit';
-import HostDetail from './HostDetail';
 import Snackbar from '../../components/Snackbar/Snackbar';
+import PatternDetail from './PatternDetail';
+import PatternEdit from './PatternEdit';
 
 const styles = {
     cardCategoryWhite: {
@@ -59,10 +59,10 @@ const styles = {
 };
 const useStyles = makeStyles(styles);
 const LIMIT = 10;
-const ROOT_PATH = '/admin/host';
-const ADD_PATH = '/admin/host/create';
-const DETAIL_PATH = '/admin/host/detail';
-const EDIT_PATH = '/admin/host/edit';
+const ROOT_PATH = '/admin/pattern';
+const ADD_PATH = '/admin/pattern/create';
+const DETAIL_PATH = '/admin/pattern/detail';
+const EDIT_PATH = '/admin/pattern/edit';
 const notificationType = {
     SUCCESS: 0,
     FAILED: 1,
@@ -74,7 +74,7 @@ export default function HostIndex() {
     const [successNotification, setSuccessNotification] = useState(false);
     const [failedNotification, setFailedNotification] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [hosts, setHosts] = useState({ hosts: [], hasNext: false });
+    const [patterns, setPatterns] = useState({ patterns: [], hasNext: false });
     const [pageNumber, setPageNumber] = useState(0);
 
     const showNotification = (type) => {
@@ -106,7 +106,7 @@ export default function HostIndex() {
                                     <h3>Bạn có chắc?</h3>
                                 </CardHeader>
                                 <CardBody>
-                                    <p>Bạn có chắc muốn xóa máy chủ này?</p>
+                                    <p>Bạn có chắc muốn xóa mẫu này?</p>
                                 </CardBody>
                                 <CardFooter>
                                     <Button
@@ -114,7 +114,7 @@ export default function HostIndex() {
                                         onClick={async () => {
                                             onClose();
                                             const { error } = await deleteData(
-                                                `host/${id}`
+                                                `pattern/${id}`
                                             );
                                             if (error) {
                                                 setErrorMessage(error.cause);
@@ -148,53 +148,52 @@ export default function HostIndex() {
                 showNotification(notificationType.FAILED);
             }
         };
+        const truncateSourceUrl = (url, num = 70) => {
+            if (url.length <= num) {
+                return url;
+            }
+            return url.slice(0, num) + '...';
+        };
 
         (async () => {
-            let { hosts, hasNext } = await getData(
-                'hosts',
+            let { patterns, hasNext } = await getData(
+                'patterns',
                 {
                     key: 'offset',
                     value: pageNumber * LIMIT,
                 },
-                {
-                    key: 'limit',
-                    value: LIMIT,
-                }
+                { key: 'limit', value: LIMIT }
             );
-            hosts = hosts.map(({ id, name, domain }) => [
+            patterns = patterns.map(({ id, sourceUrl }) => [
                 id,
-                name,
-                domain,
-                <div>
-                    <Link to={`${DETAIL_PATH}/${id}`}>
+                truncateSourceUrl(sourceUrl),
+                <GridContainer>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <Link to={`${DETAIL_PATH}/${id}`}>
+                            <Button color={'info'} size={'sm'}>
+                                <Info />
+                            </Button>
+                        </Link>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <Link to={`${EDIT_PATH}/${id}`}>
+                            <Button color={'warning'} size={'sm'}>
+                                <Edit />
+                            </Button>
+                        </Link>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
                         <Button
-                            color={'info'}
+                            color={'danger'}
                             size={'sm'}
-                            className={classes.actionButton}
+                            onClick={() => handleDelete(id)}
                         >
-                            <Info />
+                            <Delete />
                         </Button>
-                    </Link>
-                    <Link to={`${EDIT_PATH}/${id}`}>
-                        <Button
-                            color={'warning'}
-                            size={'sm'}
-                            className={classes.actionButton}
-                        >
-                            <Edit />
-                        </Button>
-                    </Link>
-                    <Button
-                        color={'danger'}
-                        size={'sm'}
-                        className={classes.actionButton}
-                        onClick={() => handleDelete(id)}
-                    >
-                        <Delete />
-                    </Button>
-                </div>,
+                    </GridItem>
+                </GridContainer>,
             ]);
-            setHosts({ hosts, hasNext });
+            setPatterns({ patterns: patterns, hasNext });
         })();
     }, [pageNumber, classes]);
 
@@ -218,15 +217,15 @@ export default function HostIndex() {
                 closeNotification={() => setFailedNotification(false)}
                 close
             />
-            <GridItem xs={12} sm={12} md={8}>
+            <GridItem xs={12} sm={12} md={6}>
                 <Card>
                     <CardHeader color="primary">
                         <h4 className={classes.cardTitleWhite}>
-                            Danh sách máy chủ
+                            Danh sách mẫu dữ liệu
                         </h4>
                         <p className={classes.cardCategoryWhite}>
-                            Danh sách các máy chủ để thu thập dữ liệu bất động
-                            sản
+                            Danh sách các mẫu để xác định vị trí dữ liệu cần rút
+                            trích
                         </p>
                     </CardHeader>
                     <CardBody>
@@ -237,8 +236,8 @@ export default function HostIndex() {
                         </Link>
                         <Table
                             tableHeaderColor="primary"
-                            tableHead={['ID', 'Tên', 'Tên miền', '']}
-                            tableData={hosts.hosts}
+                            tableHead={['ID', 'URL nguồn', '']}
+                            tableData={patterns.patterns}
                         />
                     </CardBody>
                     <CardFooter>
@@ -254,26 +253,26 @@ export default function HostIndex() {
                             type="button"
                             color="primary"
                             onClick={handleNextPageChange}
-                            disabled={!hosts.hasNext}
+                            disabled={!patterns.hasNext}
                         >
                             Trang sau
                         </Button>
                     </CardFooter>
                 </Card>
             </GridItem>
-            <GridItem xs={12} sm={12} md={4}>
+            <GridItem xs={12} sm={12} md={6}>
                 <Switch>
                     <Route
                         path={`${match.path}/detail/:id`}
-                        component={HostDetail}
+                        component={PatternDetail}
                     />
                     <Route
                         path={`${match.path}/edit/:id`}
-                        component={HostEdit}
+                        component={PatternEdit}
                     />
                     <Route
                         path={`${match.path}/create`}
-                        component={() => <HostEdit isCreate={true} />}
+                        component={() => <PatternEdit isCreate={true} />}
                     />
                     <Redirect from={`${ROOT_PATH}/`} to={ROOT_PATH} />
                 </Switch>

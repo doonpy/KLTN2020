@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
-import { Error } from '@material-ui/icons';
+import { Error, Link as LinkIcon } from '@material-ui/icons';
 // core components
 import GridItem from 'components/Grid/GridItem.js';
 import GridContainer from 'components/Grid/GridContainer.js';
@@ -10,7 +11,7 @@ import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import Primary from '../../components/Typography/Primary';
 import { useRouteMatch } from 'react-router-dom';
-import { getData } from '../../services/ApiService';
+import { getApiServer, getData } from '../../services/ApiService';
 import Snackbar from '../../components/Snackbar/Snackbar';
 
 const styles = {
@@ -33,13 +34,24 @@ const styles = {
 };
 
 const useStyles = makeStyles(styles);
+const DETAIL_HOST_PATH = '/admin/host/detail/';
+const DETAIL_PATTERN_PATH = '/admin/pattern/detail/';
 
-export default function HostDetail() {
+export default function CatalogDetail() {
     const classes = useStyles();
-    const [host, setHost] = useState({});
+    const [catalog, setCatalog] = useState({
+        id: NaN,
+        title: '',
+        url: '',
+        host: { id: NaN },
+        pattern: { id: NaN },
+        locator: { detailUrl: '', pageNumber: '' },
+        createAt: '',
+        updateAt: '',
+    });
     const [failedNotification, setFailedNotification] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const hostId = useRouteMatch().params.id;
+    const catalogId = useRouteMatch().params.id;
     const showErrorNotification = () => {
         setFailedNotification(true);
         setTimeout(() => setFailedNotification(false), 5000);
@@ -47,20 +59,20 @@ export default function HostDetail() {
 
     useEffect(() => {
         (async () => {
-            const { host, error } = await getData(`host/${hostId}`);
+            const { catalog, error } = await getData(`catalog/${catalogId}`);
             if (error) {
                 setErrorMessage(error.cause);
                 showErrorNotification();
-                window.location.href = '/admin/host';
+                window.location.href = '/admin/catalog';
                 return;
             }
-            setHost(host);
+            setCatalog(catalog);
         })();
-    }, [hostId]);
+    }, [catalogId]);
     return (
         <Card>
             <CardHeader color="primary">
-                <h4 className={classes.cardTitleWhite}>Chi tiết máy chủ</h4>
+                <h4 className={classes.cardTitleWhite}>Chi tiết danh mục</h4>
             </CardHeader>
             <CardBody>
                 <Snackbar
@@ -73,31 +85,63 @@ export default function HostDetail() {
                     close
                 />
                 <GridContainer>
-                    <GridItem xs={12} sm={12} md={6}>
+                    <GridItem xs={12} sm={12} md={4}>
                         <h4>
-                            <Primary>ID:</Primary> {host.id}
+                            <Primary>ID:</Primary> {catalog.id}
                         </h4>
                     </GridItem>
-                    <GridItem xs={12} sm={12} md={6}>
+                    <GridItem xs={12} sm={12} md={4}>
                         <h4>
-                            <Primary>Tên miền:</Primary> {host.domain}
+                            <Primary>ID máy chủ:</Primary>
+                            {catalog.host.id}
+                            <Link to={`${DETAIL_HOST_PATH}${catalog.host.id}`}>
+                                <LinkIcon fontSize={'small'} />
+                            </Link>
+                        </h4>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={4}>
+                        <h4>
+                            <Primary>ID mẫu:</Primary>
+                            {catalog.pattern.id}
+                            <Link
+                                to={`${DETAIL_PATTERN_PATH}${catalog.pattern.id}`}
+                            >
+                                <LinkIcon fontSize={'small'} />
+                            </Link>
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={12}>
                         <h4>
-                            <Primary>Tên:</Primary> {host.name}
+                            <Primary>Tên:</Primary> {catalog.title}
+                        </h4>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={12}>
+                        <h4>
+                            <Primary>URL:</Primary> {catalog.url}
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={6}>
                         <h4>
                             <Primary>Ngày tạo:</Primary>{' '}
-                            {new Date(host.createAt).toLocaleString()}
+                            {new Date(catalog.createAt).toLocaleString()}
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={6}>
                         <h4>
                             <Primary>Ngày chỉnh sửa cuối:</Primary>{' '}
-                            {new Date(host.updateAt).toLocaleString()}
+                            {new Date(catalog.updateAt).toLocaleString()}
+                        </h4>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={12}>
+                        <h4>
+                            <Primary>Live view:</Primary>
+                            <iframe
+                                src={`${getApiServer()}/api/v1/catalogs/get-catalog-view?id=${
+                                    catalog.id
+                                }`}
+                                width={'100%'}
+                                height={'600px'}
+                            />
                         </h4>
                     </GridItem>
                 </GridContainer>

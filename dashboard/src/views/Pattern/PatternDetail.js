@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { Error } from '@material-ui/icons';
@@ -10,7 +11,7 @@ import CardHeader from 'components/Card/CardHeader.js';
 import CardBody from 'components/Card/CardBody.js';
 import Primary from '../../components/Typography/Primary';
 import { useRouteMatch } from 'react-router-dom';
-import { getData } from '../../services/ApiService';
+import { getApiServer, getData } from '../../services/ApiService';
 import Snackbar from '../../components/Snackbar/Snackbar';
 
 const styles = {
@@ -34,12 +35,25 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function HostDetail() {
+export default function PatternDetail() {
     const classes = useStyles();
-    const [host, setHost] = useState({});
+    const [pattern, setCatalog] = useState({
+        id: NaN,
+        sourceUrl: '',
+        mainLocator: {
+            postDate: { locator: '', delimiter: '', format: '' },
+            propertyType: '',
+            title: '',
+            describe: '',
+            price: '',
+            acreage: '',
+            address: '',
+        },
+        subLocator: [{ name: '', value: '' }],
+    });
     const [failedNotification, setFailedNotification] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const hostId = useRouteMatch().params.id;
+    const patternId = useRouteMatch().params.id;
     const showErrorNotification = () => {
         setFailedNotification(true);
         setTimeout(() => setFailedNotification(false), 5000);
@@ -47,20 +61,20 @@ export default function HostDetail() {
 
     useEffect(() => {
         (async () => {
-            const { host, error } = await getData(`host/${hostId}`);
+            const { pattern, error } = await getData(`pattern/${patternId}`);
             if (error) {
                 setErrorMessage(error.cause);
                 showErrorNotification();
-                window.location.href = '/admin/host';
+                window.location.href = '/admin/catalog';
                 return;
             }
-            setHost(host);
+            setCatalog(pattern);
         })();
-    }, [hostId]);
+    }, [patternId]);
     return (
         <Card>
             <CardHeader color="primary">
-                <h4 className={classes.cardTitleWhite}>Chi tiết máy chủ</h4>
+                <h4 className={classes.cardTitleWhite}>Chi tiết mẫu dữ liệu</h4>
             </CardHeader>
             <CardBody>
                 <Snackbar
@@ -73,31 +87,38 @@ export default function HostDetail() {
                     close
                 />
                 <GridContainer>
-                    <GridItem xs={12} sm={12} md={6}>
+                    <GridItem xs={12} sm={12} md={1}>
                         <h4>
-                            <Primary>ID:</Primary> {host.id}
+                            <Primary>ID:</Primary> {pattern.id}
                         </h4>
                     </GridItem>
-                    <GridItem xs={12} sm={12} md={6}>
+                    <GridItem xs={12} sm={12} md={11}>
                         <h4>
-                            <Primary>Tên miền:</Primary> {host.domain}
-                        </h4>
-                    </GridItem>
-                    <GridItem xs={12} sm={12} md={12}>
-                        <h4>
-                            <Primary>Tên:</Primary> {host.name}
+                            <Primary>URL nguồn:</Primary> {pattern.sourceUrl}
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={6}>
                         <h4>
                             <Primary>Ngày tạo:</Primary>{' '}
-                            {new Date(host.createAt).toLocaleString()}
+                            {new Date(pattern.createAt).toLocaleString()}
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={6}>
                         <h4>
                             <Primary>Ngày chỉnh sửa cuối:</Primary>{' '}
-                            {new Date(host.updateAt).toLocaleString()}
+                            {new Date(pattern.updateAt).toLocaleString()}
+                        </h4>
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={12}>
+                        <h4>
+                            <Primary>Live view:</Primary>
+                            <iframe
+                                src={`${getApiServer()}/api/v1/patterns/get-pattern-view?id=${
+                                    pattern.id
+                                }`}
+                                width={'100%'}
+                                height={'600px'}
+                            />
                         </h4>
                     </GridItem>
                 </GridContainer>
