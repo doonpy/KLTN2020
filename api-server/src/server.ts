@@ -1,6 +1,10 @@
 import './prepend';
 import * as bodyParser from 'body-parser';
 import cors from 'cors';
+import morgan from 'morgan';
+import path from 'path';
+import fs from 'fs';
+import expressBasicAuth from 'express-basic-auth';
 import HostController from '@service/host/HostController';
 import CatalogController from '@service/catalog/CatalogController';
 import PatternController from '@service/pattern/PatternController';
@@ -16,9 +20,6 @@ import VisualSummaryDistrictWardController from '@service/visual/summary/distric
 import VisualMapPointController from '@service/visual/map-point/VisualMapPointController';
 import VisualAnalyticsController from '@service/visual/analytics/VisualAnalyticsController';
 import { App } from './App';
-import morgan from 'morgan';
-import path from 'path';
-import fs from 'fs';
 
 const initDefaultFolder = (): void => {
     const staticFolder = process.env.STATIC_FOLDER;
@@ -48,6 +49,11 @@ const initDefaultFolder = (): void => {
             bodyParser.urlencoded({ extended: true }),
             morgan('dev'),
             cors(),
+            expressBasicAuth({
+                users: {
+                    [process.env.AUTH_USERNAME!]: process.env.AUTH_PASSWORD!,
+                },
+            }),
         ],
         controllers: [
             {
