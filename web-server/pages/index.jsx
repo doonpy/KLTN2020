@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import fs from 'fs';
 import path from 'path';
+import Head from 'next/head';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Loading from '../components/Loading';
@@ -103,6 +104,13 @@ const Home = ({ mapStaticJSON }) => {
         <>
             {dataDistrict && dataWard ? (
                 <PageLayout>
+                    <Head>
+                        <title>Trang chủ</title>
+                        <meta
+                            name="viewport"
+                            content="initial-scale=1.0, width=device-width"
+                        />
+                    </Head>
                     <main
                         className="dark:text-white text-light font-medium block"
                         style={{

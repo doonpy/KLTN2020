@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Router from 'next/router';
+import Head from 'next/head';
 import groupBy from 'lodash.groupby';
 import NProgress from 'nprogress';
 import PageLayout from '../components/page-layout';
@@ -66,6 +67,13 @@ const Analytics = () => {
         <>
             {dataSortByMonthYear ? (
                 <PageLayout>
+                    <Head>
+                        <title>Trang Phân tích</title>
+                        <meta
+                            name="viewport"
+                            content="initial-scale=1.0, width=device-width"
+                        />
+                    </Head>
                     <div
                         className="max-w-screen-xl m-auto text-white pb-64"
                         style={{ color: '#BDD1F8', paddingTop: '100px' }}

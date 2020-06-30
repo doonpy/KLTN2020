@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import NProgress from 'nprogress';
+import Head from 'next/head';
 import { numberWithCommas } from '../../util/services/helper';
 import useRawDataDetail from '../../hooks/use-raw-data-detail';
 import PageLayout from '../../components/page-layout';
@@ -51,6 +52,15 @@ const DetailRealEstate = () => {
             `}</style>
             {data && !isValidating ? (
                 <PageLayout>
+                    <Head>
+                        <title>
+                            {`Trang chi tiết: ${data.rawData?.title}`}
+                        </title>
+                        <meta
+                            name="viewport"
+                            content="initial-scale=1.0, width=device-width"
+                        />
+                    </Head>
                     <div style={{ paddingTop: '100px' }}>
                         <div
                             className="w-full m-0 p-0 bg-cover bg-bottom"
