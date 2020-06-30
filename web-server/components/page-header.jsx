@@ -13,7 +13,7 @@ const PageHeader = () => {
 
     return (
         <nav
-            className="w-full dark:bg-gray-900  block bg-white fixed shadow"
+            className="w-full block bg-white fixed shadow"
             style={{
                 height: '100px',
                 minHeight: '100px',

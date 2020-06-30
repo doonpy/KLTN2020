@@ -20,7 +20,7 @@ const PriceStatisticsCard = ({ titlePrice, valuePrice, unitPrice }) => {
                     border: 0;
                 }
             `}</style>
-            <div className="bg-gray-900 border border-gray-800 rounded shadow p-2 card">
+            <div className=" rounded shadow p-2 card">
                 <div className="flex flex-row items-center">
                     <div className="flex-shrink pr-4">
                         <div className="rounded p-3 bg-green-600">

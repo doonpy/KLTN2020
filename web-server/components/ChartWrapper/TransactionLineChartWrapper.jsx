@@ -60,7 +60,7 @@ const TransactionLineChartWrapper = ({ data }) => {
     };
 
     return (
-        <div className="pt-10 pr-4 dark:bg-gray-900 bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
+        <div className="pt-10 pr-4  bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
             <LineChart
                 title="Biểu đồ thể hiện sự biến động giá của giao dịch bán và mua qua từng năm"
                 catagoriesData={Object.keys(dataYears)}

@@ -1,5 +1,5 @@
 module.exports = {
-    // important: true,
+    important: true,
     purge: {
         enabled: true,
         content: [
@@ -8,8 +8,6 @@ module.exports = {
         ],
     },
     theme: {
-        darkSelector: '.dark-mode',
-
         backgroundColor: (theme) => ({
             ...theme('colors'),
             dark: '#191919',
@@ -17,8 +15,6 @@ module.exports = {
             hover: '#212A39',
             'dark-gray': '#272E48',
             'dark-bg': '#1A233A',
-
-            //
             'green-light': '#0bb783',
             'white-bg': '#f3f6f9',
         }),
@@ -29,8 +25,6 @@ module.exports = {
             'dark-gray': '#464D5',
             hover: '#2196f3',
             'green-light': '#0bb783',
-
-            // '    border-right: 1px solid #ebedf3;'
         }),
         textColor: (theme) => ({
             ...theme('colors'),
@@ -43,11 +37,4 @@ module.exports = {
         }),
         extend: {},
     },
-    variants: {
-        backgroundColor: ['dark', 'responsive', 'hover', 'focus'],
-        borderColor: ['dark', 'responsive', 'hover'],
-        textColor: ['dark', 'responsive', 'hover', 'focus'],
-        borderWidth: ['dark', 'responsive'],
-    },
-    plugins: [require('tailwindcss-dark-mode')()],
 };

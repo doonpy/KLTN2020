@@ -12,7 +12,7 @@ const PropertyOptionBottom = ({
         <div
             className={
                 isDensityMode
-                    ? `bottom-0 left-0 w-full absolute dark:bg-gray-900 bg-white`
+                    ? `bottom-0 left-0 w-full absolute  bg-white`
                     : 'hidden'
             }
             style={{ height: '80px' }}

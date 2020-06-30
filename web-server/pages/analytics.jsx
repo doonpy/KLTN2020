@@ -116,12 +116,7 @@ const Analytics = () => {
                     </div>
                 </PageLayout>
             ) : (
-                <div
-                    className="flex bg-gray-900 h-full w-full justify-center"
-                    style={{
-                        height: 'calc(100vh)',
-                    }}
-                >
+                <div className="flex bg-gray-900 w-full justify-center h-screen">
                     <Loading />
                 </div>
             )}

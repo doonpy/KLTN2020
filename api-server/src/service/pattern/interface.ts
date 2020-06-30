@@ -43,6 +43,8 @@ export interface PatternRequestParamSchema extends CommonRequestParamSchema {}
 
 export interface PatternRequestQuerySchema extends CommonRequestQuerySchema {
     sourceUrl: string;
+    id: string;
+    filePath: string;
 }
 
 export interface PatternRequestBodySchema extends CommonRequestBodySchema {

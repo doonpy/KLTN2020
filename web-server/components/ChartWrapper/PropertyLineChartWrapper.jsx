@@ -68,7 +68,7 @@ const PropertyLineChartWrapper = ({ data, catagoriesYear }) => {
     return (
         <div className="flex mt-12">
             <div className="w-1/2 mr-2">
-                <div className="pt-10 pr-4 dark:bg-gray-900 bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
+                <div className="pt-10 pr-4  bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
                     <LineChart
                         title="Biểu đồ thể hiện sự biến động giá của các loại bất động sản theo giao dịch Bán qua thời gian"
                         catagoriesData={catagoriesYear}
@@ -77,7 +77,7 @@ const PropertyLineChartWrapper = ({ data, catagoriesYear }) => {
                 </div>
             </div>
             <div className="w-1/2 ml-2">
-                <div className="pt-10 pr-4 dark:bg-gray-900 bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
+                <div className="pt-10 pr-4  bg-white border border-solid border-light-primary dark:border-primary h-full w-full">
                     <LineChart
                         title="Biểu đồ thể hiện sự biến động giá của các loại bất động sản theo giao dịch Thuê qua thời gian"
                         catagoriesData={catagoriesYear}

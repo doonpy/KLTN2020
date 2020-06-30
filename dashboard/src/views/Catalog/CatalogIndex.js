@@ -21,9 +21,9 @@ import CardFooter from '../../components/Card/CardFooter';
 import { Link } from 'react-router-dom';
 // services
 import { deleteData, getData } from '../../services/ApiService';
-import HostEdit from './HostEdit';
-import HostDetail from './HostDetail';
 import Snackbar from '../../components/Snackbar/Snackbar';
+import CatalogDetail from './CatalogDetail';
+import CatalogEdit from './CatalogEdit';
 
 const styles = {
     cardCategoryWhite: {
@@ -59,10 +59,10 @@ const styles = {
 };
 const useStyles = makeStyles(styles);
 const LIMIT = 10;
-const ROOT_PATH = '/admin/host';
-const ADD_PATH = '/admin/host/create';
-const DETAIL_PATH = '/admin/host/detail';
-const EDIT_PATH = '/admin/host/edit';
+const ROOT_PATH = '/admin/catalog';
+const ADD_PATH = '/admin/catalog/create';
+const DETAIL_PATH = '/admin/catalog/detail';
+const EDIT_PATH = '/admin/catalog/edit';
 const notificationType = {
     SUCCESS: 0,
     FAILED: 1,
@@ -74,7 +74,7 @@ export default function HostIndex() {
     const [successNotification, setSuccessNotification] = useState(false);
     const [failedNotification, setFailedNotification] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [hosts, setHosts] = useState({ hosts: [], hasNext: false });
+    const [catalogs, setCatalogs] = useState({ catalogs: [], hasNext: false });
     const [pageNumber, setPageNumber] = useState(0);
 
     const showNotification = (type) => {
@@ -106,7 +106,7 @@ export default function HostIndex() {
                                     <h3>Bạn có chắc?</h3>
                                 </CardHeader>
                                 <CardBody>
-                                    <p>Bạn có chắc muốn xóa máy chủ này?</p>
+                                    <p>Bạn có chắc muốn xóa danh mục này?</p>
                                 </CardBody>
                                 <CardFooter>
                                     <Button
@@ -114,7 +114,7 @@ export default function HostIndex() {
                                         onClick={async () => {
                                             onClose();
                                             const { error } = await deleteData(
-                                                `host/${id}`
+                                                `catalog/${id}`
                                             );
                                             if (error) {
                                                 setErrorMessage(error.cause);
@@ -150,21 +150,17 @@ export default function HostIndex() {
         };
 
         (async () => {
-            let { hosts, hasNext } = await getData(
-                'hosts',
+            let { catalogs, hasNext } = await getData(
+                'catalogs',
                 {
                     key: 'offset',
                     value: pageNumber * LIMIT,
                 },
-                {
-                    key: 'limit',
-                    value: LIMIT,
-                }
+                { key: 'limit', value: LIMIT }
             );
-            hosts = hosts.map(({ id, name, domain }) => [
+            catalogs = catalogs.map(({ id, title }) => [
                 id,
-                name,
-                domain,
+                title,
                 <div>
                     <Link to={`${DETAIL_PATH}/${id}`}>
                         <Button
@@ -194,7 +190,7 @@ export default function HostIndex() {
                     </Button>
                 </div>,
             ]);
-            setHosts({ hosts, hasNext });
+            setCatalogs({ catalogs, hasNext });
         })();
     }, [pageNumber, classes]);
 
@@ -218,15 +214,15 @@ export default function HostIndex() {
                 closeNotification={() => setFailedNotification(false)}
                 close
             />
-            <GridItem xs={12} sm={12} md={8}>
+            <GridItem xs={12} sm={12} md={6}>
                 <Card>
                     <CardHeader color="primary">
                         <h4 className={classes.cardTitleWhite}>
-                            Danh sách máy chủ
+                            Danh sách danh mục
                         </h4>
                         <p className={classes.cardCategoryWhite}>
-                            Danh sách các máy chủ để thu thập dữ liệu bất động
-                            sản
+                            Danh sách các danh mục để thu thập dữ liệu bất động
+                            sản theo loại
                         </p>
                     </CardHeader>
                     <CardBody>
@@ -237,8 +233,8 @@ export default function HostIndex() {
                         </Link>
                         <Table
                             tableHeaderColor="primary"
-                            tableHead={['ID', 'Tên', 'Tên miền', '']}
-                            tableData={hosts.hosts}
+                            tableHead={['ID', 'Tên', '']}
+                            tableData={catalogs.catalogs}
                         />
                     </CardBody>
                     <CardFooter>
@@ -254,26 +250,26 @@ export default function HostIndex() {
                             type="button"
                             color="primary"
                             onClick={handleNextPageChange}
-                            disabled={!hosts.hasNext}
+                            disabled={!catalogs.hasNext}
                         >
                             Trang sau
                         </Button>
                     </CardFooter>
                 </Card>
             </GridItem>
-            <GridItem xs={12} sm={12} md={4}>
+            <GridItem xs={12} sm={12} md={6}>
                 <Switch>
                     <Route
                         path={`${match.path}/detail/:id`}
-                        component={HostDetail}
+                        component={CatalogDetail}
                     />
                     <Route
                         path={`${match.path}/edit/:id`}
-                        component={HostEdit}
+                        component={CatalogEdit}
                     />
                     <Route
                         path={`${match.path}/create`}
-                        component={() => <HostEdit isCreate={true} />}
+                        component={() => <CatalogEdit isCreate={true} />}
                     />
                     <Redirect from={`${ROOT_PATH}/`} to={ROOT_PATH} />
                 </Switch>

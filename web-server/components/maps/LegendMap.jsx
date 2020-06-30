@@ -37,7 +37,7 @@ const LegendMap = ({ typeLegend, setOnLegend, transactionStage }) => {
     return (
         <div className="border relative mt-4 shadow dark:border-white">
             <div
-                className="dark:bg-gray-900 flex justify-center items-center relative bg-white text-primary dark:text-white font-bold border-b boder-primary border-solid"
+                className=" flex justify-center items-center relative bg-white text-primary dark:text-white font-bold border-b boder-primary border-solid"
                 style={{ height: '25px', borderBottom: '1px solid #ebedf3' }}
             >
                 Chú thích

@@ -16,27 +16,30 @@
 
 */
 // @material-ui/icons
-import Dashboard from '@material-ui/icons/Dashboard';
-import Person from '@material-ui/icons/Person';
-import LibraryBooks from '@material-ui/icons/LibraryBooks';
-import BubbleChart from '@material-ui/icons/BubbleChart';
-import LocationOn from '@material-ui/icons/LocationOn';
-import Notifications from '@material-ui/icons/Notifications';
-import Unarchive from '@material-ui/icons/Unarchive';
-import Language from '@material-ui/icons/Language';
-import Storage from '@material-ui/icons/Storage';
+// import Dashboard from '@material-ui/icons/Dashboard';
+// import Person from '@material-ui/icons/Person';
+// import BubbleChart from '@material-ui/icons/BubbleChart';
+// import LocationOn from '@material-ui/icons/LocationOn';
+// import Notifications from '@material-ui/icons/Notifications';
+// import Unarchive from '@material-ui/icons/Unarchive';
+// import Language from '@material-ui/icons/Language';
+import { Storage, LibraryBooks, ViewCompact } from '@material-ui/icons';
+
 // core components/views for Admin layout
-import DashboardPage from 'views/Dashboard/Dashboard.js';
-import UserProfile from 'views/UserProfile/UserProfile.js';
-import TableList from 'views/TableList/TableList.js';
-import Typography from 'views/Typography/Typography.js';
-import Icons from 'views/Icons/Icons.js';
-import Maps from 'views/Maps/Maps.js';
-import NotificationsPage from 'views/Notifications/Notifications.js';
-import UpgradeToPro from 'views/UpgradeToPro/UpgradeToPro.js';
+// import DashboardPage from 'views/Dashboard/Dashboard.js';
+// import UserProfile from 'views/UserProfile/UserProfile.js';
+// import TableList from 'views/TableList/TableList.js';
+// import Typography from 'views/Typography/Typography.js';
+// import Icons from 'views/Icons/Icons.js';
+// import Maps from 'views/Maps/Maps.js';
+// import NotificationsPage from 'views/Notifications/Notifications.js';
+// import UpgradeToPro from 'views/UpgradeToPro/UpgradeToPro.js';
 import HostIndex from './views/Host/HostIndex';
+import CatalogIndex from './views/Catalog/CatalogIndex';
+import PatternIndex from './views/Pattern/PatternIndex';
+
 // core components/views for RTL layout
-import RTLPage from 'views/RTLPage/RTLPage.js';
+// import RTLPage from 'views/RTLPage/RTLPage.js';
 
 const dashboardRoutes = [
     {
@@ -46,89 +49,95 @@ const dashboardRoutes = [
         icon: Storage,
         component: HostIndex,
         layout: '/admin',
-        isChildRoute: false,
     },
     {
-        path: '/dashboard',
-        name: 'Dashboard',
+        path: '/catalog',
+        name: 'Danh mục',
         rtlName: 'لوحة القيادة',
-        icon: Dashboard,
-        component: DashboardPage,
-        layout: '/admin',
-        isChildRoute: false,
-    },
-    {
-        path: '/user',
-        name: 'User Profile',
-        rtlName: 'ملف تعريفي للمستخدم',
-        icon: Person,
-        component: UserProfile,
-        layout: '/admin',
-        isChildRoute: false,
-    },
-    {
-        path: '/table',
-        name: 'Table List',
-        rtlName: 'قائمة الجدول',
-        icon: 'content_paste',
-        component: TableList,
-        layout: '/admin',
-        isChildRoute: false,
-    },
-    {
-        path: '/typography',
-        name: 'Typography',
-        rtlName: 'طباعة',
         icon: LibraryBooks,
-        component: Typography,
+        component: CatalogIndex,
         layout: '/admin',
-        isChildRoute: false,
     },
     {
-        path: '/icons',
-        name: 'Icons',
-        rtlName: 'الرموز',
-        icon: BubbleChart,
-        component: Icons,
+        path: '/pattern',
+        name: 'Mẫu dữ liệu',
+        rtlName: 'لوحة القيادة',
+        icon: ViewCompact,
+        component: PatternIndex,
         layout: '/admin',
-        isChildRoute: false,
     },
-    {
-        path: '/maps',
-        name: 'Maps',
-        rtlName: 'خرائط',
-        icon: LocationOn,
-        component: Maps,
-        layout: '/admin',
-        isChildRoute: false,
-    },
-    {
-        path: '/notifications',
-        name: 'Notifications',
-        rtlName: 'إخطارات',
-        icon: Notifications,
-        component: NotificationsPage,
-        layout: '/admin',
-        isChildRoute: false,
-    },
-    {
-        path: '/rtl-page',
-        name: 'RTL Support',
-        rtlName: 'پشتیبانی از راست به چپ',
-        icon: Language,
-        component: RTLPage,
-        layout: '/rtl',
-        isChildRoute: false,
-    },
-    {
-        path: '/upgrade-to-pro',
-        name: 'Upgrade To PRO',
-        rtlName: 'التطور للاحترافية',
-        icon: Unarchive,
-        component: UpgradeToPro,
-        layout: '/admin',
-        isChildRoute: false,
-    },
+    // {
+    //     path: '/dashboard',
+    //     name: 'Dashboard',
+    //     rtlName: 'لوحة القيادة',
+    //     icon: Dashboard,
+    //     component: DashboardPage,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/user',
+    //     name: 'User Profile',
+    //     rtlName: 'ملف تعريفي للمستخدم',
+    //     icon: Person,
+    //     component: UserProfile,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/table',
+    //     name: 'Table List',
+    //     rtlName: 'قائمة الجدول',
+    //     icon: 'content_paste',
+    //     component: TableList,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/typography',
+    //     name: 'Typography',
+    //     rtlName: 'طباعة',
+    //     icon: LibraryBooks,
+    //     component: Typography,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/icons',
+    //     name: 'Icons',
+    //     rtlName: 'الرموز',
+    //     icon: BubbleChart,
+    //     component: Icons,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/maps',
+    //     name: 'Maps',
+    //     rtlName: 'خرائط',
+    //     icon: LocationOn,
+    //     component: Maps,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/notifications',
+    //     name: 'Notifications',
+    //     rtlName: 'إخطارات',
+    //     icon: Notifications,
+    //     component: NotificationsPage,
+    //     layout: '/admin',
+    // },
+    // {
+    //     path: '/rtl-page',
+    //     name: 'RTL Support',
+    //     rtlName: 'پشتیبانی از راست به چپ',
+    //     icon: Language,
+    //     component: RTLPage,
+    //     layout: '/rtl',
+    // },
+    // {
+    //     path: '/upgrade-to-pro',
+    //     name: 'Upgrade To PRO',
+    //     rtlName: 'التطور للاحترافية',
+    //     icon: Unarchive,
+    //     component: UpgradeToPro,
+    //     layout: '/admin',
+    // },
 ];
 
 export default dashboardRoutes;

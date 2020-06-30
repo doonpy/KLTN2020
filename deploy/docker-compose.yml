@@ -1,4 +1,5 @@
 version: '3'
+
 services:
   api-server:
     image: doonpy/kltn2020:latest
@@ -40,6 +41,20 @@ services:
     tty: true
     ports:
       - 3001:3001
+    networks:
+      - app-network
+
+  dashboard:
+    image: doonpy/kltn2020:latest
+    container_name: kltn2020_dashboard
+    entrypoint:
+      - /bin/sh
+      - tools/docker/dashboard/command.sh
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    tty: true
+    ports:
+      - 5000:5000
     networks:
       - app-network
 

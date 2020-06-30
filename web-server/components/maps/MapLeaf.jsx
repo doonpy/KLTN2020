@@ -4,7 +4,6 @@ import { Map, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import Control from 'react-leaflet-control';
 import debounce from 'lodash.debounce';
 import { useSelector, useDispatch } from 'react-redux';
-import useDarkMode from 'use-dark-mode';
 import { FaRegListAlt } from 'react-icons/fa';
 import LoadingWithTitle from './LoadingWithTitle';
 import PropTypes from 'prop-types';
@@ -64,7 +63,6 @@ export default function MapLeaf({
 }) {
     const MIN_ACREAGE = 1;
     const map = useRef();
-    const { value: hasActiveDarkMode } = useDarkMode();
     const url = `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.MAP_BOX_KEY}`;
 
     const { modeMap } = useSelector((state) => state.modeMap);
@@ -168,19 +166,11 @@ export default function MapLeaf({
                     </div>
                 </Control>
 
-                {!hasActiveDarkMode ? (
-                    <TileLayer
-                        url={url}
-                        id="mapbox/streets-v11"
-                        attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
-                    />
-                ) : (
-                    <TileLayer
-                        attribution='&amp;&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                    />
-                )}
-
+                <TileLayer
+                    url={url}
+                    id="mapbox/streets-v11"
+                    attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
+                />
                 {data?.mapPoints &&
                     data.mapPoints?.map((c) => {
                         return c.points.map((point) => {
