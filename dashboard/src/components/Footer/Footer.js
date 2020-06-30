@@ -7,6 +7,7 @@ import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 // core components
 import styles from 'assets/jss/material-dashboard-react/components/footerStyle.js';
+import { getWebServer } from '../../services/ApiService';
 
 const useStyles = makeStyles(styles);
 
@@ -35,6 +36,11 @@ export default function Footer(props) {
                         <ListItem className={classes.inlineBlock}>
                             <a href="/admin/pattern" className={classes.block}>
                                 Mẫu dữ liệu
+                            </a>
+                        </ListItem>
+                        <ListItem className={classes.inlineBlock}>
+                            <a href={getWebServer()} className={classes.block}>
+                                Trang trực quan hóa dữ liệu
                             </a>
                         </ListItem>
                     </List>

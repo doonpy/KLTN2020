@@ -13,6 +13,7 @@ import Primary from '../../components/Typography/Primary';
 import { useRouteMatch } from 'react-router-dom';
 import { getApiServer, getData } from '../../services/ApiService';
 import Snackbar from '../../components/Snackbar/Snackbar';
+import LiveViewIframe from '../../components/LiveViewIframe/LiveViewIframe';
 
 const styles = {
     cardCategoryWhite: {
@@ -133,16 +134,13 @@ export default function CatalogDetail() {
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={12}>
-                        <h4>
-                            <Primary>Live view:</Primary>
-                            <iframe
+                        {catalog.id && (
+                            <LiveViewIframe
                                 src={`${getApiServer()}/api/v1/catalogs/get-catalog-view?id=${
                                     catalog.id
                                 }`}
-                                width={'100%'}
-                                height={'600px'}
                             />
-                        </h4>
+                        )}
                     </GridItem>
                 </GridContainer>
             </CardBody>

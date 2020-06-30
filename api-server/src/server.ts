@@ -1,6 +1,6 @@
 import './prepend';
 import * as bodyParser from 'body-parser';
-import checkCors from '@middleware/check-cors';
+import cors from 'cors';
 import HostController from '@service/host/HostController';
 import CatalogController from '@service/catalog/CatalogController';
 import PatternController from '@service/pattern/PatternController';
@@ -47,7 +47,7 @@ const initDefaultFolder = (): void => {
             bodyParser.json(),
             bodyParser.urlencoded({ extended: true }),
             morgan('dev'),
-            // checkCors,
+            cors(),
         ],
         controllers: [
             {

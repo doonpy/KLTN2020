@@ -19,6 +19,7 @@ import {
 import { CheckCircle, Error, RemoveCircle } from '@material-ui/icons';
 import Snackbar from '../../components/Snackbar/Snackbar';
 import Primary from '../../components/Typography/Primary';
+import LiveViewIframe from '../../components/LiveViewIframe/LiveViewIframe';
 
 const styles = {
     cardCategoryWhite: {
@@ -64,7 +65,7 @@ export default function PatternEdit({ isCreate }) {
         },
         subLocator: [],
     });
-    const [filePath, setFilePath] = useState(NaN);
+    const [filePath, setFilePath] = useState('');
     const [successNotification, setSuccessNotification] = useState(false);
     const [failedNotification, setFailedNotification] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -104,7 +105,7 @@ export default function PatternEdit({ isCreate }) {
         }
     };
     const handleSourceUrlChange = (event) => {
-        pattern.sourceUrl = event.target.url;
+        pattern.sourceUrl = event.target.value;
         setPattern({ ...pattern });
     };
     const handlePostDateChange = (key, value) => {
@@ -135,6 +136,7 @@ export default function PatternEdit({ isCreate }) {
     };
     const handleReviewButton = async () => {
         try {
+            setFilePath('');
             const { filePath, error } = await createData(
                 `patterns/pattern-review`,
                 {
@@ -225,18 +227,11 @@ export default function PatternEdit({ isCreate }) {
                             </Button>
                         </GridItem>
                         <GridItem xs={12} sm={12} md={12}>
-                            <h4>
-                                <Primary>Live view:</Primary>
-                                <iframe
-                                    src={
-                                        filePath
-                                            ? `${getApiServer()}/${filePath}`
-                                            : ``
-                                    }
-                                    width={'100%'}
-                                    height={'600px'}
+                            {filePath && (
+                                <LiveViewIframe
+                                    src={`${getApiServer()}/${filePath}`}
                                 />
-                            </h4>
+                            )}
                         </GridItem>
                         <GridItem xs={12} sm={12} md={12}>
                             <CustomInput

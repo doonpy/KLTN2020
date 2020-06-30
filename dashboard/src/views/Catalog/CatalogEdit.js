@@ -20,6 +20,7 @@ import { CheckCircle, Error } from '@material-ui/icons';
 import Snackbar from '../../components/Snackbar/Snackbar';
 import CustomSelect from '../../components/CustomSelect/CustomSelect';
 import Primary from '../../components/Typography/Primary';
+import LiveViewIframe from '../../components/LiveViewIframe/LiveViewIframe';
 
 const styles = {
     cardCategoryWhite: {
@@ -253,18 +254,11 @@ export default function CatalogEdit({ isCreate }) {
                             </Button>
                         </GridItem>
                         <GridItem xs={12} sm={12} md={12}>
-                            <h4>
-                                <Primary>Live view:</Primary>
-                                <iframe
-                                    src={
-                                        filePath
-                                            ? `${getApiServer()}/${filePath}`
-                                            : ``
-                                    }
-                                    width={'100%'}
-                                    height={'600px'}
+                            {filePath && (
+                                <LiveViewIframe
+                                    src={`${getApiServer()}/${filePath}`}
                                 />
-                            </h4>
+                            )}
                         </GridItem>
                         <GridItem xs={12} sm={12} md={12}>
                             <CustomInput

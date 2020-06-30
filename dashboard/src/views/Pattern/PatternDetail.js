@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 import { Error } from '@material-ui/icons';
@@ -13,6 +12,7 @@ import Primary from '../../components/Typography/Primary';
 import { useRouteMatch } from 'react-router-dom';
 import { getApiServer, getData } from '../../services/ApiService';
 import Snackbar from '../../components/Snackbar/Snackbar';
+import LiveViewIframe from '../../components/LiveViewIframe/LiveViewIframe';
 
 const styles = {
     cardCategoryWhite: {
@@ -110,16 +110,11 @@ export default function PatternDetail() {
                         </h4>
                     </GridItem>
                     <GridItem xs={12} sm={12} md={12}>
-                        <h4>
-                            <Primary>Live view:</Primary>
-                            <iframe
-                                src={`${getApiServer()}/api/v1/patterns/get-pattern-view?id=${
-                                    pattern.id
-                                }`}
-                                width={'100%'}
-                                height={'600px'}
-                            />
-                        </h4>
+                        <LiveViewIframe
+                            src={`${getApiServer()}/api/v1/patterns/get-pattern-view?id=${
+                                pattern.id
+                            }`}
+                        />
                     </GridItem>
                 </GridContainer>
             </CardBody>

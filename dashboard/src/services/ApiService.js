@@ -4,8 +4,13 @@ const API_SERVER =
     process.env.NODE_ENV === 'production'
         ? 'http://pk2020.tk:3000'
         : 'http://localhost:3000';
+const WEB_SERVER =
+    process.env.NODE_ENV === 'production'
+        ? 'http://pk2020.tk'
+        : 'http://localhost:3001';
 
 export const getApiServer = () => API_SERVER;
+export const getWebServer = () => WEB_SERVER;
 
 export const getData = async (endpoint, ...queries) => {
     const queryString = queries
