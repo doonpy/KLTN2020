@@ -9,7 +9,6 @@ import {
 export interface PatternPostDate {
     locator: string;
     format: string;
-    delimiter: string;
 }
 
 export interface PatternMainLocator {

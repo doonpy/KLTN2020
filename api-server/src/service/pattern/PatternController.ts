@@ -91,7 +91,6 @@ export default class PatternController extends ServiceControllerBase<
                 postDate: Joi.object<PatternPostDate>({
                     locator: Joi.string(),
                     format: Joi.string(),
-                    delimiter: Joi.string(),
                 }),
             }),
             subLocator: Joi.array().items(
@@ -116,7 +115,6 @@ export default class PatternController extends ServiceControllerBase<
                 postDate: Joi.object<PatternPostDate>({
                     locator: Joi.required(),
                     format: Joi.required(),
-                    delimiter: Joi.required(),
                 }),
             }),
             subLocator: Joi.array().items(

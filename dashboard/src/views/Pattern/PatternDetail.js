@@ -41,7 +41,7 @@ export default function PatternDetail() {
         id: NaN,
         sourceUrl: '',
         mainLocator: {
-            postDate: { locator: '', delimiter: '', format: '' },
+            postDate: { locator: '', format: '' },
             propertyType: '',
             title: '',
             describe: '',

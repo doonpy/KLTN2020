@@ -32,7 +32,7 @@ export const createPatternViewFile = async (
     const toolboxLocators: ToolboxLocator[] = [];
     toolboxLocators.push({
         cssSelector: mainLocator.postDate.locator,
-        label: `Ngày đăng\nKý tự phân cách: ${mainLocator.postDate.delimiter}\nĐịnh dạng: ${mainLocator.postDate.format}`,
+        label: `Ngày đăng\nĐịnh dạng: ${mainLocator.postDate.format}`,
     });
     toolboxLocators.push({ cssSelector: mainLocator.title, label: 'Tiêu đề' });
     toolboxLocators.push({ cssSelector: mainLocator.describe, label: 'Mô tả' });

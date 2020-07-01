@@ -1,33 +1,33 @@
 export const convertStringToDate = (
     value: string,
-    format: string,
-    delimiter: '/' | '-' | '.' | string
+    format: string
 ): Date | undefined => {
     if (!value) {
         return undefined;
     }
+    let day = '';
+    let month = '';
+    let year = '';
 
-    const separatedFormat = format.toLowerCase().split(delimiter);
-    const separatedValue = value.split(delimiter);
-    const dayIndex = separatedFormat.indexOf('dd');
-    const monthIndex = separatedFormat.indexOf('mm');
-    const yearIndex = separatedFormat.indexOf('yyyy');
+    format.split('').forEach((metaData, index) => {
+        switch (metaData) {
+            case 'd':
+                day += value[index];
+                break;
+            case 'm':
+                month += value[index];
+                break;
+            case 'y':
+                year += value[index];
+                break;
+        }
+    });
 
-    if (!separatedValue[dayIndex] || !Number(separatedValue[dayIndex])) {
+    if (!day || !month || !year) {
         return undefined;
     }
-    if (!separatedValue[monthIndex] || !Number(separatedValue[monthIndex])) {
-        return undefined;
-    }
-    if (!separatedValue[yearIndex] || !Number(separatedValue[yearIndex])) {
-        return undefined;
-    }
 
-    return new Date(
-        Number(separatedValue[yearIndex]),
-        Number(separatedValue[monthIndex]) - 1,
-        Number(separatedValue[dayIndex])
-    );
+    return new Date(Number(year), Number(month) - 1, Number(day));
 };
 
 export const isExactTime = (expectTime: Date, isUtcTime = false): boolean => {

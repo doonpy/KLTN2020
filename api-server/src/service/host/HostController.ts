@@ -48,8 +48,10 @@ export default class HostController extends ServiceControllerBase<
         this.reqBodySchema = this.reqBodySchema.keys({
             name: Joi.string(),
             domain: Joi.string()
-                .regex(/[0-9a-z-.]+\.[a-z]+\/?/i)
-                .domain(),
+                .regex(/[0-9a-z-.]+\.[a-z]+\/?$/i)
+                .uri({
+                    scheme: [/https?/],
+                }),
         });
     }
 
