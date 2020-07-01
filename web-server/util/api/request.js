@@ -24,6 +24,7 @@ const request = {
             method,
             headers: {
                 // config header and authen
+                Authorization: 'Basic cGtyb290OkNBVXI5eFZHUnFzbWY3VVBZSHRY',
             },
         };
 
