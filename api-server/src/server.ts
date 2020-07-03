@@ -49,11 +49,11 @@ const initDefaultFolder = (): void => {
             bodyParser.urlencoded({ extended: true }),
             morgan('dev'),
             cors(),
-            expressBasicAuth({
-                users: {
-                    [process.env.AUTH_USERNAME!]: process.env.AUTH_PASSWORD!,
-                },
-            }),
+            // expressBasicAuth({
+            //     users: {
+            //         [process.env.AUTH_USERNAME!]: process.env.AUTH_PASSWORD!,
+            //     },
+            // }),
         ],
         controllers: [
             {

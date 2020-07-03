@@ -27,9 +27,6 @@ services:
     
     links:
       - mongo
-    ports:
-      - 3000:3000
-      - 3001:3001
 
   mongo:
     image: mongo
