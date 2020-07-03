@@ -6,19 +6,12 @@ import { upperCaseFirstCharacter } from '@util/helper/string';
 
 export default class DatabaseMongodb {
     private static instance: DatabaseMongodb | undefined;
-
     public connection: Mongoose | undefined;
-
     private readonly dbHost: string | undefined;
-
     private readonly dbPort: string | undefined;
-
     private readonly dbName: string | undefined;
-
     private readonly authDb: string | undefined;
-
     private readonly username: string | undefined;
-
     private readonly password: string | undefined;
 
     constructor() {
