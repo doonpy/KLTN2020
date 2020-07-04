@@ -8,6 +8,9 @@ const WEB_SERVER =
     process.env.NODE_ENV === 'production'
         ? 'http://pk2020.tk'
         : 'http://localhost:3001';
+axios.defaults.headers = {
+    Authorization: 'Basic cGtyb290OkNBVXI5eFZHUnFzbWY3VVBZSHRY',
+};
 
 export const getApiServer = () => API_SERVER;
 export const getWebServer = () => WEB_SERVER;

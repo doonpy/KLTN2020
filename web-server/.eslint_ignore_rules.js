@@ -13,7 +13,10 @@ module.exports = [
     },
     {
         rules: { 'node/no-unpublished-import': 'off' },
-        files: ['web-server/store/store.js'],
+        files: [
+            'web-server/store/store.js',
+            'web-server/util/services/helper.js',
+        ],
     },
     {
         rules: { 'consistent-return': 'off' },

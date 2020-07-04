@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { useRouteMatch } from 'react-router-dom';
 // @material-ui/core components
 import { makeStyles } from '@material-ui/core/styles';
 // core components
@@ -55,7 +55,7 @@ export default function PatternEdit({ isCreate }) {
         id: NaN,
         sourceUrl: '',
         mainLocator: {
-            postDate: { locator: '', delimiter: '', format: '' },
+            postDate: { locator: '', format: '' },
             propertyType: '',
             title: '',
             describe: '',
@@ -126,9 +126,7 @@ export default function PatternEdit({ isCreate }) {
     };
     const handleAddSubLocator = () => {
         pattern.subLocator.push({ name: '', value: '' });
-        setPattern({
-            ...pattern,
-        });
+        setPattern({ ...pattern });
     };
     const handleRemoveSubLocator = (index) => {
         pattern.subLocator.splice(index, 1);
@@ -265,28 +263,7 @@ export default function PatternEdit({ isCreate }) {
                                 }}
                             />
                             <GridContainer>
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="Ký tự phân cách ngày đăng:"
-                                        id="postDateDelimiter"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        inputProps={{
-                                            placeholder: 'Ví dụ: -, /',
-                                            required: true,
-                                            value:
-                                                pattern.mainLocator.postDate
-                                                    .delimiter,
-                                            onChange: (event) =>
-                                                handlePostDateChange(
-                                                    'delimiter',
-                                                    event.target.value
-                                                ),
-                                        }}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={6}>
+                                <GridItem xs={12} sm={12} md={12}>
                                     <CustomInput
                                         labelText="Định dạng ngày đăng:"
                                         id="postDateFormat"
@@ -422,15 +399,14 @@ export default function PatternEdit({ isCreate }) {
                             <GridItem xs={12} sm={12} md={6} key={index}>
                                 <Primary>
                                     Thông tin phụ {index + 1}&nbsp;
-                                    <Link to={'#'}>
-                                        <RemoveCircle
-                                            color={'error'}
-                                            fontSize={'small'}
-                                            onClick={() =>
-                                                handleRemoveSubLocator(index)
-                                            }
-                                        />
-                                    </Link>
+                                    <RemoveCircle
+                                        color={'error'}
+                                        fontSize={'small'}
+                                        cursor={'pointer'}
+                                        onClick={() =>
+                                            handleRemoveSubLocator(index)
+                                        }
+                                    />
                                 </Primary>
 
                                 <CustomInput

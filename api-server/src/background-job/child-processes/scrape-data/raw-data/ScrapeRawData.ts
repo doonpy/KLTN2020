@@ -316,8 +316,7 @@ export default class ScrapeRawData extends ScrapeBase {
                 ?.shift() || '';
         const postDate = convertStringToDate(
             postDateString,
-            this.pattern.mainLocator.postDate.format,
-            this.pattern.mainLocator.postDate.delimiter
+            this.pattern.mainLocator.postDate.format
         );
 
         const acreage = acreageHandler(acreageData);

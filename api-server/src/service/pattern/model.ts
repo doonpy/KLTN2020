@@ -15,11 +15,6 @@ const patternSchema: Schema = new Schema(
             postDate: {
                 locator: { type: Schema.Types.String, required: true },
                 format: { type: Schema.Types.String, required: true },
-                delimiter: {
-                    type: Schema.Types.String,
-                    enum: ['-', '/', '.'],
-                    required: true,
-                },
             },
         },
         subLocator: [

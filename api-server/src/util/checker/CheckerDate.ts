@@ -4,7 +4,7 @@ import CheckerBase from './CheckerBase';
 import CheckerWording from './wording';
 
 export default class CheckerDate extends CheckerBase {
-    constructor(private format: string, private delimiter: string) {
+    constructor(private format: string) {
         super();
     }
 
@@ -15,7 +15,7 @@ export default class CheckerDate extends CheckerBase {
             return;
         }
 
-        if (!convertStringToDate(value, this.format, this.delimiter)) {
+        if (!convertStringToDate(value, this.format)) {
             throw {
                 statusCode: ResponseStatusCode.BAD_REQUEST,
                 cause: { wording: CheckerWording.CAUSE.CAU_CHK_1, value: [] },

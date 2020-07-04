@@ -19,7 +19,6 @@ import {
 import { CheckCircle, Error } from '@material-ui/icons';
 import Snackbar from '../../components/Snackbar/Snackbar';
 import CustomSelect from '../../components/CustomSelect/CustomSelect';
-import Primary from '../../components/Typography/Primary';
 import LiveViewIframe from '../../components/LiveViewIframe/LiveViewIframe';
 
 const styles = {
