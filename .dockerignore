@@ -1,8 +1,2 @@
-node_modules/
-archive/
-public/
-deploy/
-doc/
-dist/
-README.md
-.gitignore
+tools/docker/archive.dockerfile
+tools/shell-script

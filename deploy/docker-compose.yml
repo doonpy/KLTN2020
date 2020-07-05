@@ -1,90 +1,90 @@
 version: '3'
 
 services:
-  api-server:
-    image: doonpy/kltn2020:latest
-    container_name: kltn2020_api-server
-    entrypoint:
-      - /bin/sh
-      - tools/docker/api/command.sh
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    env_file: config/api-server.config.env
-    tty: true
-    ports:
-      - 3000:3000
-    networks:
-      - app-network
+    api-server:
+        image: doonpy/kltn2020:latest
+        container_name: kltn2020_api-server
+        entrypoint:
+            - /bin/sh
+            - tools/docker/api/command.sh
+        restart: unless-stopped
+        working_dir: /usr/src/app
+        env_file: config/api-server.config.env
+        tty: true
+        ports:
+            - 3000:3000
+        networks:
+            - app-network
 
-  background-job:
-    image: doonpy/kltn2020:latest
-    container_name: kltn2020_background-job
-    entrypoint:
-      - /bin/sh
-      - tools/docker/background-job/command.sh
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    env_file: config/background-job.config.env
-    tty: true
-    networks:
-      - app-network
+    background-job:
+        image: doonpy/kltn2020:latest
+        container_name: kltn2020_background-job
+        entrypoint:
+            - /bin/sh
+            - tools/docker/background-job/command.sh
+        restart: unless-stopped
+        working_dir: /usr/src/app
+        env_file: config/background-job.config.env
+        tty: true
+        networks:
+            - app-network
 
-  web-server:
-    image: doonpy/kltn2020:latest
-    container_name: kltn2020_web-server
-    entrypoint:
-      - /bin/sh
-      - tools/docker/web/command.sh
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    env_file: config/web-server.config.env
-    tty: true
-    ports:
-      - 3001:3001
-    networks:
-      - app-network
+    web-server:
+        image: doonpy/kltn2020:latest
+        container_name: kltn2020_web-server
+        entrypoint:
+            - /bin/sh
+            - tools/docker/web/command.sh
+        restart: unless-stopped
+        working_dir: /usr/src/app
+        env_file: config/web-server.config.env
+        tty: true
+        ports:
+            - 3001:3001
+        networks:
+            - app-network
 
-  dashboard:
-    image: doonpy/kltn2020:latest
-    container_name: kltn2020_dashboard
-    entrypoint:
-      - /bin/sh
-      - tools/docker/dashboard/command.sh
-    restart: unless-stopped
-    working_dir: /usr/src/app
-    tty: true
-    ports:
-      - 5000:5000
-    networks:
-      - app-network
+    dashboard:
+        image: doonpy/kltn2020:latest
+        container_name: kltn2020_dashboard
+        entrypoint:
+            - /bin/sh
+            - tools/docker/dashboard/command.sh
+        restart: unless-stopped
+        working_dir: /usr/src/app
+        tty: true
+        ports:
+            - 5000:5000
+        networks:
+            - app-network
 
-  database:
-    image: mongo:4.2
-    container_name: kltn2020_db
-    env_file: config/database.config.env
-    volumes:
-      - kltn2020_db-volume:/data/db
-    ports:
-      - '27017-27019:27017-27019'
-    tty: true
-    restart: unless-stopped
-    networks:
-      - app-network
+    database:
+        image: mongo:4.2
+        container_name: kltn2020_db
+        env_file: config/database.config.env
+        volumes:
+            - kltn2020_db-volume:/data/db
+        ports:
+            - '27017-27019:27017-27019'
+        tty: true
+        restart: unless-stopped
+        networks:
+            - app-network
 
-  nginx:
-    image: nginx:1.19.0
-    container_name: kltn2020_nginx
-    volumes:
-      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - app-network
+    nginx:
+        image: nginx:1.19.0
+        container_name: kltn2020_nginx
+        volumes:
+            - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - 80:80
+            - 443:443
+        networks:
+            - app-network
 
 volumes:
-  kltn2020_db-volume:
+    kltn2020_db-volume:
 
 networks:
-  app-network:
-    driver: bridge
+    app-network:
+        driver: bridge
