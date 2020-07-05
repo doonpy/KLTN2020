@@ -4,7 +4,7 @@
  */
 export const fetchMapData = async (mapKey) => {
     const response = await fetch(
-        `http://localhost:3001/hcm/${mapKey}.geo.json`
+        `${process.env.WEB_URI}/hcm/${mapKey}.geo.json`
     );
     return response.json();
 };

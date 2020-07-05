@@ -1,29 +1,36 @@
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import PropTypes from 'prop-types';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import RenderCompleted from '../hooks/use-mounted';
-import LoadingIcon from './LoadingIcon';
+import PropertyOptionBottom from './maps/PropertyOptionBottom';
+import LoadingWithTitle from './maps/LoadingWithTitle';
 import { PROPERTY_TYPE_NUMBER, MAP_MODE } from '../util/constants';
-
+/* eslint-disable react/display-name */
 const MapLeaf = dynamic(() => import('./maps/MapLeaf'), {
     ssr: false,
+    loading: () => <LoadingWithTitle name="Đang tải dữ liệu" />,
 });
 const MapOverview = dynamic(() => import('./maps/MapOverview'), {
-    loading: () => <LoadingIcon />,
+    loading: () => <LoadingWithTitle name="Đang tải dữ liệu" />,
 });
 const MapWard = dynamic(() => import('./maps/MapWard'), {
-    loading: () => <LoadingIcon />,
+    loading: () => <LoadingWithTitle name="Đang tải dữ liệu" />,
 });
 
-const PageMap = ({ mapStaticJSON, dataSummary, transactionStage }) => {
+const PageMap = ({
+    mapStaticJSON,
+    dataSummary,
+    transactionStage,
+    setTransaction,
+}) => {
     const { modeMap } = useSelector((state) => state.modeMap);
     const [stage, setStage] = useState(0);
     const [propertyStage, setProperty] = useState(PROPERTY_TYPE_NUMBER[0].id);
-    const mapData = mapStaticJSON[0].content;
+    const mapData = mapStaticJSON[0]?.content;
     const isMounted = new RenderCompleted();
     const dataMap = dataSummary
-        .map((w) => {
+        ?.map((w) => {
             const realEstateDensity = w.summaryAmount / w.acreage;
             return {
                 name: w.name,
@@ -37,53 +44,27 @@ const PageMap = ({ mapStaticJSON, dataSummary, transactionStage }) => {
         setProperty(index);
     };
     return (
-        <div className="flex-1 flex relative">
-            <div
-                className={
-                    modeMap !== MAP_MODE.DENSITY_MODE
-                        ? `bottom-0 left-0 w-full  border border-solid border-light-primary dark:border-primary absolute dark:bg-gray-900 bg-white`
-                        : 'hidden'
-                }
-                style={{ height: '40px' }}
-            >
-                <div className="flex items-center justify-around pt-1">
-                    {PROPERTY_TYPE_NUMBER.map((property) => (
-                        <div
-                            className={`mx-2 py-1 cursor-pointer text-center ${
-                                propertyStage === property.id
-                                    ? 'font-extrabold text-blue-400'
-                                    : ''
-                            }`}
-                            key={property.id}
-                            style={{ fontSize: '9px' }}
-                            role="presentation"
-                            onClick={() => onClickProperty(property.id)}
-                        >
-                            {property.wording[0]}
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <div className="flex-1 flex relative mt-1 mx-1">
+            <PropertyOptionBottom
+                isDensityMode={modeMap !== MAP_MODE.DENSITY_MODE}
+                onClickProperty={onClickProperty}
+                propertyStage={propertyStage}
+            />
             {modeMap !== MAP_MODE.DENSITY_MODE ? (
-                <div className="w-full border-r border-light-primary dark:border-primary">
+                <div className="w-full ">
                     <div className="overflow-auto w-full">
                         {isMounted && (
                             <MapLeaf
                                 tabMap={modeMap}
                                 propertyStage={propertyStage}
                                 transactionStage={transactionStage}
+                                setTransaction={setTransaction}
                             />
                         )}
                     </div>
                 </div>
             ) : (
                 <div className="w-full h-full relative">
-                    {/* <div
-                        className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400, text-xs"
-                        style={{ zIndex: 10, left: '35px', padding: '10px' }}
-                    >
-                        {` Bản đồ thể hiện ${modeMap} bất động sản`}
-                    </div> */}
                     {dataSummary &&
                         (stage === 0 ? (
                             <MapOverview
@@ -102,10 +83,9 @@ const PageMap = ({ mapStaticJSON, dataSummary, transactionStage }) => {
         </div>
     );
 };
-// PageMap.propTypes = {
-//     mapStaticJSON: PropTypes.isRequired,
-//     dataSummary: PropTypes.isRequired,
-//     tabMap: PropTypes.isRequired,
-//     transactionStage: PropTypes.isRequired,
-// };
+PageMap.propTypes = {
+    mapStaticJSON: PropTypes.arrayOf(PropTypes.any),
+    dataSummary: PropTypes.arrayOf(PropTypes.object),
+    transactionStage: PropTypes.number,
+};
 export default PageMap;

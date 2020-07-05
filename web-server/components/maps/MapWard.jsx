@@ -13,7 +13,7 @@ import {
     CUSTOM_STYLE_HIGHMAPS,
     CUSTOM_SERIES_HIGHMAPS,
     getCustomHighmaps,
-} from '../../themes/custom-map';
+} from '../../custom/custom-map';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
@@ -44,7 +44,6 @@ const MapWard = ({ dataWard, setStage }) => {
         title: {
             text: 'Bản đồ thể hiện mật độ bất động sản ',
             style: {
-                color: 'white',
                 fontSize: '12px',
             },
         },
@@ -85,11 +84,11 @@ const MapWard = ({ dataWard, setStage }) => {
     return (
         <>
             {wardMap ? (
-                <div style={{ height: 'calc(100vh - 100px)' }}>
+                <div style={{ height: 'calc(100vh - 104px)' }}>
                     <HighchartsReact
                         containerProps={{
                             style: {
-                                height: 'calc(100vh - 100px)',
+                                height: 'calc(100vh - 104px)',
                             },
                         }}
                         constructorType="mapChart"

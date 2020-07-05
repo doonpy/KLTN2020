@@ -2,43 +2,34 @@ import React, { useState, useEffect } from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
+import PropTypes from 'prop-types';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { BINDING_OPTIONS } from '../../util/bindingOptions';
-import { DARK_UNICA } from '../../themes/dark-unica';
+import { SAND_COLOR } from '../../themes/color';
+import {
+    CUSTOM_CHART,
+    TURN_OFF_CONTEXT_MENU,
+} from '../../custom/custom-charts';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
 
-const PieChart = ({ data }) => {
+const PieChart = ({ data, title }) => {
+    const TEXT_STYLE = {
+        fontSize: '13px',
+        fontWeight: 600,
+    };
     const [chartOptions, setChartOptions] = useState({
-        ...BINDING_OPTIONS,
-        colors: [
-            '#2b908f',
-            '#90ee7e',
-            '#f45b5b',
-            '#7798BF',
-            '#aaeeee',
-            '#ff0066',
-            '#eeaaee',
-            '#55BF3B',
-            '#DF5353',
-            '#7798BF',
-            '#aaeeee',
-        ],
+        ...CUSTOM_CHART,
+        ...TURN_OFF_CONTEXT_MENU,
         chart: {
             type: 'pie',
-            backgroundColor: 'rgba(0,0,0,0)',
-            height: '100%',
         },
-
+        colors: SAND_COLOR,
         title: {
-            text: 'Biểu đồ thể hiện các loại bất động sản TPHCM (đơn vị %)',
-            style: {
-                fontSize: '10px',
-                color: '#ffffff',
-            },
+            text: title,
+            style: TEXT_STYLE,
         },
         legend: {
             enabled: true,
@@ -62,8 +53,7 @@ const PieChart = ({ data }) => {
                 dataLabels: {
                     enabled: false,
                 },
-                // showInLegend: true,
-                // size: '70%',
+                showInLegend: true,
             },
             series: {
                 dataLabels: {
@@ -86,7 +76,6 @@ const PieChart = ({ data }) => {
                 color: 'white',
             },
         },
-
         series: [
             {
                 name: 'Tỷ lệ',
@@ -109,9 +98,21 @@ const PieChart = ({ data }) => {
     }, [data]);
     return (
         <div className="relative z-1000">
-            <HighchartsReact highcharts={Highcharts} options={chartOptions} />
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={chartOptions}
+                containerProps={{
+                    style: {
+                        height: 'calc((100vh - 172px)/2)',
+                    },
+                }}
+            />
         </div>
     );
 };
 
+PieChart.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.array),
+    title: PropTypes.string,
+};
 export default React.memo(PieChart);

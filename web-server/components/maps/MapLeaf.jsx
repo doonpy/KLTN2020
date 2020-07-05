@@ -4,21 +4,22 @@ import { Map, TileLayer, CircleMarker, Popup, Tooltip } from 'react-leaflet';
 import Control from 'react-leaflet-control';
 import debounce from 'lodash.debounce';
 import { useSelector, useDispatch } from 'react-redux';
-import useDarkMode from 'use-dark-mode';
 import { FaRegListAlt } from 'react-icons/fa';
+import LoadingWithTitle from './LoadingWithTitle';
 import PropTypes from 'prop-types';
 import LegendMap from './LegendMap';
 import styled from 'styled-components';
-import LoadingIcon from '../LoadingIcon';
 import MapLeafLeftSide from './MapLeafLeftSide';
-import { ZOOM_LEVEL, MAP_MODE } from '../../util/constants';
+import TransactionOptionBottom from './TransactionOptionBottom';
+import {
+    ZOOM_LEVEL,
+    MAP_MODE,
+    AREA_LEGEND,
+    PRICE_LEGEND,
+} from '../../util/constants';
 import useMapPoint from '../../hooks/use-map-point';
 import * as action from '../../store/color-point/actions';
-import {
-    numberWithCommas,
-    setColorByArea,
-    setColorByPrice,
-} from '../../util/services/helper';
+import { numberWithCommas, setColor } from '../../util/services/helper';
 
 const StyledPop = styled(Popup)`
     border-radius: 0;
@@ -36,7 +37,7 @@ const StyledPop = styled(Popup)`
 const TitleTypeMap = ({ type }) => {
     return (
         <h1
-            className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400, text-xs"
+            className="text-center absolute font-bold top-0 right-0 m-auto text-gray-400, text-xs"
             style={{ zIndex: 9999, left: '35px', padding: '10px' }}
         >
             {` Bản đồ thể hiện ${type} bất động sản`}
@@ -47,17 +48,22 @@ const TitleTypeMap = ({ type }) => {
 const LoadingMap = ({ isLoading }) => {
     return isLoading ? (
         <div
-            className="text-center absolute font-bold top-0 right-0 m-0 m-auto text-gray-400 h-full"
+            className="text-center absolute font-bold top-0 right-0 m-auto text-gray-400 "
             style={{ zIndex: 9999, left: '35px', padding: '10px' }}
         >
-            <LoadingIcon />
+            <LoadingWithTitle name="Đang tải" />
         </div>
     ) : null;
 };
-export default function MapLeaf({ propertyStage, transactionStage }) {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export default function MapLeaf({
+    propertyStage,
+    transactionStage,
+    setTransaction,
+}) {
     const MIN_ACREAGE = 1;
     const map = useRef();
-    const { value: hasActiveDarkMode } = useDarkMode();
+    const url = `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.MAP_BOX_KEY}`;
 
     const { modeMap } = useSelector((state) => state.modeMap);
     const dispatch = useDispatch();
@@ -106,8 +112,23 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
         setZoomLevel(10);
     };
     return (
-        <div className="relative" style={{ height: 'calc(100vh - 135px)' }}>
+        <div className="relative" style={{ height: 'calc(100vh - 184px)' }}>
             <TitleTypeMap type={modeMap} />
+            <span
+                className="text-center absolute font-bold bottom-0 left-0 text-primary"
+                style={{
+                    zIndex: 9999,
+                    padding: '10px',
+                    fontSize: '10px',
+                    opacity: '0.4',
+                }}
+            >
+                *Phóng to để xem được nhiều dữ liệu hơn
+            </span>
+            <TransactionOptionBottom
+                transactionStage={transactionStage}
+                setTransaction={setTransaction}
+            />
             <LoadingMap isLoading={!data && isValidating} />
             <Map
                 ref={map}
@@ -129,31 +150,27 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                             zoomLevel={zoomLevel}
                             typeLegend={modeMap}
                             setOnLegend={setOnLegend}
+                            transactionStage={transactionStage}
                         />
                     ) : null}
                 </Control>
                 <MapLeafLeftSide resetState={resetState} />
                 <Control position="bottomright">
-                    <FaRegListAlt
-                        size={24}
-                        className="cursor-pointer text-gray-400 relative"
-                        onClick={() => setOnLegend(!onLegend)}
-                        style={{ zIndex: 99999 }}
-                    />
+                    <div className="shadow bg-white py-2 px-4 rounded-sm">
+                        <FaRegListAlt
+                            size={24}
+                            className="cursor-pointer font-semibold relative text-primary"
+                            onClick={() => setOnLegend(!onLegend)}
+                            style={{ zIndex: 99999 }}
+                        />
+                    </div>
                 </Control>
 
-                {!hasActiveDarkMode ? (
-                    <TileLayer
-                        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                    />
-                ) : (
-                    <TileLayer
-                        attribution='&amp;&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                    />
-                )}
-
+                <TileLayer
+                    url={url}
+                    id="mapbox/streets-v11"
+                    attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>'
+                />
                 {data?.mapPoints &&
                     data.mapPoints?.map((c) => {
                         return c.points.map((point) => {
@@ -175,12 +192,14 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                     }}
                                     color={
                                         modeMap === MAP_MODE.AREA_MODE
-                                            ? setColorByArea(
-                                                  point.rawDataset[0].acreage
+                                            ? setColor(
+                                                  point.rawDataset[0].acreage,
+                                                  AREA_LEGEND
                                               )
-                                            : setColorByPrice(
+                                            : setColor(
                                                   point.rawDataset[0].price /
-                                                      1000000000
+                                                      1000000000,
+                                                  PRICE_LEGEND
                                               )
                                     }
                                     key={point.rawDataset[0].rawDataId}
@@ -194,7 +213,10 @@ export default function MapLeaf({ propertyStage, transactionStage }) {
                                         <div className="flex flex-col cursor-pointer">
                                             <div
                                                 className="overflow-auto h-full w-full"
-                                                style={{ maxHeight: '100px' }}
+                                                style={{
+                                                    maxHeight: '100px',
+                                                    maxWidth: '300px',
+                                                }}
                                             >
                                                 {point.rawDataset.map(
                                                     (rawdata) => {
@@ -265,4 +287,5 @@ LoadingMap.propTypes = {
 MapLeaf.propTypes = {
     transactionStage: PropTypes.number,
     propertyStage: PropTypes.number,
+    setTransaction: PropTypes.func,
 };

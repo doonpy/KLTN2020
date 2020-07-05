@@ -1,8 +1,18 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Router from 'next/router';
+import Head from 'next/head';
+import groupBy from 'lodash.groupby';
 import NProgress from 'nprogress';
 import PageLayout from '../components/page-layout';
-import AnalystLeft from '../components/analytics/analyst-left';
+import PropertyLineChartWrapper from '../components/ChartWrapper/PropertyLineChartWrapper';
+import AnalysticsSelect from '../components/analytics/AnalysticsSelect';
+import PriceStatistics from '../components/analytics/PriceStatistics';
+import PricePeratoWrapper from '../components/ChartWrapper/PricePeratoWrapper';
+import Loading from '../components/Loading';
+import TransactionLinChartWrapper from '../components/ChartWrapper/TransactionLineChartWrapper';
+import { getTimeAgo } from '../util/services/helper';
+import useAnalytics from '../hooks/use-analytics';
 
 NProgress.configure({
     minimum: 0.3,
@@ -15,227 +25,111 @@ Router.events.on('routeChangeStart', () => {
 });
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
-const analytics = () => {
-    return (
-        <PageLayout>
-            <div>
-                <div className="flex ">
-                    <AnalystLeft />
-                    <div className="w-full" style={{ paddingLeft: '64px' }}>
-                        <div className="w-full px-4 md:px-0 md:mt-8 mb-16 text-gray-800 leading-normal">
-                            <div className="flex flex-wrap">
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow p-2">
-                                        <div className="flex flex-row items-center">
-                                            <div className="flex-shrink pr-4">
-                                                <div className="rounded p-3 bg-green-600">
-                                                    <i className="fa fa-wallet fa-2x fa-fw fa-inverse" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">
-                                                    Total Revenue
-                                                </h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">
-                                                    sd
-                                                    <span className="text-green-500">
-                                                        <i className="fas fa-caret-up" />
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow p-2">
-                                        <div className="flex flex-row items-center">
-                                            <div className="flex-shrink pr-4">
-                                                <div className="rounded p-3 bg-orange-600">
-                                                    <i className="fas fa-users fa-2x fa-fw fa-inverse" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">
-                                                    Total Users
-                                                </h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">
-                                                    123
-                                                    <span className="text-orange-500">
-                                                        <i className="fas fa-exchange-alt" />
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow p-2">
-                                        <div className="flex flex-row items-center">
-                                            <div className="flex-shrink pr-4">
-                                                <div className="rounded p-3 bg-yellow-600">
-                                                    <i className="fas fa-user-plus fa-2x fa-fw fa-inverse" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">
-                                                    New Users
-                                                </h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">
-                                                    <span className="text-yellow-600">
-                                                        <i className="fas fa-caret-up" />
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow p-2">
-                                        <div className="flex flex-row items-center">
-                                            <div className="flex-shrink pr-4">
-                                                <div className="rounded p-3 bg-blue-600">
-                                                    <i className="fas fa-server fa-2x fa-fw fa-inverse" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">
-                                                    Server Uptime
-                                                </h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">
-                                                    152 days
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow p-2">
-                                        <div className="flex flex-row items-center">
-                                            <div className="flex-shrink pr-4">
-                                                <div className="rounded p-3 bg-indigo-600">
-                                                    <i className="fas fa-tasks fa-2x fa-fw fa-inverse" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">
-                                                    To Do List
-                                                </h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">
-                                                    7 tasks
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow p-2">
-                                        <div className="flex flex-row items-center">
-                                            <div className="flex-shrink pr-4">
-                                                <div className="rounded p-3 bg-red-600">
-                                                    <i className="fas fa-inbox fa-2x fa-fw fa-inverse" />
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 text-right md:text-center">
-                                                <h5 className="font-bold uppercase text-gray-400">
-                                                    Issues
-                                                </h5>
-                                                <h3 className="font-bold text-3xl text-gray-600">
-                                                    <span className="text-red-500">
-                                                        <i className="fas fa-caret-up" />
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <hr className="border-b-2 border-gray-600 my-8 mx-4" />
-                            <div className="flex flex-row flex-wrap flex-grow mt-2">
-                                <div className="w-full md:w-1/2 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
-                                        <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">
-                                                Graph
-                                            </h5>
-                                        </div>
-                                        <div className="p-5">
-                                            <canvas
-                                                id="chartjs-7"
-                                                className="chartjs"
-                                                width="undefined"
-                                                height="undefined"
-                                            />
-                                        </div>
+const Analytics = () => {
+    const analytics = useSelector((state) => state.analytics);
+    const { data: dataAnalytics, isValidating } = useAnalytics({
+        variables: {
+            fromMonth: JSON.stringify(getTimeAgo(analytics.time).month),
+            fromYear: JSON.stringify(getTimeAgo(analytics.time).year),
+            propertyType: analytics.propertyType,
+            transactionType: analytics.transactionType,
+        },
+    });
+
+    const dataSortByMonthYear = dataAnalytics?.analytics?.sort(
+        (a, b) => a.year - b.year || a.month - b.month
+    );
+    const dataPriceMax =
+        dataSortByMonthYear?.find((c) => Math.max(c.priceMax)) || 0;
+    const dataPriceMin =
+        dataSortByMonthYear?.find((c) => Math.min(c.priceMin)) || 0;
+    const dataPerMeterMin =
+        dataSortByMonthYear?.find((c) => Math.min(c.perMeterMin)) || 0;
+    const dataPerMeterMax =
+        dataSortByMonthYear?.find((c) => Math.max(c.perMeterMax)) || 0;
+
+    const amountTotal =
+        dataSortByMonthYear?.reduce((sum, p) => sum + p.amount, 0) || 0;
+
+    const averagePrice =
+        dataAnalytics?.analytics?.reduce(
+            (sum, p) => sum + p.perMeterSum / p.amount,
+            0
+        ) / dataSortByMonthYear?.length || 0;
+
+    const dataGroupBy = groupBy(
+        dataSortByMonthYear,
+        (data) => `${data.month}-${data.year}`
+    );
+
+    return (
+        <>
+            {dataSortByMonthYear ? (
+                <PageLayout>
+                    <Head>
+                        <title>Trang Phân tích</title>
+                        <meta
+                            name="viewport"
+                            content="initial-scale=1.0, width=device-width"
+                        />
+                    </Head>
+                    <div
+                        className="max-w-screen-xl m-auto text-white pb-64"
+                        style={{ color: '#BDD1F8', paddingTop: '100px' }}
+                    >
+                        <div className="flex flex-col h-full">
+                            {dataAnalytics && (
+                                <PriceStatistics
+                                    maxPrice={+dataPriceMax.priceMax || 0}
+                                    minPrice={
+                                        Number(dataPriceMin.priceMin) || 0
+                                    }
+                                    minPricePerMeter={
+                                        +dataPerMeterMin.perMeterMin || 0
+                                    }
+                                    maxPricePerMeter={
+                                        +dataPerMeterMax.perMeterMax || 0
+                                    }
+                                    amountTotal={amountTotal}
+                                    averagePrice={averagePrice}
+                                />
+                            )}
+
+                            <div className="w-full h-full">
+                                <div className="flex">
+                                    <AnalysticsSelect />
+                                    <PricePeratoWrapper
+                                        dataGroupBy={dataGroupBy}
+                                        loading={!dataAnalytics && isValidating}
+                                    />
+                                </div>
+                                <hr className="border-b-2 border-gray-600 my-8 mx-4" />
+                                <div className="flex mt-12">
+                                    <div className="w-full ml-2">
+                                        <TransactionLinChartWrapper
+                                            data={dataAnalytics}
+                                            catagoriesYear={Object.keys(
+                                                dataGroupBy
+                                            )}
+                                        />
                                     </div>
                                 </div>
-                                <div className="w-full md:w-1/2 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
-                                        <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">
-                                                Graph
-                                            </h5>
-                                        </div>
-                                        <div className="p-5">
-                                            <canvas
-                                                id="chartjs-0"
-                                                className="chartjs"
-                                                width="undefined"
-                                                height="undefined"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
-                                        <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">
-                                                Graph
-                                            </h5>
-                                        </div>
-                                        <div className="p-5">
-                                            <canvas
-                                                id="chartjs-1"
-                                                className="chartjs"
-                                                width="undefined"
-                                                height="undefined"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
-                                        <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">
-                                                Graph
-                                            </h5>
-                                        </div>
-                                        <div className="p-5">
-                                            <canvas
-                                                id="chartjs-4"
-                                                className="chartjs"
-                                                width="undefined"
-                                                height="undefined"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-full md:w-1/2 xl:w-1/3 p-3">
-                                    <div className="dark:bg-gray-900 bg-white border border-gray-800 rounded shadow">
-                                        <div className="border-b border-gray-800 p-3">
-                                            <h5 className="font-bold uppercase text-gray-600">
-                                                Template
-                                            </h5>
-                                        </div>
-                                    </div>
-                                </div>
+                                <PropertyLineChartWrapper
+                                    data={dataAnalytics}
+                                    catagoriesYear={Object.keys(dataGroupBy)}
+                                />
                             </div>
                         </div>
                     </div>
+                </PageLayout>
+            ) : (
+                <div className="flex bg-gray-900 w-full justify-center h-screen">
+                    <Loading />
                 </div>
-            </div>
-        </PageLayout>
+            )}
+        </>
     );
 };
 
-export default analytics;
+export default Analytics;

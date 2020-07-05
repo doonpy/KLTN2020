@@ -2,14 +2,15 @@ import React, { useRef } from 'react';
 import Highcharts from 'highcharts/highmaps';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import { useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
 import HighchartsReact from 'highcharts-react-official';
-import { BINDING_OPTIONS } from '../../util/bindingOptions';
+
 import {
     CUSTOM_STYLE_HIGHMAPS,
     CUSTOM_SERIES_HIGHMAPS,
     getCustomHighmaps,
-} from '../../themes/custom-map';
+} from '../../custom/custom-map';
 import * as action from '../../store/map-key/actions';
 
 if (typeof Highcharts === 'object') {
@@ -37,8 +38,6 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
                 'Bản đồ thể hiện mật độ bất động sản của Thành Phố Hồ Chí Minh',
             style: {
                 fontSize: '12px',
-                backgroundColor: 'rgba(0,0,0,0)',
-                color: '#fff',
             },
         },
         chart: getCustomHighmaps({
@@ -58,12 +57,16 @@ const MapOverview = ({ mapData, dataMap, setStage }) => {
     return dataMap ? (
         <HighchartsReact
             ref={chartRef}
-            containerProps={{ style: { height: 'calc(100vh - 100px)' } }}
+            containerProps={{ style: { height: 'calc(100vh - 104px)' } }}
             constructorType="mapChart"
             highcharts={Highcharts}
             options={mapOptions}
         />
     ) : null;
 };
-
+MapOverview.propTypes = {
+    mapData: PropTypes.any,
+    dataMap: PropTypes.any,
+    setStage: PropTypes.func,
+};
 export default MapOverview;

@@ -3,9 +3,7 @@ const {
     PHASE_PRODUCTION_BUILD,
 } = require('next/constants');
 const path = require('path');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-    enabled: false,
-});
+const withFonts = require('next-fonts');
 
 module.exports = (phase) => {
     const distDir = '../dist/web/.next';
@@ -13,6 +11,16 @@ module.exports = (phase) => {
     const isProd = phase === PHASE_PRODUCTION_BUILD;
     console.log(`🚀 Mode: ${isDev ? `Development` : 'Production'}`);
     const env = {
+        WEB_URI: (() => {
+            if (isDev) {
+                return 'http://localhost:3001';
+            }
+
+            if (isProd) {
+                return 'http://pk2020.tk';
+            }
+            return 'WEB_URI is invalid!';
+        })(),
         API_URI: (() => {
             if (isDev) {
                 return 'http://localhost:3000';
@@ -22,6 +30,16 @@ module.exports = (phase) => {
                 return 'http://pk2020.tk:3000';
             }
             return 'API_URL is invalid!';
+        })(),
+        MAP_BOX_KEY: (() => {
+            if (isDev) {
+                return 'pk.eyJ1IjoiZG9vbnB5IiwiYSI6ImNrYW9xd3hjcTB3a3Eycm1vNHhzY250c2sifQ.Ti9ktyjr224DM5eDsXftfQ';
+            }
+
+            if (isProd) {
+                return 'pk.eyJ1IjoiZG9vbnB5IiwiYSI6ImNrYW9xd3hjcTB3a3Eycm1vNHhzY250c2sifQ.Ti9ktyjr224DM5eDsXftfQ';
+            }
+            return 'MAP_BOX_KEY is invalid!';
         })(),
     };
 
@@ -40,7 +58,7 @@ module.exports = (phase) => {
         return config;
     };
 
-    return withBundleAnalyzer({
+    return withFonts({
         distDir,
         env,
         webpack,

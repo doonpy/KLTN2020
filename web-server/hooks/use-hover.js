@@ -1,0 +1,27 @@
+import { useRef, useState, useEffect } from 'react';
+
+export function useHover() {
+    const [value, setValue] = useState(false);
+
+    const ref = useRef(null);
+
+    const handleMouseOver = () => setValue(true);
+    const handleMouseOut = () => setValue(false);
+
+    // eslint-disable-next-line consistent-return
+    useEffect(() => {
+        const node = ref.current;
+        if (node) {
+            node.addEventListener('mouseover', handleMouseOver);
+            node.addEventListener('mouseout', handleMouseOut);
+
+            return () => {
+                node.removeEventListener('mouseover', handleMouseOver);
+                node.removeEventListener('mouseout', handleMouseOut);
+            };
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ref.current]);
+
+    return [ref, value];
+}

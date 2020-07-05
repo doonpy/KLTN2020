@@ -1,59 +1,87 @@
+export const AREA_LEGEND = [0, 50, 100, 500, 1000, 5000, 10000, 50000, 100000];
+export const PRICE_LEGEND = [0, 0.5, 1, 5, 10, 50, 100, 500, 1000, 5000];
+
+export const COLOR_CODE = [
+    '#F6DB00',
+    '#768603',
+    '#CA6F1E',
+    '#7D6608',
+    '#000080',
+    '#633974 ',
+    'green',
+    '#2980B9',
+    '#154360',
+    'red',
+];
 export const UNIT_OF_MEASURE = {
-    SQUARE_METER: 'm2',
+    SQUARE_METER: 'm²',
     VND: 'VND',
 };
 export const PROPERTY_TYPE_NUMBER = [
     {
         id: 0,
         wording: ['Tổng hợp', 'Total RealEstate'],
+        img: '/images/property/chung.jpg',
     },
     {
         id: 1,
         wording: ['Căn hộ, chung cư', 'apartment'],
+        img: '/images/property/chung_cu.jpg',
     },
     {
         id: 2,
         wording: ['Nhà, nhà riêng, nhà nguyên căn', 'individual house'],
+        img: '/images/property/nha_rieng.jpg',
     },
     {
         id: 3,
         wording: ['Biệt thự, nhà liền kề', 'villa'],
+        img: '/images/property/biet_thu.jpg',
     },
     {
         id: 4,
         wording: ['Nhà mặt tiền, nhà mặt phố, nhà phố', 'townhouse'],
+        img: '/images/property/nhamatien.jpg',
     },
     {
         id: 5,
         wording: ['Đất nền dự án', 'project land'],
+        img: '/images/property/dat_nen_du_an.jpg',
     },
     {
         id: 6,
         wording: ['Đất', 'land'],
+        img: '/images/property/dat.jpg',
     },
     {
         id: 7,
         wording: ['Trang trại, khu nghỉ dưỡng', 'farm, resort'],
+        img: '/images/property/khu_du_lich.jpg',
     },
     {
         id: 8,
         wording: ['Kho, nhà xưởng', 'warehouse, factory'],
+        img: '/images/property/kho_xuong.jpg',
     },
     {
         id: 9,
         wording: ['Nhà trọ, phòng trọ', 'room'],
+        img: '/images/property/nha_tro.jpg',
     },
     {
         id: 10,
         wording: ['Văn phòng, mặt bằng', 'office, ground'],
+        img: '/images/property/van_phong.jpg',
     },
     {
         id: 11,
         wording: ['Cửa hàng, bán lẻ, ki ốt', 'shop'],
+        img: '/images/property/cua_hang.jpg',
     },
     {
         id: 12,
         wording: ['Nhà hàng, khách sạn, nhà nghỉ', 'restaurant, hotel'],
+        img: '/images/property/khach_san.jpg',
     },
 ];
 export const MODEL_URL = {
@@ -129,3 +157,32 @@ export const MAP_MODE = {
 };
 
 export const MAP_KEY_HCM = 'full';
+
+export const TRANSATION_SELECT = [
+    {
+        id: 0,
+        type: 'Tổng hợp',
+    },
+    {
+        id: 1,
+        type: 'Bán',
+    },
+    {
+        id: 2,
+        type: 'Thuê',
+    },
+];
+export const TIME_SELECT = [
+    {
+        value: 6,
+        time: '6 tháng',
+    },
+    {
+        value: 12,
+        time: '1 năm',
+    },
+    {
+        value: 24,
+        time: '2 năm',
+    },
+];

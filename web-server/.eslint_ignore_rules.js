@@ -1,10 +1,4 @@
 module.exports = [
-    // {
-    //     rules: {
-    //         '@typescript-eslint/explicit-module-boundary-types': 'off',
-    //     }, //Turn off typescript for Javascript React
-    //     files: ['./web-server/**/*'],
-    // },
     {
         rules: { 'default-param-last': 'off' },
         files: ['web-server/store/map-key/reducers.js'],
@@ -19,7 +13,10 @@ module.exports = [
     },
     {
         rules: { 'node/no-unpublished-import': 'off' },
-        files: ['web-server/store/store.js'],
+        files: [
+            'web-server/store/store.js',
+            'web-server/util/services/helper.js',
+        ],
     },
     {
         rules: { 'consistent-return': 'off' },

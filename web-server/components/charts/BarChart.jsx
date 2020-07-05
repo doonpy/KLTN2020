@@ -1,70 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
+import PropTypes from 'prop-types';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsDrilldown from 'highcharts/modules/drilldown';
-import { BINDING_OPTIONS } from '../../util/bindingOptions';
-// import { DARK_UNICA } from '../../themes/dark-unica';
+import {
+    CUSTOM_CHART,
+    BUTTON_VIEW_FULLSCREEN,
+} from '../../custom/custom-charts';
+import { DARK_UNICA_COLOR } from '../../themes/color';
 
 if (typeof Highcharts === 'object') {
     new HighchartsExporting(Highcharts);
     new HighchartsDrilldown(Highcharts);
 }
 
-const BarChart = ({ data }) => {
+const BarChart = ({ data, title }) => {
+    const TEXT_COLOR = {
+        fontWeight: 600,
+    };
     const [barChartOption, setBarChartOption] = useState({
-        ...BINDING_OPTIONS,
-
+        ...CUSTOM_CHART,
+        ...BUTTON_VIEW_FULLSCREEN,
         chart: {
-            type: 'bar',
+            type: 'column',
             backgroundColor: 'rgba(0,0,0,0)',
-            height: '75%',
         },
+        colors: DARK_UNICA_COLOR,
         title: {
-            text: 'Biểu đồ thể hiện số lượng bất động sản theo từng khu vực',
+            text: title,
             style: {
-                fontSize: '10px',
-                color: '#ffffff',
+                fontSize: '13px',
+                ...TEXT_COLOR,
             },
         },
         xAxis: {
             type: 'category',
             labels: {
                 style: {
-                    fontSize: '6px',
-                    color: '#ffffff',
+                    fontSize: '9px',
                 },
             },
         },
+
         yAxis: {
             min: 0,
             title: {
                 text: 'Số lượng (bất động sản)',
                 style: {
-                    fontSize: '9px',
-                    color: '#ffffff',
+                    ...TEXT_COLOR,
                 },
             },
             labels: {
-                style: {
-                    // fontSize: '6px',
-                    color: '#ffffff',
-                },
+                style: TEXT_COLOR,
             },
         },
 
         legend: {
             enabled: false,
         },
-        responsive: {
-            rules: [
-                {
-                    condition: {
-                        maxWidth: 500,
-                    },
-                },
-            ],
-        },
+
         tooltip: {
             pointFormat: '<b>{point.y} bds</b>',
         },
@@ -74,6 +69,7 @@ const BarChart = ({ data }) => {
             },
         ],
     });
+
     useEffect(() => {
         setBarChartOption({
             ...barChartOption,
@@ -85,6 +81,7 @@ const BarChart = ({ data }) => {
             ],
         });
     }, [data]);
+
     return (
         <div>
             <HighchartsReact
@@ -92,7 +89,7 @@ const BarChart = ({ data }) => {
                 options={barChartOption}
                 containerProps={{
                     style: {
-                        maxHeight: '100%',
+                        height: 'calc((100vh - 172px)/2)',
                     },
                 }}
             />
@@ -100,4 +97,8 @@ const BarChart = ({ data }) => {
     );
 };
 
+BarChart.propTypes = {
+    data: PropTypes.arrayOf(PropTypes.array),
+    title: PropTypes.string,
+};
 export default React.memo(BarChart);
