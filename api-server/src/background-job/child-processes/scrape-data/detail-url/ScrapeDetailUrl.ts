@@ -1,3 +1,4 @@
+import puppeteer from 'puppeteer';
 import { CatalogDocumentModel } from '@service/catalog/interface';
 import { replaceMetaDataString } from '@util/helper/string';
 import { sanitizeUrl } from '@util/helper/url';
@@ -20,12 +21,14 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic;
     private pageNumberQueue: string[];
     private scrapedPageNumber: string[];
+    private isEarlyDone: boolean;
 
     constructor(catalog: CatalogDocumentModel) {
         super(catalog);
         this.detailUrlLogic = DetailUrlLogic.getInstance();
         this.pageNumberQueue = [];
         this.scrapedPageNumber = [];
+        this.isEarlyDone = false;
     }
 
     /**
@@ -35,6 +38,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
         try {
             this.startTime = process.hrtime();
             this.isRunning = true;
+            this.browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                defaultViewport: null,
+            });
 
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
@@ -101,26 +109,12 @@ export default class ScrapeDetailUrl extends ScrapeBase {
     }
 
     protected async handleSuccess($: CheerioStatic): Promise<void> {
-        let newPageNumberUrls = ScrapeBase.extractData(
-            $,
-            this.catalog.locator.pageNumber,
-            ATTRIBUTE_TO_GET_DATA
-        );
-        newPageNumberUrls = newPageNumberUrls.map((url) => sanitizeUrl(url));
-        for (const newPageNumberUrl of newPageNumberUrls) {
-            if (
-                this.pageNumberQueue.indexOf(newPageNumberUrl) < 0 &&
-                this.scrapedPageNumber.indexOf(newPageNumberUrl) < 0
-            ) {
-                this.pageNumberQueue.push(newPageNumberUrl);
-            }
-        }
-
         let newDetailUrlList = ScrapeBase.extractData(
             $,
             this.catalog.locator.detailUrl,
             ATTRIBUTE_TO_GET_DATA
         );
+        let existCounter = 0;
         newDetailUrlList = newDetailUrlList.map((url) => sanitizeUrl(url));
         for (const newDetailUrl of newDetailUrlList) {
             const isExists: boolean = await this.detailUrlLogic.isExists({
@@ -129,10 +123,11 @@ export default class ScrapeDetailUrl extends ScrapeBase {
 
             if (!isExists) {
                 try {
-                    const createdDoc = await this.detailUrlLogic.create(({
+                    existCounter++;
+                    const createdDoc = await this.detailUrlLogic.create({
                         catalogId: this.catalog._id,
                         url: newDetailUrl,
-                    } as unknown) as DetailUrlDocumentModel);
+                    });
                     new ConsoleLog(
                         ConsoleConstant.Type.INFO,
                         `Scrape detail URL -> DID: ${
@@ -147,12 +142,32 @@ export default class ScrapeDetailUrl extends ScrapeBase {
                 }
             }
         }
+        this.isEarlyDone = existCounter === 0;
+        if (this.isEarlyDone) {
+            return;
+        }
+
+        let newPageNumberUrls = ScrapeBase.extractData(
+            $,
+            this.catalog.locator.pageNumber,
+            ATTRIBUTE_TO_GET_DATA
+        );
+        newPageNumberUrls = newPageNumberUrls.map((url) => sanitizeUrl(url));
+        for (const newPageNumberUrl of newPageNumberUrls) {
+            if (
+                this.pageNumberQueue.indexOf(newPageNumberUrl) < 0 &&
+                this.scrapedPageNumber.indexOf(newPageNumberUrl) < 0
+            ) {
+                this.pageNumberQueue.push(newPageNumberUrl);
+            }
+        }
     }
 
     /**
      * Finish scrape action.
      */
     protected async finishAction(): Promise<void> {
+        await this.browser.close();
         await this.telegramChatBotInstance.sendMessage(
             replaceMetaDataString(
                 ScrapeDetailUrlConstantChatBotMessage.FINISH,

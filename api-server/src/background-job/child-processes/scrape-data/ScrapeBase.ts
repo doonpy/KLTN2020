@@ -1,26 +1,19 @@
 import cherrio from 'cheerio';
+import { Browser, Page } from 'puppeteer';
 import ChatBotTelegram from '@util/chatbot/ChatBotTelegram';
-import { sendRequest } from '@util/request';
-import ResponseStatusCode from '@common/response-status-code';
 import { CatalogDocumentModel } from '@service/catalog/interface';
-import { AxiosRequestConfig } from 'axios';
 import ConsoleLog from '@util/console/ConsoleLog';
 import ConsoleConstant from '@util/console/constant';
 
-const DEFAULT_REQUEST_OPTIONS: AxiosRequestConfig = {
-    headers: {
-        'User-Agent':
-            'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-        Accept: 'text/plain,text/html,*/*',
-    },
-    timeout: Number(process.env.BGR_REQUEST_TIMEOUT || '10000'),
-};
+const DEFAULT_USER_AGENT =
+    'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)';
 
 export default abstract class ScrapeBase {
     protected startTime: [number, number] | undefined;
     protected readonly catalog: CatalogDocumentModel;
     protected isRunning = false;
     protected telegramChatBotInstance = ChatBotTelegram.getInstance();
+    protected browser!: Browser;
 
     protected constructor(catalog: CatalogDocumentModel) {
         this.catalog = catalog;
@@ -34,32 +27,21 @@ export default abstract class ScrapeBase {
             const DOMAIN_PATTERN = RegExp(
                 /^(https?:\/\/)(?:www\.)?([\d\w-]+)(\.([\d\w-]+))+/
             );
-            const originDomain = domain.replace(/\/{2,}$/, '');
-            const url = DOMAIN_PATTERN.test(path)
+            const url = (DOMAIN_PATTERN.test(path)
                 ? path
-                : originDomain + (/^\//.test(path) ? path : `/${path}`);
+                : domain + (/^\//g.test(path) ? path : `/${path}`)
+            ).replace(/\/{3,}/g, '/');
 
-            const { data, status, request } = await sendRequest<string>({
-                ...DEFAULT_REQUEST_OPTIONS,
-                url,
-            });
-
-            if (
-                status !== ResponseStatusCode.OK ||
-                !url.includes(request.path)
-            ) {
-                new ConsoleLog(
-                    ConsoleConstant.Type.ERROR,
-                    `Scrape -> ${domain}${request.path} - ${status}`
-                ).show();
-                return null;
-            }
-
+            const page: Page = await this.browser.newPage();
+            await page.setUserAgent(DEFAULT_USER_AGENT);
+            await page.goto(url, { waitUntil: 'load', timeout: 60000 });
+            const content = await page.content();
+            await page.close();
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
-                `Scrape -> ${domain}${request.path} - ${status}`
+                `Scrape -> ${page.url()}`
             ).show();
-            return cherrio.load(data);
+            return cherrio.load(content);
         } catch (error) {
             new ConsoleLog(
                 ConsoleConstant.Type.ERROR,

@@ -13,10 +13,6 @@ process.on(
             const catalogLogic = CatalogLogic.getInstance();
             await catalogLogic.checkExisted({ _id: catalogId });
             const catalog = await catalogLogic.getById(catalogId);
-            await PatternLogic.getInstance().checkExisted({
-                _id: catalog!.patternId,
-            });
-
             await new ScrapeDetailUrl(catalog!).start();
         } catch (error) {
             new ConsoleLog(

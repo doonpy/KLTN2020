@@ -23,6 +23,8 @@ import {
     ScrapeRawDataConstant,
     ScrapeRawDataConstantChatBotMessage,
 } from './constant';
+import puppeteer from 'puppeteer';
+import PatternLogic from '@service/pattern/PatternLogic';
 
 const NOT_EXTRACTED = false;
 const EXTRACTED = true;
@@ -35,13 +37,12 @@ export default class ScrapeRawData extends ScrapeBase {
     private readonly detailUrlLogic: DetailUrlLogic;
     private readonly rawDataLogic: RawDataLogic;
     private detailUrls: DetailUrlDocumentModel[];
-    private pattern: PatternDocumentModel;
+    private pattern!: PatternDocumentModel;
 
     constructor(catalog: CatalogDocumentModel) {
         super(catalog);
         this.detailUrlLogic = DetailUrlLogic.getInstance();
         this.rawDataLogic = RawDataLogic.getInstance();
-        this.pattern = catalog.patternId as PatternDocumentModel;
         this.detailUrls = [];
     }
 
@@ -52,6 +53,16 @@ export default class ScrapeRawData extends ScrapeBase {
         try {
             this.startTime = process.hrtime();
             this.isRunning = true;
+            await PatternLogic.getInstance().checkExisted({
+                _id: (this.catalog.patternId as PatternDocumentModel)._id,
+            });
+            this.pattern = this.catalog.patternId as PatternDocumentModel;
+
+            this.browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                defaultViewport: null,
+            });
 
             new ConsoleLog(
                 ConsoleConstant.Type.INFO,
@@ -165,7 +176,7 @@ export default class ScrapeRawData extends ScrapeBase {
         const addressData = removeBreakLineAndTrim(
             ScrapeBase.extractData($, address)
                 .map((item) => removeSpecialCharacterAtHeadAndTail(item))
-                .join('. ')
+                .join(', ')
         );
         const othersData = this.pattern.subLocator
             .map((subLocatorItem) =>
@@ -340,6 +351,7 @@ export default class ScrapeRawData extends ScrapeBase {
      * Finish action
      */
     public async finishAction(): Promise<void> {
+        await this.browser.close();
         await this.telegramChatBotInstance.sendMessage(
             replaceMetaDataString(ScrapeRawDataConstantChatBotMessage.FINISH, [
                 this.catalog.title,

@@ -3,13 +3,13 @@ import {
     PatternSubLocator,
 } from '@service/pattern/interface';
 import fs from 'fs';
-import { AxiosRequestConfig } from 'axios';
-import { sendRequest } from '@util/request';
 import {
     addHighlight,
     ToolboxLocator,
 } from '@util/cheerio-helper/cheerio-helper';
 import { getCryptoFilename } from '@util/file/file';
+import puppeteer from 'puppeteer';
+import { getContent } from '@util/request';
 
 export const createPatternViewFile = async (
     sourceUrl: string,
@@ -18,17 +18,6 @@ export const createPatternViewFile = async (
 ): Promise<void> => {
     const filename = getCryptoFilename(sourceUrl);
     const reviewFolder = process.env.REVIEW_FOLDER!;
-    const DEFAULT_REQUEST_OPTIONS: AxiosRequestConfig = {
-        headers: {
-            'User-Agent':
-                'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-            Accept: 'text/plain,text/html,*/*',
-        },
-    };
-    const { data } = await sendRequest<string>({
-        ...DEFAULT_REQUEST_OPTIONS,
-        url: sourceUrl,
-    });
     const toolboxLocators: ToolboxLocator[] = [];
     toolboxLocators.push({
         cssSelector: mainLocator.postDate.locator,
@@ -59,8 +48,9 @@ export const createPatternViewFile = async (
             label: `Giá trị thông tin phụ thứ ${index + 1}`,
         });
     });
+    const content = await getContent(sourceUrl);
     fs.writeFileSync(
         `${reviewFolder}/${filename}`,
-        addHighlight(data, toolboxLocators)
+        addHighlight(content, toolboxLocators)
     );
 };

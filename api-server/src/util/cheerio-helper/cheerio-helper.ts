@@ -10,9 +10,8 @@ export const addHighlight = (
     toolboxLocators: ToolboxLocator[]
 ): string | null => {
     const $ = cheerio.load(html);
-    $('head')
-        .append(
-            `<style>
+    $('head').append(
+        `<style>
                 .pk-border {
                   border: 2px solid red !important;
                 }
@@ -63,10 +62,8 @@ export const addHighlight = (
                   opacity: 1;
                 }
             </style>`
-        )
-        .find('script')
-        .remove();
-    $('body').find('script').remove();
+    );
+
     $('a').each((index, element) => {
         $(element).attr('href', '#');
     });
