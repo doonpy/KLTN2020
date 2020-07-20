@@ -46,7 +46,7 @@
         "isomorphic-unfetch": "^3.0.0",
         "leaflet": "^1.6.0",
         "leaflet-geosearch": "^3.0.6",
-        "lodash": "^4.17.15",
+        "lodash": "^4.17.19",
         "lodash.debounce": "^4.0.8",
         "lodash.groupby": "^4.6.0",
         "lodash.sortby": "^4.7.0",
