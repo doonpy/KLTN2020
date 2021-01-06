@@ -30,7 +30,7 @@
     "dependencies": {
         "@atlaskit/spinner": "^15.0.0",
         "@hapi/joi": "^17.1.1",
-        "axios": "^0.19.2",
+        "axios": "^0.21.1",
         "body-parser": "^1.19.0",
         "chalk": "^3.0.0",
         "cheerio": "^1.0.0-rc.3",
